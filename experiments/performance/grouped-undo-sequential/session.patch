@@ -1,0 +1,245 @@
+--- a/src/shared/document-session.ts
++++ b/src/shared/document-session.ts
+@@ -514,6 +514,7 @@
+ 			) => propose(actor => projection.stage(label, build, actor)),
+ 			undo: (textTarget?: string) => undo(false, textTarget),
+ 			redo: (textTarget?: string) => undo(true, textTarget),
++			undoGroup,
+ 			compensate: (original: CommittedAction) =>
+ 				propose(actor => projection.compensate(original, actor)),
+ 			commit: (action: DocumentAction) =>
+@@ -724,43 +725,114 @@
+ 				),
+ 			)
+ 		}
++		function undoGroup(ids: readonly string[], redo = false, textTarget?: string) {
++			let expected = Object.freeze([...ids])
++			let generation = projection.editGeneration()
++			let completed = Ref.makeUnsafe<readonly DocumentAction[]>([])
++			let steps = expected.map((_, index) => prepareProposal(actor =>
++				projection.undo(redo, actor, textTarget, expected.slice(index)).pipe(
++					Effect.tap(() => generation === projection.editGeneration()
++						? Effect.void
++						: Effect.fail(new UndoUnavailable({
++							reason: "Stale",
++							message: "New typing interrupted the Undo group",
++						}))),
++				), false, projection.undoPrefix(redo, textTarget, expected.slice(index)).pipe(
++				Effect.tap(() => generation === projection.editGeneration()
++					? Effect.void
++					: Effect.fail(new UndoUnavailable({
++						reason: "Stale", message: "New typing interrupted the Undo group",
++					}))),
++			)))
++			let command = gate.withPermit(Effect.gen(function* () {
++				if (!expected.length || expected.length > 128 || new Set(expected).size !== expected.length)
++					return yield* Effect.fail(new UndoUnavailable({
++						reason: "Stale", message: "Invalid Undo group",
++					}))
++				for (let index = Ref.getUnsafe(completed).length; index < steps.length; index++) {
++					if (generation !== projection.editGeneration())
++						return yield* Effect.fail(new UndoUnavailable({
++							reason: "Stale",
++							message: "New typing interrupted the Undo group",
++						}))
++					let step = steps[index]
++					if (!step) return yield* conflict("Undo group lost its prepared command")
++					yield* Effect.uninterruptibleMask(restore => restore(step.run).pipe(
++						Effect.tap(action => Ref.update(completed, actions => [...actions, action])),
++					))
++				}
++				return Ref.getUnsafe(completed)
++			}))
++			let run = Effect.acquireUseRelease(
++				Ref.update(inFlight, count => count + 1).pipe(Effect.andThen(Effect.sync(drafts.update))),
++				() => command,
++				() => Ref.update(inFlight, count => count - 1).pipe(Effect.andThen(Effect.sync(drafts.update))),
++			)
++			let reconcile = gate.withPermit(Effect.gen(function* () {
++				yield* requireOpen
++				yield* recovery.attempt("projection", projection.replay)
++				for (let index = Ref.getUnsafe(completed).length; index < steps.length; index++) {
++					let step = steps[index]
++					if (!step) break
++					let action = yield* step.reconcile
++					if (!action) break
++					yield* Ref.update(completed, actions => [...actions, action])
++				}
++				return Ref.getUnsafe(completed)
++			}))
++			return { run, reconcile, completed: () => Ref.getUnsafe(completed) }
++		}
++
+ 		function propose(
+-			prepare: (
+-				actor: string,
+-			) => Effect.Effect<DocumentAction, DocumentFailure>,
++			prepare: (actor: string) => Effect.Effect<DocumentAction, DocumentFailure>,
++		) {
++			return prepareProposal(prepare).run
++		}
++		function prepareProposal(
++			prepare: (actor: string) => Effect.Effect<DocumentAction, DocumentFailure>,
++			serialized = true,
++			admit: Effect.Effect<void, DocumentFailure> = Effect.void,
+ 		) {
+ 			let prepared = Ref.makeUnsafe<DocumentAction | undefined>(undefined)
+-			return Effect.acquireUseRelease(
++			let command = Effect.gen(function* () {
++				yield* requireOpen
++				yield* flushUnlocked
++				yield* recovery.attempt("projection", projection.replay)
++				let action = yield* Ref.get(prepared)
++				if (!action) {
++					let actor = yield* documentActor(cryptography, options)
++					action = freezeAction(yield* prepare(actor))
++					yield* Ref.set(prepared, action)
++				}
++				if (projection.proposed(action.id)) {
++					yield* projection.validate({ kind: "proposed", action })
++					let rejected = projection.rejection(action.id)
++					if (rejected) return yield* Effect.fail(rejected.failure)
++					return action
++				}
++				yield* admit
++				yield* persistUnlocked({ kind: "proposed", action })
++				return action
++			})
++			let run = Effect.acquireUseRelease(
+ 				Ref.update(inFlight, count => count + 1).pipe(
+ 					Effect.andThen(Effect.sync(drafts.update)),
+ 				),
+-				() =>
+-					gate.withPermit(
+-						Effect.gen(function* () {
+-							yield* requireOpen
+-							yield* flushUnlocked
+-							yield* recovery.attempt("projection", projection.replay)
+-							let action = yield* Ref.get(prepared)
+-							if (!action) {
+-								let actor = yield* documentActor(cryptography, options)
+-								action = freezeAction(yield* prepare(actor))
+-								yield* Ref.set(prepared, action)
+-							}
+-							if (projection.proposed(action.id)) {
+-								yield* projection.validate({ kind: "proposed", action })
+-								let rejected = projection.rejection(action.id)
+-								if (rejected) return yield* Effect.fail(rejected.failure)
+-								return action
+-							}
+-							yield* persistUnlocked({ kind: "proposed", action })
+-							return action
+-						}),
+-					),
++				() => serialized ? gate.withPermit(command) : command,
+ 				() =>
+ 					Ref.update(inFlight, count => count - 1).pipe(
+ 						Effect.andThen(Effect.sync(drafts.update)),
+ 					),
+ 			)
++			let reconcile = Effect.gen(function* () {
++				let action = Ref.getUnsafe(prepared)
++				if (!action || !projection.proposed(action.id)) return undefined
++				yield* projection.validate({ kind: "proposed", action })
++				let rejected = projection.rejection(action.id)
++				if (rejected) return yield* Effect.fail(rejected.failure)
++				return action
++			})
++			return { run, reconcile }
+ 		}
+ 
+ 		function publishDraftStatus() {
+@@ -1280,38 +1352,23 @@
+ 				build: (staged: Replica) => (Operation | null)[],
+ 				actor: string,
+ 			) => buildAction(durable, options.document, label, build, actor),
+-			undo: (redo: boolean, actor: string, textTarget?: string) =>
++			undoPrefix: (redo: boolean, textTarget: string | undefined, expectedIds: readonly string[]) =>
++				undoCandidates(redo, textTarget).pipe(Effect.flatMap(candidates =>
++					expectedIds.some((id, index) => candidates[index]?.root.id !== id)
++						? Effect.fail(new UndoUnavailable({
++							reason: "Stale", message: "Undo history changed before the group write",
++						}))
++						: Effect.void)),
++			undo: (redo: boolean, actor: string, textTarget?: string, expectedIds?: readonly string[]) =>
+ 				Effect.gen(function* () {
+-					yield* indexUndoHistory()
+-					let excluded = new Set<string>()
+-					for (let item of rejected.values()) {
+-						if (
+-							item.failure._tag !== "UndoUnavailable" ||
+-							item.failure.reason !== "BelowFloor"
+-						)
+-							continue
+-						let entry = undoEntries.get(item.action.undoOf ?? "")
+-						let visited = new Set<string>()
+-						while (entry?.undoOf && !visited.has(entry.id)) {
+-							visited.add(entry.id)
+-							entry = undoEntries.get(entry.undoOf)
+-						}
+-						if (entry) excluded.add(entry.id)
+-					}
+-					let candidates = yield* documentUndoCandidates(
+-						[...undoEntries.values()].map(entry => ({
+-							...entry,
+-							eligible: !excluded.has(entry.id),
+-							active:
+-								!rejected.has(entry.id) &&
+-								(undoReceipts.has(entry.id) || pending.has(entry.id)),
+-						})),
+-						options.subject,
+-						redo,
+-						textTarget,
+-					)
++					let candidates = yield* undoCandidates(redo, textTarget)
++					if (expectedIds !== undefined && expectedIds.some((id, index) => candidates[index]?.root.id !== id))
++						return yield* Effect.fail(new UndoUnavailable({
++							reason: "Stale",
++							message: "Undo history changed since this typing group was captured",
++						}))
+ 					let unavailable: UndoUnavailable | undefined
+-					for (let candidate of candidates) {
++					for (let candidate of expectedIds === undefined ? candidates : candidates.slice(0, 1)) {
+ 						let original = yield* undoBasis(candidate.tip.id)
+ 						let result = yield* undoAction(durable, original, actor).pipe(
+ 							Effect.result,
+@@ -1508,6 +1565,39 @@
+ 				}),
+ 		}
+ 
++		function undoCandidates(redo: boolean, textTarget?: string) {
++			return Effect.gen(function* () {
++					yield* indexUndoHistory()
++					let excluded = new Set<string>()
++					for (let item of rejected.values()) {
++						if (
++							item.failure._tag !== "UndoUnavailable" ||
++							item.failure.reason !== "BelowFloor"
++						)
++							continue
++						let entry = undoEntries.get(item.action.undoOf ?? "")
++						let visited = new Set<string>()
++						while (entry?.undoOf && !visited.has(entry.id)) {
++							visited.add(entry.id)
++							entry = undoEntries.get(entry.undoOf)
++						}
++						if (entry) excluded.add(entry.id)
++					}
++					return yield* documentUndoCandidates(
++						[...undoEntries.values()].map(entry => ({
++							...entry,
++							eligible: !excluded.has(entry.id),
++							active:
++								!rejected.has(entry.id) &&
++								(undoReceipts.has(entry.id) || pending.has(entry.id)),
++						})),
++						options.subject,
++						redo,
++						textTarget,
++					)
++			})
++		}
++
+ 		function indexUndoHistory() {
+ 			return Effect.gen(function* () {
+ 				while (undoPosition < localPosition) {

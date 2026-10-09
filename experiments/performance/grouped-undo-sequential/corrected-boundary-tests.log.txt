@@ -1,0 +1,14 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/typing-group-session.test.ts:
+(pass) one typing-group command preserves eight accepted action identities and concurrent peer contributions [195.05ms]
+
+tests/typing-group-boundaries.test.ts:
+(pass) grouped Undo preserves durable identity across interrupt [61.70ms]
+(pass) grouped Undo preserves durable identity across failure [50.38ms]
+(pass) grouped Undo preserves durable identity across revoke [58.80ms]
+
+ 4 pass
+ 0 fail
+ 50 expect() calls
+Ran 4 tests across 2 files. [418.00ms]

@@ -1,0 +1,25 @@
+{
+  "strict": "PASS",
+  "newPublicIntegration": {
+    "tests": 4,
+    "assertions": 50,
+    "result": "PASS"
+  },
+  "existingReplacement": {
+    "tests": 14,
+    "assertions": 180,
+    "result": "PASS"
+  },
+  "failedSetup": "absolute .reference archive symlink; excluded",
+  "initialTypes": "obsolete fifth membership argument",
+  "initialBoundary": "fixture creator identity wrong before writer grant; fixed",
+  "limitations": [
+    "no app wiring/native grouping",
+    "sequential writes may expose partial erasure",
+    "reader may prepare local offline proposals; actual server withholds commits until regrant",
+    "no full IME/deletion/smart-pair/multicursor parity",
+    "initial pre-creation failed test temporary DBs not retained; logs retained",
+    "memory-only command intent; no tab-loss group guarantee"
+  ],
+  "processesClosed": true
+}

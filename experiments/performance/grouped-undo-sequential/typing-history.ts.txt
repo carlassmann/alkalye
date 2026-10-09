@@ -1,0 +1,57 @@
+import type { Operation } from "../shared/model"
+
+export interface TypingIntent {
+	inputType: string
+	collapsed: boolean
+	time: number
+}
+
+export function makeTypingHistory() {
+	let groups: string[][] = []
+	let previous: { target: string; atom: string; time: number } | undefined
+	function boundary() {
+		previous = undefined
+	}
+	return {
+		boundary,
+		record(operation: Operation | null, intent?: TypingIntent) {
+			let last = operation?.insert.at(-1)
+			if (!operation || operation.kind !== "text" || operation.remove.length ||
+				!last || intent?.inputType !== "insertText" || !intent.collapsed) {
+				boundary()
+				return
+			}
+			let group = groups.at(-1)
+			let adjacent = previous && previous.target === operation.target &&
+				operation.insert[0]?.after === previous.atom &&
+				intent.time >= previous.time && intent.time - previous.time < 500
+			if (!adjacent || !group || group.length >= 128) {
+				group = []
+				groups.push(group)
+				if (groups.length > 100) groups.shift()
+			}
+			group.push(operation.id)
+			previous = { target: operation.target, atom: last.id, time: intent.time }
+		},
+		capture() {
+			boundary()
+			let group = groups.at(-1)
+			return group ? {
+				group,
+				ids: Object.freeze([...group].reverse()),
+			} : undefined
+		},
+		completePrefix(captured: { group: readonly string[]; ids: readonly string[] }, count: number) {
+			let { ids } = captured
+			let index = groups.findIndex(group => group === captured.group)
+			let group = groups[index]
+			if (!Number.isSafeInteger(count) || count < 0 || count > ids.length ||
+				!group || group.length !== ids.length ||
+				ids.some((id, index) => group[group.length - 1 - index] !== id)) return false
+			group.splice(group.length - count, count)
+			if (!group.length) groups.splice(index, 1)
+			boundary()
+			return true
+		},
+	}
+}

@@ -1,0 +1,56 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/typing-group-session.test.ts:
+(pass) one typing-group command preserves eight accepted action identities and concurrent peer contributions [163.98ms]
+
+tests/typing-group-boundaries.test.ts:
+2757 | 		new ResourceUnavailable({ message: "Resource unavailable" }),
+2758 | 	)
+2759 | }
+2760 | 
+2761 | function forbidden() {
+2762 | 	return Effect.fail(new PermissionDenied({ message: "Permission denied" }))
+                               ^
+error: Permission denied
+ _tag: "PermissionDenied",
+
+      at forbidden (/private/tmp/alkalye-typing-undo-group/runtime/src/server/document-store.ts:2762:25)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at /Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17
+(fail) grouped Undo preserves durable identity across interrupt [9.72ms]
+2757 | 		new ResourceUnavailable({ message: "Resource unavailable" }),
+2758 | 	)
+2759 | }
+2760 | 
+2761 | function forbidden() {
+2762 | 	return Effect.fail(new PermissionDenied({ message: "Permission denied" }))
+                               ^
+error: Permission denied
+ _tag: "PermissionDenied",
+
+      at forbidden (/private/tmp/alkalye-typing-undo-group/runtime/src/server/document-store.ts:2762:25)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at /Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17
+(fail) grouped Undo preserves durable identity across failure [8.29ms]
+2757 | 		new ResourceUnavailable({ message: "Resource unavailable" }),
+2758 | 	)
+2759 | }
+2760 | 
+2761 | function forbidden() {
+2762 | 	return Effect.fail(new PermissionDenied({ message: "Permission denied" }))
+                               ^
+error: Permission denied
+ _tag: "PermissionDenied",
+
+      at forbidden (/private/tmp/alkalye-typing-undo-group/runtime/src/server/document-store.ts:2762:25)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at /Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17
+(fail) grouped Undo preserves durable identity across revoke [9.39ms]
+
+ 1 pass
+ 3 fail
+ 24 expect() calls
+Ran 4 tests across 2 files. [256.00ms]

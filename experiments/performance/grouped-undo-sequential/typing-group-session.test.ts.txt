@@ -1,0 +1,163 @@
+import { expect, test } from "bun:test"
+import { mkdtemp, rm } from "node:fs/promises"
+import { join } from "node:path"
+import { tmpdir } from "node:os"
+import * as Effect from "effect/Effect"
+import * as Context from "effect/Context"
+import * as Layer from "effect/Layer"
+import { cliDocumentSessionLayer } from "../src/cli/document-platform"
+import { DocumentSession } from "../src/shared/document-session"
+import type { DocumentTransport } from "../src/shared/document-session"
+import { WorkspaceStore } from "../src/server/document-store"
+import { Identity, personalWorkspaceRequest } from "../src/shared/workspace"
+import { Replica } from "../src/shared/crdt"
+import {
+	buildAction,
+	ResourceUnavailable,
+	restoreSnapshot,
+} from "../src/shared/document-actions"
+import { newDocument } from "../src/shared/documents"
+
+test("one typing-group command preserves eight accepted action identities and concurrent peer contributions", async () => {
+	let directory = await mkdtemp(join(tmpdir(), "alkalye-typing-group-"))
+	let source = '---\ntitle: "Replacement"\n---\nBase 😀\n'
+	try {
+		await Effect.runPromise(Effect.scoped(Effect.gen(function* () {
+						let services = yield* Layer.build(
+							WorkspaceStore.layer(join(directory, "server.sqlite")),
+						)
+						let store = Context.get(services, WorkspaceStore)
+						let subject = "replacement-owner"
+						let creation = yield* buildAction(
+							new Replica("birth"),
+							"document",
+							"Seed",
+							staged => newDocument(staged, "document", "Replacement", source),
+						)
+						yield* store
+							.create("workspace", "Workspace", personalWorkspaceRequest)
+							.pipe(Effect.provideService(Identity, { subject, actors: [] }))
+						yield* store.createDocument("workspace", creation).pipe(
+							Effect.provideService(Identity, {
+								subject,
+								actors: [creation.actor],
+							}),
+						)
+						function owner<A, E>(effect: Effect.Effect<A, E, Identity>) {
+							return effect.pipe(
+								Effect.provideService(Identity, { subject, actors: [] }),
+							)
+						}
+						let transport: DocumentTransport = {
+							snapshot: document =>
+								owner(store.snapshot(document)).pipe(
+									Effect.flatMap(value =>
+										value
+											? Effect.succeed(value)
+											: Effect.fail(
+													new ResourceUnavailable({
+														message: "Missing snapshot",
+													}),
+												),
+									),
+								),
+							commit: action =>
+								store.commit(action).pipe(
+									Effect.provideService(Identity, {
+										subject,
+										actors: [action.actor],
+									}),
+								),
+							history: (document, after, log, limit) =>
+								owner(store.history(document, after, log, limit)),
+							action: (document, id) =>
+								owner(store.action(document, id)).pipe(
+									Effect.flatMap(value =>
+										value
+											? Effect.succeed(value)
+											: Effect.fail(
+													new ResourceUnavailable({
+														message: "Missing action",
+													}),
+												),
+									),
+								),
+							chain: (document, id) =>
+								owner(store.chain(document, id)).pipe(
+									Effect.flatMap(value =>
+										value
+											? Effect.succeed(value)
+											: Effect.fail(
+													new ResourceUnavailable({ message: "Missing chain" }),
+												),
+									),
+								),
+						}
+						let sessionServices = yield* Layer.build(
+							cliDocumentSessionLayer(join(directory, "client"), {
+								document: "document",
+								subject,
+								author: "Writer",
+								transport,
+								cooperativeWork: true,
+							}),
+						)
+						let session = Context.get(sessionServices, DocumentSession)
+
+						expect(session.replica.text("document")).toBe(source)
+						yield* owner(store.membership("workspace", "peer-owner", "writer", "peer-membership"))
+						let ids: string[] = []
+						let markers: string[] = []
+						for (let character of "GROUP123") {
+							let current = session.replica.text("document")
+							let edit = session.replace([{ start: current.indexOf("Base"), remove: 0, text: character }])
+							expect(edit.operation).not.toBeNull()
+							if (!edit.operation) throw new Error("Missing admitted operation")
+							ids.push(edit.operation.id)
+							yield* edit.saved
+							yield* session.sync
+							let remote = yield* restoreSnapshot(yield* transport.snapshot("document"), "peer-owner-client")
+							let marker = "Peer" + ids.length + " 🦊\n"
+							markers.push(marker)
+							let proposal = yield* buildAction(remote, "document", "Peer append", staged =>
+								[staged.prepareEdit("document", remote.text("document") + marker)])
+							yield* store.commit(proposal).pipe(Effect.provideService(Identity, {
+								subject: "peer-owner", actors: [proposal.actor],
+							}))
+							yield* session.sync
+						}
+						let edited = session.replica.text("document")
+						let beforeRefusal = yield* transport.snapshot("document")
+						let refused = session.undoGroup(ids)
+						let refusal = yield* refused.run.pipe(Effect.result)
+						expect(refusal._tag).toBe("Failure")
+						if (refusal._tag === "Failure") expect(refusal.failure).toMatchObject({
+							_tag: "UndoUnavailable", reason: "Stale",
+						})
+						expect(refused.completed()).toHaveLength(0)
+						expect(session.replica.text("document")).toBe(edited)
+						expect((yield* transport.snapshot("document")).position).toBe(beforeRefusal.position)
+						let group = session.undoGroup([...ids].reverse())
+						let actions = yield* group.run
+						expect(actions.map(action => action.undoOf)).toEqual([...ids].reverse())
+						expect(new Set(actions.map(action => action.id)).size).toBe(8)
+						expect(group.completed()).toEqual(actions)
+						yield* session.sync
+						let undone = source + markers.join("")
+						expect(session.replica.text("document")).toBe(undone)
+						expect((yield* restoreSnapshot(yield* transport.snapshot("document"), "independent-undo")).text("document")).toBe(undone)
+						let redone = yield* session.undoGroup(ids, true).run
+						expect(redone.map(action => action.undoOf)).toEqual(actions.map(action => action.id).reverse())
+						yield* session.sync
+						expect(session.replica.text("document")).toBe(edited)
+						expect((yield* restoreSnapshot(yield* transport.snapshot("document"), "independent-redo")).text("document")).toBe(edited)
+						let again = yield* session.undoGroup([...ids].reverse()).run
+						expect(again.map(action => action.undoOf)).toEqual(redone.map(action => action.id).reverse())
+						yield* session.sync
+						expect((yield* restoreSnapshot(yield* transport.snapshot("document"), "independent-again")).text("document")).toBe(undone)
+
+		})))
+	} finally {
+		await rm(directory, { recursive: true, force: true })
+	}
+})

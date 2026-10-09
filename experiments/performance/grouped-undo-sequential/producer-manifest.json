@@ -1,0 +1,32 @@
+{
+  "exactTestedSource": {
+    "src/shared/document-session.ts": "a2146ffe03393b74b62612b6fd1e75a300da15cc2155a291ea53b05bd4985388",
+    "src/client/components/editor.ts": "3a0bfe5d321cfd87b2fb2fb663535d108290e2527e682be94de4d53d4a2b7381",
+    "src/client/typing-history.ts": "9dbb0cfe1cebb63725952439a734a6da7e2299a4f857731c3d26c01b4b780039",
+    "tests/typing-group-session.test.ts": "c4c4c2f835ac90fddf5d1bf3ee47bac1d9c583ab73318458fe5e796f278a945f",
+    "tests/typing-group-boundaries.test.ts": "e7937923b03914ac01386a3660688bea22d2731c28490114ecde2b845a27952e"
+  },
+  "baselineSessionSHA": "643001563d7f322103197af6e821541b9b0907c6a6d94a1b7dbf50143b40e9f4",
+  "files": {
+    "initial-public-tests.log.txt": "44b9fbfb06cf0030e4f0a5b8e23c5bd49c1dc5795b3c64720dd91af78a9dd70f",
+    "typing-group-boundaries.test.ts.txt": "e7937923b03914ac01386a3660688bea22d2731c28490114ecde2b845a27952e",
+    "session.patch": "6df6eed8e330e20359ca0738557916b2428d45ffb809cb3fc7c2ec2e0542be79",
+    "boundary-types.log.txt": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92",
+    "existing-replacement-tests.log.txt": "2bf9662dd62b6a0154f9a2a787b7be7571d40248e0ccc2ba7cea6fd7856ff122",
+    "runtime-provenance.json": "08e70c27afb3f81c913b7a7d23a3d4b270970211ec1d88da35b0ad90fcfcaa90",
+    "results.json": "fa12c55c086bc05aa1a8ee9b75675b8e28c252ef7d4e049cc7611d9f7f097fac",
+    "opus-review.json": "e6e2ab6c4b3084d5ae58a7190218faf802f9c65bf414e340210d66a3126d97e9",
+    "corrected-boundary-tests.log.txt": "982608d55bd24f3f812f526b07e48ae49524c8127e5c6afa653a89a3939fb9e6",
+    "typing-group-session.test.ts.txt": "c4c4c2f835ac90fddf5d1bf3ee47bac1d9c583ab73318458fe5e796f278a945f",
+    "editor-intent.patch": "713a26dbac47fc9ea40a317ca98645bd5f03bb00bcb6cf8c1363886cca7e7c62",
+    "README.md": "281b0651c093228e004849a319e53cbf7d50e474e8d4887bb9db63f740b28f6d",
+    "final-types.log.txt": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92",
+    "wrong-cwd-root-types.log.txt": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92",
+    "typing-history.ts.txt": "9dbb0cfe1cebb63725952439a734a6da7e2299a4f857731c3d26c01b4b780039",
+    "initial-candidate-types.log.txt": "2397c4ed48ec630e5eda4f308e371f4e3ab0c0acf4221bea7763b1e4d2221981",
+    "opus-final.json": "4cf506b157d3e8c12dfd7d333cd6099e87f06125a575e9bf400386257f9f6de9",
+    "initial-boundary-tests.log.txt": "65d1dbbc1993b8e79e1d4913f351a17c9716e3d8f3842006afadedfc065359fa",
+    "opus-followup.json": "dfcd22f9695e41a31770abb1158d2c5d1407d11a74a7deccded155c43f4bd8f3",
+    "corrected-types.log.txt": "8366207267355d3e3d5bf3bf6e8c94c5f93f6078c34f08973fa2b38cdda6cc92"
+  }
+}

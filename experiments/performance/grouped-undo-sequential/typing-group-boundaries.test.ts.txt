@@ -1,0 +1,276 @@
+import { expect, test } from "bun:test"
+import { mkdtemp, rm } from "node:fs/promises"
+import { join } from "node:path"
+import { tmpdir } from "node:os"
+import * as Effect from "effect/Effect"
+import * as Context from "effect/Context"
+import * as Layer from "effect/Layer"
+import { cliDocumentPlatform } from "../src/cli/document-platform"
+import { DocumentSession, documentDatabaseName } from "../src/shared/document-session"
+import type { DocumentTransport } from "../src/shared/document-session"
+import { WorkspaceStore } from "../src/server/document-store"
+import { Identity, personalWorkspaceRequest } from "../src/shared/workspace"
+import { Replica } from "../src/shared/crdt"
+import {
+	CommittedActionSchema, AccessConflict, DocumentActionSchema, DocumentSnapshotSchema, DocumentPublicationSchema, LocalDocumentCreationSchema, buildAction,
+	ResourceUnavailable,
+	restoreSnapshot,
+} from "../src/shared/document-actions"
+import { newDocument } from "../src/shared/documents"
+
+import * as Deferred from "effect/Deferred"
+import * as Fiber from "effect/Fiber"
+import * as Exit from "effect/Exit"
+import * as Cause from "effect/Cause"
+import * as EventJournal from "effect/eventlog/EventJournal"
+import * as Schema from "effect/Schema"
+import * as SchemaBinary from "effect/encoding/SchemaBinary"
+import { DocumentJournal } from "../src/platform/document-journal"
+import { UndoUnavailable } from "../src/shared/document-errors"
+test.each(["interrupt", "failure", "revoke"])("grouped Undo preserves durable identity across %s", async mode => {
+	let directory = await mkdtemp(join(tmpdir(), "alkalye-group-boundary-"))
+	let source = '---\ntitle: "Replacement"\n---\nBase 😀\n'
+	let passed = false
+	try {
+		await Effect.runPromise(Effect.scoped(Effect.gen(function* () {
+						let services = yield* Layer.build(
+							WorkspaceStore.layer(join(directory, "server.sqlite")),
+						)
+						let store = Context.get(services, WorkspaceStore)
+						let subject = "group-writer"
+						let creation = yield* buildAction(
+							new Replica("birth"),
+							"document",
+							"Seed",
+							staged => newDocument(staged, "document", "Replacement", source),
+						)
+						yield* store
+							.create("workspace", "Workspace", personalWorkspaceRequest)
+							.pipe(Effect.provideService(Identity, { subject: "creator", actors: [] }))
+						yield* store.createDocument("workspace", creation).pipe(
+							Effect.provideService(Identity, {
+								subject: "creator",
+								actors: [creation.actor],
+							}),
+						)
+						function owner<A, E>(effect: Effect.Effect<A, E, Identity>) {
+							return effect.pipe(
+								Effect.provideService(Identity, { subject, actors: [] }),
+							)
+						}
+						let transport: DocumentTransport = {
+							snapshot: document =>
+								owner(store.snapshot(document)).pipe(
+									Effect.flatMap(value =>
+										value
+											? Effect.succeed(value)
+											: Effect.fail(
+													new ResourceUnavailable({
+														message: "Missing snapshot",
+													}),
+												),
+									),
+								),
+							commit: action =>
+								store.commit(action).pipe(
+									Effect.provideService(Identity, {
+										subject,
+										actors: [action.actor],
+									}),
+								),
+							history: (document, after, log, limit) =>
+								owner(store.history(document, after, log, limit)),
+							action: (document, id) =>
+								owner(store.action(document, id)).pipe(
+									Effect.flatMap(value =>
+										value
+											? Effect.succeed(value)
+											: Effect.fail(
+													new ResourceUnavailable({
+														message: "Missing action",
+													}),
+												),
+									),
+								),
+							chain: (document, id) =>
+								owner(store.chain(document, id)).pipe(
+									Effect.flatMap(value =>
+										value
+											? Effect.succeed(value)
+											: Effect.fail(
+													new ResourceUnavailable({ message: "Missing chain" }),
+												),
+									),
+								),
+						}
+
+		function administrator<A,E>(task: Effect.Effect<A,E,Identity>) {
+			return task.pipe(Effect.provideService(Identity, { subject: "creator", actors: [] }))
+		}
+		yield* administrator(store.membership("workspace", subject, "writer", "writer-grant"))
+		let options = { document: "document", subject, author: "Writer", transport, cooperativeWork: true }
+		let platform = cliDocumentPlatform(join(directory, "client"))
+		let storageServices = yield* Layer.build(platform.journal(documentDatabaseName(options)))
+		let storage = Context.get(storageServices, DocumentJournal)
+		let held = yield* Deferred.make<void>()
+		let release = yield* Deferred.make<void>()
+		let armed = false
+		let writeCount = 0
+		let holdReady = false
+		let heldEntry: EventJournal.Entry | undefined
+		let journal: EventJournal.EventJournal["Service"] = {
+			...storage.journal,
+			write: request => Effect.suspend(() => {
+				if (armed) writeCount++
+				if (armed && mode === "failure" && writeCount === 2) {
+					armed = false
+					return Effect.fail(new EventJournal.EventJournalError({method:"write",cause:new Error("Controlled second group write failure")}))
+				}
+				return storage.journal.write({ ...request, effect: entry => request.effect(entry).pipe(
+					Effect.tap(() => Effect.sync(() => {
+						if (armed && mode === "interrupt" && writeCount === 2) {
+							heldEntry = entry
+							holdReady = true
+						}
+					})),
+				) })
+			}),
+			withLock: storeId => task => storage.journal.withLock(storeId)(task).pipe(
+				Effect.tap(() => Effect.suspend(() => {
+					if (!holdReady) return Effect.void
+					holdReady = false
+					armed = false
+					return Deferred.succeed(held, undefined).pipe(Effect.andThen(Deferred.await(release)))
+				})),
+			),
+		}
+		let opened = yield* Layer.build(DocumentSession.layer(options).pipe(
+			Layer.provide(Layer.merge(
+				Layer.succeed(DocumentJournal, {...storage,journal}),
+				Layer.succeed(EventJournal.EventJournal,journal),
+			)),
+			Layer.provide(platform.lifecycle),
+		))
+		let session = Context.get(opened, DocumentSession)
+		let ids: string[] = []
+		for (let character of "GROUP123") {
+			let current = session.replica.text("document")
+			let edit = session.replace([{start:current.indexOf("Base"),remove:0,text:character}])
+			if (!edit.operation) throw new Error("Missing admitted edit")
+			ids.push(edit.operation.id)
+			yield* edit.saved
+			yield* session.sync
+		}
+		let original = session.replica.text("document")
+		let originalSnapshot = yield* administrator(store.snapshot("document"))
+		if (!originalSnapshot) throw new Error("Missing accepted snapshot")
+		let group = session.undoGroup([...ids].reverse())
+		if (mode === "interrupt") {
+			armed = true
+			let running = yield* group.run.pipe(Effect.forkScoped)
+			yield* Deferred.await(held).pipe(Effect.timeout("5 seconds"))
+			if (!heldEntry) throw new Error("Missing held committed compensation")
+			let independentlyRead = yield* storage.entry(heldEntry.idString)
+			expect(independentlyRead).toBeDefined()
+			if (!independentlyRead) throw new Error("Held transaction is not committed")
+			let recording = Schema.decodeUnknownSync(recordingCodec)(independentlyRead.payload)
+			expect(recording.kind).toBe("proposed")
+			if (recording.kind !== "proposed") throw new Error("Held entry is not group compensation")
+			expect(recording.action.undoOf).toBe(ids[6])
+			yield* Fiber.interrupt(running)
+			let exit = yield* Fiber.await(running)
+			expect(Exit.isFailure(exit)).toBe(true)
+			if (Exit.isFailure(exit)) expect(Cause.hasInterrupts(exit.cause)).toBe(true)
+			expect(group.completed()).toHaveLength(1)
+			let reconciled = yield* group.reconcile
+			expect(reconciled).toHaveLength(2)
+			expect(reconciled[1]?.id).toBe(recording.action.id)
+			let beforeResume = yield* storage.readAfter(0)
+			yield* group.run
+			yield* session.sync
+			let afterResume = yield* storage.readAfter(0)
+			expect(afterResume.position).toBeGreaterThan(beforeResume.position)
+			let undoReceipts = (yield* transport.history("document", originalSnapshot.position, originalSnapshot.log, 100)).filter(row => row.action.undoOf)
+			expect(undoReceipts).toHaveLength(8)
+			expect(new Set(undoReceipts.map(row => row.action.id)).size).toBe(8)
+			expect(new Set(undoReceipts.map(row => row.action.undoOf)).size).toBe(8)
+			expect(undoReceipts.filter(row => row.action.id === recording.action.id)).toHaveLength(1)
+			expect((yield* restoreSnapshot(yield* transport.snapshot("document"),"interrupt-oracle")).text("document")).toBe(source)
+		} else if (mode === "failure") {
+			armed = true
+			let result = yield* group.run.pipe(Effect.result)
+			expect(result._tag).toBe("Failure")
+			expect(group.completed()).toHaveLength(1)
+			expect((yield* group.reconcile)).toHaveLength(1)
+			yield* group.run
+			yield* session.sync
+			expect(group.completed()).toHaveLength(8)
+			expect((yield* restoreSnapshot(yield* transport.snapshot("document"),"failure-oracle")).text("document")).toBe(source)
+		} else {
+			yield* administrator(store.membership("workspace",subject,"reader","writer-revoked"))
+			yield* group.run
+			let result = yield* session.sync.pipe(Effect.result)
+			expect(result._tag).toBe("Failure")
+			if (result._tag === "Failure") expect(result.failure).toMatchObject({_tag:"PermissionDenied"})
+			let denied = yield* administrator(store.snapshot("document"))
+			expect(denied?.position).toBe(originalSnapshot.position)
+			if (!denied) throw new Error("Missing creator-readable snapshot")
+			expect((yield* restoreSnapshot(denied,"revoked-oracle")).text("document")).toBe(original)
+			expect(session.pending()).toHaveLength(8)
+			yield* administrator(store.membership("workspace",subject,"writer","writer-regranted"))
+			yield* session.sync
+			expect(session.pending()).toHaveLength(0)
+			expect((yield* restoreSnapshot(yield* transport.snapshot("document"),"regranted-oracle")).text("document")).toBe(source)
+		}
+
+		})))
+		passed = true
+	} finally {
+		if (passed) await rm(directory, {recursive:true,force:true})
+		else console.error("Preserved failed boundary storage", directory)
+	}
+}, 30000)
+
+let recordingCodec = SchemaBinary.toCodec(
+	Schema.Union([
+		Schema.Struct({
+			kind: Schema.Literal("withdrawn"),
+			action: Schema.String,
+			entry: Schema.String,
+		}),
+		Schema.Struct({
+			kind: Schema.Literal("localCreated"),
+			creation: LocalDocumentCreationSchema,
+		}),
+		Schema.Struct({
+			kind: Schema.Literal("published"),
+			publication: DocumentPublicationSchema,
+		}),
+		Schema.Struct({
+			kind: Schema.Literal("opened"),
+			snapshot: DocumentSnapshotSchema,
+		}),
+		Schema.Struct({
+			kind: Schema.Literal("proposed"),
+			action: DocumentActionSchema,
+		}),
+		Schema.Struct({
+			kind: Schema.Literal("rejected"),
+			action: Schema.String,
+			entry: Schema.String,
+			failure: Schema.Union([UndoUnavailable, AccessConflict]),
+			closure: Schema.Array(Schema.String),
+		}),
+		Schema.Struct({
+			kind: Schema.Literal("received"),
+			log: Schema.String,
+			after: Schema.Natural,
+			actions: Schema.Array(
+				Schema.Struct({
+					position: Schema.Natural,
+					action: CommittedActionSchema,
+				}),
+			),
+		}),
+	]),
+)

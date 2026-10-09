@@ -1,0 +1,7 @@
+{
+  "baseRevision": "48770b8510eab29a33f1d155b9702b5ab6cf0ecb",
+  "sourceCopies": true,
+  "nodeModulesDevSymlinkOnly": true,
+  "initialSetupFailure": "git archive absolute read-only reference symlink; excluded references",
+  "unrelatedRootTypesNotCandidateProof": true
+}

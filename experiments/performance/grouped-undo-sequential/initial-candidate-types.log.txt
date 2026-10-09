@@ -1,0 +1,2 @@
+$ tsc --noEmit
+tests/typing-group-session.test.ts(108,82): error TS2554: Expected 4 arguments, but got 5.
