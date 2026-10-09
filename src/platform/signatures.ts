@@ -60,7 +60,7 @@ function makeSignatures() {
 				let exported = yield* cryptography("export public identity", () =>
 					crypto.subtle.exportKey("jwk", privateKey),
 				)
-				if (!exported.x)
+				if (!("x" in exported) || typeof exported.x !== "string" || !exported.x)
 					return yield* Effect.fail(
 						new CryptoError({
 							operation: "public identity",

@@ -1,5 +1,10 @@
-import { EmailAuthentication } from "./email-authentication"
-import { EmailDelivery } from "./email-delivery"
+import {
+	agentStoreLayer,
+	sessionsLayer,
+	emailAuthenticationLayer,
+	workspaceStoreLayer,
+} from "./bun-databases"
+import { bunEmailDeliveryLayer } from "./bun-email-delivery"
 import * as HttpClient from "effect/http/HttpClient"
 import * as FetchHttpClient from "effect/http/FetchHttpClient"
 import * as Context from "effect/Context"
@@ -16,15 +21,13 @@ import type { Connection } from "./application"
 import { AgentCredentials } from "./agent-credentials"
 import { AccountApplication } from "./account-api"
 import { RequestOrigin, requestOriginLayer } from "./request-origin"
-import { WorkspaceStore } from "./document-store"
-import { Sessions } from "./sessions"
 import { DocumentObservability } from "../shared/document-observability"
 import { Application } from "./application"
 import { bunAssetsLayer } from "./bun-assets"
-import { AgentStore } from "./agent-store"
 import type { ServerOptions } from "./settings"
 import { RelaySettings } from "./settings"
 import { bunSettingsLayer, bunSecretsLayer } from "./bun-settings"
+import { bunClientMetadataLayer } from "./bun-client-metadata"
 
 export class BunServer extends Context.Service<
 	BunServer,
@@ -40,26 +43,26 @@ export function serverLayer(options: ServerOptions = {}) {
 	let store = Layer.unwrap(
 		Effect.gen(function* () {
 			let settings = yield* RelaySettings
-			return AgentStore.layer(resolve(settings.data, "relay.sqlite"))
+			return agentStoreLayer(resolve(settings.data, "relay.sqlite"))
 		}),
 	).pipe(Layer.provideMerge(secrets))
 	let sessions = Layer.unwrap(
 		Effect.gen(function* () {
 			let settings = yield* RelaySettings
-			return Sessions.layer(resolve(settings.data, "accounts.sqlite"))
+			return sessionsLayer(resolve(settings.data, "accounts.sqlite"))
 		}),
 	).pipe(Layer.provideMerge(secrets))
 	let emails = Layer.unwrap(
 		Effect.gen(function* () {
 			let settings = yield* RelaySettings
-			return EmailAuthentication.layer(resolve(settings.data, "email.sqlite"))
+			return emailAuthenticationLayer(resolve(settings.data, "email.sqlite"))
 		}),
-	).pipe(Layer.provideMerge(Layer.merge(sessions, EmailDelivery.layer)))
+	).pipe(Layer.provideMerge(Layer.merge(sessions, bunEmailDeliveryLayer)))
 	let origins = requestOriginLayer.pipe(Layer.provideMerge(emails))
 	let documents = Layer.unwrap(
 		Effect.gen(function* () {
 			let settings = yield* RelaySettings
-			return WorkspaceStore.layer(resolve(settings.data, "documents.sqlite"))
+			return workspaceStoreLayer(resolve(settings.data, "documents.sqlite"))
 		}),
 	).pipe(Layer.provideMerge(origins))
 	let credentials = AgentCredentials.layer.pipe(
@@ -73,6 +76,7 @@ export function serverLayer(options: ServerOptions = {}) {
 		Layer.provideMerge(bunAssetsLayer.pipe(Layer.provide(settings))),
 		Layer.provideMerge(FetchHttpClient.layer),
 		Layer.provideMerge(webCryptoLayer),
+		Layer.provideMerge(bunClientMetadataLayer),
 	)
 	return BunServer.layer.pipe(
 		Layer.provideMerge(application),

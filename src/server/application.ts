@@ -21,6 +21,7 @@ import type {
 import { AccountApplication } from "./account-api"
 import { AgentCredentials } from "./agent-credentials"
 import { OAuth } from "./oauth"
+import { ClientMetadata } from "./client-metadata"
 import { RelaySettings } from "./settings"
 import { StaticAssets } from "./static-assets"
 
@@ -44,7 +45,13 @@ function makeApplication() {
 		let mcp = yield* AgentCredentials
 		let documents = yield* makeDocuments()
 		let handleMcp = yield* makeMcpHandler(mcp, documents, settings.publicOrigin)
-		let oauth = new OAuth(database.oauth, mcp, cipher, settings.publicOrigin)
+		let oauth = new OAuth(
+			database.oauth,
+			mcp,
+			cipher,
+			yield* ClientMetadata,
+			settings.publicOrigin,
+		)
 		yield* startOAuthMaintenance(database.oauth.cleanup())
 		let assets = yield* StaticAssets
 		function handleRequest(
