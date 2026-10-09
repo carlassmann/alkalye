@@ -5,6 +5,8 @@ import type {
 import * as Deferred from "effect/Deferred"
 import * as Effect from "effect/Effect"
 import * as Fiber from "effect/Fiber"
+import * as Schema from "effect/Schema"
+import * as SqlSchema from "effect/sql/SqlSchema"
 import * as SqlClient from "effect/sql/SqlClient"
 import { cloudflareSqliteLayer } from "../src/platform/cloudflare-sqlite"
 
@@ -17,6 +19,14 @@ export class SqliteProbe {
 					let sql = yield* SqlClient.SqlClient
 					yield* sql`CREATE TABLE IF NOT EXISTS probe (name TEXT PRIMARY KEY)`
 					yield* sql`DELETE FROM probe`
+					yield* sql`CREATE TABLE IF NOT EXISTS binary_probe (id INTEGER PRIMARY KEY, bytes BLOB NOT NULL)`
+					yield* sql`INSERT OR REPLACE INTO binary_probe VALUES (${1}, ${new Uint8Array([1, 2, 255])})`
+					let binary = yield* SqlSchema.findOne({
+						Request: Schema.Void,
+						Result: Schema.Struct({ bytes: Schema.Uint8Array }),
+						execute: () => sql`SELECT bytes FROM binary_probe WHERE id=1`,
+					})(undefined)
+					let boolean = yield* sql`SELECT ${true} AS value`
 					let failed = yield* sql
 						.withTransaction(
 							Effect.gen(function* () {
@@ -85,6 +95,8 @@ export class SqliteProbe {
 					let isolatedRead = yield* Fiber.join(reader)
 					let rows = yield* sql`SELECT name FROM probe ORDER BY name`
 					return {
+						binary: [...binary.bytes],
+						boolean,
 						failed,
 						nested,
 						interrupted,
@@ -99,7 +111,9 @@ export class SqliteProbe {
 	}
 }
 export let handler = {
-	fetch(_request: Request, env: { PROBE: DurableObjectNamespace }) {
+	fetch(request: Request, env: { PROBE: DurableObjectNamespace }) {
+		if (new URL(request.url).pathname === "/health")
+			return Response.json({ ready: true })
 		return env.PROBE.get(env.PROBE.idFromName("sqlite")).fetch(
 			"https://probe.test/",
 		)

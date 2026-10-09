@@ -14,9 +14,35 @@ import * as Statement from "effect/sql/Statement"
 import * as Stream from "effect/Stream"
 
 let bindingsSchema = Schema.Array(
-	Schema.Union([Schema.String, Schema.Finite, Schema.Null, Schema.Uint8Array]),
+	Schema.Union([
+		Schema.String,
+		Schema.Finite,
+		Schema.Boolean,
+		Schema.BigInt,
+		Schema.Null,
+		Schema.Uint8Array,
+	]),
 )
-let decodeBindings = Schema.decodeUnknownEffect(bindingsSchema)
+function decodeBindings(params: ReadonlyArray<unknown>) {
+	return Schema.decodeUnknownEffect(bindingsSchema)(params).pipe(
+		Effect.flatMap(bindings =>
+			Effect.try({
+				try: () =>
+					bindings.map(value => {
+						if (typeof value === "boolean") return value ? 1 : 0
+						if (typeof value !== "bigint") return value
+						let number = Number(value)
+						if (!Number.isSafeInteger(number))
+							throw new Error(
+								"SQLite bigint binding exceeds exact numeric range",
+							)
+						return number
+					}),
+				catch: cause => failure("bind", cause),
+			}),
+		),
+	)
+}
 let clientId = 0
 
 export function cloudflareSqliteLayer(storage: DurableObjectStorage) {
@@ -66,27 +92,31 @@ function makeClient(storage: DurableObjectStorage) {
 					Effect.Services<typeof effect>
 				>(resume => {
 					let cancelled = false
-					let completion = storage
-						.transaction(
-							txn =>
-								new Promise<void>(resolve => {
-									if (cancelled) {
-										txn.rollback()
-										resolve()
-										return
-									}
-									resume(
-										body.pipe(
-											Effect.onExit(exit => {
-												if (Exit.isFailure(exit)) txn.rollback()
-												resolve()
-												return Effect.promise(() => completion)
-											}),
-										),
-									)
-								}),
-						)
-						.catch(cause => resume(Effect.fail(failure("transaction", cause))))
+					let completion = storage.transaction(
+						txn =>
+							new Promise<void>(resolve => {
+								if (cancelled) {
+									txn.rollback()
+									resolve()
+									return
+								}
+								resume(
+									body.pipe(
+										Effect.onExit(exit => {
+											if (Exit.isFailure(exit)) txn.rollback()
+											resolve()
+											return Effect.tryPromise({
+												try: () => completion,
+												catch: cause => failure("transaction", cause),
+											})
+										}),
+									),
+								)
+							}),
+					)
+					completion.catch(cause =>
+						resume(Effect.fail(failure("transaction", cause))),
+					)
 					return Effect.suspend(() => {
 						cancelled = true
 						return Effect.promise(() => completion)

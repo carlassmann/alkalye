@@ -19,6 +19,7 @@ import * as SqlEventJournal from "effect/eventlog/SqlEventJournal"
 import * as SqlClient from "effect/sql/SqlClient"
 import * as SqlError from "effect/sql/SqlError"
 import * as SqlSchema from "effect/sql/SqlSchema"
+import { DocumentBlobObjects } from "./document-blob-objects"
 import { webCryptoLayer } from "../platform/web-crypto"
 import { IdentifierSchema } from "../shared/model"
 import { decode, encode } from "../shared/base64"
@@ -434,6 +435,7 @@ function makeDocumentStore() {
 	return Effect.gen(function* () {
 		let sql = yield* SqlClient.SqlClient
 		let crypto = yield* Crypto.Crypto
+		let blobObjects = yield* DocumentBlobObjects
 		let write = yield* EventLog.makeClient(events)
 		let blobLimit = yield* Config.schema(
 			Schema.Int.check(Schema.isGreaterThanOrEqualTo(0)),
@@ -457,14 +459,30 @@ function makeDocumentStore() {
 		let readQueries = makeQueries(readSql)
 		let readWorkspace = makeWorkspaceProjection(readSql)
 		yield* sql`CREATE TABLE IF NOT EXISTS document_blobs (document TEXT NOT NULL, digest TEXT NOT NULL, bytes BLOB NOT NULL, PRIMARY KEY(document,digest))`
+		yield* Migrator.make({})({
+			table: "document_blob_migrations",
+			loader: Migrator.fromRecord({
+				"001_external_blob_objects": Effect.gen(function* () {
+					yield* sql`ALTER TABLE document_blobs ADD COLUMN size INTEGER`
+					yield* sql`ALTER TABLE document_blobs ADD COLUMN external INTEGER NOT NULL DEFAULT 0`
+				}),
+				"002_blob_object_receipts": Effect.gen(function* () {
+					yield* sql`ALTER TABLE document_blobs ADD COLUMN object_key TEXT`
+				}),
+			}),
+		})
 		let readBlob = SqlSchema.findOneOption({
 			Request: Schema.Struct({
 				document: IdentifierSchema,
 				digest: BlobDigestSchema,
 			}),
-			Result: Schema.Struct({ bytes: Schema.Unknown }),
+			Result: Schema.Struct({
+				bytes: Schema.Unknown,
+				external: Schema.Literals([0, 1]),
+				object_key: Schema.NullOr(Schema.String),
+			}),
 			execute: ({ document, digest }) =>
-				readSql`SELECT bytes FROM document_blobs WHERE document=${document} AND digest=${digest}`,
+				readSql`SELECT bytes,external,object_key FROM document_blobs WHERE document=${document} AND digest=${digest}`,
 		})
 		let storedBlobSize = SqlSchema.findOneOption({
 			Request: Schema.Struct({
@@ -473,25 +491,25 @@ function makeDocumentStore() {
 			}),
 			Result: Schema.Struct({ size: Schema.Natural }),
 			execute: ({ document, digest }) =>
-				sql`SELECT length(bytes) AS size FROM document_blobs WHERE document=${document} AND digest=${digest}`,
+				sql`SELECT CASE WHEN external=1 THEN size ELSE length(bytes) END AS size FROM document_blobs WHERE document=${document} AND digest=${digest}`,
 		})
 		let accountBlobBytes = SqlSchema.findOne({
 			Request: IdentifierSchema,
 			Result: Schema.Struct({ size: Schema.Natural }),
 			execute: owner =>
-				sql`SELECT COALESCE(SUM(length(b.bytes)),0) AS size FROM document_blobs b JOIN workspace_documents d ON d.document=b.document JOIN workspaces w ON w.workspace=d.workspace WHERE w.owner=${owner}`,
+				sql`SELECT COALESCE(SUM(CASE WHEN b.external=1 THEN b.size ELSE length(b.bytes) END),0) AS size FROM document_blobs b JOIN workspace_documents d ON d.document=b.document JOIN workspaces w ON w.workspace=d.workspace WHERE w.owner=${owner}`,
 		})
 		let blobBytes = SqlSchema.findOne({
 			Request: IdentifierSchema,
 			Result: Schema.Struct({ size: Schema.Natural }),
 			execute: document =>
-				sql`SELECT COALESCE(SUM(length(bytes)),0) AS size FROM document_blobs WHERE document=${document}`,
+				sql`SELECT COALESCE(SUM(CASE WHEN external=1 THEN size ELSE length(bytes) END),0) AS size FROM document_blobs WHERE document=${document}`,
 		})
 		let serverBlobBytes = SqlSchema.findOne({
 			Request: Schema.Void,
 			Result: Schema.Struct({ size: Schema.Natural }),
 			execute: () =>
-				sql`SELECT COALESCE(SUM(length(bytes)),0) AS size FROM document_blobs`,
+				sql`SELECT COALESCE(SUM(CASE WHEN external=1 THEN size ELSE length(bytes) END),0) AS size FROM document_blobs`,
 		})
 		let knownBlobs = SqlSchema.findAll({
 			Request: Schema.Struct({
@@ -502,7 +520,7 @@ function makeDocumentStore() {
 			}),
 			Result: Schema.Struct({ digest: BlobDigestSchema, size: Schema.Natural }),
 			execute: ({ document, chunks }) =>
-				readSql`SELECT digest, length(bytes) AS size FROM document_blobs WHERE document=${document} AND typeof(bytes)='blob' AND ${readSql.in(
+				readSql`SELECT digest, CASE WHEN external=1 THEN size ELSE length(bytes) END AS size FROM document_blobs WHERE document=${document} AND (external=1 OR typeof(bytes)='blob') AND ${readSql.in(
 					"digest",
 					chunks.map(chunk => chunk.digest),
 				)}`,
@@ -704,6 +722,11 @@ function makeDocumentStore() {
 				yield* verifyBlobChunk(digest, bytes).pipe(
 					Effect.provideService(Crypto.Crypto, crypto),
 				)
+				let objectKey = blobObjects
+					? yield* blobObjects
+							.put(document, digest, bytes)
+							.pipe(Effect.mapError(blobObjectFailure))
+					: null
 				return yield* transact(
 					Effect.gen(function* () {
 						yield* workspace
@@ -749,7 +772,9 @@ function makeDocumentStore() {
 										"The server's retained attachments exceed its storage limit",
 								}),
 							)
-						yield* sql`INSERT INTO document_blobs(document,digest,bytes) VALUES (${document},${digest},${bytes}) ON CONFLICT(document,digest) DO UPDATE SET bytes=excluded.bytes WHERE document_blobs.bytes IS NOT excluded.bytes`
+						let storedBytes = blobObjects ? new Uint8Array() : bytes
+						let external = blobObjects ? 1 : 0
+						yield* sql`INSERT INTO document_blobs(document,digest,bytes,size,external,object_key) VALUES (${document},${digest},${storedBytes},${bytes.length},${external},${objectKey}) ON CONFLICT(document,digest) DO UPDATE SET bytes=excluded.bytes,size=excluded.size,external=excluded.external,object_key=excluded.object_key WHERE document_blobs.bytes IS NOT excluded.bytes OR document_blobs.size IS NOT excluded.size OR document_blobs.external IS NOT excluded.external OR document_blobs.object_key IS NOT excluded.object_key`
 					}),
 					() => Effect.void,
 				)
@@ -759,18 +784,32 @@ function makeDocumentStore() {
 			return Identity.use(identity =>
 				Effect.gen(function* () {
 					let corrupted: unknown
+					let corruptedObjectKey: string | undefined
 					return yield* readSql
 						.withTransaction(
 							Effect.gen(function* () {
 								yield* authorizeRead(document, identity)
 								let stored = yield* readBlob({ document, digest })
 								if (Option.isNone(stored)) return yield* unavailable()
-								return yield* verifyBlobChunk(digest, stored.value.bytes).pipe(
+								let bytes =
+									stored.value.external === 1
+										? blobObjects && stored.value.object_key !== null
+											? yield* blobObjects
+													.get(document, digest, stored.value.object_key)
+													.pipe(Effect.mapError(blobObjectFailure))
+											: undefined
+										: stored.value.bytes
+								return yield* verifyBlobChunk(digest, bytes).pipe(
 									Effect.provideService(Crypto.Crypto, crypto),
 									Effect.tapError(error =>
 										Effect.sync(() => {
-											if (error._tag === "BlobCorrupt")
+											if (error._tag === "BlobCorrupt") {
 												corrupted = stored.value.bytes
+												corruptedObjectKey =
+													stored.value.external === 1
+														? (stored.value.object_key ?? undefined)
+														: undefined
+											}
 										}),
 									),
 								)
@@ -788,10 +827,12 @@ function makeDocumentStore() {
 											))
 										)
 											return yield* unavailable()
-										if (corrupted instanceof Uint8Array)
-											yield* sql`DELETE FROM document_blobs WHERE document=${document} AND digest=${digest} AND bytes=${corrupted}`
+										if (corruptedObjectKey !== undefined)
+											yield* sql`DELETE FROM document_blobs WHERE document=${document} AND digest=${digest} AND external=1 AND object_key=${corruptedObjectKey}`
+										else if (corrupted instanceof Uint8Array)
+											yield* sql`DELETE FROM document_blobs WHERE document=${document} AND digest=${digest} AND external=0 AND bytes=${corrupted}`
 										else
-											yield* sql`DELETE FROM document_blobs WHERE document=${document} AND digest=${digest} AND typeof(bytes)!='blob'`
+											yield* sql`DELETE FROM document_blobs WHERE document=${document} AND digest=${digest} AND external=0 AND typeof(bytes)!='blob'`
 									}),
 									() => Effect.void,
 								).pipe(Effect.andThen(Effect.fail(error))),
@@ -2792,5 +2833,15 @@ function authorizeWriting(role: "owner" | "writer" | "reader" | undefined) {
 	return Effect.gen(function* () {
 		if (!role) return yield* unavailable()
 		if (role === "reader") return yield* forbidden()
+	})
+}
+
+function blobObjectFailure(cause: unknown) {
+	return new SqlError.SqlError({
+		reason: new SqlError.UnknownError({
+			operation: "blobObjects",
+			message: "Attachment object storage unavailable",
+			cause,
+		}),
 	})
 }
