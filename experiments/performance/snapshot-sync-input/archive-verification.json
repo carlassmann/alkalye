@@ -1,0 +1,640 @@
+{
+	"baseline": "6ec4596e8db9db9ba628eeeed7a682179eb5147a",
+	"verifiedProducerFiles": 87,
+	"verifiedReconstructedPaths": [
+		"unmarked-src/client/browser-library.ts",
+		"unmarked-src/client/document-app.ts",
+		"unmarked-src/client/source-textarea.ts",
+		"unmarked-src/platform/background-work.ts",
+		"unmarked-src/shared/crdt.ts",
+		"unmarked-src/shared/document-session.ts",
+		"unmarked-src/shared/projection.ts",
+		"control-src/client/browser-library.ts",
+		"control-src/client/document-app.ts",
+		"control-src/client/source-textarea.ts",
+		"control-src/platform/background-work.ts",
+		"control-src/shared/crdt.ts",
+		"control-src/shared/document-session.ts",
+		"control-src/shared/projection.ts",
+		"candidate-src/client/browser-library.ts",
+		"candidate-src/client/document-app.ts",
+		"candidate-src/client/source-textarea.ts",
+		"candidate-src/platform/background-work.ts",
+		"candidate-src/shared/crdt.ts",
+		"candidate-src/shared/document-session.ts",
+		"candidate-src/shared/projection.ts",
+		"integration/browser-library-sync.ts",
+		"integration/browser-library-sync-fixture.ts"
+	],
+	"files": [
+		{
+			"source": "/tmp/alkalye-snapshot-sync-preemption/candidate.patch",
+			"archive": "public/candidate.patch.txt",
+			"sha256": "d79c49cd81ef96bf48a11d37e93e9ba3217b149de83430832e1b6f4f3a40f759",
+			"bytes": 5449,
+			"storedAs": "public/candidate.patch.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-preemption/source-pins.json",
+			"archive": "public/source-pins.json.txt",
+			"sha256": "40d4d410e757c7541e5164eaf6bf556939e5ee34b4da6fb8366892e868b6f134",
+			"bytes": 1218,
+			"storedAs": "public/source-pins.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-preemption/types-public-first.log",
+			"archive": "public/types-public-first.log.txt",
+			"sha256": "3d9b617dc3ab4e2e3e883fa3de512bdd8ed8fe0fea4192dc1ef61b59bf9acc05",
+			"bytes": 1505,
+			"storedAs": "public/types-public-first.log.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-preemption/types-public-second.log",
+			"archive": "public/types-public-second.log.txt",
+			"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+			"bytes": 0,
+			"storedAs": "public/types-public-second.log.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-preemption/types-public-third.log",
+			"archive": "public/types-public-third.log.txt",
+			"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+			"bytes": 0,
+			"storedAs": "public/types-public-second.log.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-preemption/types-public-cold.log",
+			"archive": "public/types-public-cold.log.txt",
+			"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+			"bytes": 0,
+			"storedAs": "public/types-public-second.log.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-preemption/public-first.log",
+			"archive": "public/public-first.log.txt",
+			"sha256": "641302bd643b854da4d77a1d33194c305f73653e8d0afd09d728d6cd00957bc4",
+			"bytes": 2426,
+			"storedAs": "public/public-first.log.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-preemption/public-second.log",
+			"archive": "public/public-second.log.txt",
+			"sha256": "53ce0c0e62121b2869091e1c292ed9ec90a26c3f23fd01130c62e16a2aaecd2c",
+			"bytes": 1917,
+			"storedAs": "public/public-second.log.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-preemption/public-cold.log",
+			"archive": "public/public-cold.log.txt",
+			"sha256": "a5fbc1b9b150346a8c091c62acdce9aeb30d2248a2600bf7d1f2de77c3d972f2",
+			"bytes": 2032,
+			"storedAs": "public/public-cold.log.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-preemption/opus-followup-prompt.txt",
+			"archive": "public/opus-followup-prompt.txt.txt",
+			"sha256": "558bdbc8301cfb1d9fbafddb66edc118800820f90d2fd99f4e70fc27c1e1d92b",
+			"bytes": 1402,
+			"storedAs": "public/opus-followup-prompt.txt.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-preemption/opus-followup-review.json",
+			"archive": "public/opus-followup-review.json.txt",
+			"sha256": "5c6041085fed49b20beb1f08569dda5321b6fc200dcdcb1f3c87d8c071429d1d",
+			"bytes": 6328,
+			"storedAs": "public/opus-followup-review.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-preemption/opus-followup-stderr.log",
+			"archive": "public/opus-followup-stderr.log.txt",
+			"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+			"bytes": 0,
+			"storedAs": "public/types-public-second.log.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-preemption/integration/browser-library-sync.patch",
+			"archive": "integration/browser-library-sync.patch.txt",
+			"sha256": "929937d436f9efe642d817ddac472fa0cfd8783c7c7999a1473bed8278102675",
+			"bytes": 12281,
+			"storedAs": "integration/browser-library-sync.patch.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-preemption/integration/browser-library-sync.ts",
+			"archive": "integration/browser-library-sync.ts.txt",
+			"sha256": "0137af0ae2660fbf2d14acfd7ebf28694a6e32509a5c9a1dd56b8af7a524a17b",
+			"bytes": 20757,
+			"reconstructedFrom": "6ec4596 + integration/browser-library-sync.patch.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-preemption/integration/browser-library-sync-fixture.ts",
+			"archive": "integration/browser-library-sync-fixture.ts.txt",
+			"sha256": "a9bf769b683c553bf096b7e05220cc0900f69339a8871424bcbf1009d1b6f23c",
+			"bytes": 9007,
+			"reconstructedFrom": "6ec4596 + integration/browser-library-sync.patch.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/baseline-commit.txt",
+			"archive": "native/baseline-commit.txt.txt",
+			"sha256": "87e18d764f2d4d4e01457069155d3b7becd6a9b241ca9d61741c6d98c2de0018",
+			"bytes": 41,
+			"storedAs": "native/baseline-commit.txt.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/control-origin-markers.patch",
+			"archive": "native/control-origin-markers.patch.txt",
+			"sha256": "a0f798460b9daf88253c9018e7e9ba36377e651f24d62f737f8b70cba1ba7554",
+			"bytes": 7298,
+			"storedAs": "native/control-origin-markers.patch.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/candidate-vs-control.patch",
+			"archive": "native/candidate-vs-control.patch.txt",
+			"sha256": "b5ce29cc06b422cf01dc6527e7a4d72e73474adeac378ca8226e99cd78a6655a",
+			"bytes": 5884,
+			"storedAs": "native/candidate-vs-control.patch.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/clock-driver-pins.json",
+			"archive": "native/clock-driver-pins.json.txt",
+			"sha256": "95014eddd8c285bc3e2d021ba4e726c2d3c8773ed147eaeff0a515be6cce4917",
+			"bytes": 339,
+			"storedAs": "native/clock-driver-pins.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/clock-types.log",
+			"archive": "native/clock-types.log.txt",
+			"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+			"bytes": 0,
+			"storedAs": "public/types-public-second.log.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/unmarked-types.log",
+			"archive": "native/unmarked-types.log.txt",
+			"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+			"bytes": 0,
+			"storedAs": "public/types-public-second.log.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/unmarked-build.log",
+			"archive": "native/unmarked-build.log.txt",
+			"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+			"bytes": 0,
+			"storedAs": "public/types-public-second.log.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/control-types.log",
+			"archive": "native/control-types.log.txt",
+			"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+			"bytes": 0,
+			"storedAs": "public/types-public-second.log.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/control-build.log",
+			"archive": "native/control-build.log.txt",
+			"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+			"bytes": 0,
+			"storedAs": "public/types-public-second.log.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/candidate-types.log",
+			"archive": "native/candidate-types.log.txt",
+			"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+			"bytes": 0,
+			"storedAs": "public/types-public-second.log.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/candidate-build.log",
+			"archive": "native/candidate-build.log.txt",
+			"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+			"bytes": 0,
+			"storedAs": "public/types-public-second.log.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/native-pair-first.log",
+			"archive": "native/native-pair-first.log.txt",
+			"sha256": "a3256d3bce6433be92aa1b96ce301149cf2c2ccec692101d2af5e72d62d8cf97",
+			"bytes": 2063,
+			"storedAs": "native/native-pair-first.log.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/native-pair-clock.log",
+			"archive": "native/native-pair-clock.log.txt",
+			"sha256": "554012a5a3dbbb46943a8af8ba77a9ad393fb4f6794eea6b376dfbb23d3d9a63",
+			"bytes": 892,
+			"storedAs": "native/native-pair-clock.log.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/confirmation.log",
+			"archive": "native/confirmation.log.txt",
+			"sha256": "d70ab918d632d048406897f4fdd9d7ac443a9c30b1f69b6f33624467540acb3f",
+			"bytes": 1870,
+			"storedAs": "native/confirmation.log.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/confirmation-terminal.json",
+			"archive": "native/confirmation-terminal.json.txt",
+			"sha256": "2466ce808ba9497580706f3d105c31bc3c78a7e9ae58c001f5aa9b2a89a84b96",
+			"bytes": 770,
+			"storedAs": "native/confirmation-terminal.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/confirmation-progress.json",
+			"archive": "native/confirmation-progress.json.txt",
+			"sha256": "a7d7ebcedbea80987595a1af048da3c124844968f7cdee7809e3fc2d7011c1b7",
+			"bytes": 682,
+			"storedAs": "native/confirmation-progress.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/candidate-failed-overlap-timeline.json",
+			"archive": "native/candidate-failed-overlap-timeline.json.txt",
+			"sha256": "d27a445cae7e0615f90b067b8a22a69d467c5f29abce76589569c1226629745a",
+			"bytes": 5833,
+			"storedAs": "native/candidate-failed-overlap-timeline.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/confirmation-analysis.json",
+			"archive": "native/confirmation-analysis.json.txt",
+			"sha256": "b6b9864d44ada6d4bd7853856c1d4d9ca0093db27eb2b7b1592b16a0449f21a6",
+			"bytes": 175119,
+			"storedAs": "native/confirmation-analysis.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/confirmation-summary.json",
+			"archive": "native/confirmation-summary.json.txt",
+			"sha256": "cc40989674e3e94fbdd4c803316c5fd142ffafe650e709f6ddaa38fd68c0ff84",
+			"bytes": 9827,
+			"storedAs": "native/confirmation-summary.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/confirmation-overlap-proof.json",
+			"archive": "native/confirmation-overlap-proof.json.txt",
+			"sha256": "da1986e47d0693017986edb00298d21013e6e18dc09b170b7ab9be734acccd03",
+			"bytes": 7606,
+			"storedAs": "native/confirmation-overlap-proof.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/overlap-verification.log",
+			"archive": "native/overlap-verification.log.txt",
+			"sha256": "ca4100e5ff75cb946a7d9b6781f964914edbdab0d478e7201717f198afb3d126",
+			"bytes": 1089,
+			"storedAs": "native/overlap-verification.log.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/parse-clock.py",
+			"archive": "native/parse-clock.py.txt",
+			"sha256": "7c882c95cf947c09b06dda09ce25942e562866a72e8a88157c31f5decd6a68d7",
+			"bytes": 3631,
+			"storedAs": "native/parse-clock.py.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/parse-confirmation.py",
+			"archive": "native/parse-confirmation.py.txt",
+			"sha256": "8c6284f13c0d098ba42128cd2c34650e40956cbca36e378b2add5bfd771ab48a",
+			"bytes": 3782,
+			"storedAs": "native/parse-confirmation.py.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/verify-native-overlap.py",
+			"archive": "native/verify-native-overlap.py.txt",
+			"sha256": "8ebc82f4257628973e239b8503428c9650448f7c5f8808d5e710393cf7a61348",
+			"bytes": 2649,
+			"storedAs": "native/verify-native-overlap.py.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/second-key-task-attribution.json",
+			"archive": "native/second-key-task-attribution.json.txt",
+			"sha256": "a971ded3630b6791c47879597fb91399e2891b3a613359070dabcb0e9946cb84",
+			"bytes": 74760,
+			"storedAs": "native/second-key-task-attribution.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/run-pair-clock.ts",
+			"archive": "native/run-pair-clock.ts.txt",
+			"sha256": "af9dfb57ff61672b51f7fe720a6a00b5cdbd435e06556841d9aa4e3720caede7",
+			"bytes": 1249,
+			"storedAs": "native/run-pair-clock.ts.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/run-confirmation.ts",
+			"archive": "native/run-confirmation.ts.txt",
+			"sha256": "47b8e341e7960c85c07fdfcf0edc1701ee42b6b1a4ef3092edc359b785adc203",
+			"bytes": 1413,
+			"storedAs": "native/run-confirmation.ts.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/paced-input.failed-overlap-executed.ts.txt",
+			"archive": "native/paced-input.failed-overlap-executed.ts.txt.txt",
+			"sha256": "9b3fbffa7061991037666f19a99187b1c99e8611286b046e521b2a6cc1fc1e99",
+			"bytes": 2837,
+			"storedAs": "native/paced-input.failed-overlap-executed.ts.txt.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/CORRECTION.md",
+			"archive": "native/CORRECTION.md.txt",
+			"sha256": "d473a2db335393238186820090f578cd2bcac8eeed2120068019b8f15d959598",
+			"bytes": 1032,
+			"storedAs": "native/CORRECTION.md.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/app-runtime/bundle-parity.json",
+			"archive": "native/bundle-parity.json.txt",
+			"sha256": "f05626a2730ee9c4bd5762eeb0be9d899aa41793e44fd7f69a0ee8d285c661d9",
+			"bytes": 48787,
+			"storedAs": "native/bundle-parity.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/app-runtime/experiments/performance/interaction-matrix/runner.ts",
+			"archive": "drivers/runner.ts.txt",
+			"sha256": "814f51b15efca38dc833f4c984719216bc4694e642a990c2deaac22228ab350b",
+			"bytes": 37081,
+			"storedAs": "drivers/runner.ts.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/app-runtime/experiments/performance/interaction-matrix/browser-probes.ts",
+			"archive": "drivers/browser-probes.ts.txt",
+			"sha256": "016ee3be72a7ecbe05ea1d265d6eb3c9e0f9d183f521c4d5962108979cf5e976",
+			"bytes": 7234,
+			"storedAs": "drivers/browser-probes.ts.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/app-runtime/experiments/performance/interaction-matrix/rewrite-oracle.ts",
+			"archive": "drivers/rewrite-oracle.ts.txt",
+			"sha256": "c8f15b4b5aedd3b23d00b28b86bce76194a205e061448bcf3c7cc894272cd8e2",
+			"bytes": 2048,
+			"storedAs": "drivers/rewrite-oracle.ts.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/app-runtime/experiments/performance/interaction-matrix/paced-input.ts",
+			"archive": "drivers/paced-input.ts.txt",
+			"sha256": "6d15d8b0ca3331138f5f17d5a2b9ccbbab33f74d33fa3361b329aca4f456253c",
+			"bytes": 3657,
+			"storedAs": "drivers/paced-input.ts.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/app-runtime/experiments/performance/interaction-matrix/prime-history.ts",
+			"archive": "drivers/prime-history.ts.txt",
+			"sha256": "d88a25d5cba863326507ddf347f19773b2d9fd7987b8dcd1e3288b400594201d",
+			"bytes": 3117,
+			"storedAs": "drivers/prime-history.ts.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/app-runtime/experiments/performance/interaction-matrix/prime-history-reader.ts",
+			"archive": "drivers/prime-history-reader.ts.txt",
+			"sha256": "638dd24fd608652a8e8d89cda440cd8a198eb6af743660d2f233fc69d419e498",
+			"bytes": 3440,
+			"storedAs": "drivers/prime-history-reader.ts.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/app-runtime/experiments/performance/interaction-matrix/network.js",
+			"archive": "drivers/network.js.txt",
+			"sha256": "7a94ec05710f749d5e1c689181b00078c62e0fbbcd1e596f2d3fa9fa4b0747c0",
+			"bytes": 726,
+			"storedAs": "drivers/network.js.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/app-runtime/production-body-gate.ts",
+			"archive": "drivers/production-body-gate.ts.txt",
+			"sha256": "985df8e71166df12dd26e5e0ba039e48a640cad11c94210639f1b94a82037623",
+			"bytes": 8623,
+			"storedAs": "drivers/production-body-gate.ts.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/reconstruction-source-pins.json",
+			"archive": "native/reconstruction-source-pins.json.txt",
+			"sha256": "eeb47918f0d089873ae73a47e6ddd72df0b67c53c5268d350bbcfef0b08229ca",
+			"bytes": 4035,
+			"storedAs": "native/reconstruction-source-pins.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/paced-control-2f497652-4fe2-4db2-b92b-2cbcdf46fc55/results/8f2340a4-0c8c-42f6-ba4d-b5ec2dab496d/results.json",
+			"archive": "cells/1-control/results.json.txt",
+			"sha256": "2bb6b17224cd222e6258405416a88cad2f8f70f0cbe876afc42140911102cd1b",
+			"bytes": 30099,
+			"storedAs": "cells/1-control/results.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/paced-control-2f497652-4fe2-4db2-b92b-2cbcdf46fc55/results/8f2340a4-0c8c-42f6-ba4d-b5ec2dab496d/burst-probe.json",
+			"archive": "cells/1-control/burst-probe.json.txt",
+			"sha256": "cbeac7f2ccceabc06575f7264d7c7b1a0123ba98b71aad7d64fad5ac6ae06d58",
+			"bytes": 1753,
+			"storedAs": "cells/1-control/burst-probe.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/paced-control-2f497652-4fe2-4db2-b92b-2cbcdf46fc55/assets.json",
+			"archive": "cells/1-control/assets.json.txt",
+			"sha256": "d013e82bdaff904c4391c3b701d63eb1794758bde6730315d4ca44ed4cd37a42",
+			"bytes": 4665,
+			"storedAs": "cells/1-control/assets.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/paced-control-2f497652-4fe2-4db2-b92b-2cbcdf46fc55/terminal.json",
+			"archive": "cells/1-control/terminal.json.txt",
+			"sha256": "bec4ae8bee2b8d9b875fd290595bbd96d44cf687e602f7971d48ff190a61da70",
+			"bytes": 61,
+			"storedAs": "cells/1-control/terminal.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/paced-candidate-10f27f68-ca58-4c78-9e84-1f5405a9f36e/results/f3ecfda8-620c-446d-ad87-5d8e0aafcc4c/results.json",
+			"archive": "cells/1-candidate/results.json.txt",
+			"sha256": "24827a50c3c89bcf2fe30ff5edeecff71e8bfe8cf2c4458ed2041a58be16cefe",
+			"bytes": 30428,
+			"storedAs": "cells/1-candidate/results.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/paced-candidate-10f27f68-ca58-4c78-9e84-1f5405a9f36e/results/f3ecfda8-620c-446d-ad87-5d8e0aafcc4c/burst-probe.json",
+			"archive": "cells/1-candidate/burst-probe.json.txt",
+			"sha256": "847cbaba2b7bc25aeb1108edff3f99501e3e85a086cdd554d5e1d7be40a036a4",
+			"bytes": 1744,
+			"storedAs": "cells/1-candidate/burst-probe.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/paced-candidate-10f27f68-ca58-4c78-9e84-1f5405a9f36e/assets.json",
+			"archive": "cells/1-candidate/assets.json.txt",
+			"sha256": "c5db67098ad905d666123bbdd45236fc5779d15a5937ef3859ced231afa29c22",
+			"bytes": 4665,
+			"storedAs": "cells/1-candidate/assets.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/paced-candidate-10f27f68-ca58-4c78-9e84-1f5405a9f36e/terminal.json",
+			"archive": "cells/1-candidate/terminal.json.txt",
+			"sha256": "bec4ae8bee2b8d9b875fd290595bbd96d44cf687e602f7971d48ff190a61da70",
+			"bytes": 61,
+			"storedAs": "cells/1-candidate/terminal.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/confirmation-2-candidate-9d73ee7d-e59b-4afb-9b4a-eda87f4d0ec9/results/bb682fd5-28b2-47f0-b7e1-c5e58e5627ae/results.json",
+			"archive": "cells/2-candidate/results.json.txt",
+			"sha256": "3822ebc08b7bc526a4957730a6cde09fb1a44df39f08520fdb92ce1477b6ac53",
+			"bytes": 30523,
+			"storedAs": "cells/2-candidate/results.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/confirmation-2-candidate-9d73ee7d-e59b-4afb-9b4a-eda87f4d0ec9/results/bb682fd5-28b2-47f0-b7e1-c5e58e5627ae/burst-probe.json",
+			"archive": "cells/2-candidate/burst-probe.json.txt",
+			"sha256": "b36df5d8a6bbc66a6841c2586a4acc8e0a411f818409556df088e117ab5835d3",
+			"bytes": 1745,
+			"storedAs": "cells/2-candidate/burst-probe.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/confirmation-2-candidate-9d73ee7d-e59b-4afb-9b4a-eda87f4d0ec9/assets.json",
+			"archive": "cells/2-candidate/assets.json.txt",
+			"sha256": "60d422780ccb8113df6486f297000c242f28d22204edb807a5451e0cb11e35d7",
+			"bytes": 4665,
+			"storedAs": "cells/2-candidate/assets.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/confirmation-2-candidate-9d73ee7d-e59b-4afb-9b4a-eda87f4d0ec9/terminal.json",
+			"archive": "cells/2-candidate/terminal.json.txt",
+			"sha256": "bec4ae8bee2b8d9b875fd290595bbd96d44cf687e602f7971d48ff190a61da70",
+			"bytes": 61,
+			"storedAs": "cells/2-candidate/terminal.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/confirmation-2-control-4f5d1ddb-ba27-447d-8281-a252fa66c8b0/results/3488381e-d82b-4e35-975b-33eec16de84a/results.json",
+			"archive": "cells/2-control/results.json.txt",
+			"sha256": "caff48e3423ef175157dc85f1bef96f2cd9b1bdd2e94f808ba6edc1282ffbd91",
+			"bytes": 31086,
+			"storedAs": "cells/2-control/results.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/confirmation-2-control-4f5d1ddb-ba27-447d-8281-a252fa66c8b0/results/3488381e-d82b-4e35-975b-33eec16de84a/burst-probe.json",
+			"archive": "cells/2-control/burst-probe.json.txt",
+			"sha256": "464a1202db307d9da762c526c8c0d02cc6533be498d7c8a71c4f314eac566db8",
+			"bytes": 1791,
+			"storedAs": "cells/2-control/burst-probe.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/confirmation-2-control-4f5d1ddb-ba27-447d-8281-a252fa66c8b0/assets.json",
+			"archive": "cells/2-control/assets.json.txt",
+			"sha256": "ced4dc75230b52e1bcbcd55b3070bc12512d13ad72d9e7a2eaa06d4559c83133",
+			"bytes": 4665,
+			"storedAs": "cells/2-control/assets.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/confirmation-2-control-4f5d1ddb-ba27-447d-8281-a252fa66c8b0/terminal.json",
+			"archive": "cells/2-control/terminal.json.txt",
+			"sha256": "bec4ae8bee2b8d9b875fd290595bbd96d44cf687e602f7971d48ff190a61da70",
+			"bytes": 61,
+			"storedAs": "cells/2-control/terminal.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/confirmation-3-control-d0b02a58-670b-4982-a4dd-42795361b934/results/4737e1dd-9e49-4335-8ac6-e4f6ff429bbf/results.json",
+			"archive": "cells/3-control/results.json.txt",
+			"sha256": "c2e1aaca1d695119974d4930bc2e676460afecd925f98e83ea9a678ad03f4506",
+			"bytes": 30596,
+			"storedAs": "cells/3-control/results.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/confirmation-3-control-d0b02a58-670b-4982-a4dd-42795361b934/results/4737e1dd-9e49-4335-8ac6-e4f6ff429bbf/burst-probe.json",
+			"archive": "cells/3-control/burst-probe.json.txt",
+			"sha256": "0eff51052cad27d47c59598660f840e07c114d8d9ba2aeb30da8489330db1d31",
+			"bytes": 1750,
+			"storedAs": "cells/3-control/burst-probe.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/confirmation-3-control-d0b02a58-670b-4982-a4dd-42795361b934/assets.json",
+			"archive": "cells/3-control/assets.json.txt",
+			"sha256": "e019d92fb5ed8e573c7b28950902c67167a8a5f1047cc91380cab1734c864cd8",
+			"bytes": 4665,
+			"storedAs": "cells/3-control/assets.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/confirmation-3-control-d0b02a58-670b-4982-a4dd-42795361b934/terminal.json",
+			"archive": "cells/3-control/terminal.json.txt",
+			"sha256": "bec4ae8bee2b8d9b875fd290595bbd96d44cf687e602f7971d48ff190a61da70",
+			"bytes": 61,
+			"storedAs": "cells/3-control/terminal.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/confirmation-3-candidate-23663a5e-797a-4cec-b17e-26b4ef87fc70/results/1936a5dd-deda-4aa8-9a6c-b4085debdeac/results.json",
+			"archive": "cells/3-candidate/results.json.txt",
+			"sha256": "86ffe5f0c4d4b3a11368af04c9cb41d3547dc0e540674e8da6625ede5a751199",
+			"bytes": 29756,
+			"storedAs": "cells/3-candidate/results.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/confirmation-3-candidate-23663a5e-797a-4cec-b17e-26b4ef87fc70/results/1936a5dd-deda-4aa8-9a6c-b4085debdeac/burst-probe.json",
+			"archive": "cells/3-candidate/burst-probe.json.txt",
+			"sha256": "183501cdab1d6c5b68d35f04614892dc20fff9936ee1a7ed8e52ad8db5836239",
+			"bytes": 1758,
+			"storedAs": "cells/3-candidate/burst-probe.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/confirmation-3-candidate-23663a5e-797a-4cec-b17e-26b4ef87fc70/assets.json",
+			"archive": "cells/3-candidate/assets.json.txt",
+			"sha256": "edef17e09acf03db2dfa2a5c838bf48d127f34e8c0544cb06afb7b4efd7a245a",
+			"bytes": 4665,
+			"storedAs": "cells/3-candidate/assets.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/confirmation-3-candidate-23663a5e-797a-4cec-b17e-26b4ef87fc70/terminal.json",
+			"archive": "cells/3-candidate/terminal.json.txt",
+			"sha256": "bec4ae8bee2b8d9b875fd290595bbd96d44cf687e602f7971d48ff190a61da70",
+			"bytes": 61,
+			"storedAs": "cells/3-candidate/terminal.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/paced-control-ffd51a82-af4d-4504-a959-ca1cce9f6d49/results/101a4369-b29b-420b-8bff-445f5ce788fb/results.json",
+			"archive": "failed-overlap/control/results.json.txt",
+			"sha256": "ebce91af2fe3fd75f747355fbb6421cb28567be09c5ac21af135c2c309703e8c",
+			"bytes": 32050,
+			"storedAs": "failed-overlap/control/results.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/paced-control-ffd51a82-af4d-4504-a959-ca1cce9f6d49/assets.json",
+			"archive": "failed-overlap/control/assets.json.txt",
+			"sha256": "584d993e7fb6cf8c787bdeaef345094510bf92f3d6d31bab12e1014cb1a83da4",
+			"bytes": 4665,
+			"storedAs": "failed-overlap/control/assets.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/paced-control-ffd51a82-af4d-4504-a959-ca1cce9f6d49/terminal.json",
+			"archive": "failed-overlap/control/terminal.json.txt",
+			"sha256": "bec4ae8bee2b8d9b875fd290595bbd96d44cf687e602f7971d48ff190a61da70",
+			"bytes": 61,
+			"storedAs": "failed-overlap/control/terminal.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/paced-candidate-837e491f-ee58-4bef-a630-7b3fa586495e/results/3e9d41e2-1db7-420a-b48c-47f29b567562/results.json",
+			"archive": "failed-overlap/candidate/results.json.txt",
+			"sha256": "960d80f3ad191e4f0ca273320a5dbce1b171874f6e5a2f28a26bb8450e8eea34",
+			"bytes": 13483,
+			"storedAs": "failed-overlap/candidate/results.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/paced-candidate-837e491f-ee58-4bef-a630-7b3fa586495e/assets.json",
+			"archive": "failed-overlap/candidate/assets.json.txt",
+			"sha256": "4026c41230034276070197822eac794a5aa1a6d494884f6db2fd588def182bd9",
+			"bytes": 4665,
+			"storedAs": "failed-overlap/candidate/assets.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/paced-candidate-837e491f-ee58-4bef-a630-7b3fa586495e/terminal.json",
+			"archive": "failed-overlap/candidate/terminal.json.txt",
+			"sha256": "6463efd51b3f5f14dcdbc05cfd3ba4b15331a6b0af5b8a223f85bc5a95d12da6",
+			"bytes": 94,
+			"storedAs": "failed-overlap/candidate/terminal.json.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-preemption/proof-ready/README.md",
+			"archive": "README.md",
+			"sha256": "de6489f6b68ca303ef407eaab5de178b5841a30bfff911d633d690903391768e",
+			"bytes": 4453,
+			"storedAs": "README.md.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/map-second-key.py",
+			"archive": "native/map-second-key.py.txt",
+			"sha256": "7e9fc9db3f142b34006afa4b30cd9467491631c215cc47e7f24d83786f9b235b",
+			"bytes": 1519,
+			"storedAs": "native/map-second-key.py.txt"
+		},
+		{
+			"source": "/tmp/alkalye-snapshot-sync-native/second-key-source-map.json",
+			"archive": "native/second-key-source-map.json.txt",
+			"sha256": "40af3fd5889d45f85b98de98c35445d272fd51add3900539340e9da3d66206a2",
+			"bytes": 1323,
+			"storedAs": "native/second-key-source-map.json.txt"
+		}
+	]
+}

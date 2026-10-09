@@ -1,0 +1,33 @@
+{
+  "baseline": "754c9d643c461e736a36c2b1760499edfbd885a4",
+  "currentRoot": "d6db855308450eebfde7eb80a30fb1903579d669",
+  "threeModulesUnchangedSinceBaseline": true,
+  "status": "source-only-unverified",
+  "files": [
+    {
+      "path": "baseline/src/platform/background-work.ts",
+      "sha256": "db2845852c680feca095209d00b263111deea8f7526651557d340e063d022151"
+    },
+    {
+      "path": "baseline/src/shared/document-session.ts",
+      "sha256": "643001563d7f322103197af6e821541b9b0907c6a6d94a1b7dbf50143b40e9f4"
+    },
+    {
+      "path": "baseline/src/client/browser-library.ts",
+      "sha256": "14fb720b6cf121f800eb018e500c955f40b77bb371acff2b6709c0cc307b366e"
+    },
+    {
+      "path": "candidate/src/platform/background-work.ts",
+      "sha256": "625ec1b9af735d16c69b56b7a75692adbb4262268dffd3805d493be51e994ac6"
+    },
+    {
+      "path": "candidate/src/shared/document-session.ts",
+      "sha256": "be2d252efff88e585926b0a7a6981f625ea0a9983557753d927d93b3540a39e8"
+    },
+    {
+      "path": "candidate/src/client/browser-library.ts",
+      "sha256": "1cc35e844dc1df514177fdb1cb1a40f15b281e46e42169d0fca4870caabc2ba7"
+    }
+  ],
+  "revision": "online-drain-no-forced-fallback-offline-explicit-retained"
+}

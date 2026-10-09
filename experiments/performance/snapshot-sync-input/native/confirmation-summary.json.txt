@@ -1,0 +1,490 @@
+[
+  {
+    "phase": "input",
+    "arm": "control",
+    "n": 3,
+    "mainMaxTaskMs": {
+      "values": [
+        13.507,
+        17.697,
+        15.518
+      ],
+      "median": 15.518,
+      "max": 17.697
+    },
+    "mainBusyUnionMs": {
+      "values": [
+        2216.367,
+        1808.457,
+        2118.496
+      ],
+      "median": 2118.496,
+      "max": 2216.367
+    },
+    "largestMainGCSpanMs": {
+      "values": [
+        12.627,
+        13.759,
+        14.69
+      ],
+      "median": 13.759,
+      "max": 14.69
+    },
+    "mainGCCount": {
+      "values": [
+        82,
+        61,
+        68
+      ],
+      "median": 68,
+      "max": 82
+    },
+    "sourceReadyFrameOpportunityMs": {
+      "values": [
+        737.5,
+        776.8000000119227,
+        750.8000000119227
+      ],
+      "median": 750.8000000119227,
+      "max": 776.8000000119227
+    },
+    "firstKeyTaskMs": [
+      12.673,
+      17.697,
+      6.978
+    ],
+    "allKeyTaskMs": [
+      [
+        {
+          "offsetMs": 0,
+          "maxEnclosingRunTaskMs": 12.673
+        },
+        {
+          "offsetMs": 127,
+          "maxEnclosingRunTaskMs": 13.507
+        },
+        {
+          "offsetMs": 250.6999999880809,
+          "maxEnclosingRunTaskMs": 5.928
+        },
+        {
+          "offsetMs": 364.89999997615814,
+          "maxEnclosingRunTaskMs": 5.581
+        },
+        {
+          "offsetMs": 481.5,
+          "maxEnclosingRunTaskMs": 5.743
+        },
+        {
+          "offsetMs": 594.0999999642354,
+          "maxEnclosingRunTaskMs": 5.859
+        },
+        {
+          "offsetMs": 602.5,
+          "maxEnclosingRunTaskMs": 4.996
+        },
+        {
+          "offsetMs": 730.2999999523163,
+          "maxEnclosingRunTaskMs": 4.297
+        }
+      ],
+      [
+        {
+          "offsetMs": 0.0,
+          "maxEnclosingRunTaskMs": 17.697
+        },
+        {
+          "offsetMs": 142.9000000357646,
+          "maxEnclosingRunTaskMs": 17.579
+        },
+        {
+          "offsetMs": 281.1999999880809,
+          "maxEnclosingRunTaskMs": 6.986
+        },
+        {
+          "offsetMs": 398.0,
+          "maxEnclosingRunTaskMs": 7.077
+        },
+        {
+          "offsetMs": 424.0,
+          "maxEnclosingRunTaskMs": 6.81
+        },
+        {
+          "offsetMs": 543.5,
+          "maxEnclosingRunTaskMs": 6.265
+        },
+        {
+          "offsetMs": 659.1000000238455,
+          "maxEnclosingRunTaskMs": 6.777
+        },
+        {
+          "offsetMs": 770.6999999880809,
+          "maxEnclosingRunTaskMs": 5.908
+        }
+      ],
+      [
+        {
+          "offsetMs": 0.0,
+          "maxEnclosingRunTaskMs": 6.978
+        },
+        {
+          "offsetMs": 119.30000001192275,
+          "maxEnclosingRunTaskMs": 15.411
+        },
+        {
+          "offsetMs": 246.5,
+          "maxEnclosingRunTaskMs": 6.223
+        },
+        {
+          "offsetMs": 366.5,
+          "maxEnclosingRunTaskMs": 7.166
+        },
+        {
+          "offsetMs": 483.1000000238455,
+          "maxEnclosingRunTaskMs": 5.801
+        },
+        {
+          "offsetMs": 608.7000000476837,
+          "maxEnclosingRunTaskMs": 5.884
+        },
+        {
+          "offsetMs": 620.3000000119227,
+          "maxEnclosingRunTaskMs": 6.229
+        },
+        {
+          "offsetMs": 744.4000000357646,
+          "maxEnclosingRunTaskMs": 6.329
+        }
+      ]
+    ],
+    "lastKeyToFinalExactSourceCaretFrameMs": [
+      7.200000047683716,
+      6.100000023841858,
+      6.399999976158142
+    ]
+  },
+  {
+    "phase": "input",
+    "arm": "candidate",
+    "n": 3,
+    "mainMaxTaskMs": {
+      "values": [
+        15.662,
+        16.856,
+        15.302
+      ],
+      "median": 15.662,
+      "max": 16.856
+    },
+    "mainBusyUnionMs": {
+      "values": [
+        1466.927,
+        937.84,
+        1359.921
+      ],
+      "median": 1359.921,
+      "max": 1466.927
+    },
+    "largestMainGCSpanMs": {
+      "values": [
+        12.866,
+        15.193,
+        12.598
+      ],
+      "median": 12.866,
+      "max": 15.193
+    },
+    "mainGCCount": {
+      "values": [
+        44,
+        21,
+        44
+      ],
+      "median": 44,
+      "max": 44
+    },
+    "sourceReadyFrameOpportunityMs": {
+      "values": [
+        720.4000000357646,
+        741.3999999761618,
+        710.0999999642354
+      ],
+      "median": 720.4000000357646,
+      "max": 741.3999999761618
+    },
+    "firstKeyTaskMs": [
+      6.855,
+      8.959,
+      6.729
+    ],
+    "allKeyTaskMs": [
+      [
+        {
+          "offsetMs": 0,
+          "maxEnclosingRunTaskMs": 6.855
+        },
+        {
+          "offsetMs": 115.10000002384186,
+          "maxEnclosingRunTaskMs": 15.662
+        },
+        {
+          "offsetMs": 248.9000000357646,
+          "maxEnclosingRunTaskMs": 6.741
+        },
+        {
+          "offsetMs": 364.6999999880809,
+          "maxEnclosingRunTaskMs": 6.386
+        },
+        {
+          "offsetMs": 479.5,
+          "maxEnclosingRunTaskMs": 6.468
+        },
+        {
+          "offsetMs": 592.9000000357646,
+          "maxEnclosingRunTaskMs": 7.52
+        },
+        {
+          "offsetMs": 605.4000000357646,
+          "maxEnclosingRunTaskMs": 5.16
+        },
+        {
+          "offsetMs": 714.6999999880809,
+          "maxEnclosingRunTaskMs": 5.711
+        }
+      ],
+      [
+        {
+          "offsetMs": 0.0,
+          "maxEnclosingRunTaskMs": 8.959
+        },
+        {
+          "offsetMs": 118.39999997616178,
+          "maxEnclosingRunTaskMs": 16.856
+        },
+        {
+          "offsetMs": 247.89999997616178,
+          "maxEnclosingRunTaskMs": 7.713
+        },
+        {
+          "offsetMs": 361.5999999642372,
+          "maxEnclosingRunTaskMs": 7.674
+        },
+        {
+          "offsetMs": 478.80000001192093,
+          "maxEnclosingRunTaskMs": 6.789
+        },
+        {
+          "offsetMs": 489.5,
+          "maxEnclosingRunTaskMs": 6.493
+        },
+        {
+          "offsetMs": 606.0999999642372,
+          "maxEnclosingRunTaskMs": 7.175
+        },
+        {
+          "offsetMs": 724.8000000119209,
+          "maxEnclosingRunTaskMs": 7.155
+        }
+      ],
+      [
+        {
+          "offsetMs": 0.0,
+          "maxEnclosingRunTaskMs": 6.729
+        },
+        {
+          "offsetMs": 112.29999995231628,
+          "maxEnclosingRunTaskMs": 15.302
+        },
+        {
+          "offsetMs": 236.89999997615814,
+          "maxEnclosingRunTaskMs": 6.729
+        },
+        {
+          "offsetMs": 352.5,
+          "maxEnclosingRunTaskMs": 8.029
+        },
+        {
+          "offsetMs": 469.0999999642354,
+          "maxEnclosingRunTaskMs": 5.756
+        },
+        {
+          "offsetMs": 580.3999999761581,
+          "maxEnclosingRunTaskMs": 6.07
+        },
+        {
+          "offsetMs": 589.0,
+          "maxEnclosingRunTaskMs": 5.707
+        },
+        {
+          "offsetMs": 701.1999999880809,
+          "maxEnclosingRunTaskMs": 7.348
+        }
+      ]
+    ],
+    "lastKeyToFinalExactSourceCaretFrameMs": [
+      5.700000047683716,
+      16.59999996424085,
+      8.899999976154504
+    ]
+  },
+  {
+    "phase": "undo",
+    "arm": "control",
+    "n": 3,
+    "mainMaxTaskMs": {
+      "values": [
+        13.107,
+        13.198,
+        16.087
+      ],
+      "median": 13.198,
+      "max": 16.087
+    },
+    "mainBusyUnionMs": {
+      "values": [
+        594.027,
+        671.21,
+        1051.109
+      ],
+      "median": 671.21,
+      "max": 1051.109
+    },
+    "largestMainGCSpanMs": {
+      "values": [
+        12.409,
+        12.512,
+        15.23
+      ],
+      "median": 12.512,
+      "max": 15.23
+    },
+    "mainGCCount": {
+      "values": [
+        23,
+        23,
+        35
+      ],
+      "median": 23,
+      "max": 35
+    },
+    "sourceReadyFrameOpportunityMs": {
+      "values": [
+        48.69999998808271,
+        30.600000023845496,
+        36.69999998807907
+      ],
+      "median": 36.69999998807907,
+      "max": 48.69999998808271
+    },
+    "firstKeyTaskMs": [
+      0.546,
+      0.603,
+      0.684
+    ],
+    "allKeyTaskMs": [
+      [
+        {
+          "offsetMs": 0.0,
+          "maxEnclosingRunTaskMs": 0.546
+        }
+      ],
+      [
+        {
+          "offsetMs": -0.09999996423721313,
+          "maxEnclosingRunTaskMs": 0.603
+        }
+      ],
+      [
+        {
+          "offsetMs": 0.0,
+          "maxEnclosingRunTaskMs": 0.684
+        }
+      ]
+    ],
+    "lastKeyToFinalExactSourceCaretFrameMs": [
+      48.69999998808271,
+      30.69999998808271,
+      36.69999998807907
+    ]
+  },
+  {
+    "phase": "undo",
+    "arm": "candidate",
+    "n": 3,
+    "mainMaxTaskMs": {
+      "values": [
+        13.194,
+        17.41,
+        13.704
+      ],
+      "median": 13.704,
+      "max": 17.41
+    },
+    "mainBusyUnionMs": {
+      "values": [
+        689.972,
+        819.956,
+        629.769
+      ],
+      "median": 689.972,
+      "max": 819.956
+    },
+    "largestMainGCSpanMs": {
+      "values": [
+        12.586,
+        16.468,
+        12.913
+      ],
+      "median": 12.913,
+      "max": 16.468
+    },
+    "mainGCCount": {
+      "values": [
+        23,
+        23,
+        23
+      ],
+      "median": 23,
+      "max": 23
+    },
+    "sourceReadyFrameOpportunityMs": {
+      "values": [
+        37.39999997615814,
+        28.60000002383822,
+        39.09999996423721
+      ],
+      "median": 37.39999997615814,
+      "max": 39.09999996423721
+    },
+    "firstKeyTaskMs": [
+      0.565,
+      0.668,
+      0.554
+    ],
+    "allKeyTaskMs": [
+      [
+        {
+          "offsetMs": 0.0,
+          "maxEnclosingRunTaskMs": 0.565
+        }
+      ],
+      [
+        {
+          "offsetMs": 0.0,
+          "maxEnclosingRunTaskMs": 0.668
+        }
+      ],
+      [
+        {
+          "offsetMs": 0.0,
+          "maxEnclosingRunTaskMs": 0.554
+        }
+      ]
+    ],
+    "lastKeyToFinalExactSourceCaretFrameMs": [
+      37.39999997615814,
+      28.60000002383822,
+      39.09999996423721
+    ]
+  }
+]

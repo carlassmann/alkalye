@@ -1,0 +1,1053 @@
+[
+  {
+    "version": "control",
+    "commit": "6ec4596e8db9db9ba628eeeed7a682179eb5147a",
+    "cell": "body-rich1m",
+    "trial": 0,
+    "status": "measured-complete",
+    "trace": "/tmp/alkalye-snapshot-sync-native/paced-control-2f497652-4fe2-4db2-b92b-2cbcdf46fc55/results/8f2340a4-0c8c-42f6-ba4d-b5ec2dab496d/control-body-rich1m-0.trace.json",
+    "mode": "measured",
+    "observation": {
+      "network": {
+        "openedSockets": [
+          "/api/live"
+        ],
+        "pollRequests": 0,
+        "sends": 0
+      },
+      "probe": {
+        "end": 14860.299999952316,
+        "eventTiming": [
+          {
+            "duration": 24,
+            "name": "keydown",
+            "processingEnd": 11208.69999998808,
+            "processingStart": 11208.19999998808,
+            "startTime": 11208
+          },
+          {
+            "duration": 16,
+            "name": "keyup",
+            "processingEnd": 11209.099999964235,
+            "processingStart": 11209,
+            "startTime": 11208.899999976158
+          },
+          {
+            "duration": 16,
+            "name": "keydown",
+            "processingEnd": 11211.399999976158,
+            "processingStart": 11211.19999998808,
+            "startTime": 11211.099999964235
+          },
+          {
+            "duration": 16,
+            "name": "keypress",
+            "processingEnd": 11219.899999976158,
+            "processingStart": 11211.399999976158,
+            "startTime": 11211.099999964235
+          },
+          {
+            "duration": 16,
+            "name": "beforeinput",
+            "processingEnd": 11211.5,
+            "processingStart": 11211.399999976158,
+            "startTime": 11211.399999976158
+          },
+          {
+            "duration": 16,
+            "name": "input",
+            "processingEnd": 11219.399999976158,
+            "processingStart": 11212,
+            "startTime": 11211.799999952316
+          },
+          {
+            "duration": 16,
+            "name": "keydown",
+            "processingEnd": 11859.099999964235,
+            "processingStart": 11858.899999976158,
+            "startTime": 11858.5
+          },
+          {
+            "duration": 16,
+            "name": "keypress",
+            "processingEnd": 11871.599999964235,
+            "processingStart": 11859.099999964235,
+            "startTime": 11858.5
+          },
+          {
+            "duration": 16,
+            "name": "beforeinput",
+            "processingEnd": 11859.099999964235,
+            "processingStart": 11859.099999964235,
+            "startTime": 11859.099999964235
+          },
+          {
+            "duration": 16,
+            "name": "input",
+            "processingEnd": 11871.099999964235,
+            "processingStart": 11859.399999976158,
+            "startTime": 11859.299999952316
+          },
+          {
+            "duration": 16,
+            "name": "keydown",
+            "processingEnd": 11986,
+            "processingStart": 11986,
+            "startTime": 11984.399999976158
+          },
+          {
+            "duration": 16,
+            "name": "keypress",
+            "processingEnd": 11999.399999976158,
+            "processingStart": 11986,
+            "startTime": 11984.399999976158
+          },
+          {
+            "duration": 16,
+            "name": "beforeinput",
+            "processingEnd": 11986.099999964235,
+            "processingStart": 11986,
+            "startTime": 11986
+          },
+          {
+            "duration": 16,
+            "name": "input",
+            "processingEnd": 11998.69999998808,
+            "processingStart": 11986.399999976158,
+            "startTime": 11986.399999976158
+          },
+          {
+            "duration": 16,
+            "name": "keyup",
+            "processingEnd": 12002.19999998808,
+            "processingStart": 12002.19999998808,
+            "startTime": 11999.799999952316
+          },
+          {
+            "duration": 16,
+            "name": "keyup",
+            "processingEnd": 12118.19999998808,
+            "processingStart": 12118.099999964235,
+            "startTime": 12115.899999976158
+          },
+          {
+            "duration": 24,
+            "name": "keydown",
+            "processingEnd": 12453.19999998808,
+            "processingStart": 12453.099999964235,
+            "startTime": 12452.69999998808
+          },
+          {
+            "duration": 24,
+            "name": "keypress",
+            "processingEnd": 12458.899999976158,
+            "processingStart": 12453.19999998808,
+            "startTime": 12452.69999998808
+          },
+          {
+            "duration": 24,
+            "name": "beforeinput",
+            "processingEnd": 12453.19999998808,
+            "processingStart": 12453.19999998808,
+            "startTime": 12453.19999998808
+          },
+          {
+            "duration": 24,
+            "name": "input",
+            "processingEnd": 12458.299999952316,
+            "processingStart": 12453.5,
+            "startTime": 12453.399999976158
+          },
+          {
+            "duration": 24,
+            "name": "keyup",
+            "processingEnd": 12459.399999976158,
+            "processingStart": 12459.299999952316,
+            "startTime": 12459.19999998808
+          },
+          {
+            "duration": 16,
+            "name": "keydown",
+            "processingEnd": 12461.599999964235,
+            "processingStart": 12461.5,
+            "startTime": 12461.399999976158
+          },
+          {
+            "duration": 16,
+            "name": "keypress",
+            "processingEnd": 12466.5,
+            "processingStart": 12461.599999964235,
+            "startTime": 12461.399999976158
+          },
+          {
+            "duration": 16,
+            "name": "beforeinput",
+            "processingEnd": 12461.799999952316,
+            "processingStart": 12461.69999998808,
+            "startTime": 12461.69999998808
+          },
+          {
+            "duration": 16,
+            "name": "input",
+            "processingEnd": 12466,
+            "processingStart": 12462,
+            "startTime": 12462
+          },
+          {
+            "duration": 16,
+            "name": "keyup",
+            "processingEnd": 12479.5,
+            "processingStart": 12479.5,
+            "startTime": 12466.799999952316
+          },
+          {
+            "duration": 16,
+            "name": "keydown",
+            "processingEnd": 12589.399999976158,
+            "processingStart": 12589.299999952316,
+            "startTime": 12588.399999976158
+          },
+          {
+            "duration": 16,
+            "name": "keypress",
+            "processingEnd": 12593.5,
+            "processingStart": 12589.399999976158,
+            "startTime": 12588.399999976158
+          }
+        ],
+        "events": [
+          {
+            "editor": true,
+            "eventTimestamp": 11858.5,
+            "key": "x",
+            "time": 11859,
+            "type": "keydown"
+          },
+          {
+            "data": "x",
+            "editor": true,
+            "eventTimestamp": 11859.099999964235,
+            "inputType": "insertText",
+            "time": 11859.099999964235,
+            "type": "beforeinput"
+          },
+          {
+            "editor": true,
+            "eventTimestamp": 11984.399999976158,
+            "key": "x",
+            "time": 11986,
+            "type": "keydown"
+          },
+          {
+            "data": "x",
+            "editor": true,
+            "eventTimestamp": 11986,
+            "inputType": "insertText",
+            "time": 11986.099999964235,
+            "type": "beforeinput"
+          },
+          {
+            "editor": true,
+            "eventTimestamp": 12108.69999998808,
+            "key": "x",
+            "time": 12109.69999998808,
+            "type": "keydown"
+          },
+          {
+            "data": "x",
+            "editor": true,
+            "eventTimestamp": 12109.899999976158,
+            "inputType": "insertText",
+            "time": 12109.899999976158,
+            "type": "beforeinput"
+          },
+          {
+            "editor": true,
+            "eventTimestamp": 12223.599999964235,
+            "key": "x",
+            "time": 12223.899999976158,
+            "type": "keydown"
+          },
+          {
+            "data": "x",
+            "editor": true,
+            "eventTimestamp": 12224,
+            "inputType": "insertText",
+            "time": 12224,
+            "type": "beforeinput"
+          },
+          {
+            "editor": true,
+            "eventTimestamp": 12340.099999964235,
+            "key": "x",
+            "time": 12340.5,
+            "type": "keydown"
+          },
+          {
+            "data": "x",
+            "editor": true,
+            "eventTimestamp": 12340.599999964235,
+            "inputType": "insertText",
+            "time": 12340.599999964235,
+            "type": "beforeinput"
+          },
+          {
+            "editor": true,
+            "eventTimestamp": 12452.69999998808,
+            "key": "x",
+            "time": 12453.099999964235,
+            "type": "keydown"
+          },
+          {
+            "data": "x",
+            "editor": true,
+            "eventTimestamp": 12453.19999998808,
+            "inputType": "insertText",
+            "time": 12453.19999998808,
+            "type": "beforeinput"
+          },
+          {
+            "editor": true,
+            "eventTimestamp": 12461.399999976158,
+            "key": "x",
+            "time": 12461.5,
+            "type": "keydown"
+          },
+          {
+            "data": "x",
+            "editor": true,
+            "eventTimestamp": 12461.69999998808,
+            "inputType": "insertText",
+            "time": 12461.799999952316,
+            "type": "beforeinput"
+          },
+          {
+            "editor": true,
+            "eventTimestamp": 12588.399999976158,
+            "key": "x",
+            "time": 12589.299999952316,
+            "type": "keydown"
+          },
+          {
+            "data": "x",
+            "editor": true,
+            "eventTimestamp": 12589.399999976158,
+            "inputType": "insertText",
+            "time": 12589.399999976158,
+            "type": "beforeinput"
+          }
+        ],
+        "frames": [
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.600000000000364,
+          16.799999999999272,
+          16.600000000000364,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.80000000000109,
+          16.600000000000364,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.600000000000364,
+          16.80000000000109,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.600000000000364,
+          16.80000000000109,
+          16.599999999998545,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364
+        ],
+        "ready": 12596.5,
+        "start": 11859
+      },
+      "scripts": [
+        {
+          "decoded": 253769,
+          "path": "/app.js"
+        },
+        {
+          "decoded": 2036,
+          "path": "/chunks/document-app-ra2qwka3.js"
+        },
+        {
+          "decoded": 2798,
+          "path": "/chunks/document-app-m2qx4cqf.js"
+        },
+        {
+          "decoded": 1330,
+          "path": "/chunks/document-app-p6cm7z72.js"
+        },
+        {
+          "decoded": 7968,
+          "path": "/chunks/document-app-9bxmz3qs.js"
+        },
+        {
+          "decoded": 16754,
+          "path": "/chunks/document-app-evsn8d9a.js"
+        },
+        {
+          "decoded": 3894,
+          "path": "/chunks/document-app-d11gzsjx.js"
+        },
+        {
+          "decoded": 127144,
+          "path": "/chunks/document-app-6wn27atq.js"
+        },
+        {
+          "decoded": 617,
+          "path": "/chunks/document-app-tcmm7hkw.js"
+        },
+        {
+          "decoded": 901,
+          "path": "/chunks/document-app-bq72jmq5.js"
+        },
+        {
+          "decoded": 14375,
+          "path": "/chunks/document-app-8pephsjg.js"
+        },
+        {
+          "decoded": 2725,
+          "path": "/chunks/document-app-bstcft19.js"
+        },
+        {
+          "decoded": 5735,
+          "path": "/chunks/document-app-s2qny757.js"
+        },
+        {
+          "decoded": 1656,
+          "path": "/chunks/document-app-wd8nbj0f.js"
+        },
+        {
+          "decoded": 7957,
+          "path": "/chunks/document-app-scdh2vxq.js"
+        },
+        {
+          "decoded": 6070,
+          "path": "/chunks/document-app-4zah51r2.js"
+        },
+        {
+          "decoded": 213258,
+          "path": "/chunks/document-app-07c3ttgz.js"
+        },
+        {
+          "decoded": 900,
+          "path": "/chunks/document-app-ty21w5k4.js"
+        },
+        {
+          "decoded": 24137,
+          "path": "/chunks/document-app-1e38yect.js"
+        },
+        {
+          "decoded": 11389,
+          "path": "/chunks/document-app-fkxtg08x.js"
+        },
+        {
+          "decoded": 2412,
+          "path": "/chunks/document-app-5c068pez.js"
+        },
+        {
+          "decoded": 21034,
+          "path": "/chunks/document-app-0c9230rn.js"
+        },
+        {
+          "decoded": 2354,
+          "path": "/chunks/document-app-g10xw6bh.js"
+        },
+        {
+          "decoded": 79633,
+          "path": "/chunks/document-app-f4h6jyb6.js"
+        },
+        {
+          "decoded": 2075,
+          "path": "/chunks/document-app-93ts1dff.js"
+        },
+        {
+          "decoded": 27429,
+          "path": "/chunks/document-app-e7g60yyz.js"
+        },
+        {
+          "decoded": 713,
+          "path": "/chunks/document-app-dw5303vq.js"
+        },
+        {
+          "decoded": 14516,
+          "path": "/chunks/document-app-zqcp0vnn.js"
+        },
+        {
+          "decoded": 272,
+          "path": "/chunks/document-app-1gt925s2.js"
+        },
+        {
+          "decoded": 1109,
+          "path": "/chunks/document-app-xcyk5rrv.js"
+        },
+        {
+          "decoded": 41742,
+          "path": "/chunks/document-app-cr3qy7y7.js"
+        },
+        {
+          "decoded": 174723,
+          "path": "/chunks/document-app-j2rvnrxb.js"
+        },
+        {
+          "decoded": 20324,
+          "path": "/chunks/document-worker-stats-bp6q90a0.js"
+        },
+        {
+          "decoded": 0,
+          "path": "/document-worker.js"
+        },
+        {
+          "decoded": 253769,
+          "path": "/app.js"
+        },
+        {
+          "decoded": 2036,
+          "path": "/chunks/document-app-ra2qwka3.js"
+        },
+        {
+          "decoded": 2798,
+          "path": "/chunks/document-app-m2qx4cqf.js"
+        },
+        {
+          "decoded": 1330,
+          "path": "/chunks/document-app-p6cm7z72.js"
+        },
+        {
+          "decoded": 127144,
+          "path": "/chunks/document-app-6wn27atq.js"
+        },
+        {
+          "decoded": 7968,
+          "path": "/chunks/document-app-9bxmz3qs.js"
+        },
+        {
+          "decoded": 16754,
+          "path": "/chunks/document-app-evsn8d9a.js"
+        },
+        {
+          "decoded": 3894,
+          "path": "/chunks/document-app-d11gzsjx.js"
+        },
+        {
+          "decoded": 617,
+          "path": "/chunks/document-app-tcmm7hkw.js"
+        },
+        {
+          "decoded": 14375,
+          "path": "/chunks/document-app-8pephsjg.js"
+        },
+        {
+          "decoded": 901,
+          "path": "/chunks/document-app-bq72jmq5.js"
+        },
+        {
+          "decoded": 2725,
+          "path": "/chunks/document-app-bstcft19.js"
+        },
+        {
+          "decoded": 1656,
+          "path": "/chunks/document-app-wd8nbj0f.js"
+        },
+        {
+          "decoded": 5735,
+          "path": "/chunks/document-app-s2qny757.js"
+        },
+        {
+          "decoded": 900,
+          "path": "/chunks/document-app-ty21w5k4.js"
+        },
+        {
+          "decoded": 7957,
+          "path": "/chunks/document-app-scdh2vxq.js"
+        },
+        {
+          "decoded": 24137,
+          "path": "/chunks/document-app-1e38yect.js"
+        },
+        {
+          "decoded": 6070,
+          "path": "/chunks/document-app-4zah51r2.js"
+        },
+        {
+          "decoded": 21034,
+          "path": "/chunks/document-app-0c9230rn.js"
+        },
+        {
+          "decoded": 11389,
+          "path": "/chunks/document-app-fkxtg08x.js"
+        },
+        {
+          "decoded": 2412,
+          "path": "/chunks/document-app-5c068pez.js"
+        },
+        {
+          "decoded": 79633,
+          "path": "/chunks/document-app-f4h6jyb6.js"
+        },
+        {
+          "decoded": 213258,
+          "path": "/chunks/document-app-07c3ttgz.js"
+        },
+        {
+          "decoded": 2354,
+          "path": "/chunks/document-app-g10xw6bh.js"
+        },
+        {
+          "decoded": 2075,
+          "path": "/chunks/document-app-93ts1dff.js"
+        },
+        {
+          "decoded": 27429,
+          "path": "/chunks/document-app-e7g60yyz.js"
+        },
+        {
+          "decoded": 14516,
+          "path": "/chunks/document-app-zqcp0vnn.js"
+        },
+        {
+          "decoded": 713,
+          "path": "/chunks/document-app-dw5303vq.js"
+        },
+        {
+          "decoded": 272,
+          "path": "/chunks/document-app-1gt925s2.js"
+        },
+        {
+          "decoded": 41742,
+          "path": "/chunks/document-app-cr3qy7y7.js"
+        },
+        {
+          "decoded": 174723,
+          "path": "/chunks/document-app-j2rvnrxb.js"
+        },
+        {
+          "decoded": 1109,
+          "path": "/chunks/document-app-xcyk5rrv.js"
+        },
+        {
+          "decoded": 20324,
+          "path": "/chunks/document-worker-stats-bp6q90a0.js"
+        },
+        {
+          "decoded": 155969,
+          "path": "/document-worker.js"
+        }
+      ],
+      "sourceSelection": {
+        "start": 524296,
+        "end": 524296
+      }
+    },
+    "undoObservation": {
+      "network": {
+        "openedSockets": [
+          "/api/live"
+        ],
+        "pollRequests": 0,
+        "sends": 0
+      },
+      "probe": {
+        "end": 22232.5,
+        "eventTiming": [
+          {
+            "duration": 16,
+            "name": "keydown",
+            "processingEnd": 19231.5,
+            "processingStart": 19231.099999964237,
+            "startTime": 19231
+          },
+          {
+            "duration": 16,
+            "name": "keyup",
+            "processingEnd": 19231.799999952316,
+            "processingStart": 19231.799999952316,
+            "startTime": 19231.69999998808
+          }
+        ],
+        "events": [
+          {
+            "editor": true,
+            "eventTimestamp": 19231,
+            "key": "z",
+            "time": 19231.19999998808,
+            "type": "keydown"
+          }
+        ],
+        "frames": [
+          16.600000000002183,
+          16.700000000000728,
+          16.799999999999272,
+          16.599999999998545,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.600000000002183,
+          16.69999999999709,
+          16.700000000000728,
+          16.600000000002183,
+          16.69999999999709,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.600000000002183,
+          16.69999999999709,
+          16.700000000000728,
+          16.600000000002183,
+          16.69999999999709,
+          16.700000000000728,
+          16.600000000002183,
+          16.69999999999709,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.600000000002183,
+          16.799999999999272,
+          16.599999999998545,
+          16.700000000000728,
+          16.600000000002183,
+          16.69999999999709,
+          16.600000000002183,
+          16.700000000000728,
+          16.69999999999709,
+          16.700000000000728,
+          16.600000000002183,
+          16.69999999999709,
+          16.700000000000728,
+          16.600000000002183,
+          16.69999999999709,
+          16.600000000002183,
+          16.700000000000728,
+          16.599999999998545,
+          16.799999999999272,
+          16.600000000002183,
+          16.69999999999709,
+          16.600000000002183,
+          16.700000000000728,
+          16.69999999999709,
+          16.600000000002183,
+          16.700000000000728,
+          16.69999999999709,
+          16.700000000000728,
+          16.600000000002183,
+          16.599999999998545,
+          16.799999999999272,
+          16.600000000002183,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.69999999999709,
+          16.700000000000728,
+          16.600000000002183,
+          16.599999999998545,
+          16.799999999999272,
+          16.600000000002183,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.69999999999709,
+          16.600000000002183,
+          16.599999999998545,
+          16.799999999999272,
+          16.700000000000728,
+          16.5,
+          16.700000000000728,
+          16.700000000000728,
+          16.700000000000728,
+          16.69999999999709,
+          16.600000000002183,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.799999999999272,
+          16.600000000002183,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.69999999999709,
+          16.600000000002183,
+          16.700000000000728,
+          16.69999999999709,
+          16.600000000002183,
+          16.700000000000728,
+          16.69999999999709,
+          16.600000000002183,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.69999999999709,
+          16.600000000002183,
+          16.700000000000728,
+          16.69999999999709,
+          16.600000000002183,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.700000000000728,
+          16.69999999999709,
+          16.600000000002183,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728
+        ],
+        "ready": 19279.89999997616,
+        "start": 19231.19999998808
+      }
+    },
+    "undoTrace": "/tmp/alkalye-snapshot-sync-native/paced-control-2f497652-4fe2-4db2-b92b-2cbcdf46fc55/results/8f2340a4-0c8c-42f6-ba4d-b5ec2dab496d/control-body-rich1m-0-undo.trace.json",
+    "seedReceipt": {
+      "stage": "receipt",
+      "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+      "characters": 1048577,
+      "log": "c0fdede1-1a37-4863-b445-008c57931f74:36",
+      "actionSha256": "c8521f417c232eda34911c496c4f24240da7608ca0a47b38b901db47842514c8",
+      "historyCount": 9
+    },
+    "editedReceipt": {
+      "sha256": "bcf3b98ac55a7ba2d80e7dbda81c4c160d972a25f481fb6c9d5f145c50af5aaf",
+      "characters": 1048585,
+      "log": "c0fdede1-1a37-4863-b445-008c57931f74:44"
+    },
+    "undoReceipt": {
+      "sha256": "31afa0bd439b3a96aeed38caeb34e38b35583efe289884e9cacaece57f3d2bfa",
+      "characters": 1048584,
+      "log": "c0fdede1-1a37-4863-b445-008c57931f74:45"
+    },
+    "fixture": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    }
+  }
+]

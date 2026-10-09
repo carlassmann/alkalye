@@ -1,0 +1,30 @@
+import json,hashlib,pathlib
+root=pathlib.Path('/tmp/alkalye-snapshot-sync-native')
+chars='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+def vlq(s):
+ out=[]; value=shift=0
+ for c in s:
+  n=chars.index(c); value|=(n&31)<<shift
+  if n&32: shift+=5
+  else:
+   out.append(-(value>>1) if value&1 else value>>1); value=shift=0
+ return out
+rows=[]
+for arm,name in [('control','document-app-6wn27atq.js'),('candidate','document-app-6717btxp.js')]:
+ path=root/(arm+'-dist')/'chunks'/name
+ mp=path.with_suffix('.js.map'); m=json.loads(mp.read_text()); source=line=col=nm=0; found=None
+ for li,ln in enumerate(m['mappings'].split(';')):
+  generated=0
+  for part in ln.split(','):
+   if not part: continue
+   v=vlq(part);generated+=v[0]
+   if len(v)>=4:
+    source+=v[1];line+=v[2];col+=v[3]
+    if len(v)==5:nm+=v[4]
+    if li==90 and generated<=5060:found=(source,line,col,generated)
+  if li==90:break
+ s,l,c,g=found
+ content=m['sourcesContent'][s]
+ rows.append({'arm':arm,'raw':{'url':'http://127.0.0.1:4498/chunks/'+name,'lineNumber':91,'columnNumber':5061,'coordinates':'Chrome one-based'},'generatedMappingColumnZeroBased':g,'source':m['sources'][s],'line':l+1,'column':c+1,'snippet':content.splitlines()[l],'sourceContentSHA256':hashlib.sha256(content.encode()).hexdigest(),'scriptSHA256':hashlib.sha256(path.read_bytes()).hexdigest(),'mapSHA256':hashlib.sha256(mp.read_bytes()).hexdigest()})
+(root/'second-key-source-map.json').write_text(json.dumps(rows,indent=2)+'\n')
+print(json.dumps(rows,indent=2))

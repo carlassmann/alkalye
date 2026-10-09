@@ -1,0 +1,18 @@
+let root = "/tmp/alkalye-snapshot-sync-native"
+if (!(await Bun.file(root + "/pair-clock-terminal.json").exists())) throw Error("Valid n1 required")
+if (await Bun.file(root + "/confirmation-pending.json").exists()) throw Error("Retained attempt; no unknown mutation replay")
+await Bun.write(root + "/confirmation-pending.json", JSON.stringify({ stage: "before-keys", pid: process.pid }))
+console.log(JSON.stringify({ stage: "confirmation-live", pid: process.pid }))
+let cells: { pair: number; arm: string; run: string; exit: number }[] = []
+for (let pair of [2, 3]) {
+ for (let arm of pair === 2 ? ["candidate", "control"] : ["control", "candidate"]) {
+  let run = root + "/confirmation-" + pair + "-" + arm + "-" + crypto.randomUUID()
+  let child = Bun.spawn(["bun", "production-body-gate.ts", arm, "rich1m", "--measure"], { cwd: root + "/app-runtime", env: { ...process.env, SNAPSHOT_INPUT_BURST: "1", PRODUCTION_BODY_RUN: run }, stdout: "inherit", stderr: "inherit" })
+  console.log(JSON.stringify({ stage: "cell-live", pair, arm, pid: child.pid, run }))
+  let exit = await child.exited
+  cells.push({ pair, arm, run, exit })
+  await Bun.write(root + "/confirmation-progress.json", JSON.stringify(cells, null, 2))
+  if (exit) throw Error("Cell failed; preserve pristine/mutated state, no replay")
+ }
+}
+await Bun.write(root + "/confirmation-terminal.json", JSON.stringify({ stage: "complete", cells }, null, 2))

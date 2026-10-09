@@ -1,0 +1,18 @@
+from pathlib import Path
+import json
+root=Path('/tmp/alkalye-snapshot-sync-native')
+cells=[{'pair':1,'arm':arm,'run':json.loads((root/(arm+'-clock-terminal.json')).read_text())['run']} for arm in ('control','candidate')]+json.loads((root/'confirmation-terminal.json').read_text())['cells']
+proof=[]
+for cell in cells:
+ p=next(Path(cell['run']).glob('results/*/results.json')); result=json.loads(p.read_text())[0]
+ burst=json.loads((p.parent/'burst-probe.json').read_text());probe=result['observation']['probe'];events=json.loads(Path(result['trace']).read_text())['traceEvents'];start=next(e for e in events if e.get('name')=='interaction:start');owner=(start['pid'],start['tid']);base=start['ts']-probe['start']*1000
+ first=next(e for e in burst['events'] if e['type']=='keydown');dispatches=[e for e in events if (e.get('pid'),e.get('tid'))==owner and e.get('name')=='EventDispatch' and e.get('args',{}).get('data',{}).get('type')=='keydown'];dispatch=min(dispatches,key=lambda e:abs((e['ts']-base)/1000-first['eventTime']))
+ opening=max(e['ts'] for e in events if (e.get('pid'),e.get('tid'))==owner and e.get('name')=='undo-residual:checkpoint-compact-start' and e['ts']<=dispatch['ts']);closing=min(e['ts'] for e in events if (e.get('pid'),e.get('tid'))==owner and e.get('name')=='undo-residual:checkpoint-compact-end' and e['ts']>opening)
+ interrupted=[e for e in events if (e.get('pid'),e.get('tid'))==owner and e.get('name')=='snapshot:automatic:capture-interrupted' and dispatch['ts']<=e['ts']<=dispatch['ts']+dispatch['dur']]
+ delta=(dispatch['ts']-base)/1000-first['eventTime'];overlap=opening<=dispatch['ts']<closing
+ assert overlap and 0<=delta<10
+ if cell['arm']=='candidate':assert len(interrupted)==1
+ assert result['status']=='measured-complete'
+ proof.append({'pair':cell['pair'],'arm':cell['arm'],'status':result['status'],'clockCalibration':burst['clock'],'nativeDispatchOverlap':overlap,'eventToDispatchMs':delta,'compactStartRelativeDispatchMs':(opening-dispatch['ts'])/1000,'compactTerminalRelativeDispatchMs':(closing-dispatch['ts'])/1000,'automaticInterruptRelativeDispatchMs':[(e['ts']-dispatch['ts'])/1000 for e in interrupted],'primeHistoryReceiptAfterTiming':result['seedReceipt'],'editedReceipt':result['editedReceipt'],'undoReceipt':result['undoReceipt'],'ownedScopesClosed':json.loads((Path(cell['run'])/'terminal.json').read_text())['ownedScopesClosed']})
+(root/'confirmation-overlap-proof.json').write_text(json.dumps(proof,indent=2)+'\n')
+print([{k:r[k] for k in ('pair','arm','nativeDispatchOverlap','compactTerminalRelativeDispatchMs','automaticInterruptRelativeDispatchMs','ownedScopesClosed')} for r in proof])

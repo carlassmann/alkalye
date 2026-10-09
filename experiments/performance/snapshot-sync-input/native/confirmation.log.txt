@@ -1,0 +1,17 @@
+{"stage":"confirmation-live","pid":48590}
+{"stage":"cell-live","pair":2,"arm":"candidate","pid":48593,"run":"/tmp/alkalye-snapshot-sync-native/confirmation-2-candidate-9d73ee7d-e59b-4afb-9b4a-eda87f4d0ec9"}
+started web pid=48607
+{"stage":"complete","arm":"candidate","fixture":"rich1m","resultDirectory":"/tmp/alkalye-snapshot-sync-native/confirmation-2-candidate-9d73ee7d-e59b-4afb-9b4a-eda87f4d0ec9/results","timing":"separate-input-and-undo-3s-windows"}
+stopped alkalye-snapshot-sync-native/main/web
+{"stage":"cell-live","pair":2,"arm":"control","pid":49542,"run":"/tmp/alkalye-snapshot-sync-native/confirmation-2-control-4f5d1ddb-ba27-447d-8281-a252fa66c8b0"}
+started web pid=49557
+{"stage":"complete","arm":"control","fixture":"rich1m","resultDirectory":"/tmp/alkalye-snapshot-sync-native/confirmation-2-control-4f5d1ddb-ba27-447d-8281-a252fa66c8b0/results","timing":"separate-input-and-undo-3s-windows"}
+stopped alkalye-snapshot-sync-native/main/web
+{"stage":"cell-live","pair":3,"arm":"control","pid":50539,"run":"/tmp/alkalye-snapshot-sync-native/confirmation-3-control-d0b02a58-670b-4982-a4dd-42795361b934"}
+started web pid=50555
+{"stage":"complete","arm":"control","fixture":"rich1m","resultDirectory":"/tmp/alkalye-snapshot-sync-native/confirmation-3-control-d0b02a58-670b-4982-a4dd-42795361b934/results","timing":"separate-input-and-undo-3s-windows"}
+stopped alkalye-snapshot-sync-native/main/web
+{"stage":"cell-live","pair":3,"arm":"candidate","pid":52112,"run":"/tmp/alkalye-snapshot-sync-native/confirmation-3-candidate-23663a5e-797a-4cec-b17e-26b4ef87fc70"}
+started web pid=52127
+{"stage":"complete","arm":"candidate","fixture":"rich1m","resultDirectory":"/tmp/alkalye-snapshot-sync-native/confirmation-3-candidate-23663a5e-797a-4cec-b17e-26b4ef87fc70/results","timing":"separate-input-and-undo-3s-windows"}
+stopped alkalye-snapshot-sync-native/main/web

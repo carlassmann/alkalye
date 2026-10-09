@@ -1,0 +1,9 @@
+{"stage":"pair-live","pid":41170}
+{"stage":"arm-live","arm":"control","pid":41174,"run":"/tmp/alkalye-snapshot-sync-native/paced-control-2f497652-4fe2-4db2-b92b-2cbcdf46fc55"}
+started web pid=41188
+{"stage":"complete","arm":"control","fixture":"rich1m","resultDirectory":"/tmp/alkalye-snapshot-sync-native/paced-control-2f497652-4fe2-4db2-b92b-2cbcdf46fc55/results","timing":"separate-input-and-undo-3s-windows"}
+stopped alkalye-snapshot-sync-native/main/web
+{"stage":"arm-live","arm":"candidate","pid":42131,"run":"/tmp/alkalye-snapshot-sync-native/paced-candidate-10f27f68-ca58-4c78-9e84-1f5405a9f36e"}
+started web pid=42145
+{"stage":"complete","arm":"candidate","fixture":"rich1m","resultDirectory":"/tmp/alkalye-snapshot-sync-native/paced-candidate-10f27f68-ca58-4c78-9e84-1f5405a9f36e/results","timing":"separate-input-and-undo-3s-windows"}
+stopped alkalye-snapshot-sync-native/main/web

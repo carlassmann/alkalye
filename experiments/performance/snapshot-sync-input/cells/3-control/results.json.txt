@@ -1,0 +1,1065 @@
+[
+  {
+    "version": "control",
+    "commit": "6ec4596e8db9db9ba628eeeed7a682179eb5147a",
+    "cell": "body-rich1m",
+    "trial": 0,
+    "status": "measured-complete",
+    "trace": "/tmp/alkalye-snapshot-sync-native/confirmation-3-control-d0b02a58-670b-4982-a4dd-42795361b934/results/4737e1dd-9e49-4335-8ac6-e4f6ff429bbf/control-body-rich1m-0.trace.json",
+    "mode": "measured",
+    "observation": {
+      "network": {
+        "openedSockets": [
+          "/api/live"
+        ],
+        "pollRequests": 0,
+        "sends": 0
+      },
+      "probe": {
+        "end": 15439.899999976158,
+        "eventTiming": [
+          {
+            "duration": 24,
+            "name": "keydown",
+            "processingEnd": 11669.099999964235,
+            "processingStart": 11668.5,
+            "startTime": 11668.30000001192
+          },
+          {
+            "duration": 24,
+            "name": "keyup",
+            "processingEnd": 11669.5,
+            "processingStart": 11669.5,
+            "startTime": 11669.30000001192
+          },
+          {
+            "duration": 24,
+            "name": "keydown",
+            "processingEnd": 11672.19999998808,
+            "processingStart": 11672.099999964235,
+            "startTime": 11671.899999976158
+          },
+          {
+            "duration": 24,
+            "name": "keypress",
+            "processingEnd": 11681.899999976158,
+            "processingStart": 11672.19999998808,
+            "startTime": 11671.899999976158
+          },
+          {
+            "duration": 24,
+            "name": "beforeinput",
+            "processingEnd": 11672.5,
+            "processingStart": 11672.19999998808,
+            "startTime": 11672.19999998808
+          },
+          {
+            "duration": 24,
+            "name": "input",
+            "processingEnd": 11681.099999964235,
+            "processingStart": 11672.80000001192,
+            "startTime": 11672.80000001192
+          },
+          {
+            "duration": 16,
+            "name": "keydown",
+            "processingEnd": 12438.19999998808,
+            "processingStart": 12438,
+            "startTime": 12437.69999998808
+          },
+          {
+            "duration": 16,
+            "name": "keypress",
+            "processingEnd": 12444.899999976158,
+            "processingStart": 12438.19999998808,
+            "startTime": 12437.69999998808
+          },
+          {
+            "duration": 16,
+            "name": "beforeinput",
+            "processingEnd": 12438.30000001192,
+            "processingStart": 12438.19999998808,
+            "startTime": 12438.19999998808
+          },
+          {
+            "duration": 16,
+            "name": "input",
+            "processingEnd": 12444.399999976158,
+            "processingStart": 12438.599999964235,
+            "startTime": 12438.5
+          },
+          {
+            "duration": 24,
+            "name": "keydown",
+            "processingEnd": 12557.5,
+            "processingStart": 12557.399999976158,
+            "startTime": 12557.099999964235
+          },
+          {
+            "duration": 24,
+            "name": "keypress",
+            "processingEnd": 12572.69999998808,
+            "processingStart": 12557.5,
+            "startTime": 12557.099999964235
+          },
+          {
+            "duration": 16,
+            "name": "beforeinput",
+            "processingEnd": 12557.599999964235,
+            "processingStart": 12557.5,
+            "startTime": 12557.5
+          },
+          {
+            "duration": 16,
+            "name": "input",
+            "processingEnd": 12572,
+            "processingStart": 12557.899999976158,
+            "startTime": 12557.69999998808
+          },
+          {
+            "duration": 16,
+            "name": "keydown",
+            "processingEnd": 12684.599999964235,
+            "processingStart": 12684.599999964235,
+            "startTime": 12683.599999964235
+          },
+          {
+            "duration": 16,
+            "name": "keypress",
+            "processingEnd": 12690.69999998808,
+            "processingStart": 12684.599999964235,
+            "startTime": 12683.599999964235
+          },
+          {
+            "duration": 16,
+            "name": "beforeinput",
+            "processingEnd": 12684.69999998808,
+            "processingStart": 12684.599999964235,
+            "startTime": 12684.599999964235
+          },
+          {
+            "duration": 16,
+            "name": "input",
+            "processingEnd": 12690.099999964235,
+            "processingStart": 12685,
+            "startTime": 12684.899999976158
+          },
+          {
+            "duration": 24,
+            "name": "keyup",
+            "processingEnd": 12698.30000001192,
+            "processingStart": 12698.30000001192,
+            "startTime": 12691
+          },
+          {
+            "duration": 16,
+            "name": "keydown",
+            "processingEnd": 12804.69999998808,
+            "processingStart": 12804.5,
+            "startTime": 12804.19999998808
+          },
+          {
+            "duration": 16,
+            "name": "keypress",
+            "processingEnd": 12811.599999964235,
+            "processingStart": 12804.69999998808,
+            "startTime": 12804.19999998808
+          },
+          {
+            "duration": 16,
+            "name": "beforeinput",
+            "processingEnd": 12804.80000001192,
+            "processingStart": 12804.69999998808,
+            "startTime": 12804.69999998808
+          },
+          {
+            "duration": 16,
+            "name": "input",
+            "processingEnd": 12811.099999964235,
+            "processingStart": 12805.099999964235,
+            "startTime": 12804.899999976158
+          },
+          {
+            "duration": 16,
+            "name": "keydown",
+            "processingEnd": 12921.19999998808,
+            "processingStart": 12921.099999964235,
+            "startTime": 12920.80000001192
+          },
+          {
+            "duration": 16,
+            "name": "keypress",
+            "processingEnd": 12926.899999976158,
+            "processingStart": 12921.19999998808,
+            "startTime": 12920.80000001192
+          },
+          {
+            "duration": 16,
+            "name": "beforeinput",
+            "processingEnd": 12921.19999998808,
+            "processingStart": 12921.19999998808,
+            "startTime": 12921.19999998808
+          },
+          {
+            "duration": 16,
+            "name": "input",
+            "processingEnd": 12926.19999998808,
+            "processingStart": 12921.5,
+            "startTime": 12921.399999976158
+          },
+          {
+            "duration": 16,
+            "name": "keyup",
+            "processingEnd": 13055.5,
+            "processingStart": 13055.5,
+            "startTime": 13052.899999976158
+          },
+          {
+            "duration": 16,
+            "name": "keydown",
+            "processingEnd": 13058.599999964235,
+            "processingStart": 13058.30000001192,
+            "startTime": 13058.30000001192
+          },
+          {
+            "duration": 16,
+            "name": "keypress",
+            "processingEnd": 13064.599999964235,
+            "processingStart": 13058.599999964235,
+            "startTime": 13058.30000001192
+          },
+          {
+            "duration": 16,
+            "name": "beforeinput",
+            "processingEnd": 13058.599999964235,
+            "processingStart": 13058.599999964235,
+            "startTime": 13058.599999964235
+          },
+          {
+            "duration": 16,
+            "name": "input",
+            "processingEnd": 13063.899999976158,
+            "processingStart": 13058.899999976158,
+            "startTime": 13058.80000001192
+          }
+        ],
+        "events": [
+          {
+            "editor": true,
+            "eventTimestamp": 12437.69999998808,
+            "key": "x",
+            "time": 12438.099999964235,
+            "type": "keydown"
+          },
+          {
+            "data": "x",
+            "editor": true,
+            "eventTimestamp": 12438.19999998808,
+            "inputType": "insertText",
+            "time": 12438.19999998808,
+            "type": "beforeinput"
+          },
+          {
+            "editor": true,
+            "eventTimestamp": 12557.099999964235,
+            "key": "x",
+            "time": 12557.399999976158,
+            "type": "keydown"
+          },
+          {
+            "data": "x",
+            "editor": true,
+            "eventTimestamp": 12557.5,
+            "inputType": "insertText",
+            "time": 12557.5,
+            "type": "beforeinput"
+          },
+          {
+            "editor": true,
+            "eventTimestamp": 12683.599999964235,
+            "key": "x",
+            "time": 12684.599999964235,
+            "type": "keydown"
+          },
+          {
+            "data": "x",
+            "editor": true,
+            "eventTimestamp": 12684.599999964235,
+            "inputType": "insertText",
+            "time": 12684.599999964235,
+            "type": "beforeinput"
+          },
+          {
+            "editor": true,
+            "eventTimestamp": 12804.19999998808,
+            "key": "x",
+            "time": 12804.599999964235,
+            "type": "keydown"
+          },
+          {
+            "data": "x",
+            "editor": true,
+            "eventTimestamp": 12804.69999998808,
+            "inputType": "insertText",
+            "time": 12804.69999998808,
+            "type": "beforeinput"
+          },
+          {
+            "editor": true,
+            "eventTimestamp": 12920.80000001192,
+            "key": "x",
+            "time": 12921.19999998808,
+            "type": "keydown"
+          },
+          {
+            "data": "x",
+            "editor": true,
+            "eventTimestamp": 12921.19999998808,
+            "inputType": "insertText",
+            "time": 12921.19999998808,
+            "type": "beforeinput"
+          },
+          {
+            "editor": true,
+            "eventTimestamp": 13046.5,
+            "key": "x",
+            "time": 13046.80000001192,
+            "type": "keydown"
+          },
+          {
+            "data": "x",
+            "editor": true,
+            "eventTimestamp": 13046.899999976158,
+            "inputType": "insertText",
+            "time": 13046.899999976158,
+            "type": "beforeinput"
+          },
+          {
+            "editor": true,
+            "eventTimestamp": 13058.30000001192,
+            "key": "x",
+            "time": 13058.399999976158,
+            "type": "keydown"
+          },
+          {
+            "data": "x",
+            "editor": true,
+            "eventTimestamp": 13058.599999964235,
+            "inputType": "insertText",
+            "time": 13058.599999964235,
+            "type": "beforeinput"
+          },
+          {
+            "editor": true,
+            "eventTimestamp": 13182.099999964235,
+            "key": "x",
+            "time": 13182.5,
+            "type": "keydown"
+          },
+          {
+            "data": "x",
+            "editor": true,
+            "eventTimestamp": 13182.69999998808,
+            "inputType": "insertText",
+            "time": 13182.69999998808,
+            "type": "beforeinput"
+          }
+        ],
+        "frames": [
+          16.700000000000728,
+          16.69999999999891,
+          16.600000000000364,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.700000000000728,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.600000000000364,
+          33.399999999999636,
+          16.600000000000364,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.600000000000364,
+          16.80000000000109,
+          16.69999999999891,
+          16.5,
+          16.80000000000109,
+          16.599999999998545,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.799999999999272,
+          16.600000000000364,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.600000000000364,
+          16.80000000000109,
+          16.599999999998545,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.600000000000364,
+          16.799999999999272,
+          16.600000000000364,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.600000000000364,
+          16.799999999999272,
+          16.600000000000364,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.600000000000364,
+          16.80000000000109,
+          16.599999999998545,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.600000000000364,
+          16.799999999999272,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.799999999999272,
+          16.600000000000364,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.799999999999272,
+          16.5,
+          16.799999999999272,
+          16.600000000000364,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.69999999999891,
+          16.600000000000364,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.600000000000364,
+          16.700000000000728,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728,
+          16.600000000000364,
+          16.69999999999891,
+          16.700000000000728
+        ],
+        "ready": 13188.899999976158,
+        "start": 12438.099999964235
+      },
+      "scripts": [
+        {
+          "decoded": 2036,
+          "path": "/chunks/document-app-ra2qwka3.js"
+        },
+        {
+          "decoded": 2798,
+          "path": "/chunks/document-app-m2qx4cqf.js"
+        },
+        {
+          "decoded": 1330,
+          "path": "/chunks/document-app-p6cm7z72.js"
+        },
+        {
+          "decoded": 127144,
+          "path": "/chunks/document-app-6wn27atq.js"
+        },
+        {
+          "decoded": 253769,
+          "path": "/app.js"
+        },
+        {
+          "decoded": 16754,
+          "path": "/chunks/document-app-evsn8d9a.js"
+        },
+        {
+          "decoded": 7968,
+          "path": "/chunks/document-app-9bxmz3qs.js"
+        },
+        {
+          "decoded": 3894,
+          "path": "/chunks/document-app-d11gzsjx.js"
+        },
+        {
+          "decoded": 617,
+          "path": "/chunks/document-app-tcmm7hkw.js"
+        },
+        {
+          "decoded": 901,
+          "path": "/chunks/document-app-bq72jmq5.js"
+        },
+        {
+          "decoded": 14375,
+          "path": "/chunks/document-app-8pephsjg.js"
+        },
+        {
+          "decoded": 2725,
+          "path": "/chunks/document-app-bstcft19.js"
+        },
+        {
+          "decoded": 1656,
+          "path": "/chunks/document-app-wd8nbj0f.js"
+        },
+        {
+          "decoded": 5735,
+          "path": "/chunks/document-app-s2qny757.js"
+        },
+        {
+          "decoded": 7957,
+          "path": "/chunks/document-app-scdh2vxq.js"
+        },
+        {
+          "decoded": 900,
+          "path": "/chunks/document-app-ty21w5k4.js"
+        },
+        {
+          "decoded": 6070,
+          "path": "/chunks/document-app-4zah51r2.js"
+        },
+        {
+          "decoded": 24137,
+          "path": "/chunks/document-app-1e38yect.js"
+        },
+        {
+          "decoded": 11389,
+          "path": "/chunks/document-app-fkxtg08x.js"
+        },
+        {
+          "decoded": 2412,
+          "path": "/chunks/document-app-5c068pez.js"
+        },
+        {
+          "decoded": 21034,
+          "path": "/chunks/document-app-0c9230rn.js"
+        },
+        {
+          "decoded": 79633,
+          "path": "/chunks/document-app-f4h6jyb6.js"
+        },
+        {
+          "decoded": 213258,
+          "path": "/chunks/document-app-07c3ttgz.js"
+        },
+        {
+          "decoded": 2354,
+          "path": "/chunks/document-app-g10xw6bh.js"
+        },
+        {
+          "decoded": 2075,
+          "path": "/chunks/document-app-93ts1dff.js"
+        },
+        {
+          "decoded": 27429,
+          "path": "/chunks/document-app-e7g60yyz.js"
+        },
+        {
+          "decoded": 713,
+          "path": "/chunks/document-app-dw5303vq.js"
+        },
+        {
+          "decoded": 14516,
+          "path": "/chunks/document-app-zqcp0vnn.js"
+        },
+        {
+          "decoded": 272,
+          "path": "/chunks/document-app-1gt925s2.js"
+        },
+        {
+          "decoded": 41742,
+          "path": "/chunks/document-app-cr3qy7y7.js"
+        },
+        {
+          "decoded": 1109,
+          "path": "/chunks/document-app-xcyk5rrv.js"
+        },
+        {
+          "decoded": 174723,
+          "path": "/chunks/document-app-j2rvnrxb.js"
+        },
+        {
+          "decoded": 20324,
+          "path": "/chunks/document-worker-stats-bp6q90a0.js"
+        },
+        {
+          "decoded": 0,
+          "path": "/document-worker.js"
+        },
+        {
+          "decoded": 2798,
+          "path": "/chunks/document-app-m2qx4cqf.js"
+        },
+        {
+          "decoded": 2036,
+          "path": "/chunks/document-app-ra2qwka3.js"
+        },
+        {
+          "decoded": 1330,
+          "path": "/chunks/document-app-p6cm7z72.js"
+        },
+        {
+          "decoded": 127144,
+          "path": "/chunks/document-app-6wn27atq.js"
+        },
+        {
+          "decoded": 253769,
+          "path": "/app.js"
+        },
+        {
+          "decoded": 3894,
+          "path": "/chunks/document-app-d11gzsjx.js"
+        },
+        {
+          "decoded": 16754,
+          "path": "/chunks/document-app-evsn8d9a.js"
+        },
+        {
+          "decoded": 7968,
+          "path": "/chunks/document-app-9bxmz3qs.js"
+        },
+        {
+          "decoded": 617,
+          "path": "/chunks/document-app-tcmm7hkw.js"
+        },
+        {
+          "decoded": 14375,
+          "path": "/chunks/document-app-8pephsjg.js"
+        },
+        {
+          "decoded": 901,
+          "path": "/chunks/document-app-bq72jmq5.js"
+        },
+        {
+          "decoded": 2725,
+          "path": "/chunks/document-app-bstcft19.js"
+        },
+        {
+          "decoded": 1656,
+          "path": "/chunks/document-app-wd8nbj0f.js"
+        },
+        {
+          "decoded": 5735,
+          "path": "/chunks/document-app-s2qny757.js"
+        },
+        {
+          "decoded": 7957,
+          "path": "/chunks/document-app-scdh2vxq.js"
+        },
+        {
+          "decoded": 6070,
+          "path": "/chunks/document-app-4zah51r2.js"
+        },
+        {
+          "decoded": 213258,
+          "path": "/chunks/document-app-07c3ttgz.js"
+        },
+        {
+          "decoded": 900,
+          "path": "/chunks/document-app-ty21w5k4.js"
+        },
+        {
+          "decoded": 24137,
+          "path": "/chunks/document-app-1e38yect.js"
+        },
+        {
+          "decoded": 11389,
+          "path": "/chunks/document-app-fkxtg08x.js"
+        },
+        {
+          "decoded": 2412,
+          "path": "/chunks/document-app-5c068pez.js"
+        },
+        {
+          "decoded": 2354,
+          "path": "/chunks/document-app-g10xw6bh.js"
+        },
+        {
+          "decoded": 21034,
+          "path": "/chunks/document-app-0c9230rn.js"
+        },
+        {
+          "decoded": 713,
+          "path": "/chunks/document-app-dw5303vq.js"
+        },
+        {
+          "decoded": 14516,
+          "path": "/chunks/document-app-zqcp0vnn.js"
+        },
+        {
+          "decoded": 79633,
+          "path": "/chunks/document-app-f4h6jyb6.js"
+        },
+        {
+          "decoded": 2075,
+          "path": "/chunks/document-app-93ts1dff.js"
+        },
+        {
+          "decoded": 1109,
+          "path": "/chunks/document-app-xcyk5rrv.js"
+        },
+        {
+          "decoded": 27429,
+          "path": "/chunks/document-app-e7g60yyz.js"
+        },
+        {
+          "decoded": 272,
+          "path": "/chunks/document-app-1gt925s2.js"
+        },
+        {
+          "decoded": 41742,
+          "path": "/chunks/document-app-cr3qy7y7.js"
+        },
+        {
+          "decoded": 174723,
+          "path": "/chunks/document-app-j2rvnrxb.js"
+        },
+        {
+          "decoded": 20324,
+          "path": "/chunks/document-worker-stats-bp6q90a0.js"
+        },
+        {
+          "decoded": 155969,
+          "path": "/document-worker.js"
+        }
+      ],
+      "sourceSelection": {
+        "start": 524296,
+        "end": 524296
+      }
+    },
+    "undoObservation": {
+      "network": {
+        "openedSockets": [
+          "/api/live"
+        ],
+        "pollRequests": 0,
+        "sends": 0
+      },
+      "probe": {
+        "end": 25198.39999997616,
+        "eventTiming": [],
+        "events": [
+          {
+            "editor": true,
+            "eventTimestamp": 22195.30000001192,
+            "key": "z",
+            "time": 22195.80000001192,
+            "type": "keydown"
+          }
+        ],
+        "frames": [
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.600000000002183,
+          16.799999999999272,
+          16.700000000000728,
+          16.5,
+          16.799999999999272,
+          16.599999999998545,
+          16.700000000000728,
+          16.600000000002183,
+          16.69999999999709,
+          16.700000000000728,
+          16.600000000002183,
+          16.69999999999709,
+          16.600000000002183,
+          16.700000000000728,
+          16.69999999999709,
+          16.600000000002183,
+          16.700000000000728,
+          16.69999999999709,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.600000000002183,
+          16.69999999999709,
+          16.600000000002183,
+          16.700000000000728,
+          16.69999999999709,
+          16.700000000000728,
+          16.600000000002183,
+          16.69999999999709,
+          16.600000000002183,
+          16.700000000000728,
+          16.69999999999709,
+          16.700000000000728,
+          16.600000000002183,
+          16.69999999999709,
+          16.600000000002183,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.69999999999709,
+          16.700000000000728,
+          16.600000000002183,
+          16.599999999998545,
+          16.700000000000728,
+          16.799999999999272,
+          16.599999999998545,
+          16.600000000002183,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.69999999999709,
+          16.600000000002183,
+          16.700000000000728,
+          16.69999999999709,
+          16.700000000000728,
+          16.600000000002183,
+          16.69999999999709,
+          16.600000000002183,
+          16.700000000000728,
+          16.599999999998545,
+          16.799999999999272,
+          16.600000000002183,
+          16.69999999999709,
+          16.600000000002183,
+          16.700000000000728,
+          16.69999999999709,
+          16.700000000000728,
+          16.600000000002183,
+          16.69999999999709,
+          16.700000000000728,
+          16.600000000002183,
+          16.69999999999709,
+          16.700000000000728,
+          16.600000000002183,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.69999999999709,
+          16.700000000000728,
+          16.5,
+          16.700000000000728,
+          16.799999999999272,
+          16.5,
+          16.700000000000728,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.799999999999272,
+          16.600000000002183,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.799999999999272,
+          16.5,
+          16.700000000000728,
+          16.700000000000728,
+          16.700000000000728,
+          16.69999999999709,
+          16.600000000002183,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.69999999999709,
+          16.600000000002183,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.599999999998545,
+          16.80000000000291,
+          16.599999999998545,
+          16.599999999998545,
+          16.80000000000291,
+          16.69999999999709,
+          16.600000000002183,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.599999999998545,
+          16.80000000000291,
+          16.69999999999709,
+          16.600000000002183,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.700000000000728,
+          16.599999999998545,
+          16.599999999998545,
+          16.80000000000291,
+          16.599999999998545,
+          16.599999999998545,
+          16.700000000000728,
+          16.700000000000728,
+          16.700000000000728
+        ],
+        "ready": 22232.5,
+        "start": 22195.80000001192
+      }
+    },
+    "undoTrace": "/tmp/alkalye-snapshot-sync-native/confirmation-3-control-d0b02a58-670b-4982-a4dd-42795361b934/results/4737e1dd-9e49-4335-8ac6-e4f6ff429bbf/control-body-rich1m-0-undo.trace.json",
+    "seedReceipt": {
+      "stage": "receipt",
+      "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+      "characters": 1048577,
+      "log": "c0fdede1-1a37-4863-b445-008c57931f74:36",
+      "actionSha256": "e8c1b3693dd8ade9107e6c58d52075fb3814fa3b363755e30734a433b7b08ff4",
+      "historyCount": 8
+    },
+    "editedReceipt": {
+      "sha256": "bcf3b98ac55a7ba2d80e7dbda81c4c160d972a25f481fb6c9d5f145c50af5aaf",
+      "characters": 1048585,
+      "log": "c0fdede1-1a37-4863-b445-008c57931f74:44"
+    },
+    "undoReceipt": {
+      "sha256": "31afa0bd439b3a96aeed38caeb34e38b35583efe289884e9cacaece57f3d2bfa",
+      "characters": 1048584,
+      "log": "c0fdede1-1a37-4863-b445-008c57931f74:45"
+    },
+    "fixture": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    }
+  }
+]

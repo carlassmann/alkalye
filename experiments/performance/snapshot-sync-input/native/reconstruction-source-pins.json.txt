@@ -1,0 +1,117 @@
+{
+  "baselineCommit": "6ec4596e8db9db9ba628eeeed7a682179eb5147a",
+  "candidate": "three-module snapshot+online-sync policy only",
+  "markers": "same origin context capability plus common control markers",
+  "files": [
+    {
+      "path": "unmarked-src/client/browser-library.ts",
+      "sha256": "14fb720b6cf121f800eb018e500c955f40b77bb371acff2b6709c0cc307b366e",
+      "bytes": 24156
+    },
+    {
+      "path": "unmarked-src/client/document-app.ts",
+      "sha256": "31a2fa7465d3fc2fcf6a64e5635c64c30d11128daa8918c8708d7d833c223a27",
+      "bytes": 127792
+    },
+    {
+      "path": "unmarked-src/client/source-textarea.ts",
+      "sha256": "ea21278c971230d2e6444d11b54c3c6180f1022e777f84f254f01531c15e40ec",
+      "bytes": 11186
+    },
+    {
+      "path": "unmarked-src/platform/background-work.ts",
+      "sha256": "db2845852c680feca095209d00b263111deea8f7526651557d340e063d022151",
+      "bytes": 1624
+    },
+    {
+      "path": "unmarked-src/shared/crdt.ts",
+      "sha256": "4a0aa7553a0de7fbfc2d8eb9a6332313b04bcf0dc68e558de6add25ea6e71b7d",
+      "bytes": 76683
+    },
+    {
+      "path": "unmarked-src/shared/document-session.ts",
+      "sha256": "643001563d7f322103197af6e821541b9b0907c6a6d94a1b7dbf50143b40e9f4",
+      "bytes": 67632
+    },
+    {
+      "path": "unmarked-src/shared/projection.ts",
+      "sha256": "b6af74ddc2d20e9bc9d740deaa2cdb0cb214a323b3a7e681d0e10726bd67c93f",
+      "bytes": 21774
+    },
+    {
+      "path": "control-src/client/browser-library.ts",
+      "sha256": "62d4159b7cea9a274b10d6ea75e49342fe7d245d770f9332aa9ec316d04dc732",
+      "bytes": 24368
+    },
+    {
+      "path": "control-src/client/document-app.ts",
+      "sha256": "af22539869fc5c3eb187c9438e6013c8dfabad4a358c241a1ad50adc4bf2a574",
+      "bytes": 127851
+    },
+    {
+      "path": "control-src/client/source-textarea.ts",
+      "sha256": "43003b9a98815301c4f872805b479a984d96f871cae9950de5a6e5b06fbf7235",
+      "bytes": 11591
+    },
+    {
+      "path": "control-src/platform/background-work.ts",
+      "sha256": "db2845852c680feca095209d00b263111deea8f7526651557d340e063d022151",
+      "bytes": 1624
+    },
+    {
+      "path": "control-src/shared/crdt.ts",
+      "sha256": "3b1c391be4c6b1c59f3717293f483bdfb41932433a6db1e3a921745c3eabc1aa",
+      "bytes": 77098
+    },
+    {
+      "path": "control-src/shared/document-session.ts",
+      "sha256": "b299a5f8123187e13114d2dc730b3b5cb52e6dc66121eaa4d8490d600e4c49d5",
+      "bytes": 68566
+    },
+    {
+      "path": "control-src/shared/projection.ts",
+      "sha256": "e802609eb0ab5546d6fd72feadeac64441d6d0d37fd76f5534367cccc219a802",
+      "bytes": 21906
+    },
+    {
+      "path": "candidate-src/client/browser-library.ts",
+      "sha256": "95819219087d6bc7ea882ee59eb23660140882fa6091ba801fb2376a7b2c6112",
+      "bytes": 24199
+    },
+    {
+      "path": "candidate-src/client/document-app.ts",
+      "sha256": "af22539869fc5c3eb187c9438e6013c8dfabad4a358c241a1ad50adc4bf2a574",
+      "bytes": 127851
+    },
+    {
+      "path": "candidate-src/client/source-textarea.ts",
+      "sha256": "43003b9a98815301c4f872805b479a984d96f871cae9950de5a6e5b06fbf7235",
+      "bytes": 11591
+    },
+    {
+      "path": "candidate-src/platform/background-work.ts",
+      "sha256": "625ec1b9af735d16c69b56b7a75692adbb4262268dffd3805d493be51e994ac6",
+      "bytes": 2309
+    },
+    {
+      "path": "candidate-src/shared/crdt.ts",
+      "sha256": "3b1c391be4c6b1c59f3717293f483bdfb41932433a6db1e3a921745c3eabc1aa",
+      "bytes": 77098
+    },
+    {
+      "path": "candidate-src/shared/document-session.ts",
+      "sha256": "1280a85dd13dffae80235e205e4f8372d69c0e2f0d4d0f9cba4c4ee07dee33a7",
+      "bytes": 69269
+    },
+    {
+      "path": "candidate-src/shared/projection.ts",
+      "sha256": "e802609eb0ab5546d6fd72feadeac64441d6d0d37fd76f5534367cccc219a802",
+      "bytes": 21906
+    }
+  ],
+  "completeOriginalWitness": {
+    "source": "/tmp/alkalye-snapshot-sync-native/source-pins.json",
+    "sha256": "564a1e2ce0ed5c36da0bd63dfb0aa89229edbcfaca816054720b1fcd03b1dd91",
+    "bytes": 115981
+  }
+}

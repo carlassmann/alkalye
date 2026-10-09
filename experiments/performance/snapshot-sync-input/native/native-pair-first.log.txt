@@ -1,0 +1,30 @@
+{"stage":"pair-live","pid":32922}
+{"stage":"arm-live","arm":"control","pid":32924,"run":"/tmp/alkalye-snapshot-sync-native/paced-control-ffd51a82-af4d-4504-a959-ca1cce9f6d49"}
+started web pid=32955
+{"stage":"complete","arm":"control","fixture":"rich1m","resultDirectory":"/tmp/alkalye-snapshot-sync-native/paced-control-ffd51a82-af4d-4504-a959-ca1cce9f6d49/results","timing":"separate-input-and-undo-3s-windows"}
+stopped alkalye-snapshot-sync-native/main/web
+{"stage":"arm-live","arm":"candidate","pid":34913,"run":"/tmp/alkalye-snapshot-sync-native/paced-candidate-837e491f-ee58-4bef-a630-7b3fa586495e"}
+started web pid=34959
+stopped alkalye-snapshot-sync-native/main/web
+53 | let stage = "prepare"
+54 | let failure = false
+55 | async function command(args: string[], variables: Record<string, string> = {}) {
+56 |  let child = Bun.spawn(args, { cwd: import.meta.dir, env: { ...process.env, WORK_STATE_ROOT: stateRoot, ...variables }, stdout: "inherit", stderr: "inherit" })
+57 |  let exit = await child.exited
+58 |  if (exit !== 0) throw Error("Owned command failed: " + args[0] + " (" + exit + ")")
+                            ^
+error: Owned command failed: bun (1)
+      at command (/private/tmp/alkalye-snapshot-sync-native/app-runtime/production-body-gate.ts:58:24)
+
+Bun v1.4.0 (macOS arm64)
+ 7 |  let run = root + "/paced-" + arm + "-" + crypto.randomUUID()
+ 8 |  let child = Bun.spawn(["bun", "production-body-gate.ts", arm, "rich1m", "--measure"], { cwd: root + "/app-runtime", env: { ...process.env, SNAPSHOT_INPUT_BURST: "1", PRODUCTION_BODY_RUN: run }, stdout: "inherit", stderr: "inherit" })
+ 9 |  console.log(JSON.stringify({ stage: "arm-live", arm, pid: child.pid, run }))
+10 |  let exit = await child.exited
+11 |  await Bun.write(root + "/" + arm + "-pipeline-terminal.json", JSON.stringify({ exit, run }))
+12 |  if (exit) throw Error("Arm failed; preserve cell, no repeat")
+                      ^
+error: Arm failed; preserve cell, no repeat
+      at /private/tmp/alkalye-snapshot-sync-native/run-pair-pipeline.ts:12:18
+
+Bun v1.4.0 (macOS arm64)

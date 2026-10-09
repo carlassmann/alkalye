@@ -1,0 +1,210 @@
+--- a/src/shared/document-session.ts
++++ b/src/shared/document-session.ts
+@@ -128,6 +128,17 @@
+ 	initialCreation?: LocalDocumentCreation
+ 	activity?: DocumentActivity
+ 	transport: DocumentTransport
++}
++export class SnapshotOrigin extends Context.Reference<string>("diagnostic/SnapshotOrigin", { defaultValue: () => "explicit" }) {}
++function markSnapshotCapture<A, E, R>(task: Effect.Effect<A, E, R>) {
++ return Effect.gen(function* () {
++  let origin = yield* SnapshotOrigin
++  performance.mark("snapshot:" + origin + ":capture-start")
++  return yield* task.pipe(
++   Effect.onInterrupt(() => Effect.sync(() => { performance.mark("snapshot:capture-interrupted"); performance.mark("snapshot:" + origin + ":capture-interrupted") })),
++   Effect.ensuring(Effect.sync(() => performance.mark("snapshot:" + origin + ":capture-terminal"))),
++  )
++ })
+ }
+ export class DocumentSession extends Context.Service<
+ 	DocumentSession,
+@@ -296,12 +307,12 @@
+ 		)
+ 		let saveSnapshot = gate
+ 			.withPermit(
+-				Effect.all([
++				markSnapshotCapture(Effect.all([
+ 					projection.captureSnapshot,
+ 					options.activity
+ 						? projection.captureState
+ 						: Effect.succeed(undefined),
+-				]),
++				])),
+ 			)
+ 			.pipe(
+ 				Effect.flatMap(([snapshot, state]) =>
+@@ -320,7 +331,7 @@
+ 			{
+ 				save: Effect.suspend(() => rawFlushUnlocked),
+ 				projection: projection.replay,
+-				snapshot: saveSnapshot,
++				snapshot: saveSnapshot.pipe(Effect.provideService(SnapshotOrigin, "automatic")),
+ 				notification: notify,
+ 			},
+ 			{ save: gate, projection: gate, snapshot: cacheWrites },
+@@ -412,7 +423,7 @@
+ 			Stream.runForEach(() =>
+ 				flush.pipe(
+ 					Effect.andThen(
+-						recovery.run("snapshot", cacheWrites.withPermit(saveSnapshot)),
++						recovery.run("snapshot", cacheWrites.withPermit(saveSnapshot).pipe(Effect.provideService(SnapshotOrigin, "hidden"))),
+ 					),
+ 					Effect.catch(error =>
+ 						Effect.logError("Could not save document drafts", {
+@@ -440,7 +451,7 @@
+ 				),
+ 				Effect.andThen(
+ 					save.pipe(
+-						Effect.catch(error =>
++						Effect.provideService(SnapshotOrigin, "close"),						Effect.catch(error =>
+ 							Effect.logError("Could not cache document state", {
+ 								category: documentFailureCategory(error),
+ 							}),
+@@ -1468,9 +1479,11 @@
+ 					return
+ 				if (options.passiveState)
+ 					yield* materializeDocument(accepted).pipe(Effect.ignore)
++				performance.mark("undo-residual:snapshot-start")
+ 				let compact = options.cooperativeWork
+ 					? yield* accepted.durableCheckpointEffect()
+ 					: compactCheckpoint(accepted.checkpoint())
++				performance.mark("undo-residual:snapshot-encode-start")
+ 				return {
+ 					position: localPosition,
+ 					replica: options.passiveState ? accepted : undefined,
+--- a/src/client/browser-library.ts
++++ b/src/client/browser-library.ts
+@@ -1,3 +1,4 @@
++import { SnapshotOrigin } from "../shared/document-session"
+ import { makePassiveDocumentCache } from "./passive-document-cache"
+ import * as Context from "effect/Context"
+ import * as Crypto from "effect/Crypto"
+@@ -310,7 +311,7 @@
+ 								alreadySaved = synchronized && !opened.session.unsaved()
+ 								updated ||= synchronized
+ 							}
+-							if (!alreadySaved) yield* opened.session.save
++							if (!alreadySaved) yield* opened.session.save.pipe(Effect.provideService(SnapshotOrigin, "drain-offline-or-fallback"))
+ 						}),
+ 					).pipe(
+ 						Effect.catch(() =>
+@@ -633,7 +634,7 @@
+ 						Object.freeze({ status: "syncing" }),
+ 					).pipe(
+ 						Effect.andThen(session.sync.pipe(transport.observe("sync"))),
+-						Effect.andThen(session.save),
++						Effect.andThen(session.save.pipe(Effect.provideService(SnapshotOrigin, manual ? "manual" : "synchronize"))),
+ 						Effect.andThen(
+ 							Effect.suspend(() =>
+ 								SubscriptionRef.set(
+--- a/src/shared/crdt.ts
++++ b/src/shared/crdt.ts
+@@ -1802,12 +1802,18 @@
+ 						"Replica changed while its snapshot was being captured",
+ 					)
+ 			}
++			performance.mark("undo-residual:checkpoint-borrowed-start")
+ 			let borrowed = yield* cooperative("replica.checkpoint", () =>
+ 				source.checkpointSteps(true, true),
+ 			)
+ 			unchanged()
+-			let compact = yield* compactCheckpointEffect(borrowed)
++			performance.mark("undo-residual:checkpoint-borrowed-end")
++			performance.mark("undo-residual:checkpoint-compact-start")
++			let compact = yield* compactCheckpointEffect(borrowed).pipe(
++				Effect.ensuring(Effect.sync(() => performance.mark("undo-residual:checkpoint-compact-end"))),
++			)
+ 			unchanged()
++			performance.mark("undo-residual:checkpoint-output-start")
+ 			let owned = yield* cooperative("replica.checkpoint.output", function* () {
+ 				if (compact.format === "alkalye-state-v3") {
+ 					let targets: (typeof compact.targets)[number][] = []
+@@ -1841,6 +1847,7 @@
+ 				return { ...compact, targets }
+ 			})
+ 			unchanged()
++			performance.mark("undo-residual:checkpoint-output-end")
+ 			return owned
+ 		})
+ 	}
+--- a/src/shared/projection.ts
++++ b/src/shared/projection.ts
+@@ -269,6 +269,7 @@
+ 		let active = activeSelection && selectionBounds(nextSource, activeSelection)
+ 		let viewDelta = 0,
+ 			editView = start
++		performance.mark("undo-residual:certified-token-metadata-start")
+ 		let tokens: LinkToken[] = [],
+ 			links: ProjectedLink[] = []
+ 		for (let token of this.tokens) {
+@@ -296,6 +297,7 @@
+ 			viewDelta += prefix.length + next.label.length - (next.end - next.start)
+ 			if (token.end < start) editView = start + viewDelta
+ 		}
++		performance.mark("undo-residual:certified-token-metadata-end")
+ 		let projectedText =
+ 			this.projectedText.slice(0, editView) +
+ 			insert +
+--- a/src/client/source-textarea.ts
++++ b/src/client/source-textarea.ts
+@@ -304,6 +304,7 @@
+ 		) {
+ 			previous.start = active.start
+ 			previous.end = active.end
++			performance.mark("undo-residual:projection-current-hit")
+ 			return previous.value
+ 		}
+ 		let restored = this.previousProjected
+@@ -318,8 +319,10 @@
+ 		) {
+ 			this.previousProjected = previous
+ 			this.projected = restored
++			performance.mark("undo-residual:projection-inverse-hit")
+ 			return restored.value
+ 		}
++		performance.mark("undo-residual:projection-fallback-start")
+ 		let value =
+ 			mode === "raw" || !source.includes("[")
+ 				? identity(source)
+@@ -335,6 +338,7 @@
+ 			prefix: iconPrefix,
+ 			value,
+ 		}
++		performance.mark("undo-residual:projection-fallback-end")
+ 		return value
+ 	}
+ 	private apply(
+@@ -342,6 +346,7 @@
+ 		selection: { start: number; end: number; direction?: Direction },
+ 		reveal = false,
+ 	) {
++		performance.mark("undo-residual:apply-start")
+ 		if (next.source !== this.current.source) {
+ 			let edit = difference(this.current.source, next.source)
+ 			this.sourceIndex.replace({
+@@ -351,6 +356,7 @@
+ 			})
+ 		}
+ 		this.current = next
++		performance.mark("undo-residual:model-source-assigned")
+ 		this.viewport.render(
+ 			next.text,
+ 			{
+@@ -360,6 +366,7 @@
+ 			},
+ 			{ revealSelection: reveal },
+ 		)
++		performance.mark("undo-residual:native-render-return")
+ 		this.options.painted()
+ 	}
+ }
+--- a/src/client/document-app.ts
++++ b/src/client/document-app.ts
+@@ -2664,6 +2664,7 @@
+ 			).pipe(
+ 				Effect.tap(() =>
+ 					Effect.sync(() => {
++						performance.mark("undo-residual:durable-completion")
+ 						if (
+ 							!events.signal.aborted &&
+ 							selection === selected &&

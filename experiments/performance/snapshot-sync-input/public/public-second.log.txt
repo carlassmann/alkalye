@@ -1,0 +1,34 @@
+http://localhost:57674/
+PASS library opens through real IndexedDB and authenticated HTTP
+PASS accepted sync with active owner does not force checkpoint projection
+PASS quiet checkpoint retains source
+PASS independent real SQLite source matches accepted edit
+PASS checkpoint failure does not undo durable synchronized edit
+PASS quiet real local catalogue updates frontmatter and excerpt
+PASS manual retry projects changed source under input
+PASS manual retry remains forced and durable under input
+PASS close then cold offline open restores exact journal source
+PASS peer frontmatter and quiet catalogue remain exact
+PASS no-owner online drain finalizer then cold offline open retains latest journal source
+PASS unchanged authenticated refreshes preserve catalogue projection
+PASS controlled library cache failure publishes
+PASS explicit cache failure clear publishes
+PASS real HTTP library failure publishes
+PASS successful refresh explicitly clears failure
+PASS public workspace metadata update survives
+PASS changed workspace publishes to the same catalogue observer
+PASS writer catalogue admission survives
+PASS offline edit is immediately visible
+PASS offline reload opens durable journal
+PASS offline journal survives reload
+RECONNECT {"catalogueChanges":1,"catalogues":3,"projectionWrites":0,"projections":0,"pulls":4}
+PASS reconnect preserves offline edits
+AFTER EXPLICIT SYNC {"catalogueChanges":1,"catalogues":3,"projectionWrites":1,"projections":1,"pulls":6}
+PASS permission rejection preserves durable pending edits
+PASS permission rejection preserves local source
+PASS scope release leaves journal reopenable
+PASS rejected journal survives scope release and offline reload
+PASS explicit retry commits preserved edits after access restoration
+PASS edit during blocked pull is durably queued
+PASS interrupted sync scope releases transport and reopens
+PASS edit racing a pull survives interruption and retry

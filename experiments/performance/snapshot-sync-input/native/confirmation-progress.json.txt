@@ -1,0 +1,26 @@
+[
+  {
+    "pair": 2,
+    "arm": "candidate",
+    "run": "/tmp/alkalye-snapshot-sync-native/confirmation-2-candidate-9d73ee7d-e59b-4afb-9b4a-eda87f4d0ec9",
+    "exit": 0
+  },
+  {
+    "pair": 2,
+    "arm": "control",
+    "run": "/tmp/alkalye-snapshot-sync-native/confirmation-2-control-4f5d1ddb-ba27-447d-8281-a252fa66c8b0",
+    "exit": 0
+  },
+  {
+    "pair": 3,
+    "arm": "control",
+    "run": "/tmp/alkalye-snapshot-sync-native/confirmation-3-control-d0b02a58-670b-4982-a4dd-42795361b934",
+    "exit": 0
+  },
+  {
+    "pair": 3,
+    "arm": "candidate",
+    "run": "/tmp/alkalye-snapshot-sync-native/confirmation-3-candidate-23663a5e-797a-4cec-b17e-26b4ef87fc70",
+    "exit": 0
+  }
+]

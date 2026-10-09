@@ -1,0 +1,218 @@
+[
+  {
+    "pair": 1,
+    "arm": "control",
+    "status": "measured-complete",
+    "clockCalibration": {
+      "eventTime": 11208,
+      "observerTime": 11208.399999976158,
+      "started": 11175.099999964235,
+      "finished": 11209.599999964235
+    },
+    "nativeDispatchOverlap": true,
+    "eventToDispatchMs": 0.43100000000049477,
+    "compactStartRelativeDispatchMs": -106.677,
+    "compactTerminalRelativeDispatchMs": 113.526,
+    "automaticInterruptRelativeDispatchMs": [],
+    "primeHistoryReceiptAfterTiming": {
+      "stage": "receipt",
+      "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+      "characters": 1048577,
+      "log": "c0fdede1-1a37-4863-b445-008c57931f74:36",
+      "actionSha256": "c8521f417c232eda34911c496c4f24240da7608ca0a47b38b901db47842514c8",
+      "historyCount": 9
+    },
+    "editedReceipt": {
+      "sha256": "bcf3b98ac55a7ba2d80e7dbda81c4c160d972a25f481fb6c9d5f145c50af5aaf",
+      "characters": 1048585,
+      "log": "c0fdede1-1a37-4863-b445-008c57931f74:44"
+    },
+    "undoReceipt": {
+      "sha256": "31afa0bd439b3a96aeed38caeb34e38b35583efe289884e9cacaece57f3d2bfa",
+      "characters": 1048584,
+      "log": "c0fdede1-1a37-4863-b445-008c57931f74:45"
+    },
+    "ownedScopesClosed": true
+  },
+  {
+    "pair": 1,
+    "arm": "candidate",
+    "status": "measured-complete",
+    "clockCalibration": {
+      "eventTime": 13203.400000035765,
+      "observerTime": 13203.900000035765,
+      "started": 13171.400000035765,
+      "finished": 13205
+    },
+    "nativeDispatchOverlap": true,
+    "eventToDispatchMs": 0.3189999642345356,
+    "compactStartRelativeDispatchMs": -104.019,
+    "compactTerminalRelativeDispatchMs": 0.108,
+    "automaticInterruptRelativeDispatchMs": [
+      0.192
+    ],
+    "primeHistoryReceiptAfterTiming": {
+      "stage": "receipt",
+      "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+      "characters": 1048577,
+      "log": "c0fdede1-1a37-4863-b445-008c57931f74:36",
+      "actionSha256": "b681fd47da94fa510303bba06d832ea6ee9096965f20a2ea29791cb6cea76474",
+      "historyCount": 9
+    },
+    "editedReceipt": {
+      "sha256": "bcf3b98ac55a7ba2d80e7dbda81c4c160d972a25f481fb6c9d5f145c50af5aaf",
+      "characters": 1048585,
+      "log": "c0fdede1-1a37-4863-b445-008c57931f74:44"
+    },
+    "undoReceipt": {
+      "sha256": "31afa0bd439b3a96aeed38caeb34e38b35583efe289884e9cacaece57f3d2bfa",
+      "characters": 1048584,
+      "log": "c0fdede1-1a37-4863-b445-008c57931f74:45"
+    },
+    "ownedScopesClosed": true
+  },
+  {
+    "pair": 2,
+    "arm": "candidate",
+    "status": "measured-complete",
+    "clockCalibration": {
+      "eventTime": 16962.80000001192,
+      "observerTime": 16963.599999964237,
+      "started": 16914.69999998808,
+      "finished": 16967.599999964237
+    },
+    "nativeDispatchOverlap": true,
+    "eventToDispatchMs": 0.828999988079886,
+    "compactStartRelativeDispatchMs": -38.079,
+    "compactTerminalRelativeDispatchMs": 0.152,
+    "automaticInterruptRelativeDispatchMs": [
+      0.248
+    ],
+    "primeHistoryReceiptAfterTiming": {
+      "stage": "receipt",
+      "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+      "characters": 1048577,
+      "log": "c0fdede1-1a37-4863-b445-008c57931f74:36",
+      "actionSha256": "9ed31b2a3104b03bdf5d2ec09b2cd15f3ddd3cae16ef8c7455e293563f7ff47b",
+      "historyCount": 9
+    },
+    "editedReceipt": {
+      "sha256": "bcf3b98ac55a7ba2d80e7dbda81c4c160d972a25f481fb6c9d5f145c50af5aaf",
+      "characters": 1048585,
+      "log": "c0fdede1-1a37-4863-b445-008c57931f74:44"
+    },
+    "undoReceipt": {
+      "sha256": "31afa0bd439b3a96aeed38caeb34e38b35583efe289884e9cacaece57f3d2bfa",
+      "characters": 1048584,
+      "log": "c0fdede1-1a37-4863-b445-008c57931f74:45"
+    },
+    "ownedScopesClosed": true
+  },
+  {
+    "pair": 2,
+    "arm": "control",
+    "status": "measured-complete",
+    "clockCalibration": {
+      "eventTime": 12530,
+      "observerTime": 12530.69999998808,
+      "started": 12489.599999964235,
+      "finished": 12532.299999952316
+    },
+    "nativeDispatchOverlap": true,
+    "eventToDispatchMs": 0.2259999866491853,
+    "compactStartRelativeDispatchMs": -83.631,
+    "compactTerminalRelativeDispatchMs": 179.79,
+    "automaticInterruptRelativeDispatchMs": [],
+    "primeHistoryReceiptAfterTiming": {
+      "stage": "receipt",
+      "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+      "characters": 1048577,
+      "log": "c0fdede1-1a37-4863-b445-008c57931f74:36",
+      "actionSha256": "4164fcaef4b2321f4e9d4056587e4ff78fb9d956d59fe7bfe9382417a22a3b03",
+      "historyCount": 9
+    },
+    "editedReceipt": {
+      "sha256": "bcf3b98ac55a7ba2d80e7dbda81c4c160d972a25f481fb6c9d5f145c50af5aaf",
+      "characters": 1048585,
+      "log": "c0fdede1-1a37-4863-b445-008c57931f74:44"
+    },
+    "undoReceipt": {
+      "sha256": "31afa0bd439b3a96aeed38caeb34e38b35583efe289884e9cacaece57f3d2bfa",
+      "characters": 1048584,
+      "log": "c0fdede1-1a37-4863-b445-008c57931f74:45"
+    },
+    "ownedScopesClosed": true
+  },
+  {
+    "pair": 3,
+    "arm": "control",
+    "status": "measured-complete",
+    "clockCalibration": {
+      "eventTime": 11668.30000001192,
+      "observerTime": 11668.80000001192,
+      "started": 11624,
+      "finished": 11670
+    },
+    "nativeDispatchOverlap": true,
+    "eventToDispatchMs": 0.323999950884172,
+    "compactStartRelativeDispatchMs": -60.773,
+    "compactTerminalRelativeDispatchMs": 191.403,
+    "automaticInterruptRelativeDispatchMs": [],
+    "primeHistoryReceiptAfterTiming": {
+      "stage": "receipt",
+      "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+      "characters": 1048577,
+      "log": "c0fdede1-1a37-4863-b445-008c57931f74:36",
+      "actionSha256": "e8c1b3693dd8ade9107e6c58d52075fb3814fa3b363755e30734a433b7b08ff4",
+      "historyCount": 8
+    },
+    "editedReceipt": {
+      "sha256": "bcf3b98ac55a7ba2d80e7dbda81c4c160d972a25f481fb6c9d5f145c50af5aaf",
+      "characters": 1048585,
+      "log": "c0fdede1-1a37-4863-b445-008c57931f74:44"
+    },
+    "undoReceipt": {
+      "sha256": "31afa0bd439b3a96aeed38caeb34e38b35583efe289884e9cacaece57f3d2bfa",
+      "characters": 1048584,
+      "log": "c0fdede1-1a37-4863-b445-008c57931f74:45"
+    },
+    "ownedScopesClosed": true
+  },
+  {
+    "pair": 3,
+    "arm": "candidate",
+    "status": "measured-complete",
+    "clockCalibration": {
+      "eventTime": 11842.5,
+      "observerTime": 11842.900000035765,
+      "started": 11810.5,
+      "finished": 11843.900000035765
+    },
+    "nativeDispatchOverlap": true,
+    "eventToDispatchMs": 0.3870000610349962,
+    "compactStartRelativeDispatchMs": -75.656,
+    "compactTerminalRelativeDispatchMs": 0.114,
+    "automaticInterruptRelativeDispatchMs": [
+      0.198
+    ],
+    "primeHistoryReceiptAfterTiming": {
+      "stage": "receipt",
+      "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+      "characters": 1048577,
+      "log": "c0fdede1-1a37-4863-b445-008c57931f74:36",
+      "actionSha256": "a57b684e856790e678c6c3ff6a5fc22cfa05467a79e3cc56ffdad3387f1aa170",
+      "historyCount": 9
+    },
+    "editedReceipt": {
+      "sha256": "bcf3b98ac55a7ba2d80e7dbda81c4c160d972a25f481fb6c9d5f145c50af5aaf",
+      "characters": 1048585,
+      "log": "c0fdede1-1a37-4863-b445-008c57931f74:44"
+    },
+    "undoReceipt": {
+      "sha256": "31afa0bd439b3a96aeed38caeb34e38b35583efe289884e9cacaece57f3d2bfa",
+      "characters": 1048584,
+      "log": "c0fdede1-1a37-4863-b445-008c57931f74:45"
+    },
+    "ownedScopesClosed": true
+  }
+]

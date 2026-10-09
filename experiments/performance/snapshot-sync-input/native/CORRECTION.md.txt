@@ -1,0 +1,9 @@
+# Failed overlap oracle; no action replay
+
+First candidate is failed after eight native keys, before final accepted/Undo/reload gates. Preserve profile/DB/results/trace. No performance comparison.
+
+Common Chrome trace: first burst keydown EventDispatch −0.305ms; active compact started −120.391ms and ended −0.185ms; automatic capture interrupted −0.100ms. Later probe performance.now≈0 records after earlier background key listener canceled capture. Mechanism genuinely hit; oracle measured listener ordering incorrectly.
+
+Proposed correction: retain observation time for response/latency; add actual trusted event.timeStamp for overlap only. Validate clock/order against Chrome EventDispatch in fresh capture. Guard genuine finite positive native timestamps; unchanged eight trusted inputs, exact source/caret, immutable prime receipt, final accepted action chain, Undo and reload. Both arms identical driver. Fresh pristine per-arm seed, never mutate/replay failed cell. No new app change.
+
+written with gpt-6 in codex

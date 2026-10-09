@@ -1,0 +1,72 @@
+import * as Effect from "effect/Effect"
+import * as Schema from "effect/Schema"
+import * as HttpApiClient from "effect/http-api/HttpApiClient"
+import * as HttpClient from "effect/http/HttpClient"
+import * as HttpClientRequest from "effect/http/HttpClientRequest"
+import * as FetchHttpClient from "effect/http/FetchHttpClient"
+import { createInterface } from "node:readline"
+import { DocumentApi } from "../../../src/shared/document-api"
+import { restoreSnapshot, applyAction } from "../../../src/shared/document-actions"
+
+let Configuration = Schema.Struct({
+ origin: Schema.String,
+ document: Schema.String,
+ cookie: Schema.String,
+ seedSha256: Schema.String,
+ primeSha256: Schema.String,
+})
+let [configurationPath] = Bun.argv.slice(2)
+if (!configurationPath) throw Error("Private history reader configuration required")
+let configuration = Schema.decodeUnknownSync(Configuration)(await Bun.file(configurationPath).json())
+function digest(value: string) {
+ return new Bun.CryptoHasher("sha256").update(value).digest("hex")
+}
+await Effect.runPromise(Effect.gen(function* () {
+ let api = yield* HttpApiClient.make(DocumentApi, {
+  baseUrl: configuration.origin,
+  transformClient: client => HttpClient.mapRequest(client, HttpClientRequest.setHeaders({
+   Cookie: configuration.cookie,
+   Origin: configuration.origin,
+  })),
+ })
+ let snapshot = yield* api.documents.snapshot({ params: { document: configuration.document }, query: {} })
+ let replica = yield* restoreSnapshot(snapshot, "independent-history-reader")
+ let source = replica.text(configuration.document)
+ if (digest(source) !== configuration.seedSha256) throw Error("Independent baseline snapshot differs")
+ let preflight = yield* api.documents.history({ params: { document: configuration.document }, query: { after: snapshot.position, log: snapshot.log, limit: 1 } })
+ if (preflight.length) throw Error("Baseline history advanced during preflight")
+ console.log(JSON.stringify({ stage: "ready", position: snapshot.position, log: snapshot.log }))
+ let input = createInterface({ input: process.stdin })
+ let command = yield* Effect.tryPromise({
+  try: async () => {
+   try { for await (let line of input) return line } finally { input.close() }
+   throw Error("Missing capture-finished command")
+  },
+  catch: error => error,
+ })
+ if (command !== "capture-finished") throw Error("History read permitted only after capture")
+ let history = yield* api.documents.history({
+  params: { document: configuration.document },
+  query: { after: snapshot.position, log: snapshot.log, limit: 1000 },
+ })
+ let previous = snapshot.position
+ let prime: { sha256: string; characters: number; log: string; actionSha256: string; historyCount: number } | undefined
+ for (let entry of history) {
+  if (entry.position <= previous) throw Error("History position did not advance")
+  previous = entry.position
+  yield* applyAction(replica, entry.action)
+  if (!prime) {
+   source = replica.text(configuration.document)
+   let sha256 = digest(source)
+   if (sha256 === configuration.primeSha256) prime = {
+    sha256,
+    characters: source.length,
+    log: snapshot.log + ":" + entry.position,
+    actionSha256: digest(entry.action.id),
+    historyCount: history.length,
+   }
+  }
+ }
+ if (!prime) throw Error("Exact prime contribution absent from immutable history")
+ console.log(JSON.stringify({ stage: "receipt", ...prime }))
+}).pipe(Effect.provide(FetchHttpClient.layer), Effect.timeout("60 seconds")))

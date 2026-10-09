@@ -1,0 +1,303 @@
+{
+  "tracePath": "paced-candidate-837e491f-ee58-4bef-a630-7b3fa586495e/results/3e9d41e2-1db7-420a-b48c-47f29b567562/candidate-body-rich1m-0.trace.json",
+  "owner": [
+    35259,
+    21474406
+  ],
+  "rows": [
+    {
+      "name": "EventDispatch",
+      "type": "keydown",
+      "ms": -1695.232,
+      "durMs": 0.633
+    },
+    {
+      "name": "EventDispatch",
+      "type": "beforeinput",
+      "ms": -1694.43,
+      "durMs": 0.227
+    },
+    {
+      "name": "EventDispatch",
+      "type": "input",
+      "ms": -1693.8,
+      "durMs": 8.954
+    },
+    {
+      "name": "EventDispatch",
+      "type": "keyup",
+      "ms": -1680.141,
+      "durMs": 0.055
+    },
+    {
+      "name": "snapshot:automatic:capture-start",
+      "type": null,
+      "ms": -1461.451,
+      "durMs": 0.0
+    },
+    {
+      "name": "undo-residual:checkpoint-compact-start",
+      "type": null,
+      "ms": -1392.14,
+      "durMs": 0.0
+    },
+    {
+      "name": "undo-residual:checkpoint-compact-end",
+      "type": null,
+      "ms": -1142.507,
+      "durMs": 0.0
+    },
+    {
+      "name": "snapshot:automatic:capture-terminal",
+      "type": null,
+      "ms": -890.294,
+      "durMs": 0.0
+    },
+    {
+      "name": "snapshot:automatic:capture-start",
+      "type": null,
+      "ms": -881.606,
+      "durMs": 0.0
+    },
+    {
+      "name": "snapshot:automatic:capture-terminal",
+      "type": null,
+      "ms": -881.533,
+      "durMs": 0.0
+    },
+    {
+      "name": "snapshot:automatic:capture-start",
+      "type": null,
+      "ms": -369.231,
+      "durMs": 0.0
+    },
+    {
+      "name": "undo-residual:checkpoint-compact-start",
+      "type": null,
+      "ms": -120.391,
+      "durMs": 0.0
+    },
+    {
+      "name": "EventDispatch",
+      "type": "keydown",
+      "ms": -0.305,
+      "durMs": 0.376
+    },
+    {
+      "name": "undo-residual:checkpoint-compact-end",
+      "type": null,
+      "ms": -0.185,
+      "durMs": 0.0
+    },
+    {
+      "name": "snapshot:capture-interrupted",
+      "type": null,
+      "ms": -0.105,
+      "durMs": 0.0
+    },
+    {
+      "name": "snapshot:automatic:capture-interrupted",
+      "type": null,
+      "ms": -0.1,
+      "durMs": 0.0
+    },
+    {
+      "name": "snapshot:automatic:capture-terminal",
+      "type": null,
+      "ms": -0.095,
+      "durMs": 0.0
+    },
+    {
+      "name": "EventDispatch",
+      "type": "beforeinput",
+      "ms": 0.083,
+      "durMs": 0.048
+    },
+    {
+      "name": "EventDispatch",
+      "type": "input",
+      "ms": 0.429,
+      "durMs": 5.425
+    },
+    {
+      "name": "EventDispatch",
+      "type": "keyup",
+      "ms": 6.801,
+      "durMs": 0.041
+    },
+    {
+      "name": "EventDispatch",
+      "type": "keydown",
+      "ms": 112.517,
+      "durMs": 0.139
+    },
+    {
+      "name": "EventDispatch",
+      "type": "beforeinput",
+      "ms": 112.667,
+      "durMs": 0.051
+    },
+    {
+      "name": "EventDispatch",
+      "type": "input",
+      "ms": 113.029,
+      "durMs": 16.398
+    },
+    {
+      "name": "EventDispatch",
+      "type": "keyup",
+      "ms": 133.935,
+      "durMs": 0.04
+    },
+    {
+      "name": "EventDispatch",
+      "type": "keydown",
+      "ms": 240.11,
+      "durMs": 0.141
+    },
+    {
+      "name": "EventDispatch",
+      "type": "beforeinput",
+      "ms": 240.263,
+      "durMs": 0.048
+    },
+    {
+      "name": "EventDispatch",
+      "type": "input",
+      "ms": 240.616,
+      "durMs": 5.802
+    },
+    {
+      "name": "EventDispatch",
+      "type": "keyup",
+      "ms": 250.442,
+      "durMs": 0.052
+    },
+    {
+      "name": "EventDispatch",
+      "type": "keydown",
+      "ms": 356.766,
+      "durMs": 0.147
+    },
+    {
+      "name": "EventDispatch",
+      "type": "beforeinput",
+      "ms": 356.926,
+      "durMs": 0.063
+    },
+    {
+      "name": "EventDispatch",
+      "type": "input",
+      "ms": 357.32,
+      "durMs": 5.596
+    },
+    {
+      "name": "EventDispatch",
+      "type": "keyup",
+      "ms": 371.067,
+      "durMs": 0.056
+    },
+    {
+      "name": "EventDispatch",
+      "type": "keydown",
+      "ms": 476.57,
+      "durMs": 0.166
+    },
+    {
+      "name": "EventDispatch",
+      "type": "beforeinput",
+      "ms": 476.75,
+      "durMs": 0.049
+    },
+    {
+      "name": "EventDispatch",
+      "type": "input",
+      "ms": 477.144,
+      "durMs": 5.706
+    },
+    {
+      "name": "EventDispatch",
+      "type": "keyup",
+      "ms": 486.532,
+      "durMs": 0.054
+    },
+    {
+      "name": "EventDispatch",
+      "type": "keydown",
+      "ms": 488.772,
+      "durMs": 0.137
+    },
+    {
+      "name": "EventDispatch",
+      "type": "beforeinput",
+      "ms": 488.919,
+      "durMs": 0.052
+    },
+    {
+      "name": "EventDispatch",
+      "type": "input",
+      "ms": 489.325,
+      "durMs": 4.971
+    },
+    {
+      "name": "EventDispatch",
+      "type": "keyup",
+      "ms": 497.758,
+      "durMs": 0.044
+    },
+    {
+      "name": "EventDispatch",
+      "type": "keydown",
+      "ms": 602.023,
+      "durMs": 0.091
+    },
+    {
+      "name": "EventDispatch",
+      "type": "beforeinput",
+      "ms": 602.122,
+      "durMs": 0.04
+    },
+    {
+      "name": "EventDispatch",
+      "type": "input",
+      "ms": 602.457,
+      "durMs": 5.068
+    },
+    {
+      "name": "EventDispatch",
+      "type": "keyup",
+      "ms": 608.49,
+      "durMs": 0.034
+    },
+    {
+      "name": "EventDispatch",
+      "type": "keydown",
+      "ms": 714.442,
+      "durMs": 0.129
+    },
+    {
+      "name": "EventDispatch",
+      "type": "beforeinput",
+      "ms": 714.581,
+      "durMs": 0.049
+    },
+    {
+      "name": "EventDispatch",
+      "type": "input",
+      "ms": 714.94,
+      "durMs": 4.958
+    },
+    {
+      "name": "EventDispatch",
+      "type": "keyup",
+      "ms": 720.746,
+      "durMs": 0.035
+    },
+    {
+      "name": "snapshot:automatic:capture-start",
+      "type": null,
+      "ms": 832.175,
+      "durMs": 0.0
+    }
+  ]
+}

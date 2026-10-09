@@ -1,0 +1,14 @@
+let root = "/tmp/alkalye-snapshot-sync-native"
+if (!(await Bun.file(root + "/preparation-ready.json").exists())) throw Error("Strict/build/graph gate required")
+if (await Bun.file(root + "/pair-clock-pending.json").exists()) throw Error("Existing attempt retained; do not replay unknown keys")
+await Bun.write(root + "/pair-clock-pending.json", JSON.stringify({ stage: "before-keys", baseline: "6ec4596e8db9db9ba628eeeed7a682179eb5147a", arms: ["control", "candidate"] }))
+console.log(JSON.stringify({ stage: "pair-live", pid: process.pid }))
+for (let arm of ["control", "candidate"]) {
+ let run = root + "/paced-" + arm + "-" + crypto.randomUUID()
+ let child = Bun.spawn(["bun", "production-body-gate.ts", arm, "rich1m", "--measure"], { cwd: root + "/app-runtime", env: { ...process.env, SNAPSHOT_INPUT_BURST: "1", PRODUCTION_BODY_RUN: run }, stdout: "inherit", stderr: "inherit" })
+ console.log(JSON.stringify({ stage: "arm-live", arm, pid: child.pid, run }))
+ let exit = await child.exited
+ await Bun.write(root + "/" + arm + "-clock-terminal.json", JSON.stringify({ exit, run }))
+ if (exit) throw Error("Arm failed; preserve cell, no repeat")
+}
+await Bun.write(root + "/pair-clock-terminal.json", JSON.stringify({ stage: "complete", arms: 2 }))

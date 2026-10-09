@@ -1,0 +1,37 @@
+import json,pathlib,hashlib
+root=pathlib.Path('/tmp/alkalye-snapshot-sync-native')
+runs=[{'pair':1,'arm':arm,'run':json.loads((root/(arm+'-clock-terminal.json')).read_text())['run']} for arm in ['control','candidate']]+json.loads((root/'confirmation-terminal.json').read_text())['cells']
+rows=[]
+for cell in runs:
+ pair,arm,run=cell["pair"],cell["arm"],pathlib.Path(cell["run"]).name
+ resultpath=next((root/run).glob('results/*/results.json')); result=json.loads(resultpath.read_text())[0]
+ burst=json.loads((resultpath.parent/'burst-probe.json').read_text())
+ for phase,key in [('input','trace'),('undo','undoTrace')]:
+  path=pathlib.Path(result[key]); data=json.loads(path.read_text()); events=data.get('traceEvents',[]) if isinstance(data,dict) else data
+  begin=next(e for e in events if e.get('name')=='interaction:start'); owner=(begin['pid'],begin['tid']); start=begin['ts']; end=next(e['ts'] for e in events if e.get('name')=='interaction:end' and (e['pid'],e['tid'])==owner and e['ts']>start)
+  owned=[e for e in events if (e.get('pid'),e.get('tid'))==owner]
+  marks=[{'name':e['name'],'ms':(e['ts']-start)/1000} for e in owned if e.get('ts',0)<end and (e.get('name','').startswith('undo-residual:') or e.get('name','').startswith('snapshot:') or e.get('name')=='interaction:ready')]
+  tasks=[e for e in owned if e.get('name')=='RunTask' and e.get('dur') and e['ts']<end and e['ts']+e['dur']>start]
+  intervals=sorted((max(start,e['ts']),min(end,e['ts']+e['dur'])) for e in tasks); busy=0;last=start
+  for a,b in intervals:
+   if b>last:busy+=b-max(a,last);last=b
+  gc=[{'name':e['name'],'ms':(e['ts']-start)/1000,'durationMs':e['dur']/1000} for e in owned if e.get('name') in ['MinorGC','MajorGC'] and e.get('dur') and start<=e.get('ts',0)<end]
+  stages=[]
+  for prefix in ['checkpoint-borrowed','checkpoint-compact','checkpoint-output','snapshot-encode','certified-token-metadata','projection-fallback']:
+   openings=[]
+   for mark in marks:
+    if mark['name']=='undo-residual:'+prefix+'-start':openings.append(mark['ms'])
+    elif mark['name']=='undo-residual:'+prefix+'-end' and openings:
+     a=openings.pop(0);b=mark['ms']
+     if b>=0:stages.append({'stage':prefix,'startMs':a,'endMs':b,'wallMs':b-a,'overlappingGCCount':sum(g['ms']<b and g['ms']+g['durationMs']>a for g in gc)})
+  probe=result['observation' if phase=='input' else 'undoObservation']['probe']
+  keyTasks=[]
+  for event in probe['events']:
+   if event['type']!='keydown':continue
+   ts=start+(event['time']-probe['start'])*1000
+   enclosing=[e for e in tasks if e['ts']-100<=ts<=e['ts']+e['dur']+100]
+   keyTasks.append({'offsetMs':event['time']-probe['start'],'maxEnclosingRunTaskMs':max((e['dur']/1000 for e in enclosing),default=None)})
+  row={'pair':pair,'arm':arm,'phase':phase,'status':result['status'],'owner':owner,'tracePath':str(path),'traceSHA256':hashlib.sha256(path.read_bytes()).hexdigest(),'traceBytes':path.stat().st_size,'windowMs':(end-start)/1000,'mainMaxTaskMs':max(e['dur']/1000 for e in tasks),'mainBusyUnionMs':busy/1000,'largestMainGCSpanMs':max((g['durationMs'] for g in gc),default=0),'mainGCCount':len(gc),'sourceReadyFrameOpportunityMs':probe['ready']-probe['start'],'keyTasks':keyTasks,'markers':marks,'stages':stages,'gc':gc,'sourceSelection':result['observation' if phase=='input' else 'undoObservation'].get('sourceSelection')}
+  rows.append(row)
+  print(json.dumps({k:row[k] for k in ['arm','phase','mainMaxTaskMs','mainBusyUnionMs','largestMainGCSpanMs','mainGCCount','sourceReadyFrameOpportunityMs','keyTasks']}))
+(root/'confirmation-analysis.json').write_text(json.dumps({'scope':'n1 paced native diagnostic; each arm first trusted burst key overlaps active compaction; prime excluded; GC spans are not retained allocation ownership','rows':rows},indent=2)+'\n')

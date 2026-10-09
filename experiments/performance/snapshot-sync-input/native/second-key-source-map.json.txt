@@ -1,0 +1,36 @@
+[
+  {
+    "arm": "control",
+    "raw": {
+      "url": "http://127.0.0.1:4498/chunks/document-app-6wn27atq.js",
+      "lineNumber": 91,
+      "columnNumber": 5061,
+      "coordinates": "Chrome one-based"
+    },
+    "generatedMappingColumnZeroBased": 5060,
+    "source": "../src/client/components/editor.ts",
+    "line": 264,
+    "column": 21,
+    "snippet": "\ttextarea.oninput = () => {",
+    "sourceContentSHA256": "61c2627f622e0bc815544843b5e591f7b68e6f5663a4fb874438fc0464ebdb2c",
+    "scriptSHA256": "2b9db81a6fa7653f4ec6757255991f05fb2e12dea317b1e3f23a5da61ea4e64a",
+    "mapSHA256": "5d13dca5fa21ea6236430542a565db3dfcf77e8e40f101e502cb6eaeeb9ccec5"
+  },
+  {
+    "arm": "candidate",
+    "raw": {
+      "url": "http://127.0.0.1:4498/chunks/document-app-6717btxp.js",
+      "lineNumber": 91,
+      "columnNumber": 5061,
+      "coordinates": "Chrome one-based"
+    },
+    "generatedMappingColumnZeroBased": 5060,
+    "source": "../src/client/components/editor.ts",
+    "line": 264,
+    "column": 21,
+    "snippet": "\ttextarea.oninput = () => {",
+    "sourceContentSHA256": "61c2627f622e0bc815544843b5e591f7b68e6f5663a4fb874438fc0464ebdb2c",
+    "scriptSHA256": "6ab877c6ef3610fbb6a99385e48c9cd9d1caa24c1e1dec7a7c4aba0c48e7c5b1",
+    "mapSHA256": "e13a6459e626b783226bd8038cee03098e18662c19f67ad4745f0d0781348fe8"
+  }
+]
