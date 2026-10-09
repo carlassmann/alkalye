@@ -1,0 +1,38 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/optimistic-undo-held.test.ts:
+(pass) optimistic Undo appears before held admission and preserves later typing through durable reopen ("before") [211.51ms]
+(pass) optimistic Undo appears before held admission and preserves later typing through durable reopen ("after") [135.93ms]
+(pass) optimistic Undo appears before held admission and preserves later typing through durable reopen ("superseded") [164.57ms]
+
+tests/optimistic-undo-negatives.test.ts:
+(pass) optimistic Undo preserves later typing across interruption and accepted peer insertion ("interrupted") [153.25ms]
+(pass) optimistic Undo preserves later typing across interruption and accepted peer insertion ("peer") [154.51ms]
+(pass) optimistic Undo preserves later typing across interruption and accepted peer insertion ("storage") [169.49ms]
+(pass) optimistic Undo preserves later typing across interruption and accepted peer insertion ("acl") [227.75ms]
+(pass) optimistic Undo preserves later typing across interruption and accepted peer insertion ("close") [171.41ms]
+
+tests/document-journal-interruption.test.ts:
+(pass) interruption at the journal commit boundary retains exactly the durable contribution ("before") [91.98ms]
+(pass) interruption at the journal commit boundary retains exactly the durable contribution ("after") [168.34ms]
+
+tests/document-save-lifecycle.test.ts:
+(pass) interrupted durable save retains protection until hidden-page retry, emits Saved without changing content, and reopens offline [70.63ms]
+
+tests/document-replacements.test.ts:
+(pass) precise document transactions retain repeated-character intent, concurrent contributions, Unicode, undo and durable reopening [137.27ms]
+(pass) frontmatter authoring keeps literal fences and the body anchor through merged snapshots, saves and undo (precise: %s) [160.86ms]
+(pass) frontmatter authoring keeps literal fences and the body anchor through merged snapshots, saves and undo (precise: %s) [205.15ms]
+(pass) large body transactions after merged frontmatter retain exact source, Unicode, remote writers, undo and snapshots [3159.24ms]
+(pass) body-boundary edits after adding a header match replayed and reopened documents [2.64ms]
+(pass) empty body under an EOF header stays canonical through deletion, undo and reopening (precise=%s) [1.96ms]
+(pass) empty body under an EOF header stays canonical through deletion, undo and reopening (precise=%s) [3.04ms]
+(pass) body-boundary insertion keeps a closing newline restored below a tombstoned anchor (precise=%s) [2.33ms]
+(pass) body-boundary insertion keeps a closing newline restored below a tombstoned anchor (precise=%s) [2.50ms]
+(pass) adding a body to an EOF header preserves one canonical header (precise=%s) [1.10ms]
+(pass) adding a body to an EOF header preserves one canonical header (precise=%s) [1.07ms]
+
+ 22 pass
+ 0 fail
+ 273 expect() calls
+Ran 22 tests across 5 files. [5.52s]

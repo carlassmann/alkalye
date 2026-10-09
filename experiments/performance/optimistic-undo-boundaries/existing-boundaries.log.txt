@@ -1,0 +1,26 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/document-journal-interruption.test.ts:
+(pass) interruption at the journal commit boundary retains exactly the durable contribution ("before") [229.89ms]
+(pass) interruption at the journal commit boundary retains exactly the durable contribution ("after") [135.69ms]
+
+tests/document-save-lifecycle.test.ts:
+(pass) interrupted durable save retains protection until hidden-page retry, emits Saved without changing content, and reopens offline [80.69ms]
+
+tests/document-replacements.test.ts:
+(pass) precise document transactions retain repeated-character intent, concurrent contributions, Unicode, undo and durable reopening [71.14ms]
+(pass) frontmatter authoring keeps literal fences and the body anchor through merged snapshots, saves and undo (precise: %s) [100.26ms]
+(pass) frontmatter authoring keeps literal fences and the body anchor through merged snapshots, saves and undo (precise: %s) [162.24ms]
+(pass) large body transactions after merged frontmatter retain exact source, Unicode, remote writers, undo and snapshots [3549.47ms]
+(pass) body-boundary edits after adding a header match replayed and reopened documents [2.65ms]
+(pass) empty body under an EOF header stays canonical through deletion, undo and reopening (precise=%s) [1.58ms]
+(pass) empty body under an EOF header stays canonical through deletion, undo and reopening (precise=%s) [31.31ms]
+(pass) body-boundary insertion keeps a closing newline restored below a tombstoned anchor (precise=%s) [1.75ms]
+(pass) body-boundary insertion keeps a closing newline restored below a tombstoned anchor (precise=%s) [1.47ms]
+(pass) adding a body to an EOF header preserves one canonical header (precise=%s) [0.81ms]
+(pass) adding a body to an EOF header preserves one canonical header (precise=%s) [0.45ms]
+
+ 14 pass
+ 0 fail
+ 166 expect() calls
+Ran 14 tests across 3 files. [4.49s]

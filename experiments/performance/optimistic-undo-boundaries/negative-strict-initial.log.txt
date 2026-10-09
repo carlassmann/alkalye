@@ -1,0 +1,6 @@
+tests/optimistic-undo-negatives.test.ts(11,1): error TS6133: 'UndoUnavailable' is declared but its value is never read.
+tests/optimistic-undo-negatives.test.ts(76,73): error TS2322: Type 'Effect<A, E, R> | Effect<never, EventJournalError, never>' is not assignable to type 'Effect<A, E, R>'.
+  Type 'Effect<never, EventJournalError, never>' is not assignable to type 'Effect<A, E, R>'.
+    Type 'EventJournalError' is not assignable to type 'E'.
+      'E' could be instantiated with an arbitrary type which could be unrelated to 'EventJournalError'.
+tests/optimistic-undo-negatives.test.ts(218,34): error TS2345: Argument of type 'void' is not assignable to parameter of type 'Exit<unknown, unknown>'.

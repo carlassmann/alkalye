@@ -1,0 +1,11 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/optimistic-undo-held.test.ts:
+(pass) optimistic Undo appears before held admission and preserves later typing through durable reopen ("before") [227.79ms]
+(pass) optimistic Undo appears before held admission and preserves later typing through durable reopen ("after") [101.83ms]
+(pass) optimistic Undo appears before held admission and preserves later typing through durable reopen ("superseded") [158.75ms]
+
+ 3 pass
+ 0 fail
+ 39 expect() calls
+Ran 3 tests across 1 file. [604.00ms]

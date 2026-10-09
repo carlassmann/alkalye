@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/**/*.ts",
+    "tests/optimistic-undo-held.test.ts",
+    "tests/document-journal-interruption.test.ts",
+    "tests/document-save-lifecycle.test.ts",
+    "tests/document-replacements.test.ts",
+    "tests/optimistic-undo-negatives.test.ts"
+  ]
+}

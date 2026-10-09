@@ -1,0 +1,23 @@
+{
+  "README.md": "a8385774f874c99ae431dd725d4a9016432446b99406fd30f668a9ef3273b780",
+  "candidate.patch.txt": "9276810a767be06d34142b830627afc9401c0e3249041b31fe7365da17b25b2e",
+  "document-session.ts.txt": "cdf8010bcc0fa6b5ed6e6a4a46fdd707ae7b75be46fe12bf1e0bcbe1d85c3c45",
+  "existing-boundaries.log.txt": "15a2e235c0a0264878e5f029da89bd9e123b0a2e5fe867d3395e9b4d10c622f1",
+  "five-case-source-before-strengthening.ts.txt": "34e4a9f7abf020730a9ae27775b410cfaff6bd5bd2adfb9b5a7cbc38cf435c96",
+  "held-initial.log.txt": "27a500b029eedfb355c3d9d8e1e94971e2bd182252c498461b1be50ce13f7004",
+  "negative-corrected.log.txt": "3dfd6dddbbfd241d6ef95c9274a34dfaffc2881ffe9e4a851413ecd7765e4286",
+  "negative-correction-review-prompt.txt": "0582533a72d4af39d0bc0bdc16a8cccb6138860d2737473c794243c700ccd2b0",
+  "negative-delta-review-prompt.txt": "9a6e836726bdd418814e2e5028e9ddd3c44211d4de0c424792879c54d7253a5b",
+  "negative-initial-fixture.ts.txt": "abb848c5a9c6c62bfb4745fbab12afbedf9deae6321381f31d669f5fb5fb38ca",
+  "negative-initial.log.txt": "4830b274184e6291eae7e0cd0a4003091c5cc5bcc518ed7fb99559ca7493b054",
+  "negative-strengthened.log.txt": "8ba36d6f3201f4b8540fbe822415b89dd0000209246739db5213480705b201d9",
+  "negative-strict-corrected.log.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "negative-strict-initial.log.txt": "be61a8135c1d0a4262abeda43b1bc5815b5393bffdcca0f8c081eda0ccf29eff",
+  "negative-strict-strengthened.log.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "optimistic-undo-held.test.ts.txt": "e11a28dbb6f9131e1531c1ec8c1d4ef7c9faf6b321f437483c6826d5b996a60b",
+  "optimistic-undo-negatives.test.ts.txt": "23747ea999813a5793fa089d13ef0b5b37b5a30c034799f98063effcfa8cb07e",
+  "opus-negative-correction.json.txt": "c65904b45def22a61ad9506d6231d1ecd41157a4da2bfc7bea5d391502eade0d",
+  "opus-negative-delta.json.txt": "a358104510ca4fcae6db238f285eedc7eb535e47b23c05743cf1d807624db542",
+  "results.json.txt": "343d2b0a21875d68877a0ba2e4c7a2afa04f65c6bafa7d30bb69086face3efce",
+  "tsconfig.optimistic.json.txt": "6077ff972ac5ad6ad85b73911a36c54d7b70bca1472140735ded20c5615562e4"
+}

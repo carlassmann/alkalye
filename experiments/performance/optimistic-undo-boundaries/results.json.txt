@@ -1,0 +1,44 @@
+{
+  "base": "754c9d643c461e736a36c2b1760499edfbd885a4",
+  "sourceSha256": "cdf8010bcc0fa6b5ed6e6a4a46fdd707ae7b75be46fe12bf1e0bcbe1d85c3c45",
+  "strict": {
+    "initialExit": 2,
+    "correctedExit": 0,
+    "strengthenedExit": 0
+  },
+  "public": {
+    "initialNegative": {
+      "pass": 4,
+      "fail": 1,
+      "assertions": 62,
+      "failure": "Fixture used Fiber.interrupt void as Exit; retained closed fixture."
+    },
+    "correctedNegative": {
+      "pass": 5,
+      "fail": 0,
+      "assertions": 68
+    },
+    "strengthenedAll": {
+      "pass": 22,
+      "fail": 0,
+      "assertions": 273
+    }
+  },
+  "review": {
+    "model": "claude-opus-5-5",
+    "resolvedCanonical": "claude-opus-5-5",
+    "latestVerdict": "conditional GO; source invariants and additional race evidence required",
+    "latestReviewedSource": "before accepted/durable-generation strengthening"
+  },
+  "runtimeResources": "all closed; no browser/server/build/native captures",
+  "limitations": [
+    "Insertion-only certificate after server sync; offline/pending contributions use fallback.",
+    "ACL case proves denied real server sync then same-ID recovery on regrant; not immediate native permission/UI admission.",
+    "Storage fault is injected pre-write public journal failure, not disk quota or IDB corruption.",
+    "Uncommitted drafts retain existing in-memory owner/protection semantics; no new cold draft ledger.",
+    "Scope close case holds already-published action; close racing asynchronous preparation remains separate missing case.",
+    "No interruption after actual commit-before-dequeue injection yet.",
+    "No native subscription-first-paint/caret or performance evidence.",
+    "Group successor not mixed into this candidate."
+  ]
+}

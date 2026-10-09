@@ -1,0 +1,31 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/optimistic-undo-negatives.test.ts:
+Retained optimistic Undo failure fixture /var/folders/db/l4qrf5wx7452h6yr3ctszzn40000gn/T/alkalye-journal-interruption-YbFwIp
+1213 | /** @internal */
+1214 | export const exitFindError = /*#__PURE__*/Filter.composePassthrough(exitFilterCause, findError);
+1215 | /** @internal */
+1216 | export const exitFindDefect = /*#__PURE__*/Filter.composePassthrough(exitFilterCause, findDefect);
+1217 | /** @internal */
+1218 | export const exitHasInterrupts = self => self._tag === "Failure" && hasInterrupts(self.cause);
+                                                ^
+TypeError: undefined is not an object (evaluating 'self._tag')
+      at exitHasInterrupts (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:1218:42)
+      at <anonymous> (/private/tmp/alkalye-optimistic-undo-754/runtime/tests/optimistic-undo-negatives.test.ts:218:20)
+      at ~effect/Effect/successCont (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:987:28)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:816:17)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:434:19)
+      at runTasks (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:169:15)
+      at afterScheduled (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:159:10)
+(fail) optimistic Undo preserves later typing across interruption and accepted peer insertion ("interrupted") [140.86ms]
+(pass) optimistic Undo preserves later typing across interruption and accepted peer insertion ("peer") [90.45ms]
+(pass) optimistic Undo preserves later typing across interruption and accepted peer insertion ("storage") [66.11ms]
+(pass) optimistic Undo preserves later typing across interruption and accepted peer insertion ("acl") [61.16ms]
+(pass) optimistic Undo preserves later typing across interruption and accepted peer insertion ("close") [65.04ms]
+
+ 4 pass
+ 1 fail
+ 62 expect() calls
+Ran 5 tests across 1 file. [518.00ms]

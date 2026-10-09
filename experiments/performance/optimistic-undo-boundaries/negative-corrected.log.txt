@@ -1,0 +1,13 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/optimistic-undo-negatives.test.ts:
+(pass) optimistic Undo preserves later typing across interruption and accepted peer insertion ("interrupted") [231.81ms]
+(pass) optimistic Undo preserves later typing across interruption and accepted peer insertion ("peer") [118.82ms]
+(pass) optimistic Undo preserves later typing across interruption and accepted peer insertion ("storage") [88.25ms]
+(pass) optimistic Undo preserves later typing across interruption and accepted peer insertion ("acl") [81.46ms]
+(pass) optimistic Undo preserves later typing across interruption and accepted peer insertion ("close") [77.19ms]
+
+ 5 pass
+ 0 fail
+ 68 expect() calls
+Ran 5 tests across 1 file. [700.00ms]

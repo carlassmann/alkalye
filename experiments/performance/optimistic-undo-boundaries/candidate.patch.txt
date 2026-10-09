@@ -1,0 +1,236 @@
+--- a/src/shared/document-session.ts
++++ b/src/shared/document-session.ts
+@@ -1,3 +1,4 @@
++import * as Deferred from "effect/Deferred"
+ import * as Cache from "effect/Cache"
+ import type * as Cause from "effect/Cause"
+ import * as Context from "effect/Context"
+@@ -334,8 +335,10 @@
+ 		)
+ 		let revision = yield* SubscriptionRef.make(0)
+ 		advanceView()
+-		let persistUnlocked = (value: Recording) =>
++		let persistUnlocked = (value: Recording, refused?: (error: DocumentFailure) => Effect.Effect<void, DocumentFailure>) =>
+ 			write("DocumentRecorded", value).pipe(
++				Effect.mapError(error => storageFailure("save document action", error)),
++				Effect.tapError(error => refused?.(error) ?? Effect.void),
+ 				Effect.catchDefect(cause =>
+ 					SqlError.isSqlError(cause)
+ 						? Effect.fail(storageFailure("save document action", cause))
+@@ -347,17 +350,38 @@
+ 				Effect.onError(() => projection.discardPreparedOpen),
+ 			)
+ 		let persist = (value: Recording) => gate.withPermit(persistUnlocked(value))
++		let optimisticUndos = new Map<string, Deferred.Deferred<DocumentAction, DocumentFailure>>()
+ 		let rawFlushUnlocked: Effect.Effect<void, DocumentFailure> = Effect.gen(
+ 			function* () {
+ 				while (Queue.sizeUnsafe(unsaved)) {
+ 					let action = yield* Queue.peek(unsaved)
+ 					yield* recovery.attempt("projection", projection.replay)
++					if (optimisticUndos.has(action.id) && !projection.proposed(action.id)) {
++						let admission = yield* projection.admitOptimisticUndo(action).pipe(Effect.mapError(error => storageFailure("admit optimistic undo", error)), Effect.result)
++						if (admission._tag === "Failure") {
++							yield* discardRefusedUndo(action, admission.failure)
++							if (!optimisticUndos.has(action.id)) continue
++							return yield* Effect.fail(admission.failure)
++						}
++					}
+ 					if (projection.proposed(action.id))
+ 						yield* projection.validate({ kind: "proposed", action })
+-					else yield* persistUnlocked({ kind: "proposed", action })
+-					yield* Queue.take(unsaved)
+-					projection.removeDraft(action.id)
+-					publishDraftStatus()
++					else {
++						let optimistic = optimisticUndos.has(action.id)
++						let result = yield* persistUnlocked({ kind: "proposed", action }, optimistic ? error => discardRefusedUndo(action, error) : undefined).pipe(Effect.result)
++						if (result._tag === "Failure") {
++							if (optimistic && !optimisticUndos.has(action.id)) continue
++							return yield* Effect.fail(result.failure)
++						}
++					}
++					yield* Effect.gen(function* () {
++						yield* Queue.take(unsaved)
++						projection.removeDraft(action.id)
++						let outcome = optimisticUndos.get(action.id)
++						if (outcome) yield* Deferred.succeed(outcome, action)
++						optimisticUndos.delete(action.id)
++						publishDraftStatus()
++					}).pipe(Effect.uninterruptible)
+ 				}
+ 			},
+ 		).pipe(
+@@ -448,6 +472,10 @@
+ 					),
+ 				),
+ 				Effect.asVoid,
++				Effect.ensuring(Effect.gen(function* () {
++					for (let outcome of optimisticUndos.values())
++						yield* Deferred.fail(outcome, new DocumentConflict({ message: "Document closed before Undo receipt was known" }))
++				})),
+ 			),
+ 		)
+ 		let view = documentView(() => projection.replica)
+@@ -651,6 +679,7 @@
+ 							: Effect.void,
+ 					),
+ 					Effect.tap(() => recovery.synchronizationFailure()),
++					Effect.tap(() => gate.withPermit(projection.certifyUndo).pipe(Effect.ignore)),
+ 				),
+ 			historyPage: (after = 0) =>
+ 				Effect.suspend(() =>
+@@ -708,7 +737,7 @@
+ 		}
+ 		function undo(redo: boolean, textTarget?: string) {
+ 			let generation = projection.editGeneration()
+-			return propose(actor =>
++			let fallback = propose(actor =>
+ 				projection.undo(redo, actor, textTarget).pipe(
+ 					Effect.tap(() =>
+ 						generation === projection.editGeneration()
+@@ -723,6 +752,29 @@
+ 					),
+ 				),
+ 			)
++			if (redo) return fallback
++			return Effect.gen(function* () {
++				yield* requireOpen
++				let prepared = yield* projection.prepareOptimisticUndo(textTarget)
++				if (!prepared) return yield* fallback
++				let outcome = Deferred.makeUnsafe<DocumentAction, DocumentFailure>()
++				let published = yield* Effect.sync(() => {
++					if (unsaved.state._tag !== "Open" || !projection.matchesOptimisticUndo(prepared.basis, prepared.generation)) return false
++					if (!Queue.offerUnsafe(unsaved, prepared.action)) return false
++					optimisticUndos.set(prepared.action.id, outcome)
++					projection.replica.apply(prepared.action.changes.map(parseOperation))
++					projection.addDraft(prepared.action)
++					drafts.update()
++					advanceView()
++					return true
++				})
++				if (!published) return yield* fallback
++				let saved = yield* flush.pipe(Effect.result)
++				let settled = yield* Deferred.poll(outcome)
++				if (Option.isSome(settled)) return yield* settled.value
++				if (saved._tag === "Failure") return yield* Effect.fail(saved.failure)
++				return yield* Deferred.await(outcome)
++			})
+ 		}
+ 		function propose(
+ 			prepare: (
+@@ -763,6 +815,22 @@
+ 			)
+ 		}
+ 
++		function discardRefusedUndo(action: DocumentAction, error: DocumentFailure) {
++			return Effect.uninterruptibleMask(restore => Effect.gen(function* () {
++				if (!(error instanceof UndoUnavailable) && !(error instanceof AccessConflict)) return
++				if (projection.proposed(action.id)) return
++				while (true) {
++					let replacement = yield* restore(projection.prepareDiscardOptimisticUndo(action.id))
++					if (projection.discardOptimisticUndo(action.id, replacement)) break
++				}
++				yield* Queue.take(unsaved)
++				let outcome = optimisticUndos.get(action.id)
++				if (outcome) yield* Deferred.fail(outcome, error)
++				optimisticUndos.delete(action.id)
++				advanceView()
++				publishDraftStatus()
++			})).pipe(Effect.mapError(error => storageFailure("discard refused undo", error)))
++		}
+ 		function publishDraftStatus() {
+ 			drafts.update()
+ 			// Durability changed without changing the document's content version.
+@@ -822,6 +890,7 @@
+ 		let undoReceipts = new Map<string, UndoReceipt>()
+ 		let undoPosition = 0
+ 		let undoOrder = 0
++		let undoCertificate: { action: CommittedAction; generation: number; position: number } | undefined
+ 		let projectionComplete = true
+ 		let preparedOpen:
+ 			| {
+@@ -1398,6 +1467,66 @@
+ 				draftVersion++
+ 				editGeneration++
+ 			},
++			certifyUndo: Effect.gen(function* () {
++				undoCertificate = undefined
++				if (drafts.size || pending.size || rejected.size) return
++				yield* indexUndoHistory()
++				if (undoPosition !== localPosition) return
++				let candidates = yield* documentUndoCandidates([...undoEntries.values()].map(entry => ({ ...entry, active: undoReceipts.has(entry.id) })), options.subject, false).pipe(Effect.result)
++				if (candidates._tag === "Failure") return
++				let candidate = candidates.success[0]
++				if (!candidate || !candidate.tip.local || candidate.depth !== 0) return
++				let receipt = undoReceipts.get(candidate.tip.id)
++				if (!receipt) return
++				let action = yield* receiptAction(receipt, candidate.tip.id)
++				let change = action.changes[0]
++				if (action.changes.length !== 1 || change?.kind !== "text" || !change.insert.length || change.remove.length || action.before.length || action.undoOf) return
++				undoCertificate = { action, generation: replica.generation, position: localPosition }
++			}),
++			prepareOptimisticUndo: (target?: string) => Effect.gen(function* () {
++				let certificate = undoCertificate
++				undoCertificate = undefined
++				if (!certificate || certificate.generation !== replica.generation || certificate.position !== localPosition || drafts.size || pending.size || rejected.size || (target && certificate.action.changes[0]?.target !== target)) return undefined
++				let basis = replica
++				let generation = replica.generation
++				let result = yield* undoAction(basis, certificate.action, basis.actor).pipe(Effect.result)
++				if (result._tag === "Failure" || replica !== basis || replica.generation !== generation) return undefined
++				return { action: freezeAction(result.success), basis, generation }
++			}),
++			matchesOptimisticUndo: (basis: Replica, generation: number) => replica === basis && replica.generation === generation && !drafts.size && !pending.size && !rejected.size,
++			admitOptimisticUndo: (action: DocumentAction) => Effect.gen(function* () {
++				yield* checkCompensationSuccessor(action)
++				if (!action.undoOf) return yield* conflict("Optimistic Undo has no contribution")
++				let original = yield* undoBasis(action.undoOf)
++				let expected = yield* undoAction(durable, original, action.actor)
++				let declared = action.changes[0]
++				let current = expected.changes[0]
++				if (action.changes.length !== 1 || expected.changes.length !== 1 || declared?.kind !== "cancel" || current?.kind !== "cancel" || declared.target !== current.target || declared.value !== current.value || declared.field !== current.field || declared.insert.length || declared.remove.length || declared.restores || action.guards.length || action.accessGuards.length) return yield* Effect.fail(new UndoUnavailable({ reason: "Stale", message: "Document changed while undo was pending" }))
++				yield* check({ kind: "proposed", action })
++			}),
++			prepareDiscardOptimisticUndo: (id: string) => Effect.gen(function* () {
++				if (proposals.has(id)) return yield* conflict("A saved Undo cannot be discarded as speculative")
++				let basis = replica
++				let generation = replica.generation
++				let durableBasis = durable
++				let durableGeneration = durable.generation
++				let acceptedBasis = accepted
++				let acceptedGeneration = accepted.generation
++				let position = localPosition
++				let rebuilt = yield* rebuild([...pending.values()], id)
++				return { ...rebuilt, basis, generation, durableBasis, durableGeneration, acceptedBasis, acceptedGeneration, position }
++			}),
++			discardOptimisticUndo: (id: string, replacement: Effect.Success<ReturnType<typeof rebuild>> & { basis: Replica; generation: number; durableBasis: Replica; durableGeneration: number; acceptedBasis: Replica; acceptedGeneration: number; position: number }) => {
++				if (proposals.has(id) || replacement.basis !== replica || replacement.generation !== replica.generation || replacement.durableBasis !== durable || replacement.durableGeneration !== durable.generation || replacement.acceptedBasis !== accepted || replacement.acceptedGeneration !== accepted.generation || replacement.position !== localPosition || replacement.draftVersion !== draftVersion) return false
++				if (drafts.delete(id)) {
++					draftVersion++
++					editGeneration++
++				}
++				replacement.replica.clock = Math.max(replica.clock, replacement.replica.clock)
++				durable = replacement.durable
++				replica = replacement.replica
++				return true
++			},
+ 			editGeneration: () => editGeneration,
+ 			removeDraft(id: string) {
+ 				if (drafts.delete(id)) draftVersion++
+@@ -1918,7 +2047,7 @@
+ 				yield* validateChanges([accepted, durable, replica], incoming)
+ 			})
+ 		}
+-		function rebuild(healthy: readonly DocumentAction[]) {
++		function rebuild(healthy: readonly DocumentAction[], excludedDraft?: string) {
+ 			return Effect.gen(function* () {
+ 				let nextDurable = new Replica("local-document", options.author)
+ 				nextDurable.restore(accepted.checkpoint())
+@@ -1935,7 +2064,7 @@
+ 					let captured = draftVersion
+ 					let nextReplica = new Replica(actor, options.author)
+ 					let queued = [...drafts.values()].filter(
+-						action => !proposals.has(action.id),
++						action => !proposals.has(action.id) && action.id !== excludedDraft,
+ 					)
+ 					nextReplica.restore(nextDurable.checkpoint())
+ 					for (let action of queued) {

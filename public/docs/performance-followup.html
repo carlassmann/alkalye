@@ -117,6 +117,32 @@
 			<code>experiments/performance/interaction-parity-7d</code> and
 			<code>experiments/performance/main-multicursor-save-gate</code>.
 		</p>
+		<h2>Find navigation parity</h2>
+		<p>
+			Change <code>6ec4596</code> keeps the active search match separate from
+			the insertion caret, as the original editor does. Next and Previous leave
+			the caret after the match; Replace still changes that match. Closing Find
+			and typing inserts text instead of deleting the matched word. Native and
+			fallback highlight browser journeys passed, including distant matches,
+			replacement and subsequent typing. Full checks passed 752 tests and
+			41,767 assertions. The earlier comparison table predates this change;
+			its search-close timings are not a measurement of the corrected journey.
+		</p>
+		<h2>Snapshot cancellation missed the browser path</h2>
+		<p>
+			One matched pair on <code>754c9d6</code> typed eight trusted keys during
+			actual compaction. Both builds passed exact source, native caret,
+			independent accepted edit and Undo, and reload checks. The cancellation
+			candidate emitted no interrupted-capture marker. Its largest task over
+			the three-second input window worsened from 13.526 to 16.857ms; total
+			main-thread task time rose from 2,224 to 2,468ms. It remains outside
+			production. Source inspection found another path: automatic library sync
+			forces a snapshot, bypassing the cancellable background capture. This pair
+			has no caller-specific marker, so it does not prove which caller started
+			each capture. The next experiment removes redundant forced captures while
+			retaining journal durability and tests the actual browser path. Evidence:
+			<code>experiments/performance/snapshot-native-overlap</code>.
+		</p>
 		<h2>Skip unchanged viewport repainting</h2>
 		<p>
 			Production change <code>754c9d6</code> skips repainting the visible editor
