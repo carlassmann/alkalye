@@ -55,6 +55,13 @@ export function clickTargetReady(selector: string) {
 	return `(() => {
 		let node = document.querySelector(${JSON.stringify(selector)});
 		if (!node?.checkVisibility()) return false;
+		// A hit during sidebar motion can move before the native pointer arrives.
+		for (let ancestor = node; ancestor; ancestor = ancestor.parentElement) {
+			if (ancestor.getAnimations().some(animation =>
+				animation.playState === "running" &&
+				animation.effect?.getComputedTiming().endTime !== Infinity
+			)) return false;
+		}
 		let bounds = node.getBoundingClientRect();
 		let hit = document.elementFromPoint(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2);
 		return Boolean(hit && (hit === node || node.contains(hit)));
