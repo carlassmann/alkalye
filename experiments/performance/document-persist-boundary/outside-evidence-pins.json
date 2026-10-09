@@ -1,0 +1,22 @@
+{
+	"/tmp/alkalye-root-persist-boundary/initial-write-boundary.test.ts.txt": {
+		"sha256": "0a4e9b4c4382de2f9e2a1e98afff91a1c30a3f713ef8e0cf2c5c0c54a77d2a78",
+		"bytes": 7149
+	},
+	"/tmp/alkalye-root-persist-boundary/initial-write-boundary.log": {
+		"sha256": "e6ee121607c803e9c6adea445ef0746977649316e7ff71f7e4348add48682fc2",
+		"bytes": 362735
+	},
+	"/tmp/alkalye-root-persist-boundary/commit-boundary.log": {
+		"sha256": "5ab2b4a51568c4746eb6ef3da08854fe2e535c1a2fae64261238c46ea93309d6",
+		"bytes": 653
+	},
+	"/tmp/alkalye-root-persist-boundary/commit-boundary-final.log": {
+		"sha256": "ea82d31d5471e0a6c23f0aa310379c2df8f1b9400317114fade0ddadb8621e16",
+		"bytes": 679
+	},
+	"/tmp/alkalye-root-persist-boundary/tests/persist-boundary.test.ts": {
+		"sha256": "4bf78d8964a617ef3ac385e52e9ac57cdc1d57531ee19f34e29ac120bb045a93",
+		"bytes": 9851
+	}
+}

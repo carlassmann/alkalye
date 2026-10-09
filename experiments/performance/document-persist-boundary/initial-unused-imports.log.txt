@@ -1,0 +1,4 @@
+../../../../../../tmp/alkalye-root-persist-boundary/tests/persist-boundary.test.ts(10,1): error TS6133: 'Scope' is declared but its value is never read.
+../../../../../../tmp/alkalye-root-persist-boundary/tests/persist-boundary.test.ts(15,10): error TS6133: 'cliDocumentSessionLayer' is declared but its value is never read.
+../../../../../../tmp/alkalye-root-persist-boundary/tests/persist-boundary.test.ts(26,23): error TS6133: 'newComment' is declared but its value is never read.
+../../../../../../tmp/alkalye-root-persist-boundary/tests/persist-boundary.test.ts(31,18): error TS6133: 'peer' is declared but its value is never read.

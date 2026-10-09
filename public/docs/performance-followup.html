@@ -1508,10 +1508,13 @@
 		<p>
 			Worker peaks stayed near 17/29ms; main total work increased. The owned
 			replica copy during Merge remains. These observer opportunities are not
-			physical paint measurements or production-worker parity. A possible
-			pre-existing interruption race after journal persistence remains to be
-			exercised separately. Evidence:
-			<code>experiments/performance/worker-single-cancellation-proposal</code>.
+			physical paint measurements or production-worker parity. A separate real
+			SQLite probe confirms that interruption after commit can leave an
+			initially stale view, then replay recovers exactly one Undo. Before commit
+			it leaves no action. Callers need unknown-completion reconciliation;
+			worker behavior at this exact boundary remains unproved. Evidence:
+			<code>experiments/performance/worker-single-cancellation-proposal</code> and
+			<code>experiments/performance/document-persist-boundary</code>.
 		</p>
 		<h2>Repeated worker selection mapping comparison</h2>
 		<p>
