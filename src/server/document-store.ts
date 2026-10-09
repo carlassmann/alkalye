@@ -23,6 +23,7 @@ import {
 	initializeTransferFences,
 	ensureWorkspaceWritable,
 	ensureDocumentWritable,
+	ensureDocumentReadable,
 } from "./workspace-transfer"
 import { DocumentBlobObjects } from "./document-blob-objects"
 import { webCryptoLayer } from "../platform/web-crypto"
@@ -171,6 +172,17 @@ export class WorkspaceStore extends Context.Service<
 		return Layer.effect(
 			WorkspaceStore,
 			StoreEngine.pipe(Effect.map(store => store.workspace)),
+		).pipe(Layer.provide(documentDatabaseLayer))
+	}
+}
+export class DocumentMaintenance extends Context.Service<
+	DocumentMaintenance,
+	Effect.Success<ReturnType<typeof makeDocumentStore>>["maintenance"]
+>()("WorkspaceStore/Maintenance") {
+	static get live() {
+		return Layer.effect(
+			DocumentMaintenance,
+			StoreEngine.pipe(Effect.map(store => store.maintenance)),
 		).pipe(Layer.provide(documentDatabaseLayer))
 	}
 }
@@ -591,6 +603,7 @@ function makeDocumentStore() {
 		let wakeups = yield* PubSub.sliding<LiveNotice>(64)
 		yield* Effect.addFinalizer(() => PubSub.shutdown(wakeups))
 		return {
+			maintenance: { recordImportedMove },
 			documentFixture: {
 				commit: commitProposal,
 				withdraw: withdrawProposal,
@@ -1723,12 +1736,83 @@ function makeDocumentStore() {
 				)
 			})
 		}
+		function recordImportedMove(
+			document: string,
+			from: string,
+			destination: string,
+			request: string,
+		) {
+			return Identity.use(identity =>
+				transact(
+					Effect.gen(function* () {
+						if (identity.access) return yield* forbidden()
+						let receipts = yield* sql<{
+							subject: string
+							destination: string
+							source: string
+						}>`SELECT subject,destination,source FROM document_move_receipts WHERE document=${document} AND request=${request}`
+						let receipt = receipts[0]
+						if (
+							!receipt ||
+							receipt.subject !== identity.subject ||
+							receipt.destination !== destination ||
+							receipt.source !== from
+						)
+							return yield* forbidden()
+						let fact = yield* Schema.decodeUnknownEffect(WorkspaceFactSchema)({
+							id: "document-moved:" + request,
+							workspace: destination,
+							subject: identity.subject,
+							change: { kind: "documentMoved", document, from },
+						})
+						let previous = yield* workspace.receipt(fact)
+						if (Option.isSome(previous))
+							return { position: previous.value.position, fact, fresh: false }
+						return yield* writeWorkspace(fact)
+					}),
+					finishWorkspace,
+				),
+			)
+		}
 		function writeWorkspace(fact: WorkspaceFact) {
 			return Effect.gen(function* () {
 				if (fact.change.kind !== "preferences")
 					yield* ensureWorkspaceWritable(sql, fact.workspace)
 				if (fact.change.kind === "documentMoved")
 					yield* ensureWorkspaceWritable(sql, fact.change.from)
+				if (
+					fact.change.kind === "documentAdded" ||
+					fact.change.kind === "documentMoved"
+				)
+					yield* ensureDocumentWritable(sql, fact.change.document)
+				if (
+					fact.change.kind === "invitationCreated" &&
+					fact.change.document !== null
+				)
+					yield* ensureDocumentWritable(sql, fact.change.document)
+				if (
+					fact.change.kind === "invitationAccepted" ||
+					fact.change.kind === "invitationRevoked" ||
+					fact.change.kind === "invitationLeft"
+				) {
+					let invitation = yield* workspace.invitation(fact.change.invitation)
+					if (Option.isSome(invitation) && invitation.value.document !== null)
+						yield* ensureDocumentWritable(sql, invitation.value.document)
+				}
+				if (fact.change.kind === "deleted") {
+					let transfers =
+						yield* sql`SELECT f.document FROM document_transfer_fences f JOIN workspace_documents d ON d.document=f.document WHERE d.workspace=${fact.workspace} AND f.phase!='retired' LIMIT 1`
+					if (transfers.length)
+						return yield* Effect.fail(
+							new SqlError.SqlError({
+								reason: new SqlError.ConnectionError({
+									cause: new Error("Workspace has a staged document move"),
+									message: "Workspace has a staged document move",
+									operation: "workspace-transfer",
+								}),
+							}),
+						)
+				}
 				let fingerprint = yield* hashWorkspace(crypto, fact)
 				let previous = yield* workspace.receipt(fact)
 				if (Option.isSome(previous)) {
@@ -2487,13 +2571,17 @@ function makeDocumentStore() {
 			document: string,
 			subject: string | Context.Service.Shape<typeof Identity>,
 		) {
-			return readWorkspace
-				.documentRole(
-					document,
-					typeof subject === "string" ? subject : subject.subject,
-					typeof subject === "string" ? undefined : subject.access,
-				)
-				.pipe(Effect.flatMap(role => (role ? Effect.void : unavailable())))
+			return ensureDocumentReadable(readSql, document).pipe(
+				Effect.andThen(
+					readWorkspace
+						.documentRole(
+							document,
+							typeof subject === "string" ? subject : subject.subject,
+							typeof subject === "string" ? undefined : subject.access,
+						)
+						.pipe(Effect.flatMap(role => (role ? Effect.void : unavailable()))),
+				),
+			)
 		}
 		function action(
 			document: string,
