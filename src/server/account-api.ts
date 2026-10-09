@@ -236,7 +236,8 @@ function makeAccountApplication() {
 		)
 		let compressed = Effect.gen(function* () {
 			let request = yield* HttpServerRequest.HttpServerRequest
-			return yield* request.method === "GET" &&
+			return yield* settings.responseCompression &&
+			request.method === "GET" &&
 			new URL(request.originalUrl).pathname.endsWith("/snapshot")
 				? HttpMiddleware.compression({ algorithms: ["gzip"] })(app)
 				: app

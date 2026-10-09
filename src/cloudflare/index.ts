@@ -6,6 +6,7 @@ import * as Layer from "effect/Layer"
 import * as ManagedRuntime from "effect/ManagedRuntime"
 import { Cipher } from "../platform/cipher"
 import { cloudflareSqliteLayer } from "../platform/cloudflare-sqlite"
+import { cloudflareBlobObjectsLayer } from "../platform/cloudflare-blob-objects"
 import { webCryptoLayer } from "../platform/web-crypto"
 import { AccountApplication } from "../server/account-api"
 import { AgentCredentials } from "../server/agent-credentials"
@@ -38,6 +39,7 @@ function relayLayer(
 	let accounts = AccountApplication.layer.pipe(Layer.provideMerge(credentials))
 	return Application.layer.pipe(
 		Layer.provideMerge(accounts),
+		Layer.provideMerge(cloudflareBlobObjectsLayer(environment.ASSETS_BUCKET)),
 		Layer.provideMerge(requestOriginLayer),
 		Layer.provideMerge(EmailDelivery.layer),
 		Layer.provideMerge(cloudflareAssetsLayer(environment.ASSETS)),

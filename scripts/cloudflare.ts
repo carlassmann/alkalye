@@ -95,7 +95,14 @@ switch (mode) {
 		break
 	case "deploy":
 		await build()
-		await run(["bun", "x", "--no-install", "wrangler", "deploy"])
+		await run([
+			"bun",
+			"x",
+			"--no-install",
+			"wrangler",
+			"deploy",
+			...Bun.argv.slice(3),
+		])
 		break
 	default:
 		throw Error("Expected build, dev, deploy, types or check")

@@ -46,6 +46,7 @@ export function bunSettingsLayer(options: ServerOptions = {}) {
 					Math.min(options.livePollWait ?? livePollWait, livePollWait),
 				),
 				resetLog,
+				responseCompression: true,
 			}
 		}),
 	)

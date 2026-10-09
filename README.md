@@ -17,6 +17,13 @@ bun run build
 NODE_ENV=production bun run start
 ```
 
+## Cloudflare
+
+The Worker serves the app shell and uses a SQLite Durable Object for the same
+Effect server application. Attachment bytes live in R2; permissions, quotas,
+events and snapshots stay in SQLite. WebSockets and polling remain available.
+See [deployment, configuration and platform limits](docs/cloudflare.md).
+
 ## Email sign-in
 
 Keep writing without an account setup step. To open the same account on another device, choose **Sign in with email** in the account menu, then **Link this account**. Enter the code sent to your email. On the other device, choose **Sign in to another account** and use the linked email. Codes expire after five minutes, work once, and belong to the browser that requested them.

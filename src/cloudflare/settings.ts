@@ -24,6 +24,7 @@ export function cloudflareSettingsLayer(environment: DeploymentEnvironment) {
 			: undefined,
 		livePollWait,
 		resetLog: false,
+		responseCompression: false,
 	})
 }
 

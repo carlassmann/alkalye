@@ -20,6 +20,7 @@ export interface Settings {
 	publicOrigin: string | undefined
 	livePollWait: number
 	resetLog: boolean
+	responseCompression: boolean
 }
 export class RelaySettings extends Context.Service<RelaySettings, Settings>()(
 	"RelaySettings",
