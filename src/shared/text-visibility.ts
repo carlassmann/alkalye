@@ -71,6 +71,7 @@ export class TextVisibility {
 	private cancels = new Map<string, string>()
 	private cancellers = new Map<string, ReadonlySet<string>>()
 	private activeCache = new Map<string, boolean>()
+	private lastActiveOperation: string | undefined
 	private legacyRemoved: Set<string>
 	private floor: number
 	private generation = 0
@@ -89,6 +90,7 @@ export class TextVisibility {
 		visibility.cancels = yield* copyMapSteps(this.cancels, cooperative)
 		visibility.cancellers = yield* copyMapSteps(this.cancellers, cooperative)
 		visibility.activeCache = yield* copyMapSteps(this.activeCache, cooperative)
+		visibility.lastActiveOperation = this.lastActiveOperation
 		visibility.legacyRemoved = yield* copySetSteps(
 			this.legacyRemoved,
 			cooperative,
@@ -190,6 +192,7 @@ export class TextVisibility {
 				cancellers.add(id)
 				visibility.cancellers.set(target, cancellers)
 				visibility.activeCache.clear()
+				visibility.lastActiveOperation = undefined
 			}
 		}
 	}
@@ -217,8 +220,17 @@ export class TextVisibility {
 		return clock(operation) > this.floor
 	}
 	active(operation: string) {
-		if (clock(operation) <= this.floor || !this.cancellers.has(operation))
+		if (
+			this.lastActiveOperation !== undefined &&
+			this.lastActiveOperation === operation
+		)
 			return true
+		let cached = this.activeCache.get(operation)
+		if (cached !== undefined) return cached
+		if (clock(operation) <= this.floor || !this.cancellers.has(operation)) {
+			if (typeof operation === "string") this.lastActiveOperation = operation
+			return true
+		}
 		let stack = [this.node(operation)]
 		while (stack.length) {
 			let node = stack.at(-1)
@@ -348,6 +360,7 @@ export class TextVisibility {
 		this.legacyRemoved = next.legacyRemoved
 		this.floor = next.floor
 		this.activeCache.clear()
+		this.lastActiveOperation = undefined
 	}
 	private *removeSteps(
 		operation: string,

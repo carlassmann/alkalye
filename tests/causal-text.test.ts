@@ -817,3 +817,212 @@ test("raising a visibility migration floor invalidates a prepared removal", () =
 	expect(visibility.checkpoint()).toEqual(before)
 	expect(visibility.known(id)).toBe(false)
 })
+
+function visibilityOperationIdentity(clock: number) {
+	return String(clock).padStart(16, "0") + ":writer"
+}
+function visibilityAtomIdentity(clock: number, index = 0) {
+	return (
+		visibilityOperationIdentity(clock) + ":" + String(index).padStart(8, "0")
+	)
+}
+function expectRepeatedActivity(
+	visibility: TextVisibility,
+	id: string,
+	expected: boolean,
+) {
+	for (let attempt = 0; attempt < 3; attempt++)
+		expect(visibility.active(id)).toBe(expected)
+}
+
+test("cached absent operation is invalidated by out-of-order cancellation and redo", () => {
+	let visibility = new TextVisibility()
+	expectRepeatedActivity(visibility, visibilityOperationIdentity(1), true)
+	visibility.cancel(
+		visibilityOperationIdentity(3),
+		visibilityOperationIdentity(2),
+	)
+	expectRepeatedActivity(visibility, visibilityOperationIdentity(2), false)
+	visibility.cancel(
+		visibilityOperationIdentity(2),
+		visibilityOperationIdentity(1),
+	)
+	expectRepeatedActivity(visibility, visibilityOperationIdentity(1), true)
+	visibility.cancel(
+		visibilityOperationIdentity(4),
+		visibilityOperationIdentity(3),
+	)
+	expectRepeatedActivity(visibility, visibilityOperationIdentity(1), false)
+	expectRepeatedActivity(visibility, visibilityOperationIdentity(2), true)
+	visibility.cancel(
+		visibilityOperationIdentity(3),
+		visibilityOperationIdentity(2),
+	)
+	expectRepeatedActivity(visibility, visibilityOperationIdentity(1), false)
+	visibility.cancel(
+		visibilityOperationIdentity(5),
+		visibilityOperationIdentity(4),
+	)
+	expectRepeatedActivity(visibility, visibilityOperationIdentity(1), true)
+})
+
+test("warmed removal and cancellation forks retain independent activity and exact snapshots", () => {
+	let parent = new TextVisibility()
+	parent.remove(visibilityOperationIdentity(2), [visibilityAtomIdentity(1)])
+	expectRepeatedActivity(parent, visibilityOperationIdentity(1), true)
+	expectRepeatedActivity(parent, visibilityOperationIdentity(2), true)
+	expect(parent.hidden(visibilityAtomIdentity(1))).toBe(true)
+	let child = parent.fork()
+	child.cancel(visibilityOperationIdentity(3), visibilityOperationIdentity(2))
+	expect(child.hidden(visibilityAtomIdentity(1))).toBe(false)
+	expect(parent.hidden(visibilityAtomIdentity(1))).toBe(true)
+	let parentSnapshot = parent.checkpoint()
+	let childSnapshot = child.checkpoint()
+	parent.cancel(visibilityOperationIdentity(4), visibilityOperationIdentity(1))
+	expect(parent.hidden(visibilityAtomIdentity(1))).toBe(true)
+	expect(child.hidden(visibilityAtomIdentity(1))).toBe(false)
+	let cold = new TextVisibility()
+	cold.restore(childSnapshot)
+	expect(cold.checkpoint()).toEqual(childSnapshot)
+	expect(cold.hidden(visibilityAtomIdentity(1))).toBe(false)
+	let original = new TextVisibility()
+	original.restore(parentSnapshot)
+	expect(original.checkpoint()).toEqual(parentSnapshot)
+	expect(original.hidden(visibilityAtomIdentity(1))).toBe(true)
+})
+
+test("restoring facts and migration floors invalidates prior cached activity", () => {
+	let visibility = new TextVisibility()
+	expectRepeatedActivity(visibility, visibilityOperationIdentity(1), true)
+	let cancelled = new TextVisibility()
+	cancelled.cancel(
+		visibilityOperationIdentity(2),
+		visibilityOperationIdentity(1),
+	)
+	visibility.restore(cancelled.checkpoint())
+	expectRepeatedActivity(visibility, visibilityOperationIdentity(1), false)
+	expect(visibility.checkpoint()).toEqual(cancelled.checkpoint())
+	let migrated = new TextVisibility()
+	expectRepeatedActivity(migrated, visibilityOperationIdentity(1), true)
+	migrated.restore(
+		new TextVisibility({
+			removed: [visibilityAtomIdentity(1)],
+			clock: 1,
+		}).checkpoint(),
+	)
+	expect(migrated.hidden(visibilityAtomIdentity(1))).toBe(true)
+	expect(() =>
+		migrated.cancel(
+			visibilityOperationIdentity(2),
+			visibilityOperationIdentity(1),
+		),
+	).toThrow("floor")
+	expect(migrated.migrationFloor).toBe(1)
+})
+
+test("stale or malformed prepared changes preserve warm activity and exact checkpoint", () => {
+	let visibility = new TextVisibility()
+	visibility.remove(visibilityOperationIdentity(2), [visibilityAtomIdentity(1)])
+	expectRepeatedActivity(visibility, visibilityOperationIdentity(2), true)
+	let prepared = visibility.prepare([
+		{
+			kind: "cancel",
+			id: visibilityOperationIdentity(3),
+			target: visibilityOperationIdentity(2),
+		},
+	])
+	visibility.cancel(
+		visibilityOperationIdentity(4),
+		visibilityOperationIdentity(2),
+	)
+	expectRepeatedActivity(visibility, visibilityOperationIdentity(2), false)
+	let before = visibility.checkpoint()
+	expect(prepared).toThrow("stale")
+	expect(() =>
+		visibility.cancel(
+			visibilityOperationIdentity(4),
+			visibilityOperationIdentity(1),
+		),
+	).toThrow("immutable")
+	expect(visibility.checkpoint()).toEqual(before)
+	expectRepeatedActivity(visibility, visibilityOperationIdentity(2), false)
+})
+
+test.each([
+	"Body 😀\r\nTOKEN\r\n",
+	"---\ntitle: Visibility\n---\nBody 🦊\nTOKEN\n",
+])(
+	"public Replica cached reads preserve peer Unicode and exact Undo checkpoints (%j)",
+	source => {
+		let parent = new Replica("base")
+		parent.edit("document", source)
+		let initial = parent.text("document")
+		let own = parent.fork("own")
+		let operation = own.edit("document", initial.replace("TOKEN", "x"))
+		if (!operation) throw new Error("Missing edit")
+		parent.apply([operation])
+		let peer = parent.fork("peer")
+		let peerOperation = peer.edit(
+			"document",
+			parent.text("document") + "Peer 😀\n",
+		)
+		if (!peerOperation) throw new Error("Missing peer edit")
+		parent.apply([peerOperation])
+		for (let read = 0; read < 3; read++) parent.visible("document")
+		let fork = parent.fork("fork")
+		let undo = parent.cancel("document", operation.id)
+		expect(parent.text("document")).toBe(initial + "Peer 😀\n")
+		expect(fork.text("document")).toBe(
+			initial.replace("TOKEN", "x") + "Peer 😀\n",
+		)
+		let snapshot = parent.checkpoint()
+		let cold = new Replica("cold")
+		cold.restore(parseCheckpoint(compactCheckpoint(snapshot)))
+		expect(cold.checkpoint()).toEqual(snapshot)
+		expect(cold.visible("document")).toEqual(parent.visible("document"))
+		cold.cancel("document", undo.id)
+		expect(cold.text("document")).toBe(fork.text("document"))
+		expect(parent.text("document")).toBe(initial + "Peer 😀\n")
+	},
+)
+
+test("alternating unknown owners and graph cache stay exact after cancellation", () => {
+	let visibility = new TextVisibility()
+	visibility.cancel(
+		visibilityOperationIdentity(3),
+		visibilityOperationIdentity(1),
+	)
+	for (let index = 4; index < 4096; index++) {
+		expectRepeatedActivity(visibility, visibilityOperationIdentity(index), true)
+		expectRepeatedActivity(visibility, visibilityOperationIdentity(1), false)
+	}
+	visibility.cancel(
+		visibilityOperationIdentity(4096),
+		visibilityOperationIdentity(3),
+	)
+	expectRepeatedActivity(visibility, visibilityOperationIdentity(1), true)
+	visibility.remove(visibilityOperationIdentity(4097), [
+		visibilityAtomIdentity(1),
+	])
+	expect(visibility.hidden(visibilityAtomIdentity(1))).toBe(true)
+	visibility.cancel(
+		visibilityOperationIdentity(4098),
+		visibilityOperationIdentity(4097),
+	)
+	expect(visibility.hidden(visibilityAtomIdentity(1))).toBe(false)
+})
+
+test("public malformed activity values still fail before any visibility mutation", () => {
+	let visibility = new TextVisibility()
+	let before = visibility.checkpoint()
+	for (let value of [undefined, null, 1, {}])
+		expect(() =>
+			Reflect.apply(visibility.active, visibility, [value]),
+		).toThrow()
+	expectRepeatedActivity(visibility, visibilityOperationIdentity(1), true)
+	for (let value of [undefined, null, 1, {}])
+		expect(() =>
+			Reflect.apply(visibility.active, visibility, [value]),
+		).toThrow()
+	expect(visibility.checkpoint()).toEqual(before)
+})
