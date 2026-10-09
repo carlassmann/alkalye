@@ -1,0 +1,203 @@
+{
+  "long-one-operation": {
+    "apply": {
+      "baseline": {
+        "samples": 3,
+        "loadMs": 905.833541,
+        "textMs": 144.74908399999913,
+        "lookupMs": 0.48720800000228337,
+        "forkMs": 456.73883300000307,
+        "firstForkWriteMs": 0.9545420000031299,
+        "firstOwnerWriteMs": 0.7321670000001177
+      },
+      "candidate": {
+        "samples": 3,
+        "loadMs": 913.180625,
+        "textMs": 149.74783300000036,
+        "lookupMs": 0.6634160000030533,
+        "forkMs": 347.9958750000005,
+        "firstForkWriteMs": 1.436041999999361,
+        "firstOwnerWriteMs": 0.9193330000016431
+      }
+    },
+    "sync": {
+      "baseline": {
+        "samples": 3,
+        "loadMs": 733.1517080000012,
+        "textMs": 225.87450000000172,
+        "lookupMs": 0.32137499999953434,
+        "forkMs": 193.57345799999985,
+        "firstForkWriteMs": 0.7678330000017013,
+        "firstOwnerWriteMs": 0.7674579999993512
+      },
+      "candidate": {
+        "samples": 3,
+        "loadMs": 678.5436250000021,
+        "textMs": 287.1317909999998,
+        "lookupMs": 0.6909579999992275,
+        "forkMs": 94.15254200000163,
+        "firstForkWriteMs": 0.9991659999996045,
+        "firstOwnerWriteMs": 0.8477920000004815
+      }
+    },
+    "cooperative": {
+      "baseline": {
+        "samples": 3,
+        "loadMs": 2097.0754159999997,
+        "textMs": 248.08774999999878,
+        "lookupMs": 0.34320799999841256,
+        "forkMs": 209.86391699999967,
+        "firstForkWriteMs": 0.8442910000003394,
+        "firstOwnerWriteMs": 0.7997080000022834
+      },
+      "candidate": {
+        "samples": 3,
+        "loadMs": 2034.9767920000013,
+        "textMs": 260.015707999999,
+        "lookupMs": 0.5962910000016564,
+        "forkMs": 96.43141699999978,
+        "firstForkWriteMs": 0.9794170000004669,
+        "firstOwnerWriteMs": 0.8231249999989814
+      }
+    }
+  },
+  "sustained-260-and-20-concurrent-writers": {
+    "apply": {
+      "baseline": {
+        "samples": 3,
+        "loadMs": 65.98770800000057,
+        "textMs": 9.172334000002593,
+        "lookupMs": 0.23516599999857135,
+        "forkMs": 28.238332999993872,
+        "firstForkWriteMs": 0.5914170000032755,
+        "firstOwnerWriteMs": 0.5427089999939199
+      },
+      "candidate": {
+        "samples": 3,
+        "loadMs": 72.20133300000452,
+        "textMs": 9.129332999997132,
+        "lookupMs": 0.4327080000002752,
+        "forkMs": 25.158833000001323,
+        "firstForkWriteMs": 0.7674999999944703,
+        "firstOwnerWriteMs": 0.5954579999961425
+      }
+    },
+    "sync": {
+      "baseline": {
+        "samples": 3,
+        "loadMs": 54.55874999999651,
+        "textMs": 14.644416999995883,
+        "lookupMs": 0.2406669999982114,
+        "forkMs": 8.547542000000249,
+        "firstForkWriteMs": 0.5900830000027781,
+        "firstOwnerWriteMs": 0.5567499999961001
+      },
+      "candidate": {
+        "samples": 3,
+        "loadMs": 56.86933300000237,
+        "textMs": 14.448083999996015,
+        "lookupMs": 0.4440000000031432,
+        "forkMs": 4.697750000006636,
+        "firstForkWriteMs": 0.6343749999941792,
+        "firstOwnerWriteMs": 0.6055830000041169
+      }
+    },
+    "cooperative": {
+      "baseline": {
+        "samples": 3,
+        "loadMs": 152.99237500000163,
+        "textMs": 19.275041999993846,
+        "lookupMs": 0.2459999999991851,
+        "forkMs": 8.382416000000376,
+        "firstForkWriteMs": 0.7367500000036671,
+        "firstOwnerWriteMs": 0.5650839999943855
+      },
+      "candidate": {
+        "samples": 3,
+        "loadMs": 138.5012910000005,
+        "textMs": 17.235916999998153,
+        "lookupMs": 0.3852919999990263,
+        "forkMs": 4.422582999999577,
+        "firstForkWriteMs": 0.6314169999968726,
+        "firstOwnerWriteMs": 0.5887499999953434
+      }
+    }
+  },
+  "logical-clock-10000-wrap": {
+    "apply": {
+      "baseline": {
+        "samples": 3,
+        "loadMs": 13.886082999997598,
+        "textMs": 0.5429589999985183,
+        "lookupMs": 0.16904100000101607,
+        "forkMs": 3.3604579999955604,
+        "firstForkWriteMs": 0.4476670000003651,
+        "firstOwnerWriteMs": 0.4205419999998412
+      },
+      "candidate": {
+        "samples": 3,
+        "loadMs": 14.44024999999965,
+        "textMs": 0.572375000003376,
+        "lookupMs": 0.2577910000036354,
+        "forkMs": 3.0467079999943962,
+        "firstForkWriteMs": 0.5285000000003492,
+        "firstOwnerWriteMs": 0.4678750000020955
+      }
+    },
+    "sync": {
+      "baseline": {
+        "samples": 3,
+        "loadMs": 4.772417000000132,
+        "textMs": 0.8037919999987935,
+        "lookupMs": 0.16295800000079907,
+        "forkMs": 0.9416659999988042,
+        "firstForkWriteMs": 0.4303330000038841,
+        "firstOwnerWriteMs": 0.44050000000424916
+      },
+      "candidate": {
+        "samples": 3,
+        "loadMs": 5.299915999996301,
+        "textMs": 0.8037919999987935,
+        "lookupMs": 0.26233399999910034,
+        "forkMs": 0.6590829999986454,
+        "firstForkWriteMs": 0.5583750000005239,
+        "firstOwnerWriteMs": 0.4752500000031432
+      }
+    },
+    "cooperative": {
+      "baseline": {
+        "samples": 3,
+        "loadMs": 10.592334000000847,
+        "textMs": 0.8660830000007991,
+        "lookupMs": 0.1642920000012964,
+        "forkMs": 0.781583000003593,
+        "firstForkWriteMs": 0.4560830000045826,
+        "firstOwnerWriteMs": 0.41570799999317387
+      },
+      "candidate": {
+        "samples": 3,
+        "loadMs": 11.054042000003392,
+        "textMs": 0.9309580000044662,
+        "lookupMs": 0.2512910000004922,
+        "forkMs": 0.6422079999974812,
+        "firstForkWriteMs": 0.5030420000039157,
+        "firstOwnerWriteMs": 0.4401249999937136
+      }
+    }
+  },
+  "legacy-colliding-arbitrary-ids": {
+    "apply": {},
+    "sync": {
+      "baseline": {
+        "samples": 1,
+        "loadMs": 7.156875000000582,
+        "textMs": 1.8002919999998994,
+        "lookupMs": 0.18254099999467144,
+        "forkMs": 0.7568329999994603,
+        "firstForkWriteMs": 0.8167089999988093,
+        "firstOwnerWriteMs": 0.9264169999951264
+      }
+    },
+    "cooperative": {}
+  }
+}

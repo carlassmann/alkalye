@@ -1,0 +1,959 @@
+{
+  "rows": [
+    {
+      "arm": "native-map",
+      "trial": 0,
+      "count": 1,
+      "phase": "input",
+      "sourceOpportunityMs": 10.199999988079071,
+      "localSavedOpportunityMs": 10.199999988079071,
+      "heapBefore": 29128848,
+      "heapAfter": 23614035,
+      "maxGCEventSpanMs": 33.892,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 5.73,
+      "mainUnionMs": 207.689,
+      "workerMaxMs": 156.912,
+      "workerUnionMs": 793.434
+    },
+    {
+      "arm": "native-map",
+      "trial": 0,
+      "count": 1,
+      "phase": "Undo",
+      "sourceOpportunityMs": 167.5999999642354,
+      "localSavedOpportunityMs": 881.3999999761545,
+      "heapBefore": 24523263,
+      "heapAfter": 37460883,
+      "maxGCEventSpanMs": 9.561,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 6.529,
+      "mainUnionMs": 215.326,
+      "workerMaxMs": 22.985,
+      "workerUnionMs": 866.208
+    },
+    {
+      "arm": "partition",
+      "trial": 0,
+      "count": 1,
+      "phase": "input",
+      "sourceOpportunityMs": 13.5,
+      "localSavedOpportunityMs": 13.5,
+      "heapBefore": 17631569,
+      "heapAfter": 18208124,
+      "maxGCEventSpanMs": 8.504,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 5.67,
+      "mainUnionMs": 206.17,
+      "workerMaxMs": 166.234,
+      "workerUnionMs": 688.657
+    },
+    {
+      "arm": "partition",
+      "trial": 0,
+      "count": 1,
+      "phase": "Undo",
+      "sourceOpportunityMs": 134.80000001192275,
+      "localSavedOpportunityMs": 883.1999999880809,
+      "heapBefore": 18046289,
+      "heapAfter": 18304984,
+      "maxGCEventSpanMs": 30.256,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 7.103,
+      "mainUnionMs": 226.72,
+      "workerMaxMs": 16.577,
+      "workerUnionMs": 636.077
+    },
+    {
+      "arm": "native-map",
+      "trial": 0,
+      "count": 512,
+      "phase": "input",
+      "sourceOpportunityMs": 5.099999964237213,
+      "localSavedOpportunityMs": 5.099999964237213,
+      "heapBefore": 35507672,
+      "heapAfter": 43829010,
+      "maxGCEventSpanMs": 40.615,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 4.805,
+      "mainUnionMs": 198.978,
+      "workerMaxMs": 172.401,
+      "workerUnionMs": 635.731
+    },
+    {
+      "arm": "native-map",
+      "trial": 0,
+      "count": 512,
+      "phase": "Undo",
+      "sourceOpportunityMs": 172.3000000119191,
+      "localSavedOpportunityMs": 905.5,
+      "heapBefore": 19033716,
+      "heapAfter": 27400873,
+      "maxGCEventSpanMs": 4.879,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 4.673,
+      "mainUnionMs": 196.635,
+      "workerMaxMs": 27.405,
+      "workerUnionMs": 518.153
+    },
+    {
+      "arm": "partition",
+      "trial": 0,
+      "count": 512,
+      "phase": "input",
+      "sourceOpportunityMs": 5.099999964237213,
+      "localSavedOpportunityMs": 5.099999964237213,
+      "heapBefore": 35256116,
+      "heapAfter": 43604642,
+      "maxGCEventSpanMs": 7.976,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 4.749,
+      "mainUnionMs": 203.076,
+      "workerMaxMs": 174.477,
+      "workerUnionMs": 612.629
+    },
+    {
+      "arm": "partition",
+      "trial": 0,
+      "count": 512,
+      "phase": "Undo",
+      "sourceOpportunityMs": 107.5,
+      "localSavedOpportunityMs": 871.6999999880809,
+      "heapBefore": 18834863,
+      "heapAfter": 27203822,
+      "maxGCEventSpanMs": 5.03,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 4.765,
+      "mainUnionMs": 230.473,
+      "workerMaxMs": 27.855,
+      "workerUnionMs": 454.769
+    },
+    {
+      "arm": "partition",
+      "trial": 1,
+      "count": 1,
+      "phase": "input",
+      "sourceOpportunityMs": 6.5,
+      "localSavedOpportunityMs": 6.600000023841858,
+      "heapBefore": 28802103,
+      "heapAfter": 23662037,
+      "maxGCEventSpanMs": 8.248,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 6.037,
+      "mainUnionMs": 207.999,
+      "workerMaxMs": 163.54,
+      "workerUnionMs": 687.414
+    },
+    {
+      "arm": "partition",
+      "trial": 1,
+      "count": 1,
+      "phase": "Undo",
+      "sourceOpportunityMs": 143.6999999880809,
+      "localSavedOpportunityMs": 875.1999999880809,
+      "heapBefore": 24537177,
+      "heapAfter": 18169444,
+      "maxGCEventSpanMs": 29.676,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 6.602,
+      "mainUnionMs": 250.223,
+      "workerMaxMs": 17.462,
+      "workerUnionMs": 704.127
+    },
+    {
+      "arm": "native-map",
+      "trial": 1,
+      "count": 1,
+      "phase": "input",
+      "sourceOpportunityMs": 6.100000023841858,
+      "localSavedOpportunityMs": 6.100000023841858,
+      "heapBefore": 29111500,
+      "heapAfter": 23557267,
+      "maxGCEventSpanMs": 37.396,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 5.647,
+      "mainUnionMs": 178.561,
+      "workerMaxMs": 160.452,
+      "workerUnionMs": 828.942
+    },
+    {
+      "arm": "native-map",
+      "trial": 1,
+      "count": 1,
+      "phase": "Undo",
+      "sourceOpportunityMs": 153.29999995231628,
+      "localSavedOpportunityMs": 880.1999999880773,
+      "heapBefore": 24468631,
+      "heapAfter": 18355327,
+      "maxGCEventSpanMs": 9.447,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 6.687,
+      "mainUnionMs": 214.557,
+      "workerMaxMs": 16.756,
+      "workerUnionMs": 761.368
+    },
+    {
+      "arm": "partition",
+      "trial": 1,
+      "count": 512,
+      "phase": "input",
+      "sourceOpportunityMs": 9.800000011920929,
+      "localSavedOpportunityMs": 9.800000011920929,
+      "heapBefore": 35248052,
+      "heapAfter": 43700594,
+      "maxGCEventSpanMs": 7.545,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 4.74,
+      "mainUnionMs": 201.74,
+      "workerMaxMs": 164.46,
+      "workerUnionMs": 606.873
+    },
+    {
+      "arm": "partition",
+      "trial": 1,
+      "count": 512,
+      "phase": "Undo",
+      "sourceOpportunityMs": 117.19999998808089,
+      "localSavedOpportunityMs": 899.8000000119191,
+      "heapBefore": 19069642,
+      "heapAfter": 27481794,
+      "maxGCEventSpanMs": 42.053,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 4.892,
+      "mainUnionMs": 229.556,
+      "workerMaxMs": 28.568,
+      "workerUnionMs": 488.853
+    },
+    {
+      "arm": "native-map",
+      "trial": 1,
+      "count": 512,
+      "phase": "input",
+      "sourceOpportunityMs": 13.100000023841858,
+      "localSavedOpportunityMs": 13.199999988079071,
+      "heapBefore": 35443888,
+      "heapAfter": 43892346,
+      "maxGCEventSpanMs": 46.084,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 4.609,
+      "mainUnionMs": 224.925,
+      "workerMaxMs": 171.571,
+      "workerUnionMs": 645.831
+    },
+    {
+      "arm": "native-map",
+      "trial": 1,
+      "count": 512,
+      "phase": "Undo",
+      "sourceOpportunityMs": 170.0,
+      "localSavedOpportunityMs": 868.7000000476837,
+      "heapBefore": 18997640,
+      "heapAfter": 27462897,
+      "maxGCEventSpanMs": 4.685,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 4.659,
+      "mainUnionMs": 233.982,
+      "workerMaxMs": 28.843,
+      "workerUnionMs": 506.828
+    },
+    {
+      "arm": "native-map",
+      "trial": 2,
+      "count": 1,
+      "phase": "input",
+      "sourceOpportunityMs": 10.699999988079071,
+      "localSavedOpportunityMs": 10.799999952316284,
+      "heapBefore": 29115911,
+      "heapAfter": 23619275,
+      "maxGCEventSpanMs": 34.919,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 5.718,
+      "mainUnionMs": 220.15,
+      "workerMaxMs": 158.883,
+      "workerUnionMs": 833.402
+    },
+    {
+      "arm": "native-map",
+      "trial": 2,
+      "count": 1,
+      "phase": "Undo",
+      "sourceOpportunityMs": 159.1999999880809,
+      "localSavedOpportunityMs": 874.2999999523163,
+      "heapBefore": 18180824,
+      "heapAfter": 18438063,
+      "maxGCEventSpanMs": 9.624,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 7.099,
+      "mainUnionMs": 196.319,
+      "workerMaxMs": 23.123,
+      "workerUnionMs": 770.464
+    },
+    {
+      "arm": "partition",
+      "trial": 2,
+      "count": 1,
+      "phase": "input",
+      "sourceOpportunityMs": 6.399999976158142,
+      "localSavedOpportunityMs": 6.399999976158142,
+      "heapBefore": 28869675,
+      "heapAfter": 23600141,
+      "maxGCEventSpanMs": 9.56,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 5.812,
+      "mainUnionMs": 176.328,
+      "workerMaxMs": 167.603,
+      "workerUnionMs": 722.435
+    },
+    {
+      "arm": "partition",
+      "trial": 2,
+      "count": 1,
+      "phase": "Undo",
+      "sourceOpportunityMs": 134.0,
+      "localSavedOpportunityMs": 883.0999999642354,
+      "heapBefore": 18173209,
+      "heapAfter": 18384540,
+      "maxGCEventSpanMs": 29.068,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 6.855,
+      "mainUnionMs": 221.951,
+      "workerMaxMs": 17.152,
+      "workerUnionMs": 681.072
+    },
+    {
+      "arm": "native-map",
+      "trial": 2,
+      "count": 512,
+      "phase": "input",
+      "sourceOpportunityMs": 6.200000047683716,
+      "localSavedOpportunityMs": 6.200000047683716,
+      "heapBefore": 35720804,
+      "heapAfter": 44070754,
+      "maxGCEventSpanMs": 46.52,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 4.665,
+      "mainUnionMs": 210.522,
+      "workerMaxMs": 163.73,
+      "workerUnionMs": 646.154
+    },
+    {
+      "arm": "native-map",
+      "trial": 2,
+      "count": 512,
+      "phase": "Undo",
+      "sourceOpportunityMs": 169.60000002384186,
+      "localSavedOpportunityMs": 1052.2000000476837,
+      "heapBefore": 19237884,
+      "heapAfter": 27728197,
+      "maxGCEventSpanMs": 4.572,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 4.718,
+      "mainUnionMs": 186.058,
+      "workerMaxMs": 27.904,
+      "workerUnionMs": 499.726
+    },
+    {
+      "arm": "partition",
+      "trial": 2,
+      "count": 512,
+      "phase": "input",
+      "sourceOpportunityMs": 6.599999964237213,
+      "localSavedOpportunityMs": 6.699999988079071,
+      "heapBefore": 35245096,
+      "heapAfter": 43585502,
+      "maxGCEventSpanMs": 9.098,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 4.938,
+      "mainUnionMs": 207.796,
+      "workerMaxMs": 161.913,
+      "workerUnionMs": 614.237
+    },
+    {
+      "arm": "partition",
+      "trial": 2,
+      "count": 512,
+      "phase": "Undo",
+      "sourceOpportunityMs": 120.0,
+      "localSavedOpportunityMs": 868.8000000119227,
+      "heapBefore": 18816923,
+      "heapAfter": 27265354,
+      "maxGCEventSpanMs": 37.551,
+      "cpuProfileChunks": 0,
+      "mainMaxMs": 4.827,
+      "mainUnionMs": 222.155,
+      "workerMaxMs": 29.959,
+      "workerUnionMs": 501.597
+    }
+  ],
+  "summary": [
+    {
+      "arm": "native-map",
+      "count": 1,
+      "phase": "input",
+      "n": 3,
+      "metrics": {
+        "sourceOpportunityMs": {
+          "median": 10.199999988079071,
+          "max": 10.699999988079071,
+          "samples": [
+            10.199999988079071,
+            6.100000023841858,
+            10.699999988079071
+          ]
+        },
+        "localSavedOpportunityMs": {
+          "median": 10.199999988079071,
+          "max": 10.799999952316284,
+          "samples": [
+            10.199999988079071,
+            6.100000023841858,
+            10.799999952316284
+          ]
+        },
+        "mainMaxMs": {
+          "median": 5.718,
+          "max": 5.73,
+          "samples": [
+            5.73,
+            5.647,
+            5.718
+          ]
+        },
+        "mainUnionMs": {
+          "median": 207.689,
+          "max": 220.15,
+          "samples": [
+            207.689,
+            178.561,
+            220.15
+          ]
+        },
+        "workerMaxMs": {
+          "median": 158.883,
+          "max": 160.452,
+          "samples": [
+            156.912,
+            160.452,
+            158.883
+          ]
+        },
+        "workerUnionMs": {
+          "median": 828.942,
+          "max": 833.402,
+          "samples": [
+            793.434,
+            828.942,
+            833.402
+          ]
+        },
+        "maxGCEventSpanMs": {
+          "median": 34.919,
+          "max": 37.396,
+          "samples": [
+            33.892,
+            37.396,
+            34.919
+          ]
+        }
+      }
+    },
+    {
+      "arm": "partition",
+      "count": 1,
+      "phase": "input",
+      "n": 3,
+      "metrics": {
+        "sourceOpportunityMs": {
+          "median": 6.5,
+          "max": 13.5,
+          "samples": [
+            13.5,
+            6.5,
+            6.399999976158142
+          ]
+        },
+        "localSavedOpportunityMs": {
+          "median": 6.600000023841858,
+          "max": 13.5,
+          "samples": [
+            13.5,
+            6.600000023841858,
+            6.399999976158142
+          ]
+        },
+        "mainMaxMs": {
+          "median": 5.812,
+          "max": 6.037,
+          "samples": [
+            5.67,
+            6.037,
+            5.812
+          ]
+        },
+        "mainUnionMs": {
+          "median": 206.17,
+          "max": 207.999,
+          "samples": [
+            206.17,
+            207.999,
+            176.328
+          ]
+        },
+        "workerMaxMs": {
+          "median": 166.234,
+          "max": 167.603,
+          "samples": [
+            166.234,
+            163.54,
+            167.603
+          ]
+        },
+        "workerUnionMs": {
+          "median": 688.657,
+          "max": 722.435,
+          "samples": [
+            688.657,
+            687.414,
+            722.435
+          ]
+        },
+        "maxGCEventSpanMs": {
+          "median": 8.504,
+          "max": 9.56,
+          "samples": [
+            8.504,
+            8.248,
+            9.56
+          ]
+        }
+      }
+    },
+    {
+      "arm": "native-map",
+      "count": 1,
+      "phase": "Undo",
+      "n": 3,
+      "metrics": {
+        "sourceOpportunityMs": {
+          "median": 159.1999999880809,
+          "max": 167.5999999642354,
+          "samples": [
+            167.5999999642354,
+            153.29999995231628,
+            159.1999999880809
+          ]
+        },
+        "localSavedOpportunityMs": {
+          "median": 880.1999999880773,
+          "max": 881.3999999761545,
+          "samples": [
+            881.3999999761545,
+            880.1999999880773,
+            874.2999999523163
+          ]
+        },
+        "mainMaxMs": {
+          "median": 6.687,
+          "max": 7.099,
+          "samples": [
+            6.529,
+            6.687,
+            7.099
+          ]
+        },
+        "mainUnionMs": {
+          "median": 214.557,
+          "max": 215.326,
+          "samples": [
+            215.326,
+            214.557,
+            196.319
+          ]
+        },
+        "workerMaxMs": {
+          "median": 22.985,
+          "max": 23.123,
+          "samples": [
+            22.985,
+            16.756,
+            23.123
+          ]
+        },
+        "workerUnionMs": {
+          "median": 770.464,
+          "max": 866.208,
+          "samples": [
+            866.208,
+            761.368,
+            770.464
+          ]
+        },
+        "maxGCEventSpanMs": {
+          "median": 9.561,
+          "max": 9.624,
+          "samples": [
+            9.561,
+            9.447,
+            9.624
+          ]
+        }
+      }
+    },
+    {
+      "arm": "partition",
+      "count": 1,
+      "phase": "Undo",
+      "n": 3,
+      "metrics": {
+        "sourceOpportunityMs": {
+          "median": 134.80000001192275,
+          "max": 143.6999999880809,
+          "samples": [
+            134.80000001192275,
+            143.6999999880809,
+            134.0
+          ]
+        },
+        "localSavedOpportunityMs": {
+          "median": 883.0999999642354,
+          "max": 883.1999999880809,
+          "samples": [
+            883.1999999880809,
+            875.1999999880809,
+            883.0999999642354
+          ]
+        },
+        "mainMaxMs": {
+          "median": 6.855,
+          "max": 7.103,
+          "samples": [
+            7.103,
+            6.602,
+            6.855
+          ]
+        },
+        "mainUnionMs": {
+          "median": 226.72,
+          "max": 250.223,
+          "samples": [
+            226.72,
+            250.223,
+            221.951
+          ]
+        },
+        "workerMaxMs": {
+          "median": 17.152,
+          "max": 17.462,
+          "samples": [
+            16.577,
+            17.462,
+            17.152
+          ]
+        },
+        "workerUnionMs": {
+          "median": 681.072,
+          "max": 704.127,
+          "samples": [
+            636.077,
+            704.127,
+            681.072
+          ]
+        },
+        "maxGCEventSpanMs": {
+          "median": 29.676,
+          "max": 30.256,
+          "samples": [
+            30.256,
+            29.676,
+            29.068
+          ]
+        }
+      }
+    },
+    {
+      "arm": "native-map",
+      "count": 512,
+      "phase": "input",
+      "n": 3,
+      "metrics": {
+        "sourceOpportunityMs": {
+          "median": 6.200000047683716,
+          "max": 13.100000023841858,
+          "samples": [
+            5.099999964237213,
+            13.100000023841858,
+            6.200000047683716
+          ]
+        },
+        "localSavedOpportunityMs": {
+          "median": 6.200000047683716,
+          "max": 13.199999988079071,
+          "samples": [
+            5.099999964237213,
+            13.199999988079071,
+            6.200000047683716
+          ]
+        },
+        "mainMaxMs": {
+          "median": 4.665,
+          "max": 4.805,
+          "samples": [
+            4.805,
+            4.609,
+            4.665
+          ]
+        },
+        "mainUnionMs": {
+          "median": 210.522,
+          "max": 224.925,
+          "samples": [
+            198.978,
+            224.925,
+            210.522
+          ]
+        },
+        "workerMaxMs": {
+          "median": 171.571,
+          "max": 172.401,
+          "samples": [
+            172.401,
+            171.571,
+            163.73
+          ]
+        },
+        "workerUnionMs": {
+          "median": 645.831,
+          "max": 646.154,
+          "samples": [
+            635.731,
+            645.831,
+            646.154
+          ]
+        },
+        "maxGCEventSpanMs": {
+          "median": 46.084,
+          "max": 46.52,
+          "samples": [
+            40.615,
+            46.084,
+            46.52
+          ]
+        }
+      }
+    },
+    {
+      "arm": "partition",
+      "count": 512,
+      "phase": "input",
+      "n": 3,
+      "metrics": {
+        "sourceOpportunityMs": {
+          "median": 6.599999964237213,
+          "max": 9.800000011920929,
+          "samples": [
+            5.099999964237213,
+            9.800000011920929,
+            6.599999964237213
+          ]
+        },
+        "localSavedOpportunityMs": {
+          "median": 6.699999988079071,
+          "max": 9.800000011920929,
+          "samples": [
+            5.099999964237213,
+            9.800000011920929,
+            6.699999988079071
+          ]
+        },
+        "mainMaxMs": {
+          "median": 4.749,
+          "max": 4.938,
+          "samples": [
+            4.749,
+            4.74,
+            4.938
+          ]
+        },
+        "mainUnionMs": {
+          "median": 203.076,
+          "max": 207.796,
+          "samples": [
+            203.076,
+            201.74,
+            207.796
+          ]
+        },
+        "workerMaxMs": {
+          "median": 164.46,
+          "max": 174.477,
+          "samples": [
+            174.477,
+            164.46,
+            161.913
+          ]
+        },
+        "workerUnionMs": {
+          "median": 612.629,
+          "max": 614.237,
+          "samples": [
+            612.629,
+            606.873,
+            614.237
+          ]
+        },
+        "maxGCEventSpanMs": {
+          "median": 7.976,
+          "max": 9.098,
+          "samples": [
+            7.976,
+            7.545,
+            9.098
+          ]
+        }
+      }
+    },
+    {
+      "arm": "native-map",
+      "count": 512,
+      "phase": "Undo",
+      "n": 3,
+      "metrics": {
+        "sourceOpportunityMs": {
+          "median": 170.0,
+          "max": 172.3000000119191,
+          "samples": [
+            172.3000000119191,
+            170.0,
+            169.60000002384186
+          ]
+        },
+        "localSavedOpportunityMs": {
+          "median": 905.5,
+          "max": 1052.2000000476837,
+          "samples": [
+            905.5,
+            868.7000000476837,
+            1052.2000000476837
+          ]
+        },
+        "mainMaxMs": {
+          "median": 4.673,
+          "max": 4.718,
+          "samples": [
+            4.673,
+            4.659,
+            4.718
+          ]
+        },
+        "mainUnionMs": {
+          "median": 196.635,
+          "max": 233.982,
+          "samples": [
+            196.635,
+            233.982,
+            186.058
+          ]
+        },
+        "workerMaxMs": {
+          "median": 27.904,
+          "max": 28.843,
+          "samples": [
+            27.405,
+            28.843,
+            27.904
+          ]
+        },
+        "workerUnionMs": {
+          "median": 506.828,
+          "max": 518.153,
+          "samples": [
+            518.153,
+            506.828,
+            499.726
+          ]
+        },
+        "maxGCEventSpanMs": {
+          "median": 4.685,
+          "max": 4.879,
+          "samples": [
+            4.879,
+            4.685,
+            4.572
+          ]
+        }
+      }
+    },
+    {
+      "arm": "partition",
+      "count": 512,
+      "phase": "Undo",
+      "n": 3,
+      "metrics": {
+        "sourceOpportunityMs": {
+          "median": 117.19999998808089,
+          "max": 120.0,
+          "samples": [
+            107.5,
+            117.19999998808089,
+            120.0
+          ]
+        },
+        "localSavedOpportunityMs": {
+          "median": 871.6999999880809,
+          "max": 899.8000000119191,
+          "samples": [
+            871.6999999880809,
+            899.8000000119191,
+            868.8000000119227
+          ]
+        },
+        "mainMaxMs": {
+          "median": 4.827,
+          "max": 4.892,
+          "samples": [
+            4.765,
+            4.892,
+            4.827
+          ]
+        },
+        "mainUnionMs": {
+          "median": 229.556,
+          "max": 230.473,
+          "samples": [
+            230.473,
+            229.556,
+            222.155
+          ]
+        },
+        "workerMaxMs": {
+          "median": 28.568,
+          "max": 29.959,
+          "samples": [
+            27.855,
+            28.568,
+            29.959
+          ]
+        },
+        "workerUnionMs": {
+          "median": 488.853,
+          "max": 501.597,
+          "samples": [
+            454.769,
+            488.853,
+            501.597
+          ]
+        },
+        "maxGCEventSpanMs": {
+          "median": 37.551,
+          "max": 42.053,
+          "samples": [
+            5.03,
+            42.053,
+            37.551
+          ]
+        }
+      }
+    }
+  ],
+  "failures": []
+}

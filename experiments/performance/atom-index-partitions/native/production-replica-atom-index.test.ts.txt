@@ -1,0 +1,71 @@
+import { expect, test } from "bun:test"
+import * as Effect from "effect/Effect"
+import { Replica } from "../src/shared/crdt"
+import type { LegacyReplicaCheckpoint } from "../src/shared/checkpoint"
+
+	test("siblings and parent remain independent through sustained edits and repeated fork", async () => {
+		let owner = new Replica("owner")
+		let source = "Body 😀"
+		if (!owner.edit("document", source)) throw Error("Missing seed")
+		for (let index = 0; index < 260; index++) {
+			source += "x"
+			if (!owner.edit("document", source)) throw Error("Missing history edit")
+		}
+		let first = owner.fork("first")
+		let second = owner.fork("second")
+		let retained = owner.checkpoint()
+		let firstEdit = first.edit("document", source + "First 🦋")
+		let secondEdit = second.edit("document", "Second 🌻" + source)
+		let ownerEdit = owner.edit("document", source + "Owner")
+		if (!firstEdit || !secondEdit || !ownerEdit) throw Error("Missing branch edit")
+		expect(first.text("document")).toBe(source + "First 🦋")
+		expect(second.text("document")).toBe("Second 🌻" + source)
+		expect(owner.text("document")).toBe(source + "Owner")
+		for (let atom of firstEdit.insert) {
+			expect(owner.atomTarget(atom.id)).toBeUndefined()
+			expect(second.atomTarget(atom.id)).toBeUndefined()
+		}
+		for (let atom of ownerEdit.insert) expect(first.atomTarget(atom.id)).toBeUndefined()
+		first.apply([secondEdit, ownerEdit])
+		second.apply([firstEdit, ownerEdit])
+		owner.apply([firstEdit, secondEdit])
+		expect(first.text("document")).toBe(owner.text("document"))
+		expect(second.text("document")).toBe(owner.text("document"))
+		let cold = new Replica("cold")
+		cold.restore(retained)
+		expect(cold.text("document")).toBe(source)
+		let another = await Effect.runPromise(Replica.fromCheckpointEffect(owner.checkpoint(), "another"))
+		expect(another.text("document")).toBe(owner.text("document"))
+	})
+
+	test("legacy arbitrary UTF16 atom identities survive fork and cold restore", () => {
+		let snapshot: LegacyReplicaCheckpoint = {
+			format: "alkalye-state-v1",
+			clock: 1,
+			restored: [],
+			targets: [{
+				id: "document", created: 1, updated: 1, fields: [], removed: [],
+				atoms: [
+					{ id: "legacy/first/🌻", after: "", value: "A" },
+					{ id: "odd:ordinal-not-decimal", after: "legacy/first/🌻", value: "😀" },
+					{ id: "\uD800-old-id", after: "odd:ordinal-not-decimal", value: "B\r\n" },
+				],
+			}],
+		}
+		let owner = new Replica("owner")
+		owner.restore(snapshot)
+		expect(owner.text("document")).toBe("A😀B\r\n")
+		let peer = owner.fork("peer")
+		for (let atom of snapshot.targets[0]?.atoms ?? []) {
+			expect(owner.atomTarget(atom.id)).toBe("document")
+			expect(peer.atomTarget(atom.id)).toBe("document")
+		}
+		let cold = new Replica("cold")
+		cold.restore(peer.checkpoint())
+		expect(cold.text("document")).toBe(owner.text("document"))
+		let before = peer.checkpoint()
+		let added = owner.edit("document", owner.text("document") + "Owner")
+		if (!added) throw Error("Missing legacy append")
+		expect(peer.checkpoint()).toEqual(before)
+		for (let atom of added.insert) expect(peer.atomTarget(atom.id)).toBeUndefined()
+	})

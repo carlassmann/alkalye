@@ -119,7 +119,7 @@ export class Replica {
 	operations = new Map<string, Operation>()
 	clock = 0
 	historyLoaded = true
-	private atomIndex = new Map<string, { target: string; atom: Atom }>()
+	private atomIndex = new AtomIndex()
 	private children = new Map<string, Map<string, Atom[]>>()
 	private visibility = new Map<string, TextVisibility>()
 	private textOwners = new Map<string, string>()
@@ -176,7 +176,7 @@ export class Replica {
 			this.legacyTextTargets,
 			cooperative,
 		)
-		replica.atomIndex = yield* copyMapSteps(this.atomIndex, cooperative)
+		replica.atomIndex = this.atomIndex.fork()
 		for (let [target, children] of this.children)
 			replica.children.set(target, yield* copyMapSteps(children, cooperative))
 		for (let [target, visibility] of this.visibility)
@@ -2279,7 +2279,7 @@ export class Replica {
 			this.legacyTextTargets.add(target)
 		if (this.atomIndex.has(atom.id)) return
 		freezeTextAtom(atom)
-		this.atomIndex.set(atom.id, { target, atom })
+		this.atomIndex.set(atom.id, Object.freeze({ target, atom }))
 		let owner = atom.id.slice(0, -9)
 		this.ownedAtomCounts.set(owner, (this.ownedAtomCounts.get(owner) ?? 0) + 1)
 		let children = this.children.get(target) ?? new Map<string, Atom[]>()
@@ -2293,6 +2293,81 @@ export class Replica {
 		if (!this.historyLoaded)
 			throw new Error("Load history before opening a past version")
 	}
+}
+
+interface AtomIndexEntry {
+	readonly target: string
+	readonly atom: Atom
+}
+
+class AtomIndex {
+	private buckets: Map<string, AtomIndexEntry>[]
+	private ownedBuckets = new Uint8Array(256)
+	constructor(buckets?: Map<string, AtomIndexEntry>[]) {
+		this.buckets = buckets ?? Array.from({ length: 256 }, () => new Map())
+		if (!buckets) this.ownedBuckets.fill(1)
+	}
+	fork() {
+		// Both replicas must copy a shared bucket before their next write.
+		this.ownedBuckets.fill(0)
+		return new AtomIndex(this.buckets.slice())
+	}
+	get(id: string) {
+		return this.buckets[atomIndexBucket(id)]?.get(id)
+	}
+	has(id: string) {
+		return this.buckets[atomIndexBucket(id)]?.has(id) ?? false
+	}
+	set(id: string, entry: AtomIndexEntry) {
+		let bucket = atomIndexBucket(id)
+		let entries = this.buckets[bucket]
+		if (!entries) throw new Error("Missing atom index partition")
+		if (!this.ownedBuckets[bucket]) {
+			entries = new Map(entries)
+			this.buckets[bucket] = entries
+			this.ownedBuckets[bucket] = 1
+		}
+		entries.set(id, entry)
+	}
+	*[Symbol.iterator]() {
+		for (let bucket of this.buckets) yield* bucket
+	}
+}
+
+function atomIndexBucket(id: string) {
+	if (
+		id.length >= 27 &&
+		id.charCodeAt(16) === 58 &&
+		id.charCodeAt(id.length - 9) === 58
+	) {
+		let clock = 0
+		let ordinal = 0
+		let digits = true
+		for (let offset = 12; offset < 16; offset++) {
+			let digit = id.charCodeAt(offset) - 48
+			if (digit < 0 || digit > 9) {
+				digits = false
+				break
+			}
+			clock = clock * 10 + digit
+		}
+		if (digits) {
+			for (let offset = id.length - 8; offset < id.length; offset++) {
+				let digit = id.charCodeAt(offset) - 48
+				if (digit < 0 || digit > 9) {
+					digits = false
+					break
+				}
+				ordinal = ordinal * 10 + digit
+			}
+			// Adjacent insertions reuse one copied bucket instead of copying every bucket.
+			if (digits) return (clock * 31 + (ordinal >>> 12)) & 255
+		}
+	}
+	let hash = 0
+	for (let offset = 0; offset < id.length; offset++)
+		hash = (Math.imul(hash, 31) + id.charCodeAt(offset)) | 0
+	return hash & 255
 }
 
 function atomIdentity(atom: Atom) {

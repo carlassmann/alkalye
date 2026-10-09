@@ -1,0 +1,18 @@
+{
+  "baseline": {
+    "loadMs": 6.258915999999999,
+    "textMs": 1.5718340000000097,
+    "lookupMs": 0.2399170000000055,
+    "forkMs": 1.1522499999999951,
+    "firstForkWriteMs": 1.1752500000000055,
+    "firstOwnerWriteMs": 1.4960420000000028
+  },
+  "candidate": {
+    "loadMs": 8.549417000000005,
+    "textMs": 1.4676669999999916,
+    "lookupMs": 0.45520799999999895,
+    "forkMs": 0.6942500000000109,
+    "firstForkWriteMs": 0.9277079999999955,
+    "firstOwnerWriteMs": 0.9122500000000002
+  }
+}

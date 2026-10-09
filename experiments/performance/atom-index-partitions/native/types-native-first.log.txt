@@ -1,0 +1,29 @@
+src/client/worker-document/app-owner.ts(21,19): error TS2339: Property 'mergeSelection' does not exist on type 'EditorElement'.
+src/client/worker-document/app-owner.ts(26,38): error TS2339: Property 'setEditable' does not exist on type 'EditorElement'.
+src/client/worker-document/app-owner.ts(37,14): error TS2339: Property 'failAuthority' does not exist on type 'EditorElement'.
+src/client/worker-document/app-owner.ts(44,141): error TS2339: Property 'failAuthority' does not exist on type 'EditorElement'.
+src/client/worker-document/app-owner.ts(56,26): error TS2339: Property 'adoptMerged' does not exist on type 'EditorElement'.
+src/client/worker-document/app-owner.ts(64,87): error TS2339: Property 'setEditable' does not exist on type 'EditorElement'.
+src/client/worker-document/app-owner.ts(67,50): error TS2339: Property 'setEditable' does not exist on type 'EditorElement'.
+src/client/worker-document/app-route.ts(36,424): error TS2739: Type '{ kind: string; }' is missing the following properties from type '{ atoms: Atom[]; content: string; operation: Operation | null; }': atoms, content, operation
+src/client/worker-document/app-route.ts(54,4): error TS2353: Object literal may only specify known properties, and 'authority' does not exist in type 'EditorOptions'.
+src/client/worker-document/app-route.ts(65,11): error TS2339: Property 'setEditable' does not exist on type 'EditorElement'.
+src/client/worker-document/bindings.ts(3,10): error TS2305: Module '"../source-textarea"' has no exported member 'sourceDifference'.
+src/client/worker-document/bindings.ts(7,2): error TS2305: Module '"../components/editor"' has no exported member 'MergedEditorSelection'.
+src/client/worker-document/bindings.ts(72,10): error TS2339: Property 'failAuthority' does not exist on type 'EditorElement'.
+src/client/worker-document/bindings.ts(76,6): error TS2322: Type '(content: any, _base: any, replacements: any, command: any) => { kind: string; }' is not assignable to type '(content: string, base?: Atom[] | undefined, replacements?: SourceReplacement[] | undefined) => { atoms: Atom[]; content: string; operation: Operation | null; } | undefined'.
+  Target signature provides too few arguments. Expected 4 or more, but got 3.
+src/client/worker-document/bindings.ts(77,3): error TS7006: Parameter 'content' implicitly has an 'any' type.
+src/client/worker-document/bindings.ts(78,3): error TS7006: Parameter '_base' implicitly has an 'any' type.
+src/client/worker-document/bindings.ts(79,3): error TS7006: Parameter 'replacements' implicitly has an 'any' type.
+src/client/worker-document/bindings.ts(80,3): error TS7006: Parameter 'command' implicitly has an 'any' type.
+src/client/worker-document/bindings.ts(105,25): error TS2339: Property 'mergeSelection' does not exist on type 'EditorElement'.
+src/client/worker-document/bindings.ts(131,11): error TS2339: Property 'adoptMerged' does not exist on type 'EditorElement'.
+src/client/worker-document/bindings.ts(142,25): error TS2339: Property 'commandSelection' does not exist on type 'EditorElement'.
+src/client/worker-document/bindings.ts(177,19): error TS2339: Property 'commandSelection' does not exist on type 'EditorElement'.
+src/client/worker-document/bindings.ts(178,35): error TS2339: Property 'adoptMerged' does not exist on type 'EditorElement'.
+src/client/worker-document/bindings.ts(187,16): error TS2339: Property 'freezeCommands' does not exist on type 'EditorElement'.
+src/client/worker-document/bindings.ts(189,16): error TS2339: Property 'commandSelection' does not exist on type 'EditorElement'.
+src/client/worker-document/bindings.ts(216,25): error TS2339: Property 'commandSelection' does not exist on type 'EditorElement'.
+src/client/worker-document/bindings.ts(223,10): error TS2339: Property 'freezeCommands' does not exist on type 'EditorElement'.
+src/client/worker-document/bindings.ts(228,52): error TS2339: Property 'freezeCommands' does not exist on type 'EditorElement'.

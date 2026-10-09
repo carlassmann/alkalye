@@ -1,0 +1,92 @@
+{"stage":"sample","fixture":"long-one-operation","arm":"baseline","mode":"apply","trial":0,"complete":1}
+{"stage":"sample","fixture":"long-one-operation","arm":"baseline","mode":"sync","trial":0,"complete":2}
+{"stage":"sample","fixture":"long-one-operation","arm":"baseline","mode":"cooperative","trial":0,"complete":3}
+{"stage":"sample","fixture":"long-one-operation","arm":"candidate","mode":"apply","trial":0,"complete":4}
+{"stage":"sample","fixture":"long-one-operation","arm":"candidate","mode":"sync","trial":0,"complete":5}
+{"stage":"sample","fixture":"long-one-operation","arm":"candidate","mode":"cooperative","trial":0,"complete":6}
+{"stage":"sample","fixture":"long-one-operation","arm":"candidate","mode":"apply","trial":1,"complete":7}
+{"stage":"sample","fixture":"long-one-operation","arm":"candidate","mode":"sync","trial":1,"complete":8}
+{"stage":"sample","fixture":"long-one-operation","arm":"candidate","mode":"cooperative","trial":1,"complete":9}
+{"stage":"sample","fixture":"long-one-operation","arm":"baseline","mode":"apply","trial":1,"complete":10}
+{"stage":"sample","fixture":"long-one-operation","arm":"baseline","mode":"sync","trial":1,"complete":11}
+{"stage":"sample","fixture":"long-one-operation","arm":"baseline","mode":"cooperative","trial":1,"complete":12}
+{"stage":"sample","fixture":"long-one-operation","arm":"baseline","mode":"apply","trial":2,"complete":13}
+{"stage":"sample","fixture":"long-one-operation","arm":"baseline","mode":"sync","trial":2,"complete":14}
+{"stage":"sample","fixture":"long-one-operation","arm":"baseline","mode":"cooperative","trial":2,"complete":15}
+{"stage":"sample","fixture":"long-one-operation","arm":"candidate","mode":"apply","trial":2,"complete":16}
+{"stage":"sample","fixture":"long-one-operation","arm":"candidate","mode":"sync","trial":2,"complete":17}
+{"stage":"sample","fixture":"long-one-operation","arm":"candidate","mode":"cooperative","trial":2,"complete":18}
+{"stage":"sample","fixture":"sustained-260-and-20-concurrent-writers","arm":"baseline","mode":"apply","trial":0,"complete":19}
+{"stage":"sample","fixture":"sustained-260-and-20-concurrent-writers","arm":"baseline","mode":"sync","trial":0,"complete":20}
+{"stage":"sample","fixture":"sustained-260-and-20-concurrent-writers","arm":"baseline","mode":"cooperative","trial":0,"complete":21}
+{"stage":"sample","fixture":"sustained-260-and-20-concurrent-writers","arm":"candidate","mode":"apply","trial":0,"complete":22}
+{"stage":"sample","fixture":"sustained-260-and-20-concurrent-writers","arm":"candidate","mode":"sync","trial":0,"complete":23}
+{"stage":"sample","fixture":"sustained-260-and-20-concurrent-writers","arm":"candidate","mode":"cooperative","trial":0,"complete":24}
+{"stage":"sample","fixture":"sustained-260-and-20-concurrent-writers","arm":"candidate","mode":"apply","trial":1,"complete":25}
+{"stage":"sample","fixture":"sustained-260-and-20-concurrent-writers","arm":"candidate","mode":"sync","trial":1,"complete":26}
+{"stage":"sample","fixture":"sustained-260-and-20-concurrent-writers","arm":"candidate","mode":"cooperative","trial":1,"complete":27}
+{"stage":"sample","fixture":"sustained-260-and-20-concurrent-writers","arm":"baseline","mode":"apply","trial":1,"complete":28}
+{"stage":"sample","fixture":"sustained-260-and-20-concurrent-writers","arm":"baseline","mode":"sync","trial":1,"complete":29}
+{"stage":"sample","fixture":"sustained-260-and-20-concurrent-writers","arm":"baseline","mode":"cooperative","trial":1,"complete":30}
+{"stage":"sample","fixture":"sustained-260-and-20-concurrent-writers","arm":"baseline","mode":"apply","trial":2,"complete":31}
+{"stage":"sample","fixture":"sustained-260-and-20-concurrent-writers","arm":"baseline","mode":"sync","trial":2,"complete":32}
+{"stage":"sample","fixture":"sustained-260-and-20-concurrent-writers","arm":"baseline","mode":"cooperative","trial":2,"complete":33}
+{"stage":"sample","fixture":"sustained-260-and-20-concurrent-writers","arm":"candidate","mode":"apply","trial":2,"complete":34}
+{"stage":"sample","fixture":"sustained-260-and-20-concurrent-writers","arm":"candidate","mode":"sync","trial":2,"complete":35}
+{"stage":"sample","fixture":"sustained-260-and-20-concurrent-writers","arm":"candidate","mode":"cooperative","trial":2,"complete":36}
+{"stage":"sample","fixture":"logical-clock-10000-wrap","arm":"baseline","mode":"apply","trial":0,"complete":37}
+{"stage":"sample","fixture":"logical-clock-10000-wrap","arm":"baseline","mode":"sync","trial":0,"complete":38}
+{"stage":"sample","fixture":"logical-clock-10000-wrap","arm":"baseline","mode":"cooperative","trial":0,"complete":39}
+{"stage":"sample","fixture":"logical-clock-10000-wrap","arm":"candidate","mode":"apply","trial":0,"complete":40}
+{"stage":"sample","fixture":"logical-clock-10000-wrap","arm":"candidate","mode":"sync","trial":0,"complete":41}
+{"stage":"sample","fixture":"logical-clock-10000-wrap","arm":"candidate","mode":"cooperative","trial":0,"complete":42}
+{"stage":"sample","fixture":"logical-clock-10000-wrap","arm":"candidate","mode":"apply","trial":1,"complete":43}
+{"stage":"sample","fixture":"logical-clock-10000-wrap","arm":"candidate","mode":"sync","trial":1,"complete":44}
+{"stage":"sample","fixture":"logical-clock-10000-wrap","arm":"candidate","mode":"cooperative","trial":1,"complete":45}
+{"stage":"sample","fixture":"logical-clock-10000-wrap","arm":"baseline","mode":"apply","trial":1,"complete":46}
+{"stage":"sample","fixture":"logical-clock-10000-wrap","arm":"baseline","mode":"sync","trial":1,"complete":47}
+{"stage":"sample","fixture":"logical-clock-10000-wrap","arm":"baseline","mode":"cooperative","trial":1,"complete":48}
+{"stage":"sample","fixture":"logical-clock-10000-wrap","arm":"baseline","mode":"apply","trial":2,"complete":49}
+{"stage":"sample","fixture":"logical-clock-10000-wrap","arm":"baseline","mode":"sync","trial":2,"complete":50}
+{"stage":"sample","fixture":"logical-clock-10000-wrap","arm":"baseline","mode":"cooperative","trial":2,"complete":51}
+{"stage":"sample","fixture":"logical-clock-10000-wrap","arm":"candidate","mode":"apply","trial":2,"complete":52}
+{"stage":"sample","fixture":"logical-clock-10000-wrap","arm":"candidate","mode":"sync","trial":2,"complete":53}
+{"stage":"sample","fixture":"logical-clock-10000-wrap","arm":"candidate","mode":"cooperative","trial":2,"complete":54}
+{"stage":"sample","fixture":"legacy-colliding-arbitrary-ids","arm":"baseline","mode":"sync","trial":0,"complete":55}
+ 7 | import { ApplicationError } from "./errors"
+ 8 | 
+ 9 | export function attempt<A>(operation: string, work: () => A) {
+10 | 	return Effect.try({
+11 | 		try: work,
+12 | 		catch: cause => new ApplicationError({ operation, cause }),
+                       ^
+error: Expected a string matching the RegExp ^\d{16}:[\w-]{1,100}:\d{8}$
+  at ["id"]
+ operation: "checkpoint.parse",
+      _tag: "ApplicationError",
+
+      at catch (/private/tmp/alkalye-worker-native-atom-partitions/runtime/src/platform/effects.ts:12:19)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:770:19)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2478:9)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2530:19)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:2541:31)
+      at sample (/private/tmp/alkalye-worker-native-atom-partitions/runtime/fact-index-cost.ts:117:22)
+      at /private/tmp/alkalye-worker-native-atom-partitions/runtime/fact-index-cost.ts:189:10
+
+error: Expected a string matching the RegExp ^\d{16}:[\w-]{1,100}:\d{8}$
+  at ["id"]
+      issue: Composite {
+  "~effect/SchemaIssue/Issue": "~effect/SchemaIssue/Issue",
+  _tag: "Composite",
+  ast: [Object ...],
+  issues: [
+    [Object ...]
+  ],
+},
+       _tag: "SchemaError",
+ ~effect/Schema/SchemaError: "~effect/Schema/SchemaError",
+
+
+Bun v1.4.0 (macOS arm64)

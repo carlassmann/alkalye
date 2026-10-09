@@ -1,0 +1,9 @@
+{
+  "name": "legacy-colliding-arbitrary-ids",
+  "utf16Units": 17348,
+  "utf8Bytes": 19276,
+  "realNewlines": 0,
+  "literalBackslashN": 0,
+  "sourceSHA": "8a72ca46c718ec31b70a0b4d50eb91803139fdf7cd9f0c6b23dda6601c7037b7",
+  "operations": 0
+}

@@ -45,9 +45,31 @@
 	<body>
 		<h1>Interaction follow-up</h1>
 		<p>
-			Updated 8 October 2026. The fresh comparison below reruns main. Earlier
+			Updated 9 October 2026. The fresh comparison below reruns main. Earlier
 			sections compare rewrite revisions or implementation paths and follow the
 			<a href="performance-interaction.html">previous comparison with main</a>.
+		</p>
+		<h2>Partitioned document index</h2>
+		<p>
+			The document's private atom index now shares 256 native Map partitions
+			between copies. Each replica copies a partition before writing to it;
+			immutable entries preserve parent, sibling and child independence. Effect
+			continues to own application services, concurrency and lifetimes. In three
+			paired module trials, copying the large fixture fell from 194ms to 94ms;
+			loading it fell from 733ms to 679ms. Small and legacy fixtures cost
+			slightly more to load and look up.
+		</p>
+		<p>
+			Twelve fresh browser trials compared this index inside the experimental
+			worker editor. All passed exact source, every selection and caret, and
+			independent server acceptance of edits and Undo. Median Undo text-update
+			opportunity fell from 159ms to 135ms for one selection and from 170ms to
+			117ms for 512 selections. Main-thread task peaks stayed below 8.33ms
+			(maximum 7.103ms). Worker input peaks still reached 159–172ms; the
+			512-selection Undo worker peak slightly worsened. Saved timing was nearly
+			unchanged for one selection and improved for 512. This supports the index
+			change, not a complete worker cutover or measured 120Hz presentation.
+			Evidence: <code>experiments/performance/atom-index-partitions</code>.
 		</p>
 		<h2>Latest native input tasks</h2>
 		<p>

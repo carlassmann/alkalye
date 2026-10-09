@@ -1,0 +1,43 @@
+No correctness blockers found. This was a read-only review: no tests, builds or edits.
+
+**Correctness: all clear**
+- **Parent/child copy-on-write:** `fork()` clears ownership on the parent (`owned.fill(0)`) and the child starts with nothing owned. Neither side can write into a shared bucket without copying it first. I traced these cases and all stay isolated:
+  - parent writes after a fork, then forks again;
+  - a child of a child;
+  - several children of one parent.
+- **Exception/interrupt during `forkSteps`:**
+  - `atomIndex.fork()` runs synchronously between yields (`src/shared/crdt.ts:179`). If the fork is cut short afterwards, the parent only loses ownership, which costs extra copies but not correctness.
+  - If the parent changes during the copy, `forkEffect` still rejects it with the existing generation/clock check. Existing runtime failures are kept.
+  - The new `"Missing atom index partition"` throw can never fire, since bucket numbers are always 0–255. Harmless.
+- **Shared entries/Atoms:**
+  - Before, `copyMapSteps` was a shallow copy, so entries and Atoms were already shared between parent and child.
+  - Entries are only created in `indexAtom` and never changed afterwards. The new `Object.freeze` changes nothing semantically.
+  - The receipt/redo identity checks (`.atom !== receipt.atom`, lines 336/377) behave as before because Atom references are the same.
+- **Restore on an existing replica and merge aliases:**
+  - Restore goes through `has`/`get`/`indexAtom` with unchanged meaning. Partial failure mid-restore leaves things as the old in-place Map did.
+  - `mergedAliasSteps` (line 2154) only builds an id→target Map. Snapshot entries overwrite it with `set` and it is only looked up, never read in order. Iteration order doesn't matter.
+- **Duplicate/immutable identity checks:** they still use `has`/`get` on exact keys. Bucket collisions only cost performance.
+- **Partition function:**
+  - It is a pure function of the id string, so the same id always lands in the same bucket, including malformed ids. Nothing is marked trusted and Schema validation is not skipped.
+  - The fallback hash handles any UTF-16 id. Negative hashes still give 0–255 after `& 255`.
+  - Ids with more than 16 clock digits, or actors containing `:`, fall back to the hash, which is still deterministic.
+  - The fast-path numbers stay well below 2^31.
+
+**Cost issues (not correctness; confirm by measuring)**
+1. **Wasted allocation on every fork:** `new Replica()` runs the field initializer `new AtomIndex()`, which allocates 256 Maps. Line 179 then replaces it immediately, so that's 256 Maps wasted per fork. Plain `new Replica` and `fromCheckpoint` with few atoms also pay this up front. Fix: create buckets lazily on first `set`, with `get`/`has` treating a missing bucket as empty. Only do this if fork/cold timings show it.
+2. **Bucket clustering:**
+   - All atoms of one operation fall in one bucket for each block of 4096 ordinals. A 100k-character single-operation import spreads over only about 25 buckets.
+   - Lamport clocks mean concurrent writers often share a clock, so their atoms land in the same bucket.
+   - Clocks c and c+10000 also share a bucket.
+   - This only matters for the first write into a bucket after a fork, so the sustained multi-writer and 512-new-insert first-write gate is still required.
+3. **Lookup overhead:** each `get`/`has` now computes a bucket number (about 12 `charCodeAt` calls). `indexAtom` calls it twice and the restore checks call it on every atom. Along with the per-entry `Object.freeze`, this needs cold-restore measurement against the native current control.
+4. Re-copying the existing children (52ms) is untouched, as stated.
+
+**Hybrid outer Effect HashMap + native Map leaves:** not justified. The fixed256 version has no concrete blocker. Only reconsider if the clustering in item 2 actually shows up in the measured multi-writer first-write gate.
+
+**Before adoption, measure against the native current control:**
+- cold restore;
+- hot get/has in `validateIdentities` and the checkpoint loops;
+- fork, including the 256-Map allocation;
+- first write after a fork: single writer, multi-writer with the same clocks, and the 512-new-insert case;
+- the publicReplica and SQLite gates.

@@ -1,0 +1,279 @@
+{
+  "stage": "terminal",
+  "gates": [
+    "native 1 exact source/all ranges/directions/primary/caret and independent edit+Undo acceptance"
+  ],
+  "cells": [
+    {
+      "phase": "Undo",
+      "count": 1,
+      "probe": {
+        "end": 13911.099999964235,
+        "events": [
+          {
+            "key": "z",
+            "time": 10910.099999964235,
+            "type": "keydown"
+          }
+        ],
+        "heapAfter": 18169444,
+        "heapBefore": 24537177,
+        "label": "Undo-1",
+        "localSaved": 11785.299999952316,
+        "ready": 11053.799999952316,
+        "start": 10910.099999964235
+      }
+    },
+    {
+      "phase": "accepted-input-and-Undo",
+      "count": 1,
+      "selectionProbe": {
+        "end": 5060.699999988079,
+        "events": [
+          {
+            "key": "l",
+            "time": 2058.699999988079,
+            "type": "keydown"
+          }
+        ],
+        "heapAfter": 28710802,
+        "heapBefore": 26564079,
+        "label": "selection-1",
+        "localSaved": 2067.699999988079,
+        "ready": 2067.699999988079,
+        "start": 2058.699999988079
+      },
+      "singleProbe": {
+        "end": 8332.399999976158,
+        "events": [
+          {
+            "key": "x",
+            "time": 5329.599999964237,
+            "type": "keydown"
+          },
+          {
+            "inputType": "insertText",
+            "time": 5329.799999952316,
+            "type": "beforeinput"
+          },
+          {
+            "inputType": "insertText",
+            "time": 5330.299999952316,
+            "type": "input"
+          }
+        ],
+        "heapAfter": 23662037,
+        "heapBefore": 28802103,
+        "label": "single-1",
+        "localSaved": 5336.199999988079,
+        "ready": 5336.099999964237,
+        "start": 5329.599999964237
+      },
+      "mergePhases": [
+        {
+          "phase": "Merge:flush-start",
+          "time": 5490.400000035763
+        },
+        {
+          "phase": "Merge:fork-start",
+          "time": 5490.400000035763
+        },
+        {
+          "phase": "Merge:text-start",
+          "time": 5542.700000047684
+        },
+        {
+          "phase": "Merge:visible-start",
+          "time": 5542.700000047684
+        },
+        {
+          "phase": "Merge:visible-done",
+          "time": 5542.700000047684
+        },
+        {
+          "phase": "Merge:map-start",
+          "time": 5542.700000047684
+        },
+        {
+          "phase": "Merge:map-done",
+          "time": 5544.100000023842
+        },
+        {
+          "phase": "Merge:flush-start",
+          "time": 6319.100000023842
+        },
+        {
+          "phase": "Merge:fork-start",
+          "time": 6502.5
+        },
+        {
+          "phase": "Merge:text-start",
+          "time": 6559.300000011921
+        },
+        {
+          "phase": "Merge:visible-start",
+          "time": 6559.300000011921
+        },
+        {
+          "phase": "Merge:visible-done",
+          "time": 6559.300000011921
+        },
+        {
+          "phase": "Merge:map-start",
+          "time": 6559.300000011921
+        },
+        {
+          "phase": "Merge:map-done",
+          "time": 6559.400000035763
+        },
+        {
+          "phase": "Merge:flush-start",
+          "time": 10892.900000035765
+        },
+        {
+          "phase": "Merge:fork-start",
+          "time": 10892.900000035765
+        },
+        {
+          "phase": "Merge:text-start",
+          "time": 10989
+        },
+        {
+          "phase": "Merge:visible-start",
+          "time": 10989.100000023842
+        },
+        {
+          "phase": "Merge:visible-done",
+          "time": 10989.100000023842
+        },
+        {
+          "phase": "Merge:map-start",
+          "time": 10989.100000023842
+        },
+        {
+          "phase": "Merge:map-done",
+          "time": 10998.5
+        },
+        {
+          "phase": "Merge:flush-start",
+          "time": 11007.5
+        },
+        {
+          "phase": "Merge:fork-start",
+          "time": 11007.5
+        },
+        {
+          "phase": "Merge:text-start",
+          "time": 11063.100000023842
+        },
+        {
+          "phase": "Merge:visible-start",
+          "time": 11063.200000047684
+        },
+        {
+          "phase": "Merge:visible-done",
+          "time": 11063.200000047684
+        },
+        {
+          "phase": "Merge:map-start",
+          "time": 11063.200000047684
+        },
+        {
+          "phase": "Merge:map-done",
+          "time": 11063.200000047684
+        },
+        {
+          "phase": "Merge:flush-start",
+          "time": 11064.100000023842
+        },
+        {
+          "phase": "Merge:fork-start",
+          "time": 11064.100000023842
+        },
+        {
+          "phase": "Merge:text-start",
+          "time": 11116.900000035765
+        },
+        {
+          "phase": "Merge:visible-start",
+          "time": 11116.900000035765
+        },
+        {
+          "phase": "Merge:visible-done",
+          "time": 11116.900000035765
+        },
+        {
+          "phase": "Merge:map-start",
+          "time": 11116.900000035765
+        },
+        {
+          "phase": "Merge:map-done",
+          "time": 11116.900000035765
+        },
+        {
+          "phase": "Merge:flush-start",
+          "time": 11729.600000023842
+        },
+        {
+          "phase": "Merge:fork-start",
+          "time": 11911.200000047684
+        },
+        {
+          "phase": "Merge:text-start",
+          "time": 11975
+        },
+        {
+          "phase": "Merge:visible-start",
+          "time": 11975
+        },
+        {
+          "phase": "Merge:visible-done",
+          "time": 11975
+        },
+        {
+          "phase": "Merge:map-start",
+          "time": 11975
+        },
+        {
+          "phase": "Merge:map-done",
+          "time": 11975.100000023842
+        }
+      ],
+      "acceptedObservedMs": 5496.325583,
+      "sourceLength": 1048610,
+      "expectedLength": 1048606,
+      "sourceSHA": "d675ebef528946b884a7088f5d3b81d1120f0c5416bce767855f49367af8a1b3",
+      "editedSHA": "9ba37b24c80f5b7049bb81b5fdb909716dd8fcb2477b75b3e61d27a1d94419c5",
+      "after": {
+        "start": 35,
+        "end": 35,
+        "ranges": 1,
+        "secondary": [
+          {
+            "start": 35,
+            "end": 35,
+            "direction": "none"
+          }
+        ]
+      },
+      "restored": {
+        "start": 34,
+        "end": 34,
+        "ranges": 1,
+        "secondary": [
+          {
+            "start": 34,
+            "end": 34,
+            "direction": "none"
+          }
+        ]
+      }
+    }
+  ],
+  "fixture": {
+    "initialLength": 1048610,
+    "editedLength": 1048606,
+    "initialSHA": "d675ebef528946b884a7088f5d3b81d1120f0c5416bce767855f49367af8a1b3",
+    "editedSHA": "9ba37b24c80f5b7049bb81b5fdb909716dd8fcb2477b75b3e61d27a1d94419c5"
+  }
+}

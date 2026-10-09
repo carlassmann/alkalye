@@ -1,0 +1,3 @@
+cost-legacy-direct.ts(50,10): error TS6133: 'longFixture' is declared but its value is never read.
+cost-legacy-direct.ts(57,10): error TS6133: 'sustainedFixture' is declared but its value is never read.
+cost-legacy-direct.ts(81,10): error TS6133: 'clockWrapFixture' is declared but its value is never read.

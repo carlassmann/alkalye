@@ -1,0 +1,7 @@
+{"stage":"sample","fixture":"legacy-colliding-arbitrary-ids","arm":"baseline","mode":"sync","trial":0,"complete":1}
+{"stage":"sample","fixture":"legacy-colliding-arbitrary-ids","arm":"candidate","mode":"sync","trial":0,"complete":2}
+{"stage":"sample","fixture":"legacy-colliding-arbitrary-ids","arm":"candidate","mode":"sync","trial":1,"complete":3}
+{"stage":"sample","fixture":"legacy-colliding-arbitrary-ids","arm":"baseline","mode":"sync","trial":1,"complete":4}
+{"stage":"sample","fixture":"legacy-colliding-arbitrary-ids","arm":"baseline","mode":"sync","trial":2,"complete":5}
+{"stage":"sample","fixture":"legacy-colliding-arbitrary-ids","arm":"candidate","mode":"sync","trial":2,"complete":6}
+{"stage":"complete","samples":6,"exactForkIndependence":true}

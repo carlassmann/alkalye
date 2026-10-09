@@ -1,0 +1,195 @@
+import * as Effect from "effect/Effect"
+import { Replica as Baseline } from "./src/shared/crdt-baseline"
+import { Replica as Candidate } from "./src/shared/crdt"
+import type { ReplicaCheckpoint, LegacyReplicaCheckpoint } from "./src/shared/checkpoint"
+import type { Atom, Operation } from "./src/shared/model"
+
+interface ReadReplica {
+	restore(snapshot: ReplicaCheckpoint): void
+	text(target: string): string
+	visible(target: string): Atom[]
+	atomTarget(id: string): string | undefined
+	forkEffect(actor: string): Effect.Effect<ReadReplica, unknown>
+	edit(target: string, source: string): Operation | null
+}
+interface Fixture {
+	name: string
+	source: string
+	snapshot: ReplicaCheckpoint
+	operations: Operation[]
+}
+interface CostRow {
+	fixture: string
+	arm: string
+	mode: string
+	trial: number
+	loadMs: number
+	textMs: number
+	lookupMs: number
+	forkMs: number
+	firstForkWriteMs: number
+	firstOwnerWriteMs: number
+	firstForkInserted: number
+	firstOwnerInserted: number
+	heapBefore: number
+	heapAfterLoad: number
+	heapAfterFork: number
+	rssBefore: number
+	rssAfterLoad: number
+	rssAfterFork: number
+	atomCount: number
+	utf16Units: number
+	utf8Bytes: number
+	sourceSHA: string
+}
+let rows: CostRow[] = []
+let suffix = "x".repeat(512)
+function hash(value: string) {
+	return new Bun.CryptoHasher("sha256").update(value).digest("hex")
+}
+function longFixture(): Fixture {
+	let source = ("---\ntitle: Index cost\n---\n" + "Body TOKEN 😀\n".repeat(90000)).slice(0, 1_048_576)
+	let replica = new Baseline("fixture-" + "x".repeat(48))
+	let initial = replica.edit("document", source)
+	if (!initial) throw Error("Missing long seed")
+	return { name: "long-one-operation", source, snapshot: replica.checkpoint(), operations: [initial] }
+}
+function sustainedFixture(): Fixture {
+	let source = ("Body TOKEN 😀\n".repeat(12000)).slice(0, 131072)
+	let replica = new Baseline("sustained-owner")
+	let initial = replica.edit("document", source)
+	if (!initial) throw Error("Missing sustained seed")
+	let operations = [initial]
+	let concurrent: Operation[] = []
+	for (let writer = 0; writer < 20; writer++) {
+		let peer = replica.fork("peer-" + writer)
+		let operation = peer.edit("document", source + "p".repeat(32))
+		if (!operation) throw Error("Missing peer operation")
+		concurrent.push(operation)
+	}
+	replica.apply(concurrent)
+	operations.push(...concurrent)
+	source = replica.text("document")
+	for (let index = 0; index < 260; index++) {
+		source += "s"
+		let operation = replica.edit("document", source)
+		if (!operation) throw Error("Missing sustained operation")
+		operations.push(operation)
+	}
+	return { name: "sustained-260-and-20-concurrent-writers", source, snapshot: replica.checkpoint(), operations }
+}
+function clockWrapFixture(): Fixture {
+	let source = "Wrap Unicode 😀\n".repeat(32)
+	let replica = new Baseline("wrap-owner")
+	let initial = replica.edit("document", source)
+	if (!initial) throw Error("Missing clock wrap seed")
+	let operations = [initial]
+	for (let index = 0; index < 10010; index++) {
+		source += "w"
+		let operation = replica.edit("document", source)
+		if (!operation) throw Error("Missing clock wrap operation")
+		operations.push(operation)
+	}
+	return { name: "logical-clock-10000-wrap", source, snapshot: replica.checkpoint(), operations }
+}
+function legacyFixture(): Fixture {
+	let atoms: Atom[] = []
+	let source = ""
+	let after = ""
+	for (let index = 0; index < 16384; index++) {
+		let id = "legacy/"
+		for (let bit = 0; bit < 14; bit++) id += index & (1 << bit) ? "BB" : "Aa"
+		let value = index % 17 ? "a" : "😀"
+		atoms.push({ id, after, value })
+		source += value
+		after = id
+	}
+	let snapshot: LegacyReplicaCheckpoint = {
+		format: "alkalye-state-v1", clock: 1, restored: [],
+		targets: [{ id: "document", created: 1, updated: 1, fields: [], removed: [], atoms }],
+	}
+	return { name: "legacy-colliding-arbitrary-ids", source, snapshot, operations: [] }
+}
+async function sample(fixture: Fixture, arm: string, mode: string, trial: number, create: () => Promise<ReadReplica>) {
+	Bun.gc(true)
+	let before = process.memoryUsage()
+	let start = performance.now()
+	let replica = await create()
+	let loaded = performance.now()
+	let content = replica.text("document")
+	let textDone = performance.now()
+	if (content !== fixture.source) throw Error("Exact source mismatch")
+	let atoms = replica.visible("document")
+	let ids: string[] = []
+	for (let index = 0; index < 512; index++) {
+		let atom = atoms[Math.floor((index * atoms.length) / 512)]
+		if (!atom) throw Error("Missing sampled atom")
+		ids.push(atom.id)
+	}
+	let lookupStart = performance.now()
+	for (let repeat = 0; repeat < 20; repeat++)
+		for (let id of ids)
+			if (replica.atomTarget(id) !== "document") throw Error("Atom identity mismatch")
+	let lookupDone = performance.now()
+	let afterLoad = process.memoryUsage()
+	let forkStart = performance.now()
+	let forked = await Effect.runPromise(replica.forkEffect("fork-" + arm + "-" + trial))
+	let forkDone = performance.now()
+	let afterFork = process.memoryUsage()
+	if (forked.text("document") !== content) throw Error("Fork source mismatch")
+	for (let id of ids) if (forked.atomTarget(id) !== "document") throw Error("Fork identity mismatch")
+	let childWriteStart = performance.now()
+	let forkEdit = forked.edit("document", content + suffix)
+	let childWriteDone = performance.now()
+	if (!forkEdit || forkEdit.insert.length !== 512) throw Error("Expected512 new child atoms")
+	for (let atom of forkEdit.insert)
+		if (replica.atomTarget(atom.id) !== undefined) throw Error("Fork identity leaked to owner")
+	if (replica.text("document") !== content) throw Error("Fork edit changed owner")
+	let ownerWriteStart = performance.now()
+	let ownerEdit = replica.edit("document", content + suffix)
+	let ownerWriteDone = performance.now()
+	if (!ownerEdit || ownerEdit.insert.length !== 512) throw Error("Expected512 new owner atoms")
+	for (let atom of ownerEdit.insert)
+		if (forked.atomTarget(atom.id) !== undefined) throw Error("Owner identity leaked to fork")
+	if (forked.text("document") !== content + suffix) throw Error("Owner edit changed fork")
+	rows.push({
+		fixture: fixture.name, arm, mode, trial,
+		loadMs: loaded - start, textMs: textDone - loaded, lookupMs: lookupDone - lookupStart,
+		forkMs: forkDone - forkStart, firstForkWriteMs: childWriteDone - childWriteStart,
+		firstOwnerWriteMs: ownerWriteDone - ownerWriteStart,
+		firstForkInserted: forkEdit.insert.length, firstOwnerInserted: ownerEdit.insert.length,
+		heapBefore: before.heapUsed, heapAfterLoad: afterLoad.heapUsed, heapAfterFork: afterFork.heapUsed,
+		rssBefore: before.rss, rssAfterLoad: afterLoad.rss, rssAfterFork: afterFork.rss,
+		atomCount: atoms.length, utf16Units: content.length, utf8Bytes: new TextEncoder().encode(content).length,
+		sourceSHA: hash(content),
+	})
+	await Bun.write("../cost-results.json", JSON.stringify(rows, null, 2) + "\n")
+	console.log(JSON.stringify({ stage: "sample", fixture: fixture.name, arm, mode, trial, complete: rows.length }))
+}
+for (let fixture of [longFixture(), sustainedFixture(), clockWrapFixture(), legacyFixture()]) {
+	await Bun.write("../fixture-" + fixture.name + ".json", JSON.stringify({
+		name: fixture.name, utf16Units: fixture.source.length,
+		utf8Bytes: new TextEncoder().encode(fixture.source).length,
+		realNewlines: fixture.source.split("\n").length - 1,
+		literalBackslashN: fixture.source.split("\\n").length - 1,
+		sourceSHA: hash(fixture.source), operations: fixture.operations.length,
+	}, null, 2) + "\n")
+	for (let trial = 0; trial < 3; trial++) {
+		for (let arm of trial % 2 ? ["candidate", "baseline"] : ["baseline", "candidate"]) {
+			if (fixture.operations.length) await sample(fixture, arm, "apply", trial, async () => {
+				let replica = arm === "baseline" ? new Baseline("applied") : new Candidate("applied")
+				replica.apply(fixture.operations)
+				return replica
+			})
+			await sample(fixture, arm, "sync", trial, async () => {
+				let replica: ReadReplica = arm === "baseline" ? new Baseline("cold") : new Candidate("cold")
+				replica.restore(fixture.snapshot)
+				return replica
+			})
+			await sample(fixture, arm, "cooperative", trial, () => arm === "baseline"
+				? Effect.runPromise(Baseline.fromCheckpointEffect(fixture.snapshot, "cold"))
+				: Effect.runPromise(Candidate.fromCheckpointEffect(fixture.snapshot, "cold")))
+		}
+	}
+}
+console.log(JSON.stringify({ stage: "complete", samples: rows.length, exactForkIndependence: true }))
