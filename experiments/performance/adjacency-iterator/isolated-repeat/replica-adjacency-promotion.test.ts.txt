@@ -1,0 +1,217 @@
+import { expect, test } from "bun:test"
+import * as Effect from "effect/Effect"
+import * as Fiber from "effect/Fiber"
+import * as Exit from "effect/Exit"
+import * as Cause from "effect/Cause"
+import { Replica } from "../src/shared/crdt"
+import { Replica as Baseline } from "../src/shared/crdt-baseline"
+
+for (let length of [4095, 4096, 4097]) {
+	test(
+		"adjacency source and checkpoint bytes match across promotion boundary " +
+			length,
+		async () => {
+			let control = new Baseline("owner")
+			let candidate = new Replica("owner")
+			let seed = control.edit("document", "b".repeat(length))
+			if (!seed) throw Error("Missing seed")
+			candidate.apply([seed])
+			expect(candidate.text("document")).toBe(control.text("document"))
+			expect(candidate.revision("document")).toBe(control.revision("document"))
+			expect(JSON.stringify(candidate.checkpoint())).toBe(
+				JSON.stringify(control.checkpoint()),
+			)
+			expect(
+				JSON.stringify(
+					await Effect.runPromise(candidate.durableCheckpointEffect()),
+				),
+			).toBe(
+				JSON.stringify(
+					await Effect.runPromise(control.durableCheckpointEffect()),
+				),
+			)
+			let cold = await Effect.runPromise(
+				Replica.fromCheckpointEffect(candidate.checkpoint(), "cold"),
+			)
+			expect(cold.checkpoint()).toEqual(candidate.checkpoint())
+			expect(cold.text("document")).toBe(control.text("document"))
+		},
+	)
+}
+
+for (let ownerFirst of [true, false]) {
+	test(
+		"parent and child promote independently in write order ownerFirst=" +
+			ownerFirst,
+		() => {
+			let owner = new Replica("owner")
+			let source = "b".repeat(4095)
+			if (!owner.edit("document", source)) throw Error("Missing seed")
+			let child = owner.fork("child")
+			let sibling = owner.fork("sibling")
+			let siblingBefore = sibling.checkpoint()
+			function writeOwner() {
+				let before = child.checkpoint()
+				let operation = owner.edit("document", source + "Owner")
+				if (!operation) throw Error("Missing owner edit")
+				for (let atom of operation.insert)
+					expect(child.atomTarget(atom.id)).toBeUndefined()
+				expect(child.checkpoint()).toEqual(before)
+			}
+			function writeChild() {
+				let before = owner.checkpoint()
+				let operation = child.edit("document", "Child" + source)
+				if (!operation) throw Error("Missing child edit")
+				for (let atom of operation.insert)
+					expect(owner.atomTarget(atom.id)).toBeUndefined()
+				expect(owner.checkpoint()).toEqual(before)
+			}
+			if (ownerFirst) {
+				writeOwner()
+				writeChild()
+			} else {
+				writeChild()
+				writeOwner()
+			}
+			expect(owner.text("document")).toBe(source + "Owner")
+			expect(child.text("document")).toBe("Child" + source)
+			expect(sibling.checkpoint()).toEqual(siblingBefore)
+			for (let branch of [owner, child]) {
+				let cold = new Replica("cold")
+				cold.restore(branch.checkpoint())
+				expect(cold.checkpoint()).toEqual(branch.checkpoint())
+				expect(cold.text("document")).toBe(branch.text("document"))
+			}
+		},
+	)
+}
+
+test("grandchild promotion and merge restore keep still-small ancestors independent", () => {
+	let source = "b".repeat(4095)
+	let owner = new Replica("owner")
+	if (!owner.edit("document", source)) throw Error("Missing seed")
+	let child = owner.fork("child")
+	let grandchild = child.fork("grandchild")
+	let retained = owner.checkpoint()
+	let edit = grandchild.edit("document", source + "Grandchild 😀")
+	if (!edit) throw Error("Missing grandchild edit")
+	expect(owner.checkpoint()).toEqual(retained)
+	expect(child.checkpoint()).toEqual(retained)
+	child.restore(grandchild.checkpoint())
+	expect(child.text("document")).toBe(source + "Grandchild 😀")
+	expect(owner.checkpoint()).toEqual(retained)
+	let restored = new Replica("restored")
+	restored.restoreCheckpoint(child.checkpoint())
+	expect(restored.checkpoint()).toEqual(child.checkpoint())
+	expect(restored.text("document")).toBe(child.text("document"))
+})
+
+test("forks after promotion preserve old-page updates and independent descendants", () => {
+	let source = "b".repeat(8193)
+	let owner = new Replica("owner")
+	let control = new Baseline("owner")
+	let seed = control.edit("document", source)
+	if (!seed) throw Error("Missing seed")
+	owner.apply([seed])
+	let child = owner.fork("child")
+	let controlChild = control.fork("child")
+	let grandchild = child.fork("grandchild")
+	let controlGrandchild = controlChild.fork("grandchild")
+	let sibling = owner.fork("sibling")
+	let siblingBefore = sibling.checkpoint()
+	for (let { branch, reference, next } of [
+		{ branch: owner, reference: control, next: "Owner" + source },
+		{
+			branch: child,
+			reference: controlChild,
+			next: source.slice(0, 2) + "Child😀" + source.slice(2),
+		},
+		{
+			branch: grandchild,
+			reference: controlGrandchild,
+			next: source + "Grandchild",
+		},
+	]) {
+		let others = [owner, child, grandchild, sibling].filter(
+			replica => replica !== branch,
+		)
+		let retained = others.map(replica => replica.checkpoint())
+		let edit = reference.edit("document", next)
+		if (!edit) throw Error("Missing branch edit")
+		branch.apply([edit])
+		expect(branch.text("document")).toBe(next)
+		expect(branch.revision("document")).toBe(reference.revision("document"))
+		expect(branch.checkpoint()).toEqual(reference.checkpoint())
+		for (let [index, other] of others.entries()) {
+			let before = retained[index]
+			if (!before) throw Error("Missing retained checkpoint")
+			expect(other.checkpoint()).toEqual(before)
+		}
+		let cold = new Replica("cold")
+		cold.restore(branch.checkpoint())
+		expect(cold.text("document")).toBe(next)
+		expect(cold.checkpoint()).toEqual(branch.checkpoint())
+	}
+	expect(sibling.checkpoint()).toEqual(siblingBefore)
+})
+
+test("promoted target remains exact after cooperative fork interruption and parent write retry", async () => {
+	let source = "Body 😀\n".repeat(8192)
+	let owner = new Replica("owner")
+	let control = new Baseline("owner")
+	let seed = control.edit("document", source)
+	if (!seed) throw Error("Missing seed")
+	owner.apply([seed])
+	let before = owner.checkpoint()
+	await Effect.runPromise(
+		Effect.gen(function* () {
+			let copying = yield* Effect.forkChild(owner.forkEffect("interrupted"), {
+				startImmediately: true,
+			})
+			let initial = copying.pollUnsafe()
+			yield* Fiber.interrupt(copying)
+			let outcome = yield* Fiber.await(copying)
+			if (Exit.isSuccess(outcome)) {
+				expect(outcome.value.checkpoint()).toEqual(before)
+				expect(outcome.value.text("document")).toBe(source)
+				console.log(
+					JSON.stringify({
+						promotedFork: "completed-independent",
+						completedBeforeInterrupt: initial !== undefined,
+					}),
+				)
+			} else {
+				expect(Cause.hasInterruptsOnly(outcome.cause)).toBe(true)
+				console.log(JSON.stringify({ promotedFork: "interrupted" }))
+			}
+		}),
+	)
+	expect(owner.checkpoint()).toEqual(before)
+	let changed = "Parent😀" + source
+	let edit = control.edit("document", changed)
+	if (!edit) throw Error("Missing parent edit")
+	owner.apply([edit])
+	expect(owner.text("document")).toBe(changed)
+	expect(JSON.stringify(owner.checkpoint())).toBe(
+		JSON.stringify(control.checkpoint()),
+	)
+	expect(
+		JSON.stringify(await Effect.runPromise(owner.durableCheckpointEffect())),
+	).toBe(
+		JSON.stringify(await Effect.runPromise(control.durableCheckpointEffect())),
+	)
+	let retry = await Effect.runPromise(owner.forkEffect("retry"))
+	expect(JSON.stringify(retry.checkpoint())).toBe(
+		JSON.stringify(control.checkpoint()),
+	)
+	expect(
+		JSON.stringify(await Effect.runPromise(retry.durableCheckpointEffect())),
+	).toBe(
+		JSON.stringify(await Effect.runPromise(control.durableCheckpointEffect())),
+	)
+	let retryBefore = retry.checkpoint()
+	let later = owner.edit("document", changed + "Owner")
+	if (!later) throw Error("Missing later edit")
+	expect(retry.checkpoint()).toEqual(retryBefore)
+	expect(retry.text("document")).toBe(changed)
+})

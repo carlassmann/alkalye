@@ -115,6 +115,14 @@
 			planned comparison was stopped. Diagnostic profiles have not established
 			the cause; this variant did not enter production.
 		</p>
+		<p>
+			Removing an extra iterator layer also produced mixed costs in an isolated
+			36-cell repeat. Many-target load increased from 70.847 to 79.705ms; large
+			checkpoint creation improved from 65.334 to 63.040ms while durable
+			creation increased from 121.273 to 123.877ms. These variants remain
+			outside production. Actual production edit/Undo journeys will determine
+			the interaction tradeoff; these module results alone cannot establish it.
+		</p>
 		<h2>Fresh bundle comparison</h2>
 		<p>
 			Fresh production builds of main <code>a749728</code> and rewrite

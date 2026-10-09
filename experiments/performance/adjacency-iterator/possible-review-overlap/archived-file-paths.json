@@ -1,0 +1,134 @@
+[
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-cost-prepared/README.md",
+		"archive": "experiments/performance/adjacency-iterator/possible-review-overlap/README.md.txt",
+		"bytes": 2666,
+		"sha256": "bbc1aa4b62475437ea3495542a718ccf3c735debc7ac173c758728035411307c"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-cost-prepared/cost-long-only.ts.txt",
+		"archive": "experiments/performance/adjacency-iterator/possible-review-overlap/cost-long-only.ts.txt",
+		"bytes": 7359,
+		"sha256": "fe99edd28594fd15ae630398c785e5115797691a52508b09b80d381176ea04dc"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-cost-prepared/cost-long-results.json",
+		"archive": "experiments/performance/adjacency-iterator/possible-review-overlap/cost-long-results.json.txt",
+		"bytes": 16221,
+		"sha256": "6b5b75548e31ec1a78b010954837e4726bb415a0a3dbbfba12a6027522e14911"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-cost-prepared/cost-many-targets-results.json",
+		"archive": "experiments/performance/adjacency-iterator/possible-review-overlap/cost-many-targets-results.json.txt",
+		"bytes": 16539,
+		"sha256": "ded45d3978e10064fc982057a3c4dc3ee0c91cbbfa308f51be9badc2ccfd81b3"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-cost-prepared/cost-many-targets.ts.txt",
+		"archive": "experiments/performance/adjacency-iterator/possible-review-overlap/cost-many-targets.ts.txt",
+		"bytes": 7881,
+		"sha256": "a46d669a72b3ec325e78bff91e0b1419d5362154cc58d60e3aed57adfdcb0910"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-cost-prepared/cost-plan.json",
+		"archive": "experiments/performance/adjacency-iterator/possible-review-overlap/cost-plan.json.txt",
+		"bytes": 1456,
+		"sha256": "37209e054da1bc47e962d92af0a1745f122edd9dfca087cd958303d520cddc9c"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-cost-prepared/crdt-candidate.ts.txt",
+		"archive": "experiments/performance/adjacency-iterator/possible-review-overlap/crdt-candidate.ts.txt",
+		"bytes": 79810,
+		"sha256": "5c9f829552f043c7e1d71ee9f8635ce292e7f3645ab3c3f48be20c7705974343"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-cost-prepared/crdt-control.ts.txt",
+		"archive": "experiments/performance/adjacency-iterator/possible-review-overlap/crdt-control.ts.txt",
+		"bytes": 79771,
+		"sha256": "7a9bee889d498a40e650aa8f03aaf44e4f171d26712b3ff6983d3a0ea9f37b98"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-cost-prepared/fixture-1000-small-targets-plus-128k-utf16-document.json",
+		"archive": "experiments/performance/adjacency-iterator/possible-review-overlap/fixture-1000-small-targets-plus-128k-utf16-document.json.txt",
+		"bytes": 263,
+		"sha256": "3d51778872c28a6ab532bb5c24769ca558d7eda089077e180e9797d6d107592a"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-cost-prepared/fixture-long-one-operation.json",
+		"archive": "experiments/performance/adjacency-iterator/possible-review-overlap/fixture-long-one-operation.json.txt",
+		"bytes": 237,
+		"sha256": "44f1c5e91c8d333d33b3f6f381cb8142efbdbf1a297fa98b09d19a1fcf3b3eec"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-cost-prepared/isolation-caveat.json",
+		"archive": "experiments/performance/adjacency-iterator/possible-review-overlap/isolation-caveat.json.txt",
+		"bytes": 740,
+		"sha256": "92940ad7008f386c0f102a957ef62f62b8ed6f6ec516344bad5826180eb76027"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-cost-prepared/iterator-contracts.log",
+		"archive": "experiments/performance/adjacency-iterator/possible-review-overlap/iterator-contracts.log.txt",
+		"bytes": 8008,
+		"sha256": "9f57bdb15c990e803e826b83440a519a6e9575ac39180550ca369a9cbfcb1605"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-cost-prepared/iterator-cost-types-final.log",
+		"archive": "experiments/performance/adjacency-iterator/possible-review-overlap/iterator-cost-types-final.log.txt",
+		"bytes": 0,
+		"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-cost-prepared/iterator-long.log",
+		"archive": "experiments/performance/adjacency-iterator/possible-review-overlap/iterator-long.log.txt",
+		"bytes": 2001,
+		"sha256": "3436ef3141289ff15487fcc9279e962143db375c687663240bc2ef9e79771de7"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-cost-prepared/iterator-many-targets.log",
+		"archive": "experiments/performance/adjacency-iterator/possible-review-overlap/iterator-many-targets.log.txt",
+		"bytes": 2482,
+		"sha256": "fcb455b735b2a0741ffc8c92bd32d38e2146a7eeacc656448e4f5d3def725ec1"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-cost-prepared/iterator-only.patch",
+		"archive": "experiments/performance/adjacency-iterator/possible-review-overlap/iterator-only.patch.txt",
+		"bytes": 562,
+		"sha256": "31aed41a05fd9aba2049034b4298cd6d835a77cb5e2475595ee0a09dce51bc43"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-cost-prepared/iterator-summary.json",
+		"archive": "experiments/performance/adjacency-iterator/possible-review-overlap/iterator-summary.json.txt",
+		"bytes": 4723,
+		"sha256": "55f25671a073192146c527701377083bddb7cab6585ae41388b8239fc51a10bc"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-cost-prepared/iterator-types.log",
+		"archive": "experiments/performance/adjacency-iterator/possible-review-overlap/iterator-types.log.txt",
+		"bytes": 0,
+		"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-cost-prepared/replica-adjacency-promotion.test.ts.txt",
+		"archive": "experiments/performance/adjacency-iterator/possible-review-overlap/replica-adjacency-promotion.test.ts.txt",
+		"bytes": 7790,
+		"sha256": "6b6ec6844ab3fcb0a786c0d0a50e1dcca6138a12f0af73ad985a2b45d931ee70"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-cost-prepared/setup-failure.txt",
+		"archive": "experiments/performance/adjacency-iterator/possible-review-overlap/setup-failure.txt",
+		"bytes": 146,
+		"sha256": "3ca780f6ee02f0b26c60ef11650ee1f50096c2c46204ff05f891bc12a5d9260e"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-cost-prepared/source-pins.json",
+		"archive": "experiments/performance/adjacency-iterator/possible-review-overlap/source-pins.json.txt",
+		"bytes": 303,
+		"sha256": "33f1ec7ad83b483fd5af833874b08ac271135ee8a2fe7202e75ef55cd3024807"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-cost-prepared/tsconfig.hybrid-cost.json.txt",
+		"archive": "experiments/performance/adjacency-iterator/possible-review-overlap/tsconfig.hybrid-cost.json.txt",
+		"bytes": 152,
+		"sha256": "efaa7fbc295f840f3c57c2761ae04512303eacb88d9356d64b97d3eb90c55aa8"
+	}
+]

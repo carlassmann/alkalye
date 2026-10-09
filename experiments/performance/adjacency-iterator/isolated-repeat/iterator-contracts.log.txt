@@ -1,0 +1,98 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/replacement-reconstruction.test.ts:
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\ntitle: &n T\nalias: *n\n---\nBody TOKEN 😀\n","text":""}) [14.72ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\ntitle: &n T\nalias: *n\n---\nBody TOKEN 😀\n","text":"🦊é中"}) [2.68ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\nx: 1\nalias: *n\n---\nBody TOKEN 😀\n","text":""}) [2.30ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\nx: 1\nalias: *n\n---\nBody TOKEN 😀\n","text":"🦊é中"}) [1.76ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"﻿---\r\ntitle: &n T\r\nalias: *n\r\n---\r\nBody TOKEN 😀\r\n","text":""}) [4.53ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"﻿---\r\ntitle: &n T\r\nalias: *n\r\n---\r\nBody TOKEN 😀\r\n","text":"🦊é中"}) [1.65ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\ntitle: \"Broken\n---\nBody TOKEN 😀\n","text":""}) [1.35ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\ntitle: \"Broken\n---\nBody TOKEN 😀\n","text":"🦊é中"}) [1.30ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\nunclosed: *n\nBody TOKEN 😀\n","text":""}) [1.02ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\nunclosed: *n\nBody TOKEN 😀\n","text":"🦊é中"}) [1.00ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"Body TOKEN 😀\n","text":""}) [0.69ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"Body TOKEN 😀\n","text":"🦊é中"}) [0.74ms]
+(pass) root header replacement cancellation always preserves cold alias normalization (---
+anchor: &n T
+alias: *n
+---
+Body
+) [0.95ms]
+(pass) root header replacement cancellation always preserves cold alias normalization (﻿---
+anchor: &n T
+alias: *n
+---
+Body
+) [2.26ms]
+(pass) body replacement inverse preserves concurrent lost-alias normalization [3.50ms]
+
+tests/replica-adjacency-old-page.test.ts:
+(pass) parent and sibling branches independently replace first-page root children after a multi-page fork [323.12ms]
+
+tests/replica-fact-index.test.ts:
+(pass) forked fact indices stay independent through both-way insertion and checkpoint restore [214.16ms]
+{"forkRestore":"completed-independent"}
+(pass) large-document source restore preserves completed clone or rejects pending stale fork [137.80ms]
+(pass) invalid restored identities leave source and earlier forks unchanged [80.45ms]
+{"hydration":"interrupted-private"}
+(pass) interrupted private cooperative hydration leaves existing forks usable and retry independent [178.86ms]
+
+tests/replica-adjacency-promotion.test.ts:
+(pass) adjacency source and checkpoint bytes match across promotion boundary 4095 [16.94ms]
+(pass) adjacency source and checkpoint bytes match across promotion boundary 4096 [16.77ms]
+(pass) adjacency source and checkpoint bytes match across promotion boundary 4097 [17.47ms]
+(pass) parent and child promote independently in write order ownerFirst=true [14.08ms]
+(pass) parent and child promote independently in write order ownerFirst=false [15.43ms]
+(pass) grandchild promotion and merge restore keep still-small ancestors independent [15.82ms]
+(pass) forks after promotion preserve old-page updates and independent descendants [73.11ms]
+{"promotedFork":"interrupted"}
+(pass) promoted target remains exact after cooperative fork interruption and parent write retry [189.66ms]
+
+tests/replica-adjacency.test.ts:
+(pass) adjacency preserves exact checkpoint and canonical source case 13312 [86.42ms]
+(pass) adjacency preserves exact checkpoint and canonical source case 13 [1.92ms]
+(pass) adjacency preserves exact checkpoint and canonical source case 30 [2.41ms]
+(pass) adjacency preserves exact checkpoint and canonical source case 45 [1.81ms]
+(pass) adjacency preserves exact checkpoint and canonical source case 12 [1.40ms]
+
+tests/replacement-cache-diagnostic.test.ts:
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"none"}) [632.36ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"insert"}) [649.89ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"delete"}) [637.22ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"retype"}) [611.61ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"frontmatter"}) [637.22ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"comment"}) [615.50ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"scope"}) [681.98ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"none"}) [684.12ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"insert"}) [886.04ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"delete"}) [788.56ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"retype"}) [778.74ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"frontmatter"}) [809.54ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"comment"}) [789.71ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"scope"}) [862.57ms]
+
+tests/replica-native-atom-index.test.ts:
+(pass) baseline: siblings and parent remain independent through sustained edits and repeated fork [5.64ms]
+(pass) baseline: legacy arbitrary UTF16 atom identities survive fork and cold restore [0.28ms]
+(pass) candidate: siblings and parent remain independent through sustained edits and repeated fork [3.19ms]
+(pass) candidate: legacy arbitrary UTF16 atom identities survive fork and cold restore [0.17ms]
+
+tests/replica-loading.test.ts:
+(pass) cooperative replica copies preserve snapshots and independently merge Unicode edits [179.73ms]
+(pass) interrupted replica copies leave the source usable and can be retried [104.76ms]
+(pass) a concurrent source edit rejects a partially copied replica [101.80ms]
+(pass) cooperative materialization yields while preserving frontmatter and Unicode offsets [164.06ms]
+(pass) concurrent materialization never publishes a stale source cache [152.79ms]
+(pass) interrupted materialization can be read and retried without partial caches [135.35ms]
+(pass) synchronous reads during cooperative materialization share the same source [152.05ms]
+(pass) forked deletion histories independently remove and undo the same atom (cooperative=false) [0.40ms]
+(pass) forked deletion histories independently remove and undo the same atom (cooperative=true) [0.13ms]
+(pass) forked cancellation chains keep repeated undo isolated (cooperative=false) [0.13ms]
+(pass) forked cancellation chains keep repeated undo isolated (cooperative=true) [0.08ms]
+(pass) a concurrent deletion undo rejects a partially copied replica [183.98ms]
+
+ 63 pass
+ 0 fail
+ 895 expect() calls
+Ran 63 tests across 8 files. [12.73s]

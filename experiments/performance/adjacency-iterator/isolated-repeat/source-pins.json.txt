@@ -1,0 +1,6 @@
+{
+  "controlSHA256": "7a9bee889d498a40e650aa8f03aaf44e4f171d26712b3ff6983d3a0ea9f37b98",
+  "candidateSHA256": "5c9f829552f043c7e1d71ee9f8635ce292e7f3645ab3c3f48be20c7705974343",
+  "delta": "ChildrenIndex.values direct iterator return only; explicit impossible-state throw",
+  "status": "UNRUN timing"
+}

@@ -1,0 +1,20 @@
+{
+  "isolationStatus": "possible concurrent remote Claude33214 overlap; not certified isolated speed",
+  "reportedBy": "root after36 completed",
+  "sampleTimingOwnership": "unverified exact overlap; do not infer cause",
+  "ownHandles": {
+    "manyTargets": 36760,
+    "manyTargetsPID": 30872,
+    "long": 82073,
+    "longPID": 30914
+  },
+  "allOwnTerminal": true,
+  "artifactModifiedTimes": {
+    "iterator-many-targets.log": 1791514376.7607796,
+    "iterator-long.log": 1791514438.7376401,
+    "cost-many-targets-results.json": 1791514376.7606254,
+    "cost-long-results.json": 1791514438.7375257
+  },
+  "modifiedTimesAreNotSampleTimestamps": true,
+  "repeat": "UNRUN awaiting explicit lease; same source5c9/control7a, separate outputs"
+}

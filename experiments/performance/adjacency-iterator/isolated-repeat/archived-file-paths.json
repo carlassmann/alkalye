@@ -1,0 +1,116 @@
+[
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-repeat-prepared/README.md",
+		"archive": "experiments/performance/adjacency-iterator/isolated-repeat/README.md.txt",
+		"bytes": 2125,
+		"sha256": "46e236511637b043cccd604f6335e07ff7fefccff0b44d31ef21f5857269ebc5"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-repeat-prepared/crdt-candidate.ts.txt",
+		"archive": "experiments/performance/adjacency-iterator/isolated-repeat/crdt-candidate.ts.txt",
+		"bytes": 79810,
+		"sha256": "5c9f829552f043c7e1d71ee9f8635ce292e7f3645ab3c3f48be20c7705974343"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-repeat-prepared/crdt-control.ts.txt",
+		"archive": "experiments/performance/adjacency-iterator/isolated-repeat/crdt-control.ts.txt",
+		"bytes": 79771,
+		"sha256": "7a9bee889d498a40e650aa8f03aaf44e4f171d26712b3ff6983d3a0ea9f37b98"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-repeat-prepared/iterator-contracts.log",
+		"archive": "experiments/performance/adjacency-iterator/isolated-repeat/iterator-contracts.log.txt",
+		"bytes": 8008,
+		"sha256": "9f57bdb15c990e803e826b83440a519a6e9575ac39180550ca369a9cbfcb1605"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-repeat-prepared/iterator-cost-types-final.log",
+		"archive": "experiments/performance/adjacency-iterator/isolated-repeat/iterator-cost-types-final.log.txt",
+		"bytes": 0,
+		"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-repeat-prepared/iterator-only.patch",
+		"archive": "experiments/performance/adjacency-iterator/isolated-repeat/iterator-only.patch.txt",
+		"bytes": 562,
+		"sha256": "31aed41a05fd9aba2049034b4298cd6d835a77cb5e2475595ee0a09dce51bc43"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-repeat-prepared/iterator-types.log",
+		"archive": "experiments/performance/adjacency-iterator/isolated-repeat/iterator-types.log.txt",
+		"bytes": 0,
+		"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-repeat-prepared/repeat-cost-long-only.ts.txt",
+		"archive": "experiments/performance/adjacency-iterator/isolated-repeat/repeat-cost-long-only.ts.txt",
+		"bytes": 7373,
+		"sha256": "1cbf88f65d27d0f18911276cff8397c9f168dadcacd659c3589eee452b02b500"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-repeat-prepared/repeat-cost-long-results.json",
+		"archive": "experiments/performance/adjacency-iterator/isolated-repeat/repeat-cost-long-results.json.txt",
+		"bytes": 16234,
+		"sha256": "27589bf4d0c63664b29761e0689a0bf3874ed7e93ca67fa2a40230e017f889c4"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-repeat-prepared/repeat-cost-many-targets-results.json",
+		"archive": "experiments/performance/adjacency-iterator/isolated-repeat/repeat-cost-many-targets-results.json.txt",
+		"bytes": 16546,
+		"sha256": "8e79233714003df4794bcb9945fe59d095ca4d22772e93385681d647b4741fd0"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-repeat-prepared/repeat-cost-many-targets.ts.txt",
+		"archive": "experiments/performance/adjacency-iterator/isolated-repeat/repeat-cost-many-targets.ts.txt",
+		"bytes": 7895,
+		"sha256": "d7561ff1f6ceadd47229be2a845c145612dd78288922f11e8d34ddb367ad6f08"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-repeat-prepared/repeat-fixture-1000-small-targets-plus-128k-utf16-document.json",
+		"archive": "experiments/performance/adjacency-iterator/isolated-repeat/repeat-fixture-1000-small-targets-plus-128k-utf16-document.json.txt",
+		"bytes": 263,
+		"sha256": "3d51778872c28a6ab532bb5c24769ca558d7eda089077e180e9797d6d107592a"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-repeat-prepared/repeat-fixture-long-one-operation.json",
+		"archive": "experiments/performance/adjacency-iterator/isolated-repeat/repeat-fixture-long-one-operation.json.txt",
+		"bytes": 237,
+		"sha256": "44f1c5e91c8d333d33b3f6f381cb8142efbdbf1a297fa98b09d19a1fcf3b3eec"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-repeat-prepared/repeat-long.log",
+		"archive": "experiments/performance/adjacency-iterator/isolated-repeat/repeat-long.log.txt",
+		"bytes": 2001,
+		"sha256": "3436ef3141289ff15487fcc9279e962143db375c687663240bc2ef9e79771de7"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-repeat-prepared/repeat-many-targets.log",
+		"archive": "experiments/performance/adjacency-iterator/isolated-repeat/repeat-many-targets.log.txt",
+		"bytes": 2482,
+		"sha256": "fcb455b735b2a0741ffc8c92bd32d38e2146a7eeacc656448e4f5d3def725ec1"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-repeat-prepared/repeat-plan.json",
+		"archive": "experiments/performance/adjacency-iterator/isolated-repeat/repeat-plan.json.txt",
+		"bytes": 1081,
+		"sha256": "7dbf23fdb496c14d94dc56bcca38f0ca0845f2ec9171e0f2330424445a6f17b2"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-repeat-prepared/repeat-summary.json",
+		"archive": "experiments/performance/adjacency-iterator/isolated-repeat/repeat-summary.json.txt",
+		"bytes": 27305,
+		"sha256": "cbb39b93e268882619a96d653b8b65d885a50fef8075153b62b5ae577fa3939b"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-repeat-prepared/replica-adjacency-promotion.test.ts.txt",
+		"archive": "experiments/performance/adjacency-iterator/isolated-repeat/replica-adjacency-promotion.test.ts.txt",
+		"bytes": 7790,
+		"sha256": "6b6ec6844ab3fcb0a786c0d0a50e1dcca6138a12f0af73ad985a2b45d931ee70"
+	},
+	{
+		"source": "/tmp/alkalye-worker-adjacency-direct-values/archive-repeat-prepared/source-pins.json",
+		"archive": "experiments/performance/adjacency-iterator/isolated-repeat/source-pins.json.txt",
+		"bytes": 303,
+		"sha256": "33f1ec7ad83b483fd5af833874b08ac271135ee8a2fe7202e75ef55cd3024807"
+	}
+]

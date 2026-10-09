@@ -1,0 +1,16 @@
+--- /tmp/alkalye-worker-adjacency-direct-values/crdt-control.ts	2026-10-09 04:47:34
++++ /tmp/alkalye-worker-adjacency-direct-values/crdt-candidate.ts	2026-10-09 04:47:34
+@@ -2379,9 +2379,10 @@
+ 		if (!this.large) throw new Error("Missing children index")
+ 		this.large.set(id, siblings)
+ 	}
+-	*values() {
+-		if (this.small) yield* this.small.values()
+-		else if (this.large) yield* this.large.values()
++	values() {
++		if (this.small) return this.small.values()
++		if (!this.large) throw new Error("Missing children index")
++		return this.large.values()
+ 	}
+ }
+ 

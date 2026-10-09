@@ -1,0 +1,144 @@
+{
+  "many-targets": [
+    {
+      "mode": "apply",
+      "baseline": {
+        "loadMs": 102.144833,
+        "textMs": 8.283166000000165,
+        "lookupMs": 0.45499999999992724,
+        "checkpointMs": 16.006417000000056,
+        "durableCheckpointMs": 21.356249999999818,
+        "forkMs": 21.950208000000202,
+        "firstForkWriteMs": 0.7052499999999782,
+        "firstOwnerWriteMs": 0.6730840000000171
+      },
+      "candidate": {
+        "loadMs": 101.60300000000007,
+        "textMs": 9.141250000000127,
+        "lookupMs": 0.43549999999959255,
+        "checkpointMs": 18.44354099999964,
+        "durableCheckpointMs": 21.744250000000648,
+        "forkMs": 25.236667000000125,
+        "firstForkWriteMs": 0.797458000000006,
+        "firstOwnerWriteMs": 0.5368749999997817
+      }
+    },
+    {
+      "mode": "sync",
+      "baseline": {
+        "loadMs": 68.38745800000015,
+        "textMs": 14.893209000000752,
+        "lookupMs": 0.49058300000024246,
+        "checkpointMs": 12.064250000000357,
+        "durableCheckpointMs": 20.68525000000045,
+        "forkMs": 4.3191670000005615,
+        "firstForkWriteMs": 0.6646670000000086,
+        "firstOwnerWriteMs": 0.5797080000002097
+      },
+      "candidate": {
+        "loadMs": 79.12920900000017,
+        "textMs": 14.122915999999805,
+        "lookupMs": 0.45600000000013097,
+        "checkpointMs": 13.895542000000205,
+        "durableCheckpointMs": 20.866625000000113,
+        "forkMs": 5.326667000000043,
+        "firstForkWriteMs": 0.654500000000553,
+        "firstOwnerWriteMs": 0.5695420000001832
+      }
+    },
+    {
+      "mode": "cooperative",
+      "baseline": {
+        "loadMs": 193.67179099999976,
+        "textMs": 18.820458000000144,
+        "lookupMs": 0.4587089999995442,
+        "checkpointMs": 16.00145800000064,
+        "durableCheckpointMs": 26.8538750000007,
+        "forkMs": 5.00020799999993,
+        "firstForkWriteMs": 0.6925000000001091,
+        "firstOwnerWriteMs": 0.5899580000004789
+      },
+      "candidate": {
+        "loadMs": 214.83641700000044,
+        "textMs": 21.454041999999845,
+        "lookupMs": 0.46033299999999144,
+        "checkpointMs": 19.41045800000029,
+        "durableCheckpointMs": 26.040707999999995,
+        "forkMs": 4.461542000000009,
+        "firstForkWriteMs": 0.7341670000000704,
+        "firstOwnerWriteMs": 0.5854170000002341
+      }
+    }
+  ],
+  "long": [
+    {
+      "mode": "apply",
+      "baseline": {
+        "loadMs": 780.4901250000003,
+        "textMs": 127.75854100000288,
+        "lookupMs": 0.8509579999999914,
+        "checkpointMs": 80.58754199999748,
+        "durableCheckpointMs": 139.9165409999987,
+        "forkMs": 237.75750000000335,
+        "firstForkWriteMs": 1.3924170000027516,
+        "firstOwnerWriteMs": 0.7220830000005662
+      },
+      "candidate": {
+        "loadMs": 805.4042499999996,
+        "textMs": 115.03279199999997,
+        "lookupMs": 0.7721249999995052,
+        "checkpointMs": 70.14070800000081,
+        "durableCheckpointMs": 131.4526249999999,
+        "forkMs": 241.06837499999529,
+        "firstForkWriteMs": 1.6147500000006403,
+        "firstOwnerWriteMs": 0.8795409999984258
+      }
+    },
+    {
+      "mode": "sync",
+      "baseline": {
+        "loadMs": 609.1642499999998,
+        "textMs": 178.17058400000042,
+        "lookupMs": 0.6853750000009313,
+        "checkpointMs": 66.7587080000012,
+        "durableCheckpointMs": 127.92262500000015,
+        "forkMs": 0.7784160000010161,
+        "firstForkWriteMs": 1.4365419999958249,
+        "firstOwnerWriteMs": 0.8143340000024182
+      },
+      "candidate": {
+        "loadMs": 573.916333000001,
+        "textMs": 171.04662500000268,
+        "lookupMs": 0.6906660000022384,
+        "checkpointMs": 63.785832999994454,
+        "durableCheckpointMs": 126.8736659999995,
+        "forkMs": 0.4370840000046883,
+        "firstForkWriteMs": 1.0564160000012635,
+        "firstOwnerWriteMs": 0.8584169999994629
+      }
+    },
+    {
+      "mode": "cooperative",
+      "baseline": {
+        "loadMs": 1886.8869170000007,
+        "textMs": 207.25608299999294,
+        "lookupMs": 0.6543750000000728,
+        "checkpointMs": 94.53729199999907,
+        "durableCheckpointMs": 173.4801660000012,
+        "forkMs": 0.7782079999997222,
+        "firstForkWriteMs": 1.3722090000010212,
+        "firstOwnerWriteMs": 0.9144579999992857
+      },
+      "candidate": {
+        "loadMs": 1929.8319169999995,
+        "textMs": 200.33808299999873,
+        "lookupMs": 0.6578750000007858,
+        "checkpointMs": 103.16358299999774,
+        "durableCheckpointMs": 160.7410000000018,
+        "forkMs": 0.8741670000017621,
+        "firstForkWriteMs": 1.7084590000013122,
+        "firstOwnerWriteMs": 0.8982920000016748
+      }
+    }
+  ]
+}

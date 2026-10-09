@@ -1,0 +1,9 @@
+{
+  "name": "long-one-operation",
+  "utf16Units": 1048576,
+  "utf8Bytes": 1198368,
+  "realNewlines": 74899,
+  "literalBackslashN": 0,
+  "sourceSHA": "150a08eedea2f9227c8ed9d17139fd8e877f3bce0198831298d4cd0a13ba5948",
+  "operations": 1
+}
