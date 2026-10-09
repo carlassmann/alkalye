@@ -1,0 +1,116 @@
+import { expect, test } from "bun:test"
+import { TextVisibility } from "../src/shared/text-visibility"
+import { TextVisibility as ControlVisibility } from "../src/shared/text-visibility-control"
+
+function operation(clock: number) {
+	return String(clock).padStart(16, "0") + ":writer"
+}
+function atom(clock: number, index = 0) {
+	return operation(clock) + ":" + String(index).padStart(8, "0")
+}
+
+test("hidden owner shortcut preserves arbitrary public suffix and owner boundaries", () => {
+	for (let owner of ["", "a", "😀", operation(1)]) {
+		let control = new ControlVisibility(),
+			candidate = new TextVisibility()
+		expect(candidate.active(owner)).toBe(control.active(owner))
+		for (let value of [
+			owner + ":00000000",
+			owner + "123456789",
+			owner + "12345678",
+			owner + "1234567890",
+			"x" + owner + "123456789",
+			"short",
+			"",
+		]) {
+			expect(candidate.hidden(value)).toBe(control.hidden(value))
+		}
+	}
+})
+
+test("hidden owner shortcut retains remover, cancellation, fork and cold restore behavior", () => {
+	let control = new ControlVisibility(),
+		candidate = new TextVisibility()
+	function agree() {
+		for (let value of [atom(1), atom(1, 1), atom(2)])
+			expect(candidate.hidden(value)).toBe(control.hidden(value))
+		expect(candidate.checkpoint()).toEqual(control.checkpoint())
+	}
+	control.active(operation(1))
+	candidate.active(operation(1))
+	agree()
+	control.remove(operation(2), [atom(1)])
+	candidate.remove(operation(2), [atom(1)])
+	agree()
+	control.cancel(operation(3), operation(2))
+	candidate.cancel(operation(3), operation(2))
+	agree()
+	let forkControl = control.fork(),
+		forkCandidate = candidate.fork()
+	control.cancel(operation(4), operation(1))
+	candidate.cancel(operation(4), operation(1))
+	agree()
+	for (let value of [atom(1), atom(1, 1), atom(2)])
+		expect(forkCandidate.hidden(value)).toBe(forkControl.hidden(value))
+	forkControl.cancel(operation(5), operation(3))
+	forkCandidate.cancel(operation(5), operation(3))
+	for (let value of [atom(1), atom(1, 1), atom(2)])
+		expect(forkCandidate.hidden(value)).toBe(forkControl.hidden(value))
+	let restoredControl = new ControlVisibility(),
+		restoredCandidate = new TextVisibility()
+	restoredControl.restore(control.checkpoint())
+	restoredCandidate.restore(candidate.checkpoint())
+	for (let value of [atom(1), atom(1, 1), atom(2)])
+		expect(restoredCandidate.hidden(value)).toBe(restoredControl.hidden(value))
+})
+
+test("hidden owner shortcut does not bypass malformed public calls or custom slice behavior", () => {
+	let control = new ControlVisibility(),
+		candidate = new TextVisibility()
+	control.active(operation(1))
+	candidate.active(operation(1))
+	for (let value of [undefined, null, 12, {}, Symbol("atom")]) {
+		expect(() => Reflect.apply(control.hidden, control, [value])).toThrow()
+		expect(() => Reflect.apply(candidate.hidden, candidate, [value])).toThrow()
+	}
+	let calls = 0
+	let value = {
+		slice() {
+			calls++
+			return operation(1)
+		},
+	}
+	expect(Reflect.apply(candidate.hidden, candidate, [value])).toBe(
+		Reflect.apply(control.hidden, control, [value]),
+	)
+	expect(calls).toBe(2)
+})
+
+test("hidden owner shortcut clears on warm restore and never bypasses legacy removal", () => {
+	let cancelled = new TextVisibility()
+	cancelled.cancel(operation(4), operation(1))
+	let visibility = new TextVisibility()
+	visibility.active(operation(1))
+	visibility.restore(cancelled.checkpoint())
+	expect(visibility.hidden(atom(1))).toBe(true)
+	expect(visibility.hidden(atom(1, 1))).toBe(true)
+	let migrated = new TextVisibility({ removed: [atom(1)], clock: 1 })
+	migrated.active(operation(1))
+	expect(migrated.hidden(atom(1))).toBe(true)
+	expect(migrated.hidden(atom(1, 1))).toBe(false)
+	let parent = new TextVisibility()
+	parent.active(operation(1))
+	let child = parent.fork()
+	child.cancel(operation(2), operation(1))
+	expect(child.hidden(atom(1))).toBe(true)
+	expect(parent.hidden(atom(1))).toBe(false)
+	let stale = parent.prepare([
+		{ kind: "cancel", id: operation(3), target: operation(1) },
+	])
+	parent.cancel(operation(4), operation(2))
+	parent.active(operation(1))
+	let snapshot = parent.checkpoint()
+	expect(stale).toThrow("stale")
+	expect(parent.hidden(atom(1))).toBe(false)
+	expect(parent.checkpoint()).toEqual(snapshot)
+})

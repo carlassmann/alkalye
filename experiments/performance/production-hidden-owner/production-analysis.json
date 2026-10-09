@@ -1,0 +1,178 @@
+[
+  {
+    "arm": "control",
+    "fixture": "rich1m",
+    "trial": 0,
+    "phase": "input",
+    "trace": "control-body-rich1m-0.trace.json",
+    "sha256": "c2ffa8082565253fe81439b90bf7fc623d2f365e9478da7ccfec1e1b58e20965",
+    "bytes": 8440848,
+    "windowMs": 3001.096,
+    "mainThread": [
+      61227,
+      20329242
+    ],
+    "mainMaxTaskMs": 11.022,
+    "mainBusyMs": 754.259,
+    "mainGCUnionMs": 95.495,
+    "largestMainGCSpanMs": 10.277,
+    "readyFromStartMs": 11.200000047683716,
+    "readyFromNativeEventMs": 10.800000011920929,
+    "nativeEvent": "beforeinput",
+    "nativeEventInputDelayMs": 0.0,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576
+      },
+      {
+        "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+        "characters": 1048577
+      },
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    }
+  },
+  {
+    "arm": "control",
+    "fixture": "rich1m",
+    "trial": 0,
+    "phase": "undo",
+    "trace": "control-body-rich1m-0-undo.trace.json",
+    "sha256": "8680a96c0cbdcf56cb1c2a225a18c5c00b26b60ea603c04c8fe31ce229014c83",
+    "bytes": 10175896,
+    "windowMs": 3002.073,
+    "mainThread": [
+      61227,
+      20329242
+    ],
+    "mainMaxTaskMs": 10.838,
+    "mainBusyMs": 716.584,
+    "mainGCUnionMs": 96.885,
+    "largestMainGCSpanMs": 10.212,
+    "readyFromStartMs": 20.900000035764606,
+    "readyFromNativeEventMs": 20.900000035764606,
+    "nativeEvent": "keydown",
+    "nativeEventInputDelayMs": 0.30000001191910997,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576
+      },
+      {
+        "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+        "characters": 1048577
+      },
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    }
+  },
+  {
+    "arm": "owner",
+    "fixture": "rich1m",
+    "trial": 0,
+    "phase": "input",
+    "trace": "owner-body-rich1m-0.trace.json",
+    "sha256": "ed9d3a2915e8447e41eb59e169da4901220de2d6b6596e6575f78814f61fcbf8",
+    "bytes": 8477350,
+    "windowMs": 3003.118,
+    "mainThread": [
+      61650,
+      20334073
+    ],
+    "mainMaxTaskMs": 11.042,
+    "mainBusyMs": 1046.804,
+    "mainGCUnionMs": 95.206,
+    "largestMainGCSpanMs": 10.452,
+    "readyFromStartMs": 10.5,
+    "readyFromNativeEventMs": 10.100000023841858,
+    "nativeEvent": "beforeinput",
+    "nativeEventInputDelayMs": 0.10000002384185791,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576
+      },
+      {
+        "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+        "characters": 1048577
+      },
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    }
+  },
+  {
+    "arm": "owner",
+    "fixture": "rich1m",
+    "trial": 0,
+    "phase": "undo",
+    "trace": "owner-body-rich1m-0-undo.trace.json",
+    "sha256": "e6a48e547c37e182ecc9917346b96c536422b06e765fb3c7a32516ae185c7526",
+    "bytes": 9557825,
+    "windowMs": 3001.993,
+    "mainThread": [
+      61650,
+      20334073
+    ],
+    "mainMaxTaskMs": 10.562,
+    "mainBusyMs": 963.8,
+    "mainGCUnionMs": 90.444,
+    "largestMainGCSpanMs": 9.916,
+    "readyFromStartMs": 26.600000023841858,
+    "readyFromNativeEventMs": 26.600000023841858,
+    "nativeEvent": "keydown",
+    "nativeEventInputDelayMs": 0.19999998807725206,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576
+      },
+      {
+        "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+        "characters": 1048577
+      },
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    }
+  }
+]

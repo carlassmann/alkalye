@@ -1,0 +1,202 @@
+[
+  {
+    "fixture": "rich1m",
+    "phase": "input",
+    "arm": "control",
+    "n": 1,
+    "metrics": {
+      "readyFromNativeEventMs": {
+        "median": 10.800000011920929,
+        "max": 10.800000011920929,
+        "samples": [
+          10.800000011920929
+        ]
+      },
+      "readyFromStartMs": {
+        "median": 11.200000047683716,
+        "max": 11.200000047683716,
+        "samples": [
+          11.200000047683716
+        ]
+      },
+      "mainMaxTaskMs": {
+        "median": 11.022,
+        "max": 11.022,
+        "samples": [
+          11.022
+        ]
+      },
+      "mainBusyMs": {
+        "median": 754.259,
+        "max": 754.259,
+        "samples": [
+          754.259
+        ]
+      },
+      "mainGCUnionMs": {
+        "median": 95.495,
+        "max": 95.495,
+        "samples": [
+          95.495
+        ]
+      },
+      "largestMainGCSpanMs": {
+        "median": 10.277,
+        "max": 10.277,
+        "samples": [
+          10.277
+        ]
+      }
+    }
+  },
+  {
+    "fixture": "rich1m",
+    "phase": "input",
+    "arm": "owner",
+    "n": 1,
+    "metrics": {
+      "readyFromNativeEventMs": {
+        "median": 10.100000023841858,
+        "max": 10.100000023841858,
+        "samples": [
+          10.100000023841858
+        ]
+      },
+      "readyFromStartMs": {
+        "median": 10.5,
+        "max": 10.5,
+        "samples": [
+          10.5
+        ]
+      },
+      "mainMaxTaskMs": {
+        "median": 11.042,
+        "max": 11.042,
+        "samples": [
+          11.042
+        ]
+      },
+      "mainBusyMs": {
+        "median": 1046.804,
+        "max": 1046.804,
+        "samples": [
+          1046.804
+        ]
+      },
+      "mainGCUnionMs": {
+        "median": 95.206,
+        "max": 95.206,
+        "samples": [
+          95.206
+        ]
+      },
+      "largestMainGCSpanMs": {
+        "median": 10.452,
+        "max": 10.452,
+        "samples": [
+          10.452
+        ]
+      }
+    }
+  },
+  {
+    "fixture": "rich1m",
+    "phase": "undo",
+    "arm": "control",
+    "n": 1,
+    "metrics": {
+      "readyFromNativeEventMs": {
+        "median": 20.900000035764606,
+        "max": 20.900000035764606,
+        "samples": [
+          20.900000035764606
+        ]
+      },
+      "readyFromStartMs": {
+        "median": 20.900000035764606,
+        "max": 20.900000035764606,
+        "samples": [
+          20.900000035764606
+        ]
+      },
+      "mainMaxTaskMs": {
+        "median": 10.838,
+        "max": 10.838,
+        "samples": [
+          10.838
+        ]
+      },
+      "mainBusyMs": {
+        "median": 716.584,
+        "max": 716.584,
+        "samples": [
+          716.584
+        ]
+      },
+      "mainGCUnionMs": {
+        "median": 96.885,
+        "max": 96.885,
+        "samples": [
+          96.885
+        ]
+      },
+      "largestMainGCSpanMs": {
+        "median": 10.212,
+        "max": 10.212,
+        "samples": [
+          10.212
+        ]
+      }
+    }
+  },
+  {
+    "fixture": "rich1m",
+    "phase": "undo",
+    "arm": "owner",
+    "n": 1,
+    "metrics": {
+      "readyFromNativeEventMs": {
+        "median": 26.600000023841858,
+        "max": 26.600000023841858,
+        "samples": [
+          26.600000023841858
+        ]
+      },
+      "readyFromStartMs": {
+        "median": 26.600000023841858,
+        "max": 26.600000023841858,
+        "samples": [
+          26.600000023841858
+        ]
+      },
+      "mainMaxTaskMs": {
+        "median": 10.562,
+        "max": 10.562,
+        "samples": [
+          10.562
+        ]
+      },
+      "mainBusyMs": {
+        "median": 963.8,
+        "max": 963.8,
+        "samples": [
+          963.8
+        ]
+      },
+      "mainGCUnionMs": {
+        "median": 90.444,
+        "max": 90.444,
+        "samples": [
+          90.444
+        ]
+      },
+      "largestMainGCSpanMs": {
+        "median": 9.916,
+        "max": 9.916,
+        "samples": [
+          9.916
+        ]
+      }
+    }
+  }
+]

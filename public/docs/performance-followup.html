@@ -130,6 +130,16 @@
 			passed. This mixed pilot does not establish faster typing or consistent
 			120Hz interactions; the candidate is not deployed.
 		</p>
+		<h2>Production owner-prefix shortcut</h2>
+		<p>
+			Rejected after one fresh production trial per arm. Avoiding an atom-owner
+			slice with an exact prefix comparison preserved text, caret, accepted
+			edit/Undo and reload behavior, but increased three-second main-thread work
+			from 754.259ms to 1046.804ms after typing and from 716.584ms to 963.800ms
+			after Undo. GC work barely changed; typing's largest task remained about
+			11ms. Correctness passed 66 public contracts, including real SQLite cases.
+			The shortcut is not deployed; smaller-looking code was slower here.
+		</p>
 		<h2>Earlier bounded visibility memo pilot</h2>
 		<p>
 			One ordinary 1MiB trial per arm on the experimental worker editor reduced

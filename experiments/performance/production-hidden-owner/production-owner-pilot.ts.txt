@@ -1,0 +1,10 @@
+let root="/tmp/alkalye-production-hidden-owner"
+if(await Bun.file(root+"/pilot-pending.json").exists())throw Error("Retained pilot; no uncertain restart")
+await Bun.write(root+"/pilot-pending.json",JSON.stringify({fixture:"rich1m",n:1}))
+for(let arm of ["control","owner"]){
+ let run=root+"/pilot-"+arm+"-"+crypto.randomUUID()
+ let child=Bun.spawn(["bun","production-body-gate.ts",arm,"rich1m","--measure"],{cwd:import.meta.dir,env:{...process.env,PRODUCTION_BODY_RUN:run},stdout:"inherit",stderr:"inherit"})
+ let exit=await child.exited
+ console.log(JSON.stringify({arm,run,exit}))
+ if(exit!==0)throw Error("Stop after failed pilot")
+}

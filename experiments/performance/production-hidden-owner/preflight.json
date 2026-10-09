@@ -1,0 +1,10 @@
+{
+  "base": "85a6e15f2665e6ee4092dc9d66f88c5e7aae56b8",
+  "children": "4a",
+  "model": "original",
+  "controlVisibility": "f7ebd2b64fc77baa1193bed8cb0010fe1b9bdbccb215a1b62afe633a9fd74506",
+  "candidateVisibility": "aaf03b08392015e5ea4814938f4bd40edc2c7c4bafd72319522f266b9a1724ab",
+  "fixedBackend": "baseline-runtime/src/server/index",
+  "explicitAssets": "runtime/dist",
+  "runner": "dc0fbd51186789a134ced195ef2a734a2a7da426bff3e0546c7fcc27de63faeb"
+}
