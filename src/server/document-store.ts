@@ -19,6 +19,11 @@ import * as SqlEventJournal from "effect/eventlog/SqlEventJournal"
 import * as SqlClient from "effect/sql/SqlClient"
 import * as SqlError from "effect/sql/SqlError"
 import * as SqlSchema from "effect/sql/SqlSchema"
+import {
+	initializeTransferFences,
+	ensureWorkspaceWritable,
+	ensureDocumentWritable,
+} from "./workspace-transfer"
 import { DocumentBlobObjects } from "./document-blob-objects"
 import { webCryptoLayer } from "../platform/web-crypto"
 import { IdentifierSchema } from "../shared/model"
@@ -322,6 +327,7 @@ let handlers = EventLog.group(group, handlers =>
 		let queries = makeQueries(sql)
 		let workspace = makeWorkspaceProjection(sql)
 		yield* workspace.initialize()
+		yield* initializeTransferFences(sql)
 		yield* sql`CREATE TABLE IF NOT EXISTS document_heads (document TEXT PRIMARY KEY, log TEXT NOT NULL, position INTEGER NOT NULL, version INTEGER NOT NULL, state TEXT NOT NULL)`
 		yield* sql`CREATE TABLE IF NOT EXISTS document_tips (document TEXT PRIMARY KEY, log TEXT NOT NULL, position INTEGER NOT NULL, version INTEGER NOT NULL, fingerprint TEXT NOT NULL)`
 		yield* sql`CREATE TABLE IF NOT EXISTS document_actions (position INTEGER PRIMARY KEY AUTOINCREMENT, document TEXT NOT NULL, action TEXT NOT NULL, entry BLOB NOT NULL, fingerprint TEXT NOT NULL, UNIQUE(document,action))`
@@ -754,6 +760,7 @@ function makeDocumentStore() {
 					: null
 				return yield* transact(
 					Effect.gen(function* () {
+						yield* ensureDocumentWritable(sql, document)
 						yield* workspace
 							.documentRole(document, identity.subject, identity.access)
 							.pipe(Effect.flatMap(authorizeWriting))
@@ -846,6 +853,7 @@ function makeDocumentStore() {
 							Effect.catchTag("BlobCorrupt", error =>
 								transact(
 									Effect.gen(function* () {
+										yield* ensureDocumentWritable(sql, document)
 										if (
 											!(yield* workspace.documentRole(
 												document,
@@ -925,6 +933,7 @@ function makeDocumentStore() {
 			session: DocumentSession,
 		) {
 			return Effect.gen(function* () {
+				yield* ensureDocumentWritable(sql, action.document)
 				if (!principal.actors.includes(action.actor))
 					return yield* conflict("Actor identity is not authorized")
 				let operations = yield* validateActionIdentity(action)
@@ -1127,7 +1136,8 @@ function makeDocumentStore() {
 					subject: identity.subject,
 					change: { kind: "preferences", patch },
 				})
-				yield* createWorkspace(id, "Personal", personalWorkspaceRequest)
+				if (Option.isNone(yield* readWorkspace.workspace(id)))
+					yield* createWorkspace(id, "Personal", personalWorkspaceRequest)
 				return yield* transact(
 					Effect.gen(function* () {
 						if (
@@ -1715,6 +1725,10 @@ function makeDocumentStore() {
 		}
 		function writeWorkspace(fact: WorkspaceFact) {
 			return Effect.gen(function* () {
+				if (fact.change.kind !== "preferences")
+					yield* ensureWorkspaceWritable(sql, fact.workspace)
+				if (fact.change.kind === "documentMoved")
+					yield* ensureWorkspaceWritable(sql, fact.change.from)
 				let fingerprint = yield* hashWorkspace(crypto, fact)
 				let previous = yield* workspace.receipt(fact)
 				if (Option.isSome(previous)) {
@@ -2095,6 +2109,7 @@ function makeDocumentStore() {
 			expected?: DocumentRevision,
 		) {
 			return Effect.gen(function* () {
+				yield* ensureDocumentWritable(sql, action.document)
 				yield* sql`INSERT INTO document_actor_subjects VALUES (${action.actor},${principal.subject},${action.document}) ON CONFLICT DO NOTHING`
 				let actor = yield* queries.actorSubject(action.actor)
 				if (
