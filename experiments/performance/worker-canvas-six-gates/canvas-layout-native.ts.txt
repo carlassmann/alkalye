@@ -1,0 +1,112 @@
+import * as Effect from "effect/Effect"
+import * as FetchHttpClient from "effect/http/FetchHttpClient"
+import * as Redacted from "effect/Redacted"
+import * as Schema from "effect/Schema"
+import { apiDocuments } from "./src/cli/api-documents"
+import { browser, evaluate } from "./tests/browser-driver"
+
+let configuration = Schema.decodeUnknownSync(
+	Schema.Struct({
+		origin: Schema.String,
+		keyFile: Schema.String,
+		scope: Schema.String,
+	}),
+)(
+	await Bun.file(
+		"/tmp/alkalye-interaction-matrix-smoke/oracle.private.json",
+	).json(),
+)
+let api = apiDocuments(
+	configuration.origin,
+	Redacted.make((await Bun.file(configuration.keyFile).text()).trim()),
+	configuration.scope,
+)
+let session = "worker-assets-peer-" + Date.now()
+let source = 'document.querySelector("alkalye-editor").source'
+let result: {
+	stage: string
+	gates: string[]
+	failure?: string
+	state?: unknown
+	initialSHA?: string
+	editedSHA?: string
+} = { stage: "setup", gates: [] }
+function run<A, E>(
+	work: Effect.Effect<A, E, import("effect/http/HttpClient").HttpClient>,
+) {
+	return Effect.runPromise(work.pipe(Effect.provide(FetchHttpClient.layer)))
+}
+function wait(expression: string) {
+	browser(session, "wait", "--fn", expression)
+}
+function accepted(document: string, expected: string) {
+	return run(
+		Effect.gen(function* () {
+			while (true) {
+				if ((yield* api.read(document)).content === expected) return
+				yield* Effect.sleep("100 millis")
+			}
+		}).pipe(Effect.timeout("30 seconds")),
+	)
+}
+try {
+ browser(session,"--profile","/tmp/alkalye-worker-canvas/runtime/profile-run","open",configuration.origin+"/app")
+ evaluate(session,"(async()=>{for(let r of await navigator.serviceWorker.getRegistrations())await r.unregister();for(let name of await caches.keys())await caches.delete(name);return true})()")
+ let file=Bun.file("canvas-layout-created.private.json")
+ let record=(await file.exists())?Schema.decodeUnknownSync(Schema.Struct({documentId:Schema.String}))(await file.json()):await run(api.create("Worker canvas body\n","Worker canvas"))
+ if(!(await file.exists()))await Bun.write(file,JSON.stringify(record)+"\n")
+ if(await Bun.file("canvas-layout-attempt.private.json").exists())throw Error("Existing canvas mutation attempt; refusing repeat")
+ let initial=(await run(api.read(record.documentId))).content
+ browser(session,"open",configuration.origin+"/app?worker=1")
+ wait('document.querySelector('+JSON.stringify('[data-library] [data-doc="'+record.documentId+'"]')+')!==null')
+ browser(session,"click",'[data-library] [data-doc="'+record.documentId+'"]')
+ wait(source+'?.value==='+JSON.stringify(initial)+'&&!document.querySelector("#editor").readOnly')
+ let resources=Schema.decodeUnknownSync(Schema.Array(Schema.Struct({url:Schema.String,sha256:Schema.String})))(evaluate(session,'(async()=>{let urls=[...new Set(performance.getEntriesByType("resource").map(entry=>entry.name).filter(name=>new URL(name).pathname.endsWith(".js")))];urls.push(new URL("/worker-editor.js",location.href).href);return await Promise.all([...new Set(urls)].map(async url=>{let r=await fetch(url,{cache:"no-store"});if(!r.ok)throw Error("Script HTTP "+r.status);let hash=await crypto.subtle.digest("SHA-256",await r.arrayBuffer());return {url,sha256:Array.from(new Uint8Array(hash),v=>v.toString(16).padStart(2,"0")).join("")}}))})()'))
+ await Bun.write("canvas-layout-resources.json",JSON.stringify(resources,null,2)+"\n")
+ for(let resource of resources)if(new Bun.CryptoHasher("sha256").update(await Bun.file("dist"+new URL(resource.url).pathname).arrayBuffer()).digest("hex")!==resource.sha256)throw Error("Served script differs from current graph")
+
+ evaluate(session,source+'.focus();'+source+'.setSelectionRange('+initial.length+','+initial.length+')')
+ await Bun.write("canvas-layout-attempt.private.json",JSON.stringify({document:record.documentId,phase:"native-create-board",time:Date.now()})+"\n")
+ result.stage="worker-board-create"
+ browser(session,"click",'[data-worker-new-drawing]')
+ wait('document.querySelector("alkalye-whiteboard")?.editor!==undefined&&document.querySelector("[data-worker-board]")?.open&&document.querySelector("[data-testid=\\"tools.rectangle\\"]")?.checkVisibility()')
+ let canvasResources=Schema.decodeUnknownSync(Schema.Array(Schema.Struct({url:Schema.String,sha256:Schema.String})))(evaluate(session,'(async()=>{let urls=[...new Set(performance.getEntriesByType("resource").map(entry=>entry.name).filter(name=>new URL(name).pathname.endsWith(".js")))];urls.push(new URL("/worker-editor.js",location.href).href);return await Promise.all([...new Set(urls)].map(async url=>{let r=await fetch(url,{cache:"no-store"});if(!r.ok)throw Error("Script HTTP "+r.status);let hash=await crypto.subtle.digest("SHA-256",await r.arrayBuffer());return {url,sha256:Array.from(new Uint8Array(hash),v=>v.toString(16).padStart(2,"0")).join("")}}))})()'))
+ await Bun.write("canvas-layout-loaded-resources.json",JSON.stringify(canvasResources,null,2)+"\n")
+ for(let resource of canvasResources)if(new Bun.CryptoHasher("sha256").update(await Bun.file("dist"+new URL(resource.url).pathname).arrayBuffer()).digest("hex")!==resource.sha256)throw Error("Served script differs from current graph")
+
+
+ browser(session,"click",'[data-testid="tools.rectangle"]')
+ let pointSchema=Schema.Struct({x:Schema.Number,y:Schema.Number})
+ function point(x:number,y:number){return Schema.decodeUnknownSync(pointSchema)(evaluate(session,'(()=>{let r=document.querySelector(".tl-canvas").getBoundingClientRect();return {x:Math.round(r.left+r.width*'+x+'),y:Math.round(r.top+r.height*'+y+')}})()'))}
+ let start=point(.3,.3),end=point(.55,.55)
+ browser(session,"mouse","move",String(start.x),String(start.y));browser(session,"mouse","down")
+ for(let step of [.25,.5,.75,1])browser(session,"mouse","move",String(Math.round(start.x+(end.x-start.x)*step)),String(Math.round(start.y+(end.y-start.y)*step)))
+ browser(session,"mouse","up")
+ wait('document.querySelector("alkalye-whiteboard").editor.getCurrentPageShapes().length===1&&document.querySelector("#save-status").textContent==="Saved"')
+ browser(session,"click","#embed-board")
+ wait('!document.querySelector("[data-worker-board]")?.open&&'+source+'.value.includes("asset:")&&!document.querySelector("#editor").readOnly')
+ let embedded=String(evaluate(session,source+'.value'))
+ await accepted(record.documentId,embedded)
+ result.gates.push("existing native tldraw rectangle and Embed through admitted worker ledger; independent accepted source exact")
+ result.stage="undo"
+ evaluate(session,source+'.focus()');browser(session,"press","Control+z")
+ wait(source+'.value==='+JSON.stringify(initial)+'&&!document.querySelector("#editor").readOnly')
+ await accepted(record.documentId,initial)
+ result.gates.push("actual native Undo removes embed source and independent accepted source restores exact initial body")
+ result.stage="redo"
+ browser(session,"press","Control+Shift+z")
+ wait(source+'.value==='+JSON.stringify(embedded)+'&&!document.querySelector("#editor").readOnly')
+ await accepted(record.documentId,embedded)
+ result.gates.push("actual native Redo restores exact independently accepted embed source")
+ result.stage="reopen-close"
+ browser(session,"click",'[data-action^="drawing:"]')
+ wait('document.querySelector("alkalye-whiteboard")?.editor?.getCurrentPageShapes().length===1')
+ browser(session,"press","Escape")
+ wait('document.querySelector("[data-worker-board]")===null&&!document.querySelector("#editor").readOnly')
+ await accepted(record.documentId,embedded)
+ result.gates.push("authoritative canvas reopens one persisted rectangle; close drains and removes scoped owned dialog without source mutation")
+ result.initialSHA=new Bun.CryptoHasher("sha256").update(initial).digest("hex")
+ result.editedSHA=new Bun.CryptoHasher("sha256").update(embedded).digest("hex")
+ result.stage="complete"
+} catch(error){result.failure=String(error);process.exitCode=1;try{result.state=evaluate(session,'({path:location.pathname,readonly:document.querySelector("#editor")?.readOnly,source:document.querySelector("alkalye-editor")?.source?.value,dialog:document.querySelector("#dialog")?.outerHTML,text:document.body.innerText.slice(-1800)})')}catch{}}
+finally{await Bun.write("canvas-layout-results.json",JSON.stringify(result,null,2)+"\n");console.log(JSON.stringify(result));browser(session,"close")}

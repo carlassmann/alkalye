@@ -1,0 +1,31 @@
+import * as Effect from "effect/Effect"
+import * as Schema from "effect/Schema"
+import { DocumentSnapshotSchema, CommittedActionSchema, restoreSnapshot } from "./src/shared/document-actions"
+import { boardRecords, storedRecord } from "./src/shared/whiteboard"
+import { browser, evaluate } from "./tests/browser-driver"
+let session = "canvas-server-read-" + Date.now()
+let fixture = Schema.decodeUnknownSync(Schema.Struct({ documentId: Schema.String }))(await Bun.file("canvas-layout-created.private.json").json())
+let payload = Schema.Struct({ snapshot: DocumentSnapshotSchema, history: Schema.Array(Schema.Struct({ position: Schema.Natural, action: CommittedActionSchema })) })
+let result: { gates: string[]; failure?: string; position?: number; shapes?: number; labels?: string[] } = { gates: [] }
+try {
+ browser(session, "--profile", "/tmp/alkalye-worker-canvas/runtime/profile-run", "open", "http://127.0.0.1:4473/app")
+ let accepted = Schema.decodeUnknownSync(payload)(evaluate(session, '(async()=>{let oracle=await import("/canvas-oracle.js");return oracle.readAccepted('+JSON.stringify(fixture.documentId)+')})()'))
+ let replica = await Effect.runPromise(restoreSnapshot(accepted.snapshot, "accepted-board-read"))
+ let boards = replica.records("whiteboard").filter(board => board.fields.document === fixture.documentId)
+ if (boards.length !== 1 || !replica.text(fixture.documentId).includes("asset:" + boards[0]?.id)) throw Error("Exact accepted board relation/source missing")
+ let board = boards[0]
+ if (!board) throw Error("Accepted board missing")
+ let shapes = [...boardRecords(board.fields)].filter(([id,value]) => storedRecord(id,value)?.record.typeName === "shape")
+ if (shapes.length !== 1) throw Error("Expected one accepted native rectangle")
+ result.gates.push("independent authenticated HTTP snapshot restored through public Replica confirms one owned board and one native shape")
+ let actions = accepted.history.map(entry => entry.action)
+ let embed = actions.filter(action => action.label === "Embed drawing")
+ if (embed.length !== 1) throw Error("Expected exactly one accepted Embed drawing action")
+ let undo = actions.filter(action => action.undoOf === embed[0]?.id)
+ if (undo.length !== 1 || actions.filter(action => action.undoOf === undo[0]?.id).length !== 1) throw Error("Expected exactly one accepted inverse and inverse-of-inverse")
+ result.gates.push("independent server event history contains exactly one Embed plus its one Undo and one Redo inverse")
+ result.position = accepted.snapshot.position
+ result.shapes = shapes.length
+ result.labels = actions.map(action => action.label)
+} catch(error) { result.failure = String(error); process.exitCode = 1 }
+finally { await Bun.write("canvas-server-oracle-results.json", JSON.stringify(result,null,2)+"\n"); console.log(JSON.stringify(result)); browser(session,"close") }

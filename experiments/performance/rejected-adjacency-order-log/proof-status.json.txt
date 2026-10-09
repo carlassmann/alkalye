@@ -1,0 +1,14 @@
+{
+  "control": "4a0aa7553a0de7fbfc2d8eb9a6332313b04bcf0dc68e558de6add25ea6e71b7d",
+  "candidate": "93caaa87c290977d34cce3ad1676955e83196d533149d3553a4b86a9d4107565",
+  "variant": "private native4096-key order pages/number bucket IDs/lazy bucket maps/readonly replace-before-splice siblings",
+  "types": "PASS91393",
+  "tests": {
+    "pass": 54,
+    "fail": 0,
+    "assertions": 783,
+    "files": 6
+  },
+  "performance": "UNRUN",
+  "Opus": "Paged review22177 terminal no correctness blocker; number[]small-target and64-target yields followup applied"
+}

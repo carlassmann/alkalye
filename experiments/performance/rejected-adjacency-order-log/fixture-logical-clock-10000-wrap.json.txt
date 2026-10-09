@@ -1,0 +1,9 @@
+{
+  "name": "logical-clock-10000-wrap",
+  "utf16Units": 10522,
+  "utf8Bytes": 10586,
+  "realNewlines": 32,
+  "literalBackslashN": 0,
+  "sourceSHA": "9d04f9d5507f8a6dcc4928fbbd7b3a9bcdfbab7b27f86ade7762fbeaeda2e6c0",
+  "operations": 10011
+}

@@ -1,0 +1,8 @@
+$ tsc --noEmit
+src/client/worker-document/app-route.ts(213,50): error TS18048: 'owner' is possibly 'undefined'.
+src/client/worker-document/worker-boards.ts(126,185): error TS2345: Argument of type 'import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect").Effect<{ readonly id: string; readonly document: string; readonly actor: string; readonly label: string; readonly changes: readonly [{ readonly id: string; readonly value: string; readonly kind: "text" | "set" | "cancel"; ... ...' is not assignable to parameter of type 'import("/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Effect").Effect<{ readonly id: string; readonly document: string; readonly actor: string; readonly label: string; readonly changes: readonly [{ readonly id: string; readonly value: string; readonly kind: "text" | "set" | "cancel"; ... ...'.
+  Type 'PlatformError | SchemaError | DocumentConflict | UndoUnavailable | DocumentHistoryUnavailable | ... 7 more ... | LocalDocumentFailure' is not assignable to type 'PlatformError | SchemaError | DocumentConflict | UndoUnavailable | DocumentHistoryUnavailable | ... 6 more ... | LocalDocumentFailure'.
+    Type 'PermissionDenied' is not assignable to type 'PlatformError | SchemaError | DocumentConflict | UndoUnavailable | DocumentHistoryUnavailable | ... 6 more ... | LocalDocumentFailure'.
+      Type 'PermissionDenied' is missing the following properties from type 'LocalDocumentFailure': operation, retryable
+src/client/worker-document/worker-session.ts(272,18): error TS2339: Property 'epoch' does not exist on type 'WorkerDocumentAdmission'.
+src/client/worker-document/worker-session.ts(288,18): error TS2339: Property 'epoch' does not exist on type 'WorkerDocumentAdmission'.

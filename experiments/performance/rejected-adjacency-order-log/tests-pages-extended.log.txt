@@ -1,0 +1,13 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/replica-adjacency.test.ts:
+(pass) adjacency preserves exact checkpoint and canonical source case 13312 [123.45ms]
+(pass) adjacency preserves exact checkpoint and canonical source case 13 [1.85ms]
+(pass) adjacency preserves exact checkpoint and canonical source case 30 [4.68ms]
+(pass) adjacency preserves exact checkpoint and canonical source case 45 [2.12ms]
+(pass) adjacency preserves exact checkpoint and canonical source case 12 [1.48ms]
+
+ 5 pass
+ 0 fail
+ 90 expect() calls
+Ran 5 tests across 1 file. [163.00ms]

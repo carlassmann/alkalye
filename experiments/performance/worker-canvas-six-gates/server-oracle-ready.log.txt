@@ -1,0 +1,1 @@
+{"gates":["independent authenticated HTTP snapshot restored through public Replica confirms one owned board and one native shape","independent server event history contains exactly one Embed plus its one Undo and one Redo inverse"],"position":84,"shapes":1,"labels":["Agent create","Draw","Embed drawing","Undo Embed drawing","Undo Undo Embed drawing"]}

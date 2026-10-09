@@ -1,0 +1,134 @@
+--- /tmp/alkalye-worker-adjacency-partitions/crdt-control.ts	2026-10-09 03:37:42
++++ /tmp/alkalye-worker-adjacency-partitions/crdt-candidate.ts	2026-10-09 03:44:54
+@@ -120,7 +120,7 @@
+ 	clock = 0
+ 	historyLoaded = true
+ 	private atomIndex = new AtomIndex()
+-	private children = new Map<string, Map<string, Atom[]>>()
++	private children = new Map<string, ChildrenIndex>()
+ 	private visibility = new Map<string, TextVisibility>()
+ 	private textOwners = new Map<string, string>()
+ 	private ownedAtomCounts = new Map<string, number>()
+@@ -177,8 +177,11 @@
+ 			cooperative,
+ 		)
+ 		replica.atomIndex = this.atomIndex.fork()
+-		for (let [target, children] of this.children)
+-			replica.children.set(target, yield* copyMapSteps(children, cooperative))
++		let copiedChildren = 0
++		for (let [target, children] of this.children) {
++			replica.children.set(target, children.fork())
++			if (cooperative && ++copiedChildren % 64 === 0) yield
++		}
+ 		for (let [target, visibility] of this.visibility)
+ 			replica.visibility.set(target, yield* visibility.forkSteps(cooperative))
+ 		replica.textOwners = yield* copyMapSteps(this.textOwners, cooperative)
+@@ -1535,16 +1538,16 @@
+ 		let cached = this.textCache.get(target)
+ 		if (until === Infinity && cached) return cached
+ 		if (until === Infinity) {
+-			let children = this.children.get(target) ?? new Map<string, Atom[]>()
++			let children = this.children.get(target)
+ 			let visibility = this.visibility.get(target)
+ 			let result: Atom[] = [],
+-				stack = [...(children.get("") ?? [])].reverse()
++				stack = [...(children?.get("") ?? [])].reverse()
+ 			let count = 0
+ 			while (stack.length) {
+ 				let atom = stack.pop()
+ 				if (!atom) break
+ 				if (!visibility?.hidden(atom.id)) result.push(atom)
+-				let descendants = children.get(atom.id) ?? []
++				let descendants = children?.get(atom.id) ?? []
+ 				for (let index = descendants.length - 1; index >= 0; index--) {
+ 					let child = descendants[index]
+ 					if (child) stack.push(child)
+@@ -2282,7 +2285,7 @@
+ 		this.atomIndex.set(atom.id, Object.freeze({ target, atom }))
+ 		let owner = atom.id.slice(0, -9)
+ 		this.ownedAtomCounts.set(owner, (this.ownedAtomCounts.get(owner) ?? 0) + 1)
+-		let children = this.children.get(target) ?? new Map<string, Atom[]>()
++		let children = this.children.get(target) ?? new ChildrenIndex()
+ 		let siblings = [...(children.get(atom.after) ?? [])]
+ 		let index = siblings.findIndex(sibling => sibling.id < atom.id)
+ 		siblings.splice(index < 0 ? siblings.length : index, 0, atom)
+@@ -2332,6 +2335,79 @@
+ 	*[Symbol.iterator]() {
+ 		for (let bucket of this.buckets) yield* bucket
+ 	}
++}
++
++interface ChildrenOrderPage {
++ keys: string[]
++ buckets: number[]
++}
++
++class ChildrenIndex {
++ private buckets: (Map<string, readonly Atom[]> | undefined)[]
++ private ownedBuckets = new Uint8Array(256)
++ private pages: ChildrenOrderPage[]
++ private ownsTail = true
++ constructor(
++  buckets: (Map<string, readonly Atom[]> | undefined)[] = Array.from({ length: 256 }, () => undefined),
++  pages: ChildrenOrderPage[] = [],
++ ) {
++  this.buckets = buckets
++  this.pages = pages
++ }
++ fork() {
++  this.ownedBuckets.fill(0)
++  this.ownsTail = false
++  let replica = new ChildrenIndex(this.buckets.slice(), this.pages.slice())
++  replica.ownsTail = false
++  return replica
++ }
++ get(id: string) {
++  return this.buckets[atomIndexBucket(id)]?.get(id)
++ }
++ has(id: string) {
++  return this.buckets[atomIndexBucket(id)]?.has(id) ?? false
++ }
++ set(id: string, siblings: readonly Atom[]) {
++  let bucket = atomIndexBucket(id)
++  let entries = this.buckets[bucket]
++  if (!entries) {
++   entries = new Map()
++   this.buckets[bucket] = entries
++   this.ownedBuckets[bucket] = 1
++  } else if (!this.ownedBuckets[bucket]) {
++   entries = new Map(entries)
++   this.buckets[bucket] = entries
++   this.ownedBuckets[bucket] = 1
++  }
++  if (!entries.has(id)) {
++   let tail = this.pages[this.pages.length - 1]
++   if (!tail || tail.keys.length === 4096) {
++    tail = { keys: [], buckets: [] }
++    this.pages.push(tail)
++    this.ownsTail = true
++   } else if (!this.ownsTail) {
++    tail = { keys: tail.keys.slice(), buckets: tail.buckets.slice() }
++    this.pages[this.pages.length - 1] = tail
++    this.ownsTail = true
++   }
++   tail.buckets[tail.keys.length] = bucket
++   tail.keys.push(id)
++  }
++  entries.set(id, siblings)
++ }
++ *values() {
++  for (let page of this.pages) {
++   for (let index = 0; index < page.keys.length; index++) {
++    let key = page.keys[index]
++    let bucket = page.buckets[index]
++    if (key === undefined || bucket === undefined)
++     throw new Error("Missing ordered children key")
++    let siblings = this.buckets[bucket]?.get(key)
++    if (!siblings) throw new Error("Missing ordered children")
++    yield siblings
++   }
++  }
++ }
+ }
+ 
+ function atomIndexBucket(id: string) {

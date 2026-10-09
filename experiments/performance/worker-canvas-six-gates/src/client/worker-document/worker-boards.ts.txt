@@ -1,0 +1,131 @@
+import * as Context from "effect/Context"
+import * as Effect from "effect/Effect"
+import { DocumentConflict, PermissionDenied } from "../../shared/document-errors"
+import { DocumentSession } from "../../shared/document-session"
+import { isLegacyField } from "../../shared/legacy-drawing"
+import { darkPreviewField, previewField, recordPrefix, schemaPrefix, writeBatches } from "../../shared/whiteboard"
+import type { DocumentAssets } from "../document-assets"
+import type { AttachmentSelection } from "../document-assets"
+
+type Session = Context.Service.Shape<typeof DocumentSession>
+type Command = ReturnType<Session["change"]> | ReturnType<Context.Service.Shape<typeof DocumentAssets>["delete"]>
+interface BoardLease {
+ board: string
+ created: boolean
+ selection?: AttachmentSelection
+}
+export interface BoardView {
+ readonly token: string
+ readonly generation: number
+ readonly board: string
+ readonly fields: Readonly<Record<string, string>>
+ readonly documentWhiteboard?: string
+}
+
+export function makeWorkerBoards(options: {
+ document: string
+ session: Session
+ assets: Context.Service.Shape<typeof DocumentAssets>
+ canRead(): boolean
+ canWrite(): boolean
+ prepare(command: Command): Effect.Effect<{ token: string }, unknown>
+}) {
+ return Effect.gen(function* () {
+  let closed = false
+  let leases = new Map<string, BoardLease>()
+  let changed = 0
+  let cached: { version: number; changed: number; views: readonly BoardView[] } | undefined
+  yield* Effect.addFinalizer(() => Effect.sync(() => { closed = true; leases.clear() }))
+  function readable() {
+   if (closed || !options.canRead()) throw new PermissionDenied({ message: "This document is unavailable" })
+  }
+  function writable() {
+   readable()
+   if (!options.canWrite()) throw new PermissionDenied({ message: "This document is read-only" })
+  }
+  function conflict(message: string) { return new DocumentConflict({ message }) }
+  function fields(board: string, create: boolean) {
+   let current = options.session.replica.fields(board)
+   if (create && Object.keys(current).length === 0) return current
+   let pointer = options.session.replica.fields(options.document).whiteboard
+   if (current.type !== "whiteboard" || (current.document !== options.document && !(pointer === board && current.document === undefined))) throw conflict("This whiteboard is unavailable")
+   return current
+  }
+  function lease(token: string) {
+   readable()
+   let value = leases.get(token)
+   if (!value) throw conflict("This whiteboard view has closed")
+   return value
+  }
+  function view(token: string, value: BoardLease): BoardView {
+   return Object.freeze({ token, generation: changed, board: value.board, fields: Object.freeze({ ...fields(value.board, value.created) }), documentWhiteboard: options.session.replica.fields(options.document).whiteboard })
+  }
+  return Object.freeze({
+   generation: () => changed,
+   acquire(board?: string, selection?: AttachmentSelection) {
+    return Effect.try({
+     try() {
+      readable()
+      if (leases.size >= 8) throw conflict("Close an existing whiteboard first")
+      if (board === undefined) writable()
+      let value: BoardLease = { board: board ?? crypto.randomUUID(), created: board === undefined, ...(selection === undefined ? {} : { selection }) }
+      fields(value.board, value.created)
+      let token = crypto.randomUUID()
+      leases.set(token, value)
+      changed++
+      return view(token, value)
+     },
+     catch: error => error,
+    })
+   },
+   read(token: string) { return Effect.try({ try: () => view(token, lease(token)), catch: error => error }) },
+   current() {
+    if (closed || !options.canRead()) return []
+    let version = options.session.version()
+    if (cached?.version !== version || cached.changed !== changed) {
+     let views: BoardView[] = []
+     for (let [token, value] of leases) {
+      try { views.push(view(token, value)) } catch { leases.delete(token); changed++ }
+     }
+     cached = { version, changed, views: Object.freeze(views) }
+    }
+    return cached.views
+   },
+   write(token: string, values: readonly [string, string][], embed: boolean) {
+    return Effect.gen(function* () {
+     let value = yield* Effect.try({
+      try() {
+       writable()
+       let value = lease(token)
+       let current = fields(value.board, value.created)
+       for (let [field] of values) if (field !== "name" && field !== previewField && field !== darkPreviewField && !field.startsWith(recordPrefix) && !field.startsWith(schemaPrefix) && !isLegacyField(field)) throw conflict("Unsupported whiteboard field")
+       if (writeBatches(values, current).length > 1) throw conflict("Whiteboard write exceeds one action")
+       return value
+      },
+      catch: error => error,
+     })
+     let command = options.session.change(embed ? "Embed drawing" : "Draw", staged => {
+      writable()
+      fields(value.board, value.created)
+      let existing = staged.fields(value.board)
+      let changes = existing.type === "whiteboard" ? (existing.document === undefined ? [staged.set(value.board, "document", options.document)] : []) : [staged.set(value.board, "type", "whiteboard"), staged.set(value.board, "document", options.document)]
+      changes.push(...values.map(([field, data]) => staged.set(value.board, field, data)))
+      if (embed && !staged.text(options.document).includes(`asset:${value.board}`)) {
+       let selection = value.selection
+       let source = selection ? selection.atoms.map(atom => atom.value).join("") : staged.text(options.document)
+       let reference = `![Whiteboard](asset:${value.board})`
+       let edit = staged.edit(options.document, selection ? source.slice(0, selection.start) + reference + source.slice(selection.end) : source + `\n${reference}\n`, selection?.atoms)
+       if (edit) changes.push(edit)
+      }
+      return changes
+     })
+     return yield* options.prepare(command)
+    })
+   },
+   delete(token: string) {
+    return Effect.try({ try() { writable(); let value = lease(token); fields(value.board, false); return value }, catch: error => error }).pipe(Effect.flatMap(value => options.prepare(options.assets.delete(value.board))))
+   },
+   release(token: string) { return Effect.sync(() => { if (leases.delete(token)) changed++ }) },
+  })
+ })
+}

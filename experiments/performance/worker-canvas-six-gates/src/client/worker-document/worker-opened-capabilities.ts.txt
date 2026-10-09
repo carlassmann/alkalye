@@ -1,0 +1,145 @@
+import { drawingReference } from "../document-media"
+import * as Context from "effect/Context"
+import * as Effect from "effect/Effect"
+import * as Layer from "effect/Layer"
+import * as Stream from "effect/Stream"
+import * as Schema from "effect/Schema"
+import { WorkerOpenedSnapshotSchema, WorkerPresenceSchema } from "./worker-opened-schemas"
+import { makeWorkerOpenedHistory } from "./worker-opened-history"
+import { prepareWorkerTaskToggle } from "./worker-opened-tasks"
+import type { Storage } from "../storage"
+import { makeWorkerOpenedIntents } from "./worker-opened-intents"
+import type { DocumentRange } from "./opened-document-contract"
+import type { Replica } from "../../shared/crdt"
+import type { DocumentLive } from "../document-live"
+import type { LivePresence } from "../../shared/document-live"
+import type { WorkerOpenedSnapshot, WorkerEditorProjection } from "./worker-opened-schemas"
+import { DocumentSession } from "../../shared/document-session"
+import { DocumentDiscussion } from "../document-discussion"
+import { DocumentAssets } from "../document-assets"
+import { DocumentBlobs } from "../document-blobs"
+import { DocumentProperties } from "../document-properties"
+import { webCryptoLayer } from "../../platform/web-crypto"
+import { blobContentType } from "../../shared/document-blobs"
+import { documentFailureCategory } from "../../shared/document-observability"
+import type { DocumentConnectionState } from "../browser-library"
+
+interface WorkerOpenedOptions {
+ document: string
+ subject: string
+ storage: Pick<Storage, "get" | "set">
+ online(): boolean
+ workspace: string
+ author: string
+ canWrite(): boolean
+ basis(range: DocumentRange): Replica | undefined
+ live: Context.Service.Shape<typeof DocumentLive>
+ editor: {
+  current(): WorkerEditorProjection | undefined
+  changes: Stream.Stream<unknown>
+ }
+ session: Context.Service.Shape<typeof DocumentSession>
+ blobs: Context.Service.Shape<typeof DocumentBlobs>
+ connection: {
+  current(): DocumentConnectionState
+  changes: Stream.Stream<DocumentConnectionState>
+  synchronize: Effect.Effect<void>
+  retryAfterAdmissionRefresh: Effect.Effect<void>
+ }
+}
+
+export function makeWorkerOpenedCapabilities(options: WorkerOpenedOptions) {
+ return Effect.gen(function* () {
+  yield* options.live.watch(options.document)
+  let context = yield* Layer.build(Layer.mergeAll(
+   DocumentDiscussion.layer({ document: options.document, author: options.author, canWrite: options.canWrite }),
+   DocumentAssets.layer({ document: options.document, canWrite: options.canWrite }),
+   DocumentProperties.layer({ document: options.document, canWrite: options.canWrite }),
+  ).pipe(Layer.provide(Layer.merge(
+   Layer.succeed(DocumentSession, options.session),
+   Layer.succeed(DocumentBlobs, options.blobs),
+  )), Layer.provide(webCryptoLayer)))
+  let discussion = Context.get(context, DocumentDiscussion)
+  let assets = Context.get(context, DocumentAssets)
+  let properties = Context.get(context, DocumentProperties)
+  let intents = yield* makeWorkerOpenedIntents({ document: options.document, session: options.session, blobs: options.blobs, discussion, assets, properties, canWrite: options.canWrite, basis: options.basis })
+  let history = yield* makeWorkerOpenedHistory(options)
+  let session = options.session
+  let cached: { version: number; value: ReturnType<typeof materialize> } | undefined
+  function materialize() {
+   let document = session.replica.documents(options.workspace, true).find(value => value.id === options.document)
+   if (!document) return undefined
+   let position = Number(session.replica.fields(options.document).presentationItem)
+   return Object.freeze({
+    presentationItem: Number.isSafeInteger(position) && position >= 0 && session.replica.fields(options.document).presentationItem !== undefined && session.replica.fields(options.document).presentationItem !== "" ? position : undefined,
+    themes: Object.freeze(session.replica.records("theme").map(record => Object.freeze({ id: record.id, fields: Object.freeze({ ...record.fields }), source: session.replica.text(record.id) }))),
+    document: Object.freeze({ ...document, kind: document.kind ?? "document", tags: Object.freeze([...(document.tags ?? [])]), pinned: document.pinned ?? false, created: document.created ?? 0, deleted: session.replica.fields(options.document).type === "deleted" }),
+    metadata: Object.freeze({ ...session.replica.metadata(options.document), tags: Object.freeze([...session.replica.metadata(options.document).tags]) }),
+    assets: Object.freeze(assets.current().map(asset => Object.freeze({ id: asset.id, name: asset.fields.name ?? "Asset", reference: asset.fields.data, contentType: blobContentType(asset.fields.data ?? "") ?? "application/octet-stream", referenceVersion: session.replica.register(asset.id, "data")?.id, muted: asset.fields.muted === "true", audible: asset.audible }))),
+    whiteboards: Object.freeze(session.replica.records("whiteboard").filter(board => board.fields.document === options.document || (board.fields.document === undefined && session.replica.fields(options.document).whiteboard === board.id)).map(board => Object.freeze({ id: board.id, name: board.fields.name ?? "Whiteboard", referenceLight: drawingReference(board.fields, false), referenceDark: drawingReference(board.fields, true) }))),
+    threads: Object.freeze(discussion.current().map(thread => Object.freeze({ id: thread.id, fields: Object.freeze({ ...thread.fields }), range: thread.range && Object.freeze({ ...thread.range }), orphaned: thread.orphaned }))),
+   })
+  }
+  function read(): WorkerOpenedSnapshot {
+   let version = session.version()
+   if (cached?.version !== version) cached = { version, value: materialize() }
+   let failures = session.failures.current()
+   let editor = options.editor.current()
+   return Object.freeze({
+    revision: version,
+    editor: editor && Object.freeze({ basis: Object.freeze({ ...editor.basis }), ranges: Object.freeze(editor.ranges.map(range => Object.freeze({ ...range }))) }),
+    projection: cached?.value,
+    canWrite: options.canWrite(),
+    connection: Object.freeze({ ...options.connection.current() }),
+    status: Object.freeze({
+     unsaved: session.unsaved(),
+     pending: session.pending().length,
+     rejected: session.rejected().length,
+     failures: Object.freeze({
+      save: failures.save ? documentFailureCategory(failures.save) : undefined,
+      snapshot: failures.snapshot ? documentFailureCategory(failures.snapshot) : undefined,
+      projection: failures.projection ? documentFailureCategory(failures.projection) : undefined,
+     }),
+    }),
+   })
+  }
+  function readRecord(id: string) {
+   let fields = session.replica.fields(id)
+   if (id !== options.document && (fields.document !== options.document || !["asset", "whiteboard", "comment"].includes(fields.type ?? ""))) return undefined
+   return Object.freeze({ id, fields: Object.freeze({ ...fields }) })
+  }
+  return {
+   current: read,
+   record: (id: string) => Effect.sync(() => readRecord(id)),
+   changes: Stream.succeed(undefined).pipe(
+    Stream.concat(session.changes),
+    Stream.merge(session.failures.changes),
+    Stream.merge(options.connection.changes),
+    Stream.merge(options.editor.changes),
+    Stream.buffer({ capacity: 1, strategy: "sliding" }),
+    Stream.map(read),
+    Stream.changesWith(Schema.toEquivalence(WorkerOpenedSnapshotSchema)),
+   ),
+   ...intents,
+   boards: intents.boards,
+   tasks: Object.freeze({ toggle: (range: DocumentRange) => prepareWorkerTaskToggle(options, range).pipe(Effect.flatMap(intents.commands.prepare)) }),
+   history: Object.freeze({
+    load: history.load,
+    select: history.select,
+    restore: (token: string) => history.restore(token).pipe(Effect.flatMap(intents.commands.prepare)),
+    releaseMoment: history.releaseMoment,
+    releaseHistory: history.releaseHistory,
+   }),
+   presence: Object.freeze({
+    current: () => options.live.presence.current(options.document),
+    changes: options.live.presence.changes.pipe(Stream.map(() => options.live.presence.current(options.document)), Stream.buffer({ capacity: 1, strategy: "sliding" }), Stream.changesWith(Schema.toEquivalence(WorkerPresenceSchema))),
+    announce: (presence: Omit<LivePresence, "own">) => options.live.announce({ ...presence, document: options.document }),
+   }),
+   flush: session.flush,
+   save: session.save,
+   synchronize: options.connection.synchronize,
+   retryAfterAdmissionRefresh: options.connection.retryAfterAdmissionRefresh,
+  }
+ })
+}
+

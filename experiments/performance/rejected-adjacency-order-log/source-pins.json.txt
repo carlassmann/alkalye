@@ -1,0 +1,6 @@
+{
+  "crdt-control.ts": "4a0aa7553a0de7fbfc2d8eb9a6332313b04bcf0dc68e558de6add25ea6e71b7d",
+  "crdt-candidate.ts": "93caaa87c290977d34cce3ad1676955e83196d533149d3553a4b86a9d4107565",
+  "runtime/fact-index-cost.ts": "28c7f1d810cc46a0dff1ebd924c59dfce9e96caf71f576406a5734f56ffe73b9",
+  "runtime/tests/replica-adjacency.test.ts": "96875232114b148bae0821951b171535d457b7c454ebfefa04243a2897be1059"
+}

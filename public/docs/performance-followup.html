@@ -88,6 +88,25 @@
 			change, not a complete worker cutover or measured 120Hz presentation.
 			Evidence: <code>experiments/performance/atom-index-partitions</code>.
 		</p>
+		<h2>Remaining worker work</h2>
+		<p>
+			A children-index prototype passed 54 paired module cost cells with exact
+			source, fork independence and checkpoint order. Large-document copy fell
+			from 101ms to 0.65ms, but checkpoint creation rose from 53ms to 101ms and
+			durable snapshot creation from 111ms to 147ms. It remains outside
+			production. The next experiment stores ordered sibling values directly to
+			avoid the extra snapshot lookups. Evidence:
+			<code>experiments/performance/rejected-adjacency-order-log</code>.
+		</p>
+		<p>
+			The worker canvas slice passed drawing and embedding, Undo, Redo,
+			reopening the persisted shape and scoped close. Independent accepted
+			snapshots and event history confirmed the board and its inverses. These
+			six gates do not establish full parity: live revocation, deletion, legacy
+			pointers, unsaved route-close and presentation bindings still need
+			verification. Production has not adopted this worker slice. Evidence:
+			<code>experiments/performance/worker-canvas-six-gates</code>.
+		</p>
 		<h2>Latest native input tasks</h2>
 		<p>
 			Main <code>a749728</code> and rewrite <code>dc2af56</code> used separate

@@ -1,0 +1,80 @@
+import * as Effect from "effect/Effect"
+import * as Deferred from "effect/Deferred"
+import type * as Stream from "effect/Stream"
+import type { DrawingSession } from "../components/whiteboard"
+import { openDialog } from "../components/dialog"
+import type { Presence } from "../../shared/model"
+import type { BoardView } from "./worker-boards"
+
+export function openWorkerDrawing(options: {
+ document: string
+ board: string
+ actor: string
+ name: string
+ dialog: HTMLDialogElement
+ view(): BoardView
+ source(): string
+ writable(): boolean
+ changes: Stream.Stream<unknown>
+ presenceChanges: Stream.Stream<unknown>
+ people(): readonly Presence[]
+ announce(value: Presence): Effect.Effect<unknown, unknown>
+ write(values: [string, string][], embed: boolean): Effect.Effect<unknown, unknown>
+ undo(): Effect.Effect<unknown, unknown>
+ redo(): Effect.Effect<unknown, unknown>
+ report(error: unknown): void
+}) {
+ return Effect.gen(function* () {
+  let component = yield* Effect.tryPromise(() => import("../components/whiteboard"))
+  let session: DrawingSession = Object.freeze({
+   replica: {
+    fields(id: string) {
+     let view = options.view()
+     if (id === options.board) return { ...view.fields }
+     if (id === options.document) return view.documentWhiteboard === undefined ? {} : { whiteboard: view.documentWhiteboard }
+     throw new Error("Record is outside the whiteboard capability")
+    },
+    text(id: string) {
+     if (id !== options.document) throw new Error("Source is outside the whiteboard capability")
+     return options.source()
+    },
+   },
+   uuid: Effect.sync(() => crypto.randomUUID()),
+   writable: options.writable,
+   changes: options.changes,
+   presenceChanges: options.presenceChanges,
+   people: options.people,
+   announce: options.announce,
+   undo: options.undo,
+   redo: options.redo,
+   write(board: string, values: [string, string][], embed = false) {
+    if (board !== options.board) return Effect.fail(new Error("Whiteboard identity changed"))
+    return options.write(values, embed)
+   },
+  })
+  let closed = yield* Deferred.make<void>()
+  let dialog = yield* Effect.acquireRelease(Effect.sync(() => {
+   let dialog = document.createElement("dialog")
+   dialog.dataset.workerBoard = ""
+   dialog.dataset.dialog = ""
+   document.body.append(dialog)
+   return dialog
+  }), dialog => Effect.sync(() => { dialog.close(); dialog.remove() }))
+  yield* Effect.acquireRelease(Effect.sync(() => {
+   function finish() { Effect.runSync(Deferred.succeed(closed, undefined)) }
+   dialog.addEventListener("close", finish)
+   return finish
+  }), finish => Effect.sync(() => dialog.removeEventListener("close", finish)))
+  let initial = true
+  let element = yield* Effect.acquireRelease(
+   Effect.sync(() => component.openWhiteboard({ boardId: options.board, documentId: options.document, actor: options.actor, name: options.name, dialog, session, report: options.report, showDialog: (title, body) => {
+    let target = initial ? dialog : options.dialog
+    initial = false
+    openDialog(target, options.report, () => {}, title, body)
+   } })),
+   element => Effect.sync(() => dialog.close()).pipe(Effect.andThen(Effect.suspend(() => element.settled()))),
+  )
+  let close = Effect.sync(() => dialog.close()).pipe(Effect.andThen(Effect.suspend(() => element.settled())))
+  return { close, closed: Deferred.await(closed).pipe(Effect.andThen(Effect.suspend(() => element.settled()))) }
+ })
+}

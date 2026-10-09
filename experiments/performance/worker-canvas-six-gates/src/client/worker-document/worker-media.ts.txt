@@ -1,0 +1,34 @@
+import * as Stream from "effect/Stream"
+import type * as Context from "effect/Context"
+import { assetReferences } from "../../shared/authoring"
+import type { DocumentBlobs } from "../document-blobs"
+import { makeDocumentMediaResources } from "../document-media"
+import type { WorkerOpenedNoticeSchema } from "./worker-opened-schemas"
+
+export function makeWorkerMedia(options: {
+ blobs: Context.Service.Shape<typeof DocumentBlobs>
+ current(): typeof WorkerOpenedNoticeSchema.Type
+ changes: Stream.Stream<typeof WorkerOpenedNoticeSchema.Type>
+ source(): string
+}) {
+ return makeDocumentMediaResources({
+  blobs: options.blobs,
+  source: options.source,
+  changes: options.changes,
+  references(source) {
+   let snapshot = options.current()
+   let references: [string, string][] = []
+   let dark = document.documentElement.dataset.appearance === "dark"
+   for (let id of assetReferences(source)) {
+    let asset = snapshot.assets?.find(asset => asset.id === id)
+    if (asset?.reference) references.push([id, asset.reference])
+    else {
+     let board = snapshot.whiteboards?.find(board => board.id === id)
+     let reference = dark ? board?.referenceDark : board?.referenceLight
+     if (reference) references.push([id, reference])
+    }
+   }
+   return references
+  },
+ })
+}

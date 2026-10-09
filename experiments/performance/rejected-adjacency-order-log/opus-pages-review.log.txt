@@ -1,0 +1,24 @@
+I read the patch and every place that writes or reads `children` in `crdt-candidate.ts`. I ran nothing and edited nothing. **No correctness blocker found.**
+
+**Ownership**
+- **Only writer:** `indexAtom` (`crdt-candidate.ts:2285`). It copies the sibling array before `splice`, then calls `set`. Nothing else calls `set`, and nothing deletes entries, so Map insertion order and the page order always match.
+- **Fork** (`:2354`): it clears both ownership flags on the parent and starts the replica with none. Bucket Maps are copied the first time either side writes to them. The page spine is sliced. The shared tail is copied on the first new key, at most 4096 entries. Full pages are never written to again. Forks of forks and repeated forks stay independent.
+- **Interrupted `forkEffect`:** the only side effect left on the parent is lost ownership, which means one extra copy on its next write. No harm to correctness.
+- **Readers** (`:557, 659, 884` has; `:686, 1541/1547` get; `:1504, 1746, 1861` values): none of them mutate a sibling array they read. `revision` copies with `.flat()`; checkpoint copies atoms, not arrays.
+- **Changes during a cooperative checkpoint:** `values()` keeps a reference to the old tail page, so a write after a fork in the middle of iteration would be missed. The generation guards (`:1628, :1791, :1802`) already reject any change made while a snapshot is being taken, so this can't be observed.
+- **Checkpoint order:** pages follow the first time each predecessor was inserted, and siblings stay sorted by id descending. That matches the control exactly. Aliases and frontmatter don't touch this structure.
+- **Restore partial errors:** all validation happens before the commit loop (`:2071`). `indexAtom` doesn't throw. The commit phase still updates the replica in place and yields as it goes, but that was already true in the control.
+- **Tests:** 53 tests / 765 assertions and types pass. The extended run has finished: 5 pass, including case 13312, which covers 4 pages.
+
+**Not blockers, but they belong in the cost gate**
+1. **Fixed cost per target:** each target holds a 256-slot array, a 256-byte ownership array and a 4096-byte bucket array for its first page, about 6.5KB. A text with a handful of atoms or only frontmatter pays all of it. Every fork also allocates the 256-slot array and 256 bytes for each target. Many targets mean real memory use and real fork time.
+2. **No yield in the fork loop:** the loop over targets (`:180`) no longer yields. The control yielded through `copyMapSteps`. With thousands of targets this becomes one long blocking step.
+3. **Formatting:** the patch is indented with single spaces instead of tabs, so `bun run check` formatting will fail.
+4. **Stale `proof-status.json`:** it still describes the Chunk variant ("Effect Chunk…", "frozen after splice"). The sibling arrays are not frozen; they are only typed `readonly`.
+
+**Smaller useful changes, with no generic framework**
+- Store page bucket ids as a `number[]` (or a `Uint8Array` that grows) next to `keys`. That removes the up-front 4KB without changing order or bounds.
+- Inside the fork loop, add `if (cooperative && ++work % 64 === 0) yield`.
+- Optionally, create `ownedBuckets` only on first write.
+
+The cold load, hot read, first write and durable checkpoint gates are still open. There is no measured win yet.

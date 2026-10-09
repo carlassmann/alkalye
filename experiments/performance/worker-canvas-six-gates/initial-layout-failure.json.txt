@@ -1,0 +1,6 @@
+{
+  "stage": "worker-board-create",
+  "gates": [],
+  "failureSummary": "No visible tools.rectangle click target after dedicated canvas mount; owned dialog lacked data-dialog layout attributes. Failure preceded trusted stroke/Embed/Undo. Automatic initialization not assumed absent.",
+  "retention": "Original closed DB/profile, created fixture and attempt remain outside in first-failed. Corrected case used distinct fixture."
+}

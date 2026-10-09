@@ -1,0 +1,36 @@
+**Verdict: block the Chunk-based patch as written.** The bucket copy-on-write part is fine. The order log and a few other details are not. I only read the code; nothing was run or measured.
+
+**Correctness: what holds**
+- **Writers:** `indexAtom` (`crdt-candidate.ts:2286`) is the only one. Restore reaches it at :2077 and history replay at :1009. Duplicate atoms stop early at the `atomIndex.has` check. The order log grows only when a parent key is new to the copied bucket, so repeat keys don't double-append.
+- **Readers:** the `has`/`get` calls at :558, :660, :687, :885 and :1539–1548 are unaffected. `revision` (:1747) sorts, so order doesn't matter there. `originalFrames` (:1505) sorts each frame and is only consumed through `.some()` (`frontmatter-merge.ts:647`), so order doesn't matter there either. Historical `rawVisibleSteps` uses its own private Map.
+- **Fork:** both sides drop ownership of every bucket. An abandoned or interrupted `forkEffect` only costs the parent one bucket copy (about n/256 entries) on its next write. Child children/atomIndex are now atomic snapshots, which is stricter than the old cooperative copy. Cancellation, aliases (`restored`), header history and receipts never touch `children`.
+- **Order matters only for checkpoints:** `compactAtomSteps` (`model.ts:353`) merges runs of consecutive atoms in checkpoint order. Losing the order inflates v3 checkpoints. So keeping insertion order is justified, but only for checkpoint size.
+
+**Blockers**
+1. **Effect 4 `Chunk.append` is too expensive here.** It is `appendAll(self, of(a))`, which rebalances a tree and allocates O(log n) nodes per append. There is no append buffer (`Chunk.js:782`). On cold load, typed chains create a new parent key for roughly every atom: about 1M appends, tens of millions of allocations, and a large live node tree. That's a likely coldload regression.
+2. **`values()` copies everything on each call after an append.** Iterating a non-flat Chunk calls `toReadonlyArray`, which copies the whole log and replaces the shared node's backing array in place. On top of that, every key goes through `atomIndexBucket` plus a `Map.get`, where the old code iterated Map values directly. That lengthens `durableCheckpointEffect`'s cooperative window, which raises the rate of "Replica changed while its snapshot was being captured" while the user types.
+3. **Eager 256 Maps per target.** Each `new ChildrenIndex()` allocates 256 Maps and a `Uint8Array`. That happens per text target, and also in `rawVisibleSteps` (:1539) on every read of a target with no children. With many documents the memory adds up fast. Fix: lazy buckets (`Map | undefined`), and `this.children.get(target)?.get(...)` in `rawVisibleSteps` instead of allocating.
+4. **`Object.freeze(siblings)` on every insert.** It isn't needed for correctness, since the writer always copies first. In JavaScriptCore, freezing may move arrays to a slower storage mode that the hot traversal (:1548) then reads through. Drop it and rely on the `readonly` type, or measure it first.
+5. **Style will fail `check`.** The class uses 1-space indentation, one-line methods, and initializes `insertionOrder` twice (field and constructor default).
+
+**Smaller order-preserving alternative (plain arrays, no Effect)**
+
+Use a paged append-only key log:
+- `pages: string[][]` of 4096 keys each, plus a parallel `Uint8Array` per page storing each key's bucket index.
+- Only the tail page can change; a `ownsTail` flag says whether this instance may push to it.
+- `fork()`: `pages.slice()` (about 256 pointers at 1MiB) for each side, and both clear `ownsTail`.
+- Append: if the tail isn't owned, `slice()` it first (at most 4096 keys); then `push`. When it fills, start a new owned page.
+- `values()`: walk the pages and call `buckets[bucketByte[i]].get(ids[i])`. No hashing, no materialization, no allocation.
+
+Append cost on cold load is a `push`. Fork and first write stay O(1) up to 4096 keys, so the 52ms copy doesn't move to firstwrite.
+
+If golden tests don't pin checkpoint order, iterating buckets directly is cheaper still. The run splits that costs are limited to once per 4096 ordinals per operation for modern ids, but ids that fall back to the hash scatter completely. I'd only take that with a measured checkpoint-size gate.
+
+**Missing gates**
+- **Public `Replica`:**
+  - Fork, then both parent and child insert under the same parent key and under new keys; `text` and `checkpoint` stay independent.
+  - Forked and divergent replicas produce checkpoint atom order and v3 run counts equal to control.
+  - `forkEffect` interrupted or failed while the source keeps writing; afterwards the source's text and checkpoint are still correct.
+  - Restoring the same checkpoint twice, or merging a partial overlap, keeps no duplicate siblings.
+- **Real SQLite session (native 1MiB):** load, fork, type, durable checkpoint, reload; compare text and revision to control.
+- **Timings to record:** coldload, hottext, firstwrite after fork, fork, and `durableCheckpointEffect` duration plus its retry rate. Also heap after cold load and after loading many documents.

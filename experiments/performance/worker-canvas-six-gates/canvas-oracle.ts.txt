@@ -1,0 +1,27 @@
+import * as Effect from "effect/Effect"
+import * as Layer from "effect/Layer"
+import * as Redacted from "effect/Redacted"
+import { BrowserStorage } from "./src/client/storage"
+import { Signatures } from "./src/platform/signatures"
+import { accountHeader } from "./src/shared/authentication"
+
+export function readAccepted(document: string) {
+ return Effect.runPromise(Effect.scoped(Effect.gen(function* () {
+  let storage = yield* BrowserStorage
+  let recovery = yield* storage.get("recovery")
+  if (typeof recovery !== "string") return yield* Effect.fail(new Error("Existing account required; no fixture identity created"))
+  let identity = yield* Signatures.use(signatures => signatures.account(Redacted.make(recovery)))
+  let headers = { [accountHeader]: identity.subject }
+  let snapshot = yield* Effect.tryPromise({ try: async () => {
+   let response = await fetch("/api/documents/" + encodeURIComponent(document) + "/snapshot?encoding=compact", { headers, cache: "no-store" })
+   if (!response.ok) throw new Error("Accepted snapshot HTTP " + response.status)
+   return response.json()
+  }, catch: error => error })
+  let history = yield* Effect.tryPromise({ try: async () => {
+   let response = await fetch("/api/documents/" + encodeURIComponent(document) + "/history?after=0&limit=1000", { headers, cache: "no-store" })
+   if (!response.ok) throw new Error("Accepted history HTTP " + response.status)
+   return response.json()
+  }, catch: error => error })
+  return { snapshot, history }
+ })).pipe(Effect.provide(Layer.mergeAll(BrowserStorage.layer, Signatures.layer))))
+}
