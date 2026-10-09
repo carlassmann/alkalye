@@ -26,6 +26,7 @@ import { object, parseOperation } from "../src/shared/model"
 import type * as Crypto from "effect/Crypto"
 import { Replica } from "../src/shared/crdt"
 import { newDocument } from "../src/shared/documents"
+import { blobDigest } from "../src/shared/document-blobs"
 import { invitationDigest } from "../src/shared/invitations"
 
 let root = resolve(import.meta.dir, "..")
@@ -35,8 +36,9 @@ let directory =
 	resumedDirectory ??
 	(await mkdtemp(join(tmpdir(), "alkalye-cloudflare-workspaces-")))
 let probeOnly = Bun.argv[2] === "--rpc-probe"
+let blobCosts = Bun.argv[2] === "--blob-costs"
 let largeMove = Bun.argv[2] === "--moves-large"
-let moveOnly = Bun.argv[2] === "--moves" || largeMove
+let moveOnly = Bun.argv[2] === "--moves" || largeMove || blobCosts
 let largeMigration = Bun.argv[2] === "--legacy-migration-large"
 let legacyMigration = Bun.argv[2] === "--legacy-migration" || largeMigration
 let requestedOrigin = Bun.argv[2] === "--origin" ? Bun.argv[3] : undefined
@@ -495,6 +497,7 @@ try {
 	)
 	let invitation = crypto.randomUUID(),
 		secret = encode(crypto.getRandomValues(new Uint8Array(32)))
+
 	await run(
 		owner.api.invitations.create({
 			payload: {
@@ -612,6 +615,8 @@ try {
 			}),
 		)
 		await stop()
+		if (blobCosts)
+			await verifyBlobCounters(document, migrationBlob.length, "returned")
 		if (largeMove) await verifyLargeMoveStorage(document)
 		console.log("PASS native workspace moves; proof retained", directory)
 		process.exit(0)
@@ -1269,6 +1274,37 @@ async function exerciseMoves(
 			payload: bytes,
 		}),
 	)
+	if (blobCosts) {
+		let unknown = await run(
+			Effect.forEach(
+				Array.from({ length: 220 }, (_, index) => index),
+				index =>
+					blobDigest(new Uint8Array([index])).pipe(
+						Effect.map(digest => ({ digest, size: 1 })),
+					),
+			),
+		)
+		let missing = await run(
+			owner.api.documents.missingBlobs({
+				params: { document },
+				payload: [{ digest, size: bytes.length }, ...unknown],
+			}),
+		)
+		ensure(
+			JSON.stringify(missing) ===
+				JSON.stringify(unknown.map(chunk => chunk.digest)),
+			"Native descriptor discovery lost or misclassified chunks",
+		)
+		await Bun.write(
+			join(directory, "blob-descriptors.json"),
+			JSON.stringify({
+				passed: true,
+				descriptors: 221,
+				known: 1,
+				missing: missing.length,
+			}),
+		)
+	}
 	await run(
 		owner.api.invitations.create({
 			payload: {
@@ -1376,6 +1412,7 @@ async function exerciseMoves(
 		"Move lost blob bytes",
 	)
 	await stop()
+	if (blobCosts) await verifyBlobCounters(document, bytes.length, "outward")
 	await start()
 	ensure(
 		(await run(
@@ -1550,5 +1587,100 @@ async function verifyLargeMoveStorage(document: string) {
 			null,
 			2,
 		),
+	)
+}
+
+async function verifyBlobCounters(
+	document: string,
+	expectedSize: number,
+	stage: string,
+) {
+	let witnesses: {
+		retired: boolean
+		rawDocumentBytes: number
+		activeServerBytes: number
+		accounts: number
+	}[] = []
+	for await (let path of new Bun.Glob("**/*.sqlite").scan({
+		cwd: join(directory, "state", "v3", "do"),
+		absolute: true,
+	})) {
+		let database = new Database(path, { readonly: true })
+		try {
+			let tables = database
+				.query<{ name: string }, []>(
+					"SELECT name FROM sqlite_master WHERE type='table'",
+				)
+				.all()
+			if (!tables.some(row => row.name === "document_blob_document_usage"))
+				continue
+			let raw = database
+				.query<{ size: number }, [string]>(
+					"SELECT size FROM document_blob_document_usage WHERE document=?",
+				)
+				.get(document)
+			if (!raw) continue
+			ensure(
+				raw.size === expectedSize,
+				"Native retained document bytes changed",
+			)
+			let retired =
+				database
+					.query<{ phase: string }, [string]>(
+						"SELECT phase FROM document_transfer_fences WHERE document=?",
+					)
+					.get(document)?.phase === "retired"
+			let server = database
+				.query<{ size: number }, []>(
+					"SELECT size FROM document_blob_server_usage WHERE singleton=1",
+				)
+				.get()
+			let expected = database
+				.query<{ size: number }, []>(
+					"SELECT COALESCE(SUM(CASE WHEN b.external=1 THEN b.size ELSE length(b.bytes) END),0) AS size FROM document_blobs b WHERE NOT EXISTS(SELECT 1 FROM document_transfer_fences f WHERE f.document=b.document AND f.phase='retired')",
+				)
+				.get()
+			ensure(
+				server?.size === expected?.size,
+				"Native server counter disagrees with retained active bytes",
+			)
+			let accounts = database
+				.query<{ owner: string; size: number }, []>(
+					"SELECT owner,size FROM document_blob_account_usage",
+				)
+				.all()
+			for (let account of accounts) {
+				let expectedAccount = database
+					.query<{ size: number }, [string]>(
+						"SELECT COALESCE(SUM(CASE WHEN b.external=1 THEN b.size ELSE length(b.bytes) END),0) AS size FROM document_blobs b JOIN workspace_documents d ON d.document=b.document JOIN workspaces w ON w.workspace=d.workspace WHERE w.owner=? AND NOT EXISTS(SELECT 1 FROM document_transfer_fences f WHERE f.document=b.document AND f.phase='retired')",
+					)
+					.get(account.owner)
+				ensure(
+					account.size === expectedAccount?.size,
+					"Native account counter disagrees with current workspace ownership",
+				)
+			}
+			if (!server) throw Error("Native server counter missing")
+			ensure(
+				!retired || server.size === 0,
+				"Retired source still consumes native server quota",
+			)
+			witnesses.push({
+				retired,
+				rawDocumentBytes: raw.size,
+				activeServerBytes: server.size,
+				accounts: accounts.length,
+			})
+		} finally {
+			database.close()
+		}
+	}
+	ensure(
+		witnesses.length === 2 && witnesses.filter(row => row.retired).length === 1,
+		"Native active/retired workspace witnesses missing",
+	)
+	await Bun.write(
+		join(directory, `blob-counters-${stage}.json`),
+		JSON.stringify({ passed: true, witnesses }, null, 2),
 	)
 }
