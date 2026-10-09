@@ -1,0 +1,174 @@
+[
+  {
+    "fixture": "rich1m",
+    "phase": "input",
+    "arm": "control",
+    "n": 1,
+    "metrics": {
+      "readyFromNativeEventMs": {
+        "median": 10.5,
+        "max": 10.5,
+        "samples": [
+          10.5
+        ]
+      },
+      "readyFromStartMs": {
+        "median": 10.899999976158142,
+        "max": 10.899999976158142,
+        "samples": [
+          10.899999976158142
+        ]
+      },
+      "mainMaxTaskMs": {
+        "median": 10.748,
+        "max": 10.748,
+        "samples": [
+          10.748
+        ]
+      },
+      "mainBusyMs": {
+        "median": 718.367,
+        "max": 718.367,
+        "samples": [
+          718.367
+        ]
+      },
+      "largestMainGCSpanMs": {
+        "median": 10.134,
+        "max": 10.134,
+        "samples": [
+          10.134
+        ]
+      }
+    }
+  },
+  {
+    "fixture": "rich1m",
+    "phase": "input",
+    "arm": "candidate",
+    "n": 1,
+    "metrics": {
+      "readyFromNativeEventMs": {
+        "median": 10.900000035762787,
+        "max": 10.900000035762787,
+        "samples": [
+          10.900000035762787
+        ]
+      },
+      "readyFromStartMs": {
+        "median": 11.300000011920929,
+        "max": 11.300000011920929,
+        "samples": [
+          11.300000011920929
+        ]
+      },
+      "mainMaxTaskMs": {
+        "median": 11.397,
+        "max": 11.397,
+        "samples": [
+          11.397
+        ]
+      },
+      "mainBusyMs": {
+        "median": 795.169,
+        "max": 795.169,
+        "samples": [
+          795.169
+        ]
+      },
+      "largestMainGCSpanMs": {
+        "median": 2.83,
+        "max": 2.83,
+        "samples": [
+          2.83
+        ]
+      }
+    }
+  },
+  {
+    "fixture": "rich1m",
+    "phase": "undo",
+    "arm": "control",
+    "n": 1,
+    "metrics": {
+      "readyFromNativeEventMs": {
+        "median": 28.899999976158142,
+        "max": 28.899999976158142,
+        "samples": [
+          28.899999976158142
+        ]
+      },
+      "readyFromStartMs": {
+        "median": 28.800000011922748,
+        "max": 28.800000011922748,
+        "samples": [
+          28.800000011922748
+        ]
+      },
+      "mainMaxTaskMs": {
+        "median": 10.052,
+        "max": 10.052,
+        "samples": [
+          10.052
+        ]
+      },
+      "mainBusyMs": {
+        "median": 652.075,
+        "max": 652.075,
+        "samples": [
+          652.075
+        ]
+      },
+      "largestMainGCSpanMs": {
+        "median": 9.582,
+        "max": 9.582,
+        "samples": [
+          9.582
+        ]
+      }
+    }
+  },
+  {
+    "fixture": "rich1m",
+    "phase": "undo",
+    "arm": "candidate",
+    "n": 1,
+    "metrics": {
+      "readyFromNativeEventMs": {
+        "median": 28.0,
+        "max": 28.0,
+        "samples": [
+          28.0
+        ]
+      },
+      "readyFromStartMs": {
+        "median": 28.0,
+        "max": 28.0,
+        "samples": [
+          28.0
+        ]
+      },
+      "mainMaxTaskMs": {
+        "median": 7.864,
+        "max": 7.864,
+        "samples": [
+          7.864
+        ]
+      },
+      "mainBusyMs": {
+        "median": 782.12,
+        "max": 782.12,
+        "samples": [
+          782.12
+        ]
+      },
+      "largestMainGCSpanMs": {
+        "median": 3.197,
+        "max": 3.197,
+        "samples": [
+          3.197
+        ]
+      }
+    }
+  }
+]

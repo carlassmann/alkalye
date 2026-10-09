@@ -1,0 +1,5 @@
+window.WebSocket = class extends WebSocket {
+	constructor() {
+		throw new Error("Interaction matrix: WebSockets unavailable")
+	}
+}

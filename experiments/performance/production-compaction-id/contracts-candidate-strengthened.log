@@ -1,0 +1,63 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/compaction-identity-parity.test.ts:
+(pass) compact public operation retains identity wire for  [2.72ms]
+(pass) compact public operation retains identity wire for a [0.87ms]
+(pass) compact public operation retains identity wire for 123 [1.19ms]
+(pass) compact public operation retains identity wire for 000000000 [0.67ms]
+(pass) compact public operation retains identity wire for 0000000000000001:actor:00000000 [0.88ms]
+(pass) compact public operation retains identity wire for 0000000000000001:actor:00000999 [0.56ms]
+(pass) compact public operation retains identity wire for 0000000000000001:actor:99999998 [0.78ms]
+(pass) compact public operation retains identity wire for 0000000000000001:actor:99999999 [0.54ms]
+(pass) compact public operation retains identity wire for legacy [0.88ms]
+(pass) compact public operation retains identity wire for prefix00000NaN [0.47ms]
+(pass) compact public operation retains identity wire for prefixInfinity [0.75ms]
+(pass) compact public operation retains identity wire for prefix 0000001 [0.44ms]
+(pass) compact public operation retains identity wire for prefix+0000001 [0.68ms]
+(pass) compact public operation retains identity wire for prefix-0000001 [0.45ms]
+(pass) compact public operation retains identity wire for prefix1e000003 [0.76ms]
+(pass) compact public operation retains identity wire for prefix0x00000f [0.45ms]
+(pass) compact public operation retains identity wire for 😀:00000000 [0.75ms]
+(pass) public compaction preserves exact two-million-unit run boundary [3.04ms]
+(pass) public durable checkpoint bytes and independent cold reconstruction match baseline [73.06ms]
+
+tests/durable-checkpoint.test.ts:
+(pass) durable capture equals existing compact output and reopens 4 [2.47ms]
+(pass) durable capture equals existing compact output and reopens 57344 [206.56ms]
+(pass) durable capture equals existing compact output and reopens 8 [1.64ms]
+(pass) durable capture equals existing compact output and reopens 9984 [36.51ms]
+(pass) owned captured arrays and atom values cannot mutate live header or discussion [1.17ms]
+(pass) concurrent writer, source fence and retained cancellations survive durable capture [1.34ms]
+(pass) interrupted durable capture leaves live replica and later capture intact [108.13ms]
+(pass) generation changes reject the entire captured output [102.64ms]
+
+tests/durable-checkpoint-session.test.ts:
+134 | 									let restored = yield* Replica.fromCheckpointEffect(
+135 | 										value.checkpoint,
+136 | 										"snapshot-audit",
+137 | 									)
+138 | 									let baseline = baselineCompactCheckpoint(yield* restored.checkpointEffect())
+139 | 									expect(JSON.stringify(value.checkpoint)).toBe(JSON.stringify(baseline))
+                                                        ^
+error: expect(received).toBe(expected)
+
+Expected: "{"format":"alkalye-state-v3","clock":12,"restored":[],"targets":[{"id":"doc","created":179151808160... (65771 bytes truncated) ...9LI:00000000","after":"0000000000000003:compact-birth:00032795","value":"Tail😀"}],"visibility":{"floor":0,"legacyRemoved":[],"removals":[],"cancels":[]},"fields":[{"id":"0000000000000001:compact-birth","clock":1,"actor":"compact-birth","time":1791518081602,"author":"Writer","target":"doc","kind":"set","insert":[],"remove":[],"field":"type","value":"document"},{"id":"0000000000000002:compact-birth","clock":2,"actor":"compact-birth","time":1791518081602,"author":"Writer","target":"doc","kind":"set","insert":[],"remove":[],"field":"metadata","value":"frontmatter-v1"}]},{"id":"comment","created":1791518081786,"updated":1791518081786,"atoms":[],"visibility":{"floor":0,"legacyRemoved":[],"removals":[],"cancels":[]},"fields":[{"id":"0000000000000005:compact-owner-Ed6U9_-o653PapqZAEApqVfXX... (2297 bytes truncated) ...riter","target":"comment","kind":"set","insert":[],"remove":[],"field":"source","value":"body"}]}]}"
+Received: "{"format":"alkalye-state-v3","clock":12,"restored":[],"targets":[{"id":"doc","created":179151808160... (65771 bytes truncated) ...9LI:00000000","after":"0000000000000003:compact-birth:00032795","value":"Tail😀"}],"visibility":{"legacyRemoved":[],"floor":0,"removals":[],"cancels":[]},"fields":[{"id":"0000000000000001:compact-birth","clock":1,"actor":"compact-birth","time":1791518081602,"author":"Writer","target":"doc","kind":"set","insert":[],"remove":[],"field":"type","value":"document"},{"id":"0000000000000002:compact-birth","clock":2,"actor":"compact-birth","time":1791518081602,"author":"Writer","target":"doc","kind":"set","insert":[],"remove":[],"field":"metadata","value":"frontmatter-v1"}]},{"id":"comment","created":1791518081786,"updated":1791518081786,"atoms":[],"visibility":{"legacyRemoved":[],"floor":0,"removals":[],"cancels":[]},"fields":[{"id":"0000000000000005:compact-owner-Ed6U9_-o653PapqZAEApqVfXX... (2297 bytes truncated) ...riter","target":"comment","kind":"set","insert":[],"remove":[],"field":"source","value":"body"}]}]}"
+
+      at <anonymous> (/private/tmp/alkalye-compaction-id-compare/candidate/tests/durable-checkpoint-session.test.ts:139:51)
+      at ~effect/Effect/successCont (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:987:28)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:737:13)
+      at runTasks (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:169:15)
+      at afterScheduled (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:159:10)
+(fail) durable snapshots decode and reopen the exact edited document, discussion and cancellation (cooperative=%s) [257.32ms]
+(pass) durable snapshots decode and reopen the exact edited document, discussion and cancellation (cooperative=%s) [325.49ms]
+
+1 tests failed:
+(fail) durable snapshots decode and reopen the exact edited document, discussion and cancellation (cooperative=%s) [257.32ms]
+
+ 28 pass
+ 1 fail
+ 4973 expect() calls
+Ran 29 tests across 3 files. [1186.00ms]

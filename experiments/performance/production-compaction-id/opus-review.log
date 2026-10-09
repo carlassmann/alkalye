@@ -1,0 +1,32 @@
+I've read the patch, both copies of `model.ts`, the parity test, both logs and the `durable-checkpoint*` tests. I ran no commands and changed nothing.
+
+**Verdict: no semantic blockers.** The rewrite gives the same result as the old `atom.id === prefix + suffix` check for every input the code can actually receive.
+
+## Why it's equivalent
+- **Same values:** prefix and suffix come from the same `slice(0,-8)`, `Number`, `+1`, `String` and `padStart(8,"0")` steps, run in the same order. All are eager and have no side effects. So malformed, empty and short IDs, NaN (`"00000NaN"`), Infinity, negative, exponent, hex, leading-space and `99999999`→`100000000` rollover all produce identical strings.
+- **Same comparison:** if the lengths match, `startsWith(P)` plus `endsWith(S)` covers two non-overlapping ranges that span the whole ID, which is exactly `id === P+S`. All three work on raw UTF-16 code units, with no normalisation and no surrogate-pair handling. A pair split across the prefix/suffix boundary, or a lone surrogate, compares the same way as with `===`.
+- **Nothing else moved:** flags, the lone-surrogate test, the `after === last.id` anchor, the 2,000,000 run limit, the order of the `&&` conditions, the 512-step yield and the separate `compactDeletionSteps` are all unchanged (`model.ts:360-381`).
+
+## Theoretical difference (not a blocker)
+- If `atom.id` is not a string, the old `===` returns false, while the new `.length`/`startsWith` calls can throw. This only matters when that atom is the last one in the list; otherwise the next loop's `last.id.slice` throws in both versions. `AtomSchema.id` is `Schema.String` (`model.ts:183`) and the TS type is `string`, so it only matters if some caller skips decoding. Not tested.
+
+## Gaps in the tests
+1. **`startsWith` is never what rejects an ID.** No case has the right length and suffix but a different prefix (e.g. `"y"+expectedId.slice(1)`). The `"x"+expectedId` case fails on length first. Deleting `startsWith` would still pass the tests.
+2. **The length check is never needed either.** No case has the prefix and suffix overlapping in a shorter ID: last `"000000000"` gives P=`"0"`, S=`"00000001"`, and next `"00000001"` passes both prefix and suffix checks. Deleting the length check would still pass.
+3. **No direct comparison of the cooperative path against control.** `compactOperation` runs with `cooperative=false`. The 512-yield path is only reached indirectly, through the durable checkpoint test with the 2048× source.
+4. **`durable-checkpoint.test.ts` doesn't compare against control.** Its "equals compact output" check runs the patched code on both sides. It's useful for interruption, ownership and generation behaviour, but it doesn't show the patch matches control.
+5. **SQLite and cold restore:** only `durable-checkpoint-session.test.ts` goes through SQLite (`WorkspaceStore` plus `fromCheckpointEffect`), and it compares against itself, not control. The test names print a literal `%s`, so the two runs (cooperative true/false) can't be told apart in the log.
+6. **Type-check logs:** `types-candidate-corrected.log` and `types-control.log` are both empty with no exit code. The two empty logs are consistent with each other, but this only counts as a pass if exit 0 is confirmed. The uncorrected log also listed missing-module errors (`../build`, `experiments/*`) that don't appear in the corrected run, so check that both used the same tsconfig/scope.
+7. **Test run:** `contracts-candidate.log` shows 28 pass, 0 fail. Fine.
+
+## Performance: not measured yet
+- **Saves:** one string concatenation per atom (often a rope that `===` then has to flatten).
+- **Adds:** a length check plus two native calls. `startsWith` with an empty prefix and `endsWith` on 8 characters are cheap, but on long prefixes the calls may cost more than the concatenation they replace. Both versions still build two substrings, a number→string conversion and a `padStart` on every atom, so the saving may be lost in noise.
+- **To measure:** median and p95 under Bun for long same-actor runs (where every check matches), mismatch-heavy runs, and `durableCheckpointEffect` on the 57,344 case, with both versions on the same machine.
+
+## Before the performance comparison
+- Add tests for gaps 1 and 2.
+- Optionally add a cooperative parity test against control (gap 3).
+- Confirm the type-check exit codes (gap 6).
+
+Not recommending adoption yet. The Claude.ai connectors in your session (GitHub, Slack, etc.) need re-authorising in claude.ai connector settings; none were needed for this review.

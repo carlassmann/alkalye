@@ -1,0 +1,26 @@
+--- src/shared/model.ts
++++ src/shared/model.ts
+@@ -353,9 +353,9 @@
+ 	for (let atom of atoms) {
+ 		let previous = insert[insert.length - 1]
+ 
+-		let expected = last
+-			? last.id.slice(0, -8) +
+-				String(Number(last.id.slice(-8)) + 1).padStart(8, "0")
++		let expectedPrefix = last ? last.id.slice(0, -8) : ""
++		let expectedSuffix = last
++			? String(Number(last.id.slice(-8)) + 1).padStart(8, "0")
+ 			: ""
+ 		if (
+ 			previous &&
+@@ -370,7 +370,9 @@
+ 			!atom.deleted &&
+ 			!atom.emptyHeader &&
+ 			!atom.body &&
+-			atom.id === expected &&
++			atom.id.length === expectedPrefix.length + expectedSuffix.length &&
++			atom.id.startsWith(expectedPrefix) &&
++			atom.id.endsWith(expectedSuffix) &&
+ 			atom.after === last.id
+ 		)
+ 			previous.value += atom.value

@@ -1,0 +1,78 @@
+import { expect, test } from "bun:test"
+import * as Effect from "effect/Effect"
+import { compactOperation } from "../src/shared/model"
+import type { Atom } from "../src/shared/model"
+import { compactOperation as baselineCompactOperation } from "../../control/src/shared/model"
+import { Replica } from "../src/shared/crdt"
+import { Replica as BaselineReplica } from "../../control/src/shared/crdt"
+import { newDocument } from "../src/shared/documents"
+
+for (let previousId of [
+	"",
+	"a",
+	"123",
+	"000000000",
+	"0000000000000001:actor:00000000",
+	"0000000000000001:actor:00000999",
+	"0000000000000001:actor:99999998",
+	"0000000000000001:actor:99999999",
+	"legacy",
+	"prefix00000NaN",
+	"prefixInfinity",
+	"prefix 0000001",
+	"prefix+0000001",
+	"prefix-0000001",
+	"prefix1e000003",
+	"prefix0x00000f",
+	"😀:00000000",
+]) {
+	test("compact public operation retains identity wire for " + previousId, () => {
+		let expectedId = previousId.slice(0, -8) + String(Number(previousId.slice(-8)) + 1).padStart(8, "0")
+		for (let nextId of [expectedId, expectedId + "x", "x" + expectedId, previousId, "y" + expectedId.slice(1), expectedId.slice(1)]) {
+			for (let value of ["a", "😀", "\uD800", "\uDC00", "", "ab"]) {
+				let first: Atom = { id: previousId, after: "", value: "A" }
+				let next: Atom = { id: nextId, after: previousId, value }
+				let variants: Atom[] = [next, { ...next, ending: "eof" }, { ...next, order: [] }, { ...next, observed: [] }, { ...next, deleted: [] }, { ...next, migration: true }, { ...next, emptyHeader: true }, { ...next, body: true }]
+				for (let atom of variants) {
+					let replica = new Replica("identity")
+					let operation = replica.create("doc", "text")
+					operation.insert = [first, atom]
+					expect(JSON.stringify(compactOperation(operation))).toBe(JSON.stringify(baselineCompactOperation(operation)))
+				}
+			}
+		}
+	})
+}
+
+test("public compaction preserves exact two-million-unit run boundary", () => {
+	for (let length of [1_999_999, 2_000_000]) {
+		let replica = new Replica("boundary")
+		let operation = replica.create("doc", "text")
+		operation.insert = [
+			{ id: "0000000000000001:actor:00000000", after: "", value: "A".repeat(length) },
+			{ id: "0000000000000001:actor:00000001", after: "0000000000000001:actor:00000000", value: "B" },
+		]
+		expect(JSON.stringify(compactOperation(operation))).toBe(JSON.stringify(baselineCompactOperation(operation)))
+	}
+})
+
+test("public durable checkpoint bytes and independent cold reconstruction match baseline", async () => {
+	for (let source of ["Body", "Body😀\n".repeat(2048), "\uD800 lone \uDC00", "---\ntitle: Header\n---\nBody\n---\nEnd"]) {
+		let current = new Replica("owner")
+		newDocument(current, "doc", "Header", source)
+		let baseline = new BaselineReplica("baseline")
+		baseline.apply([...current.operations.values()])
+		let edit = current.edit("doc", current.text("doc") + "🌻")
+		if (!edit) throw Error("Missing public edit")
+		baseline.apply([edit])
+		let undo = current.cancel("doc", edit.id)
+		baseline.apply([undo])
+		let left = await Effect.runPromise(current.durableCheckpointEffect())
+		let right = await Effect.runPromise(baseline.durableCheckpointEffect())
+		expect(JSON.stringify(left)).toBe(JSON.stringify(right))
+		let cold = await Effect.runPromise(Replica.fromCheckpointEffect(left, "cold"))
+		expect(cold.text("doc")).toBe(current.text("doc"))
+		expect(cold.visible("doc")).toEqual(current.visible("doc"))
+		expect(cold.metadata("doc")).toEqual(current.metadata("doc"))
+	}
+})

@@ -1,0 +1,9 @@
+{"stage":"running","arm":"control","pid":58827,"run":"/tmp/alkalye-compaction-id-compare/native-control-rich1m-19eb140f-5b5e-45de-a703-592892c117ba"}
+started web pid=58843
+{"stage":"complete","arm":"control","fixture":"rich1m","resultDirectory":"/tmp/alkalye-compaction-id-compare/native-control-rich1m-19eb140f-5b5e-45de-a703-592892c117ba/results","timing":"separate-input-and-undo-3s-windows"}
+stopped alkalye-compaction-id-compare/codex-compaction-id-compare/web
+{"stage":"running","arm":"candidate","pid":59364,"run":"/tmp/alkalye-compaction-id-compare/native-candidate-rich1m-bb72321a-8eff-4a78-a54b-d8e80cbd28fd"}
+started web pid=59378
+{"stage":"complete","arm":"candidate","fixture":"rich1m","resultDirectory":"/tmp/alkalye-compaction-id-compare/native-candidate-rich1m-bb72321a-8eff-4a78-a54b-d8e80cbd28fd/results","timing":"separate-input-and-undo-3s-windows"}
+stopped alkalye-compaction-id-compare/codex-compaction-id-compare/web
+pilot complete

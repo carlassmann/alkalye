@@ -1,0 +1,198 @@
+[
+  {
+    "arm": "control",
+    "fixture": "rich1m",
+    "trial": 0,
+    "phase": "input",
+    "sha256": "108484647f20ed0b2c79b0b77b3cec4f86d805ce790a558f74681183e3891006",
+    "bytes": 8486369,
+    "windowMs": 3002.535,
+    "mainThread": [
+      59015,
+      20311909
+    ],
+    "mainMaxTaskMs": 10.748,
+    "mainBusyMs": 718.367,
+    "largestMainGCSpanMs": 10.134,
+    "readyFromStartMs": 10.899999976158142,
+    "readyFromNativeEventMs": 10.5,
+    "nativeEvent": "beforeinput",
+    "nativeEventInputDelayMs": 0.0,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 28
+      },
+      {
+        "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+        "characters": 1048577,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 36
+      },
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 37
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    },
+    "traceFile": "control-body-rich1m-0.trace.json"
+  },
+  {
+    "arm": "control",
+    "fixture": "rich1m",
+    "trial": 0,
+    "phase": "undo",
+    "sha256": "57fd94f6230f40d8d6826b5f3e3c38a4bffd09906d8d1dd7a5fba842ec28cc35",
+    "bytes": 10033182,
+    "windowMs": 3003.034,
+    "mainThread": [
+      59015,
+      20311909
+    ],
+    "mainMaxTaskMs": 10.052,
+    "mainBusyMs": 652.075,
+    "largestMainGCSpanMs": 9.582,
+    "readyFromStartMs": 28.800000011922748,
+    "readyFromNativeEventMs": 28.899999976158142,
+    "nativeEvent": "keydown",
+    "nativeEventInputDelayMs": 0.30000001191910997,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 28
+      },
+      {
+        "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+        "characters": 1048577,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 36
+      },
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 37
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    },
+    "traceFile": "control-body-rich1m-0-undo.trace.json"
+  },
+  {
+    "arm": "candidate",
+    "fixture": "rich1m",
+    "trial": 0,
+    "phase": "input",
+    "sha256": "40f57f7533e26e2ac176c9aa10db58e049213cbd6199c28387bcc3bdd6cf3118",
+    "bytes": 8450030,
+    "windowMs": 3000.353,
+    "mainThread": [
+      59503,
+      20317104
+    ],
+    "mainMaxTaskMs": 11.397,
+    "mainBusyMs": 795.169,
+    "largestMainGCSpanMs": 2.83,
+    "readyFromStartMs": 11.300000011920929,
+    "readyFromNativeEventMs": 10.900000035762787,
+    "nativeEvent": "beforeinput",
+    "nativeEventInputDelayMs": 0.0,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 28
+      },
+      {
+        "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+        "characters": 1048577,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 36
+      },
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 37
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    },
+    "traceFile": "candidate-body-rich1m-0.trace.json"
+  },
+  {
+    "arm": "candidate",
+    "fixture": "rich1m",
+    "trial": 0,
+    "phase": "undo",
+    "sha256": "a58a2907a9f809d4f71b19af2dfbb1baf650540664554aacc7966e9c6f154161",
+    "bytes": 9160657,
+    "windowMs": 3002.187,
+    "mainThread": [
+      59503,
+      20317104
+    ],
+    "mainMaxTaskMs": 7.864,
+    "mainBusyMs": 782.12,
+    "largestMainGCSpanMs": 3.197,
+    "readyFromStartMs": 28.0,
+    "readyFromNativeEventMs": 28.0,
+    "nativeEvent": "keydown",
+    "nativeEventInputDelayMs": 0.30000001191910997,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 28
+      },
+      {
+        "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+        "characters": 1048577,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 36
+      },
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 37
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    },
+    "traceFile": "candidate-body-rich1m-0-undo.trace.json"
+  }
+]

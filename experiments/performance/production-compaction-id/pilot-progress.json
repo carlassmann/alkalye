@@ -1,0 +1,14 @@
+[
+  {
+    "arm": "control",
+    "run": "/tmp/alkalye-compaction-id-compare/native-control-rich1m-19eb140f-5b5e-45de-a703-592892c117ba",
+    "pid": 58827,
+    "exit": 0
+  },
+  {
+    "arm": "candidate",
+    "run": "/tmp/alkalye-compaction-id-compare/native-candidate-rich1m-bb72321a-8eff-4a78-a54b-d8e80cbd28fd",
+    "pid": 59364,
+    "exit": 0
+  }
+]

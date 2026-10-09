@@ -1,0 +1,10 @@
+src/server/settings.ts(8,23): error TS2307: Cannot find module '../../build' or its corresponding type declarations.
+tests/browser-preview-fixture.ts(10,36): error TS2307: Cannot find module '../experiments/performance/fixture' or its corresponding type declarations.
+tests/causal-text.test.ts(13,28): error TS2307: Cannot find module '../experiments/causal-text-undo/document' or its corresponding type declarations.
+tests/compaction-identity-parity.test.ts(34,33): error TS2322: Type 'Atom | { migration: boolean; id: string; after: string; value: string; order?: readonly string[] | undefined; observed?: readonly string[] | undefined; ending?: "eof" | undefined; deleted?: readonly string[] | undefined; emptyHeader?: true | undefined; body?: true | undefined; } | { ...; } | { ...; }' is not assignable to type 'Atom'.
+  Type '{ migration: boolean; id: string; after: string; value: string; order?: readonly string[]; observed?: readonly string[]; ending?: "eof"; deleted?: readonly string[]; emptyHeader?: true; body?: true; }' is not assignable to type 'Atom'.
+    Types of property 'migration' are incompatible.
+      Type 'boolean' is not assignable to type 'true'.
+tests/document-live-poll.test.ts(13,36): error TS2307: Cannot find module '../experiments/performance/fixture' or its corresponding type declarations.
+tests/e2e.ts(4,23): error TS2307: Cannot find module '../build' or its corresponding type declarations.
+tests/tldraw-build.test.ts(6,23): error TS2307: Cannot find module '../build' or its corresponding type declarations.

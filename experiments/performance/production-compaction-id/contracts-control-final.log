@@ -1,0 +1,41 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/compaction-identity-parity.test.ts:
+(pass) compact public operation retains identity wire for  [2.89ms]
+(pass) compact public operation retains identity wire for a [0.84ms]
+(pass) compact public operation retains identity wire for 123 [1.34ms]
+(pass) compact public operation retains identity wire for 000000000 [0.72ms]
+(pass) compact public operation retains identity wire for 0000000000000001:actor:00000000 [0.95ms]
+(pass) compact public operation retains identity wire for 0000000000000001:actor:00000999 [0.55ms]
+(pass) compact public operation retains identity wire for 0000000000000001:actor:99999998 [1.08ms]
+(pass) compact public operation retains identity wire for 0000000000000001:actor:99999999 [0.52ms]
+(pass) compact public operation retains identity wire for legacy [1.05ms]
+(pass) compact public operation retains identity wire for prefix00000NaN [0.54ms]
+(pass) compact public operation retains identity wire for prefixInfinity [0.96ms]
+(pass) compact public operation retains identity wire for prefix 0000001 [0.50ms]
+(pass) compact public operation retains identity wire for prefix+0000001 [0.78ms]
+(pass) compact public operation retains identity wire for prefix-0000001 [0.47ms]
+(pass) compact public operation retains identity wire for prefix1e000003 [0.82ms]
+(pass) compact public operation retains identity wire for prefix0x00000f [0.48ms]
+(pass) compact public operation retains identity wire for 😀:00000000 [0.82ms]
+(pass) public compaction preserves exact two-million-unit run boundary [4.23ms]
+(pass) public durable checkpoint bytes and independent cold reconstruction match baseline [75.38ms]
+
+tests/durable-checkpoint.test.ts:
+(pass) durable capture equals existing compact output and reopens 4 [2.77ms]
+(pass) durable capture equals existing compact output and reopens 57344 [239.32ms]
+(pass) durable capture equals existing compact output and reopens 8 [1.62ms]
+(pass) durable capture equals existing compact output and reopens 9984 [44.15ms]
+(pass) owned captured arrays and atom values cannot mutate live header or discussion [1.37ms]
+(pass) concurrent writer, source fence and retained cancellations survive durable capture [1.55ms]
+(pass) interrupted durable capture leaves live replica and later capture intact [86.17ms]
+(pass) generation changes reject the entire captured output [78.00ms]
+
+tests/durable-checkpoint-session.test.ts:
+(pass) durable snapshots decode and reopen the exact edited document, discussion and cancellation (cooperative=%s) [387.39ms]
+(pass) durable snapshots decode and reopen the exact edited document, discussion and cancellation (cooperative=%s) [344.31ms]
+
+ 29 pass
+ 0 fail
+ 4983 expect() calls
+Ran 29 tests across 3 files. [1329.00ms]

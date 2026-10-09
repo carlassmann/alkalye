@@ -1,0 +1,14 @@
+let root = "/tmp/alkalye-compaction-id-compare"
+if (await Bun.file(root + "/pilot-pending.json").exists()) throw Error("Retained pilot; no uncertain restart")
+await Bun.write(root + "/pilot-pending.json", JSON.stringify({ stage: "before-keys" }))
+let cells: { arm: string; run: string; pid: number; exit: number }[] = []
+for (let arm of ["control", "candidate"]) {
+ let run = root + "/native-" + arm + "-rich1m-" + crypto.randomUUID()
+ let child = Bun.spawn(["bun", "production-body-gate.ts", arm, "rich1m", "--measure"], { cwd: root + "/runtime", env: { ...process.env, PRODUCTION_BODY_RUN: run }, stdout: "inherit", stderr: "inherit" })
+ console.log(JSON.stringify({ stage: "running", arm, pid: child.pid, run }))
+ let exit = await child.exited
+ cells.push({ arm, run, pid: child.pid, exit })
+ await Bun.write(root + "/pilot-progress.json", JSON.stringify(cells, null, 2))
+ if (exit !== 0) throw Error("Stop after failed or uncertain cell")
+}
+console.log("pilot complete")

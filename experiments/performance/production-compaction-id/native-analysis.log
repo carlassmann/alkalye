@@ -1,0 +1,5 @@
+parser PID 59927
+rich1m input control {"readyFromNativeEventMs": {"median": 10.5, "max": 10.5}, "readyFromStartMs": {"median": 10.9, "max": 10.9}, "mainMaxTaskMs": {"median": 10.748, "max": 10.748}, "mainBusyMs": {"median": 718.367, "max": 718.367}, "largestMainGCSpanMs": {"median": 10.134, "max": 10.134}}
+rich1m input candidate {"readyFromNativeEventMs": {"median": 10.9, "max": 10.9}, "readyFromStartMs": {"median": 11.3, "max": 11.3}, "mainMaxTaskMs": {"median": 11.397, "max": 11.397}, "mainBusyMs": {"median": 795.169, "max": 795.169}, "largestMainGCSpanMs": {"median": 2.83, "max": 2.83}}
+rich1m undo control {"readyFromNativeEventMs": {"median": 28.9, "max": 28.9}, "readyFromStartMs": {"median": 28.8, "max": 28.8}, "mainMaxTaskMs": {"median": 10.052, "max": 10.052}, "mainBusyMs": {"median": 652.075, "max": 652.075}, "largestMainGCSpanMs": {"median": 9.582, "max": 9.582}}
+rich1m undo candidate {"readyFromNativeEventMs": {"median": 28.0, "max": 28.0}, "readyFromStartMs": {"median": 28.0, "max": 28.0}, "mainMaxTaskMs": {"median": 7.864, "max": 7.864}, "mainBusyMs": {"median": 782.12, "max": 782.12}, "largestMainGCSpanMs": {"median": 3.197, "max": 3.197}}

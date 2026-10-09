@@ -1,0 +1,8 @@
+{
+  "rootCommit": "18dbb7679877bb366fd4f1702f4b051f6157ca1b",
+  "controlModelSHA": "70f8ce900a37b8a9bc3fab851528755367eba0eddac527610e4d88a53039cac8",
+  "candidateModelSHA": "0e180ccfbce84e5c8c126ef7d66b30cfcfbed297885cf00d2e203538e7ecc3f5",
+  "textVisibilitySHA": "f7ebd2b64fc77baa1193bed8cb0010fe1b9bdbccb215a1b62afe633a9fd74506",
+  "crdtSHA": "4a0aa7553a0de7fbfc2d8eb9a6332313b04bcf0dc68e558de6add25ea6e71b7d",
+  "scope": "Whole current source copy; ONLY model.compactAtomSteps expected identity comparison changes; no cachedprefix/digitmath/pieces/reencoding changes"
+}
