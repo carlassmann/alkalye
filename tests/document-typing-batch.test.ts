@@ -80,7 +80,6 @@ test("typing bursts retain each operation in one durable action, retain same-acc
 					expect(session.pending()[0]?.id).toBe(
 						session.pending()[0]?.changes.at(-1)?.id,
 					)
-					session.closeTypingGroup()
 					session.edit(session.replica.text("doc") + "🌟")
 					session.closeTypingGroup()
 					session.edit(session.replica.text("doc") + "!")

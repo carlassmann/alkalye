@@ -16,6 +16,7 @@ import * as EventLogEncryption from "effect/eventlog/EventLogEncryption"
 import { StoreId } from "effect/eventlog/EventLogMessage"
 import * as SchemaBinary from "effect/encoding/SchemaBinary"
 import * as Layer from "effect/Layer"
+import * as HttpClientError from "effect/http/HttpClientError"
 import * as SqlError from "effect/sql/SqlError"
 import * as Schema from "effect/Schema"
 import * as Semaphore from "effect/Semaphore"
@@ -409,9 +410,10 @@ function makeSession(options: DocumentSessionOptions) {
 					yield* Effect.uninterruptible(
 						Effect.gen(function* () {
 							for (let original of batch.originals) {
-								let queued = yield* Queue.take(unsaved)
+								let queued = yield* Queue.peek(unsaved)
 								if (queued.id !== original.id)
 									return yield* conflict("Typing batch lost its draft order")
+								yield* Queue.take(unsaved)
 								projection.removeDraft(original.id)
 								typingGroups.delete(original.id)
 							}
@@ -521,15 +523,18 @@ function makeSession(options: DocumentSessionOptions) {
 			}
 		}
 		function waitForTyping(
+			id: string,
 			remaining = 4,
 			sequence = typingSequence,
 		): Effect.Effect<void, DocumentFailure> {
 			return Effect.sleep("250 millis").pipe(
 				Effect.andThen(
 					Effect.suspend(() =>
-						remaining === 1 || sequence === typingSequence
-							? flush
-							: waitForTyping(remaining - 1),
+						!typingGroups.has(id)
+							? Effect.void
+							: remaining === 1 || sequence === typingSequence
+								? flush
+								: waitForTyping(id, remaining - 1),
 					),
 				),
 			)
@@ -572,7 +577,7 @@ function makeSession(options: DocumentSessionOptions) {
 				operation: freezeOperation(operation),
 				content: view.text(target),
 				atoms: view.visible(target),
-				saved: options.batchTyping ? waitForTyping() : flush,
+				saved: options.batchTyping ? waitForTyping(decoded.success.id) : flush,
 			}
 		}
 
@@ -713,7 +718,10 @@ function makeSession(options: DocumentSessionOptions) {
 										yield* pull()
 										continue
 									}
-									if (!Schema.is(rejectionFailure)(result.failure))
+									if (
+										!Schema.is(rejectionFailure)(result.failure) &&
+										!unsupportedBatch(result.failure)
+									)
 										return yield* Effect.fail(result.failure)
 								}
 							}
@@ -1476,7 +1484,9 @@ function makeProjection(options: DocumentSessionOptions) {
 				let bytes = 0
 				for (let [id, proposal] of proposals) {
 					if (proposal.settled) continue
-					if (rejected.has(id)) break
+					let rejection = rejected.get(id)
+					if (rejection && !rejection.withdrawn) break
+					if (rejection?.withdrawn) continue
 					let action = pending.get(id)
 					if (!action) break
 					let size = new TextEncoder().encode(JSON.stringify(action)).length
@@ -2246,4 +2256,13 @@ function applyChanges(replicas: Replica[], operations: Operation[]) {
 					cause instanceof Error ? cause.message : "Invalid document changes",
 			}),
 	})
+}
+
+function unsupportedBatch(error: unknown) {
+	return (
+		HttpClientError.isHttpClientError(error) &&
+		error.reason._tag === "StatusCodeError" &&
+		(error.reason.response.status === 404 ||
+			error.reason.response.status === 405)
+	)
 }
