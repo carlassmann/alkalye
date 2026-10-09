@@ -1,0 +1,22 @@
+import * as Effect from "effect/Effect"
+import { Replica as Control } from "./runtime/src/shared/crdt-control"
+import { Replica as Candidate } from "./runtime/src/shared/crdt"
+
+let source = "abcdefghijklmnop".repeat(65_536)
+let operation = new Control("seed").prepareEdit("document", source)
+if (!operation) throw new Error("Missing seed")
+let results = []
+let replicas: { name: string; replica: Control | Candidate }[] = [
+	{ name: "control", replica: new Control("writer") },
+	{ name: "candidate", replica: new Candidate("writer") },
+]
+for (let { name, replica } of replicas) {
+	replica.apply([operation])
+	let snapshot = await Effect.runPromise(replica.durableCheckpointEffect())
+	let encoded = JSON.stringify(snapshot)
+	let cold = new Candidate("cold")
+	cold.restoreCheckpoint(snapshot)
+	if (cold.text("document") !== source) throw new Error("Cold source mismatch")
+	results.push({ name, format: snapshot.format, sourceBytes: source.length, checkpointBytes: Buffer.byteLength(encoded), gzipBytes: Bun.gzipSync(encoded).byteLength, atomRuns: snapshot.targets.reduce((count, target) => count + target.atoms.length, 0), coldSourceExact: true })
+}
+await Bun.write("/tmp/alkalye-children-index-prototype/checkpoint-bytes.json", JSON.stringify({ scope: "Public durableCheckpointEffect on identical synthetic one-MiB facts; JSON/gzip sizes, not network latency", results }, null, 2) + "\n")

@@ -1,0 +1,1037 @@
+{
+  "scope": "n1 diagnostic; spans inclusive and nested, not additive; all8 native/public accepted/reload gates passed",
+  "keys": [
+    {
+      "keyOrdinal": 1,
+      "taskMs": 9.883,
+      "subphases": [
+        {
+          "phase": "text-input",
+          "start": 431379710620,
+          "end": 431379716173,
+          "ms": 5.553
+        },
+        {
+          "phase": "take-replacements",
+          "start": 431379716189,
+          "end": 431379716194,
+          "ms": 0.005
+        },
+        {
+          "phase": "prepare-replacements",
+          "start": 431379716209,
+          "end": 431379716342,
+          "ms": 0.133
+        },
+        {
+          "phase": "before-view",
+          "start": 431379716350,
+          "end": 431379716356,
+          "ms": 0.006
+        },
+        {
+          "phase": "apply-prepare",
+          "start": 431379716449,
+          "end": 431379716477,
+          "ms": 0.028
+        },
+        {
+          "phase": "atom-index-set",
+          "start": 431379716509,
+          "end": 431379716690,
+          "ms": 0.181
+        },
+        {
+          "phase": "siblings",
+          "start": 431379716694,
+          "end": 431379716700,
+          "ms": 0.006
+        },
+        {
+          "phase": "children-set",
+          "start": 431379716702,
+          "end": 431379716706,
+          "ms": 0.004
+        },
+        {
+          "phase": "apply-commit",
+          "start": 431379716483,
+          "end": 431379716710,
+          "ms": 0.227
+        },
+        {
+          "phase": "apply-cache",
+          "start": 431379716712,
+          "end": 431379716779,
+          "ms": 0.067
+        },
+        {
+          "phase": "apply-operation",
+          "start": 431379716435,
+          "end": 431379716783,
+          "ms": 0.348
+        },
+        {
+          "phase": "add-draft",
+          "start": 431379716786,
+          "end": 431379716794,
+          "ms": 0.008
+        },
+        {
+          "phase": "update-drafts",
+          "start": 431379716796,
+          "end": 431379716816,
+          "ms": 0.02
+        },
+        {
+          "phase": "advance-view",
+          "start": 431379716818,
+          "end": 431379716889,
+          "ms": 0.071
+        },
+        {
+          "phase": "after-view",
+          "start": 431379716893,
+          "end": 431379716905,
+          "ms": 0.012
+        },
+        {
+          "phase": "submit-edit",
+          "start": 431379716347,
+          "end": 431379716907,
+          "ms": 0.56
+        },
+        {
+          "phase": "launch-saved",
+          "start": 431379716909,
+          "end": 431379717068,
+          "ms": 0.159
+        },
+        {
+          "phase": "change",
+          "start": 431379716187,
+          "end": 431379717073,
+          "ms": 0.886
+        },
+        {
+          "phase": "update",
+          "start": 431379717075,
+          "end": 431379717616,
+          "ms": 0.541
+        }
+      ],
+      "preparedFlags": [
+        "second-key:prepared-text-present",
+        "second-key:prepared-cache-accepted"
+      ],
+      "indexCounts": [
+        "second-key:atom-bucket-count:4096",
+        "second-key:atom-bucket-shared"
+      ],
+      "nestedGCNotAdditive": []
+    },
+    {
+      "keyOrdinal": 2,
+      "taskMs": 21.569,
+      "subphases": [
+        {
+          "phase": "text-input",
+          "start": 431379828670,
+          "end": 431379833525,
+          "ms": 4.855
+        },
+        {
+          "phase": "take-replacements",
+          "start": 431379833540,
+          "end": 431379833548,
+          "ms": 0.008
+        },
+        {
+          "phase": "prepare-replacements",
+          "start": 431379833561,
+          "end": 431379833854,
+          "ms": 0.293
+        },
+        {
+          "phase": "before-view",
+          "start": 431379833863,
+          "end": 431379833869,
+          "ms": 0.006
+        },
+        {
+          "phase": "apply-prepare",
+          "start": 431379833955,
+          "end": 431379833984,
+          "ms": 0.029
+        },
+        {
+          "phase": "atom-index-set",
+          "start": 431379833998,
+          "end": 431379834177,
+          "ms": 0.179
+        },
+        {
+          "phase": "siblings",
+          "start": 431379834182,
+          "end": 431379834187,
+          "ms": 0.005
+        },
+        {
+          "phase": "children-set",
+          "start": 431379834189,
+          "end": 431379846440,
+          "ms": 12.251
+        },
+        {
+          "phase": "apply-commit",
+          "start": 431379833987,
+          "end": 431379846477,
+          "ms": 12.49
+        },
+        {
+          "phase": "apply-cache",
+          "start": 431379846480,
+          "end": 431379846631,
+          "ms": 0.151
+        },
+        {
+          "phase": "apply-operation",
+          "start": 431379833940,
+          "end": 431379846638,
+          "ms": 12.698
+        },
+        {
+          "phase": "add-draft",
+          "start": 431379846641,
+          "end": 431379846650,
+          "ms": 0.009
+        },
+        {
+          "phase": "update-drafts",
+          "start": 431379846652,
+          "end": 431379846672,
+          "ms": 0.02
+        },
+        {
+          "phase": "advance-view",
+          "start": 431379846675,
+          "end": 431379846757,
+          "ms": 0.082
+        },
+        {
+          "phase": "after-view",
+          "start": 431379846760,
+          "end": 431379846773,
+          "ms": 0.013
+        },
+        {
+          "phase": "submit-edit",
+          "start": 431379833860,
+          "end": 431379846776,
+          "ms": 12.916
+        },
+        {
+          "phase": "launch-saved",
+          "start": 431379846778,
+          "end": 431379846921,
+          "ms": 0.143
+        },
+        {
+          "phase": "change",
+          "start": 431379833537,
+          "end": 431379846925,
+          "ms": 13.388
+        },
+        {
+          "phase": "update",
+          "start": 431379846927,
+          "end": 431379847704,
+          "ms": 0.777
+        }
+      ],
+      "preparedFlags": [
+        "second-key:prepared-text-present",
+        "second-key:prepared-cache-accepted"
+      ],
+      "indexCounts": [
+        "second-key:atom-bucket-count:4096",
+        "second-key:atom-bucket-shared"
+      ],
+      "nestedGCNotAdditive": []
+    },
+    {
+      "keyOrdinal": 3,
+      "taskMs": 8.912,
+      "subphases": [
+        {
+          "phase": "text-input",
+          "start": 431379962048,
+          "end": 431379967107,
+          "ms": 5.059
+        },
+        {
+          "phase": "take-replacements",
+          "start": 431379967120,
+          "end": 431379967124,
+          "ms": 0.004
+        },
+        {
+          "phase": "prepare-replacements",
+          "start": 431379967134,
+          "end": 431379967307,
+          "ms": 0.173
+        },
+        {
+          "phase": "before-view",
+          "start": 431379967314,
+          "end": 431379967320,
+          "ms": 0.006
+        },
+        {
+          "phase": "apply-prepare",
+          "start": 431379967392,
+          "end": 431379967418,
+          "ms": 0.026
+        },
+        {
+          "phase": "atom-index-set",
+          "start": 431379967430,
+          "end": 431379967605,
+          "ms": 0.175
+        },
+        {
+          "phase": "siblings",
+          "start": 431379967609,
+          "end": 431379967615,
+          "ms": 0.006
+        },
+        {
+          "phase": "children-set",
+          "start": 431379967617,
+          "end": 431379967620,
+          "ms": 0.003
+        },
+        {
+          "phase": "apply-commit",
+          "start": 431379967421,
+          "end": 431379967631,
+          "ms": 0.21
+        },
+        {
+          "phase": "apply-cache",
+          "start": 431379967633,
+          "end": 431379967691,
+          "ms": 0.058
+        },
+        {
+          "phase": "apply-operation",
+          "start": 431379967380,
+          "end": 431379967694,
+          "ms": 0.314
+        },
+        {
+          "phase": "add-draft",
+          "start": 431379967697,
+          "end": 431379967714,
+          "ms": 0.017
+        },
+        {
+          "phase": "update-drafts",
+          "start": 431379967716,
+          "end": 431379967736,
+          "ms": 0.02
+        },
+        {
+          "phase": "advance-view",
+          "start": 431379967739,
+          "end": 431379967805,
+          "ms": 0.066
+        },
+        {
+          "phase": "after-view",
+          "start": 431379967809,
+          "end": 431379967816,
+          "ms": 0.007
+        },
+        {
+          "phase": "submit-edit",
+          "start": 431379967312,
+          "end": 431379967818,
+          "ms": 0.506
+        },
+        {
+          "phase": "launch-saved",
+          "start": 431379967821,
+          "end": 431379967955,
+          "ms": 0.134
+        },
+        {
+          "phase": "change",
+          "start": 431379967117,
+          "end": 431379967959,
+          "ms": 0.842
+        },
+        {
+          "phase": "update",
+          "start": 431379967961,
+          "end": 431379968661,
+          "ms": 0.7
+        }
+      ],
+      "preparedFlags": [
+        "second-key:prepared-text-present",
+        "second-key:prepared-cache-accepted"
+      ],
+      "indexCounts": [
+        "second-key:atom-bucket-count:4096",
+        "second-key:atom-bucket-shared"
+      ],
+      "nestedGCNotAdditive": []
+    },
+    {
+      "keyOrdinal": 4,
+      "taskMs": 8.474,
+      "subphases": [
+        {
+          "phase": "text-input",
+          "start": 431380080734,
+          "end": 431380085531,
+          "ms": 4.797
+        },
+        {
+          "phase": "take-replacements",
+          "start": 431380085547,
+          "end": 431380085552,
+          "ms": 0.005
+        },
+        {
+          "phase": "prepare-replacements",
+          "start": 431380085564,
+          "end": 431380085712,
+          "ms": 0.148
+        },
+        {
+          "phase": "before-view",
+          "start": 431380085721,
+          "end": 431380085728,
+          "ms": 0.007
+        },
+        {
+          "phase": "apply-prepare",
+          "start": 431380085806,
+          "end": 431380085849,
+          "ms": 0.043
+        },
+        {
+          "phase": "atom-index-set",
+          "start": 431380085865,
+          "end": 431380086057,
+          "ms": 0.192
+        },
+        {
+          "phase": "siblings",
+          "start": 431380086061,
+          "end": 431380086065,
+          "ms": 0.004
+        },
+        {
+          "phase": "children-set",
+          "start": 431380086068,
+          "end": 431380086070,
+          "ms": 0.002
+        },
+        {
+          "phase": "apply-commit",
+          "start": 431380085852,
+          "end": 431380086074,
+          "ms": 0.222
+        },
+        {
+          "phase": "apply-cache",
+          "start": 431380086077,
+          "end": 431380086126,
+          "ms": 0.049
+        },
+        {
+          "phase": "apply-operation",
+          "start": 431380085794,
+          "end": 431380086130,
+          "ms": 0.336
+        },
+        {
+          "phase": "add-draft",
+          "start": 431380086132,
+          "end": 431380086139,
+          "ms": 0.007
+        },
+        {
+          "phase": "update-drafts",
+          "start": 431380086141,
+          "end": 431380086164,
+          "ms": 0.023
+        },
+        {
+          "phase": "advance-view",
+          "start": 431380086167,
+          "end": 431380086238,
+          "ms": 0.071
+        },
+        {
+          "phase": "after-view",
+          "start": 431380086241,
+          "end": 431380086249,
+          "ms": 0.008
+        },
+        {
+          "phase": "submit-edit",
+          "start": 431380085718,
+          "end": 431380086252,
+          "ms": 0.534
+        },
+        {
+          "phase": "launch-saved",
+          "start": 431380086255,
+          "end": 431380086403,
+          "ms": 0.148
+        },
+        {
+          "phase": "change",
+          "start": 431380085544,
+          "end": 431380086408,
+          "ms": 0.864
+        },
+        {
+          "phase": "update",
+          "start": 431380086410,
+          "end": 431380086976,
+          "ms": 0.566
+        }
+      ],
+      "preparedFlags": [
+        "second-key:prepared-text-present",
+        "second-key:prepared-cache-accepted"
+      ],
+      "indexCounts": [
+        "second-key:atom-bucket-count:4096",
+        "second-key:atom-bucket-shared"
+      ],
+      "nestedGCNotAdditive": []
+    },
+    {
+      "keyOrdinal": 5,
+      "taskMs": 8.177,
+      "subphases": [
+        {
+          "phase": "text-input",
+          "start": 431380096229,
+          "end": 431380100904,
+          "ms": 4.675
+        },
+        {
+          "phase": "take-replacements",
+          "start": 431380100917,
+          "end": 431380100921,
+          "ms": 0.004
+        },
+        {
+          "phase": "prepare-replacements",
+          "start": 431380100932,
+          "end": 431380101074,
+          "ms": 0.142
+        },
+        {
+          "phase": "before-view",
+          "start": 431380101082,
+          "end": 431380101090,
+          "ms": 0.008
+        },
+        {
+          "phase": "apply-prepare",
+          "start": 431380101163,
+          "end": 431380101192,
+          "ms": 0.029
+        },
+        {
+          "phase": "atom-index-set",
+          "start": 431380101205,
+          "end": 431380101383,
+          "ms": 0.178
+        },
+        {
+          "phase": "siblings",
+          "start": 431380101388,
+          "end": 431380101393,
+          "ms": 0.005
+        },
+        {
+          "phase": "children-set",
+          "start": 431380101395,
+          "end": 431380101398,
+          "ms": 0.003
+        },
+        {
+          "phase": "apply-commit",
+          "start": 431380101196,
+          "end": 431380101402,
+          "ms": 0.206
+        },
+        {
+          "phase": "apply-cache",
+          "start": 431380101405,
+          "end": 431380101445,
+          "ms": 0.04
+        },
+        {
+          "phase": "apply-operation",
+          "start": 431380101150,
+          "end": 431380101449,
+          "ms": 0.299
+        },
+        {
+          "phase": "add-draft",
+          "start": 431380101451,
+          "end": 431380101457,
+          "ms": 0.006
+        },
+        {
+          "phase": "update-drafts",
+          "start": 431380101459,
+          "end": 431380101463,
+          "ms": 0.004
+        },
+        {
+          "phase": "advance-view",
+          "start": 431380101465,
+          "end": 431380101528,
+          "ms": 0.063
+        },
+        {
+          "phase": "after-view",
+          "start": 431380101531,
+          "end": 431380101539,
+          "ms": 0.008
+        },
+        {
+          "phase": "submit-edit",
+          "start": 431380101079,
+          "end": 431380101542,
+          "ms": 0.463
+        },
+        {
+          "phase": "launch-saved",
+          "start": 431380101544,
+          "end": 431380101559,
+          "ms": 0.015
+        },
+        {
+          "phase": "change",
+          "start": 431380100915,
+          "end": 431380101562,
+          "ms": 0.647
+        },
+        {
+          "phase": "update",
+          "start": 431380101564,
+          "end": 431380102273,
+          "ms": 0.709
+        }
+      ],
+      "preparedFlags": [
+        "second-key:prepared-text-present",
+        "second-key:prepared-cache-accepted"
+      ],
+      "indexCounts": [
+        "second-key:atom-bucket-count:4096",
+        "second-key:atom-bucket-shared"
+      ],
+      "nestedGCNotAdditive": []
+    },
+    {
+      "keyOrdinal": 6,
+      "taskMs": 8.499,
+      "subphases": [
+        {
+          "phase": "text-input",
+          "start": 431380214821,
+          "end": 431380219470,
+          "ms": 4.649
+        },
+        {
+          "phase": "take-replacements",
+          "start": 431380219483,
+          "end": 431380219487,
+          "ms": 0.004
+        },
+        {
+          "phase": "prepare-replacements",
+          "start": 431380219498,
+          "end": 431380219683,
+          "ms": 0.185
+        },
+        {
+          "phase": "before-view",
+          "start": 431380219692,
+          "end": 431380219700,
+          "ms": 0.008
+        },
+        {
+          "phase": "apply-prepare",
+          "start": 431380219774,
+          "end": 431380219803,
+          "ms": 0.029
+        },
+        {
+          "phase": "atom-index-set",
+          "start": 431380219818,
+          "end": 431380220003,
+          "ms": 0.185
+        },
+        {
+          "phase": "siblings",
+          "start": 431380220007,
+          "end": 431380220012,
+          "ms": 0.005
+        },
+        {
+          "phase": "children-set",
+          "start": 431380220015,
+          "end": 431380220018,
+          "ms": 0.003
+        },
+        {
+          "phase": "apply-commit",
+          "start": 431380219807,
+          "end": 431380220022,
+          "ms": 0.215
+        },
+        {
+          "phase": "apply-cache",
+          "start": 431380220027,
+          "end": 431380220056,
+          "ms": 0.029
+        },
+        {
+          "phase": "apply-operation",
+          "start": 431380219763,
+          "end": 431380220060,
+          "ms": 0.297
+        },
+        {
+          "phase": "add-draft",
+          "start": 431380220062,
+          "end": 431380220068,
+          "ms": 0.006
+        },
+        {
+          "phase": "update-drafts",
+          "start": 431380220071,
+          "end": 431380220087,
+          "ms": 0.016
+        },
+        {
+          "phase": "advance-view",
+          "start": 431380220090,
+          "end": 431380220156,
+          "ms": 0.066
+        },
+        {
+          "phase": "after-view",
+          "start": 431380220159,
+          "end": 431380220172,
+          "ms": 0.013
+        },
+        {
+          "phase": "submit-edit",
+          "start": 431380219688,
+          "end": 431380220175,
+          "ms": 0.487
+        },
+        {
+          "phase": "launch-saved",
+          "start": 431380220177,
+          "end": 431380220334,
+          "ms": 0.157
+        },
+        {
+          "phase": "change",
+          "start": 431380219480,
+          "end": 431380220338,
+          "ms": 0.858
+        },
+        {
+          "phase": "update",
+          "start": 431380220340,
+          "end": 431380221147,
+          "ms": 0.807
+        }
+      ],
+      "preparedFlags": [
+        "second-key:prepared-text-present",
+        "second-key:prepared-cache-accepted"
+      ],
+      "indexCounts": [
+        "second-key:atom-bucket-count:4096",
+        "second-key:atom-bucket-shared"
+      ],
+      "nestedGCNotAdditive": []
+    },
+    {
+      "keyOrdinal": 7,
+      "taskMs": 6.784,
+      "subphases": [
+        {
+          "phase": "text-input",
+          "start": 431380332808,
+          "end": 431380335636,
+          "ms": 2.828
+        },
+        {
+          "phase": "take-replacements",
+          "start": 431380335652,
+          "end": 431380335657,
+          "ms": 0.005
+        },
+        {
+          "phase": "prepare-replacements",
+          "start": 431380335668,
+          "end": 431380335863,
+          "ms": 0.195
+        },
+        {
+          "phase": "before-view",
+          "start": 431380335870,
+          "end": 431380335877,
+          "ms": 0.007
+        },
+        {
+          "phase": "apply-prepare",
+          "start": 431380335947,
+          "end": 431380335974,
+          "ms": 0.027
+        },
+        {
+          "phase": "atom-index-set",
+          "start": 431380335988,
+          "end": 431380336167,
+          "ms": 0.179
+        },
+        {
+          "phase": "siblings",
+          "start": 431380336171,
+          "end": 431380336175,
+          "ms": 0.004
+        },
+        {
+          "phase": "children-set",
+          "start": 431380336178,
+          "end": 431380336181,
+          "ms": 0.003
+        },
+        {
+          "phase": "apply-commit",
+          "start": 431380335978,
+          "end": 431380336185,
+          "ms": 0.207
+        },
+        {
+          "phase": "apply-cache",
+          "start": 431380336188,
+          "end": 431380336215,
+          "ms": 0.027
+        },
+        {
+          "phase": "apply-operation",
+          "start": 431380335935,
+          "end": 431380336218,
+          "ms": 0.283
+        },
+        {
+          "phase": "add-draft",
+          "start": 431380336221,
+          "end": 431380336227,
+          "ms": 0.006
+        },
+        {
+          "phase": "update-drafts",
+          "start": 431380336230,
+          "end": 431380336246,
+          "ms": 0.016
+        },
+        {
+          "phase": "advance-view",
+          "start": 431380336249,
+          "end": 431380336314,
+          "ms": 0.065
+        },
+        {
+          "phase": "after-view",
+          "start": 431380336317,
+          "end": 431380336333,
+          "ms": 0.016
+        },
+        {
+          "phase": "submit-edit",
+          "start": 431380335868,
+          "end": 431380336336,
+          "ms": 0.468
+        },
+        {
+          "phase": "launch-saved",
+          "start": 431380336338,
+          "end": 431380336475,
+          "ms": 0.137
+        },
+        {
+          "phase": "change",
+          "start": 431380335650,
+          "end": 431380336479,
+          "ms": 0.829
+        },
+        {
+          "phase": "update",
+          "start": 431380336482,
+          "end": 431380337251,
+          "ms": 0.769
+        }
+      ],
+      "preparedFlags": [
+        "second-key:prepared-text-present",
+        "second-key:prepared-cache-accepted"
+      ],
+      "indexCounts": [
+        "second-key:atom-bucket-count:4096",
+        "second-key:atom-bucket-shared"
+      ],
+      "nestedGCNotAdditive": []
+    },
+    {
+      "keyOrdinal": 8,
+      "taskMs": 6.245,
+      "subphases": [
+        {
+          "phase": "text-input",
+          "start": 431380452096,
+          "end": 431380455048,
+          "ms": 2.952
+        },
+        {
+          "phase": "take-replacements",
+          "start": 431380455067,
+          "end": 431380455073,
+          "ms": 0.006
+        },
+        {
+          "phase": "prepare-replacements",
+          "start": 431380455092,
+          "end": 431380455191,
+          "ms": 0.099
+        },
+        {
+          "phase": "before-view",
+          "start": 431380455203,
+          "end": 431380455211,
+          "ms": 0.008
+        },
+        {
+          "phase": "apply-prepare",
+          "start": 431380455286,
+          "end": 431380455315,
+          "ms": 0.029
+        },
+        {
+          "phase": "atom-index-set",
+          "start": 431380455330,
+          "end": 431380455518,
+          "ms": 0.188
+        },
+        {
+          "phase": "siblings",
+          "start": 431380455529,
+          "end": 431380455534,
+          "ms": 0.005
+        },
+        {
+          "phase": "children-set",
+          "start": 431380455536,
+          "end": 431380455539,
+          "ms": 0.003
+        },
+        {
+          "phase": "apply-commit",
+          "start": 431380455319,
+          "end": 431380455543,
+          "ms": 0.224
+        },
+        {
+          "phase": "apply-cache",
+          "start": 431380455546,
+          "end": 431380455581,
+          "ms": 0.035
+        },
+        {
+          "phase": "apply-operation",
+          "start": 431380455272,
+          "end": 431380455585,
+          "ms": 0.313
+        },
+        {
+          "phase": "add-draft",
+          "start": 431380455587,
+          "end": 431380455594,
+          "ms": 0.007
+        },
+        {
+          "phase": "update-drafts",
+          "start": 431380455596,
+          "end": 431380455613,
+          "ms": 0.017
+        },
+        {
+          "phase": "advance-view",
+          "start": 431380455615,
+          "end": 431380455675,
+          "ms": 0.06
+        },
+        {
+          "phase": "after-view",
+          "start": 431380455678,
+          "end": 431380455684,
+          "ms": 0.006
+        },
+        {
+          "phase": "submit-edit",
+          "start": 431380455195,
+          "end": 431380455687,
+          "ms": 0.492
+        },
+        {
+          "phase": "launch-saved",
+          "start": 431380455690,
+          "end": 431380455835,
+          "ms": 0.145
+        },
+        {
+          "phase": "change",
+          "start": 431380455064,
+          "end": 431380455840,
+          "ms": 0.776
+        },
+        {
+          "phase": "update",
+          "start": 431380455842,
+          "end": 431380456368,
+          "ms": 0.526
+        }
+      ],
+      "preparedFlags": [
+        "second-key:prepared-text-present",
+        "second-key:prepared-cache-accepted"
+      ],
+      "indexCounts": [
+        "second-key:atom-bucket-count:4096",
+        "second-key:atom-bucket-shared"
+      ],
+      "nestedGCNotAdditive": []
+    }
+  ]
+}

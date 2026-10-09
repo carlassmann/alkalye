@@ -1,0 +1,23 @@
+{
+  "scope": "Public durableCheckpointEffect on identical synthetic one-MiB facts; JSON/gzip sizes, not network latency",
+  "results": [
+    {
+      "name": "control",
+      "format": "alkalye-state-v3",
+      "sourceBytes": 1048576,
+      "checkpointBytes": 1048862,
+      "gzipBytes": 6348,
+      "atomRuns": 1,
+      "coldSourceExact": true
+    },
+    {
+      "name": "candidate",
+      "format": "alkalye-state-v3",
+      "sourceBytes": 1048576,
+      "checkpointBytes": 1049046,
+      "gzipBytes": 6405,
+      "atomRuns": 3,
+      "coldSourceExact": true
+    }
+  ]
+}

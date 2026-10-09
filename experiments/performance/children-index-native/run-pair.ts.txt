@@ -1,0 +1,14 @@
+let root = "/tmp/alkalye-children-index-native-pilot"
+if (!(await Bun.file(root + "/preparation-ready.json").exists())) throw Error("Both strict/build/sourcegraph proof prerequisites")
+if (await Bun.file(root + "/pair-pending.json").exists()) throw Error("Existing attempt; no uncertain replay")
+await Bun.write(root + "/pair-pending.json", JSON.stringify({ phase: "before-keys", baseline: "b5577ba899b46ef5900b21328535409a6c5fe99c" }))
+console.log(JSON.stringify({ stage: "pair-live", pid: process.pid }))
+for (let arm of ["control", "candidate"]) {
+ let run = root + "/pilot-" + arm + "-" + crypto.randomUUID()
+ let child = Bun.spawn(["bun", "production-body-gate.ts", arm, "rich1m", "--measure"], { cwd: root + "/app-runtime", env: { ...process.env, SNAPSHOT_INPUT_BURST: "1", PRODUCTION_BODY_RUN: run }, stdout: "inherit", stderr: "inherit" })
+ console.log(JSON.stringify({ stage: "arm-live", arm, pid: child.pid, run }))
+ let exit = await child.exited
+ await Bun.write(root + "/" + arm + "-terminal.json", JSON.stringify({ exit, run }))
+ if (exit) throw Error("Preserve failed cell; no unknown replay")
+}
+await Bun.write(root + "/pair-terminal.json", JSON.stringify({ exit: 0, arms: 2 }))

@@ -1,0 +1,369 @@
+{
+  "scope": "n1 matched marked production; initiating tasks include nested GC; source/caret opportunities not paint; input is paced8keys; no physical120Hz claim",
+  "rows": [
+    {
+      "arm": "control",
+      "status": "measured-complete",
+      "windows": {
+        "input": {
+          "maxRunTaskMs": 21.569,
+          "busyUnionMs": 1312.718,
+          "gcSpansMsNotAdditive": 143.44,
+          "maxGCSpanMs": 14.127,
+          "sourceCaretOpportunityMs": 748.4000000357628,
+          "windowMs": 3001.658,
+          "traceSHA256": "8f0191e7b4643267460b0992f3f97260240d0568a0dfd1b6d1c140f88540ca02",
+          "traceBytes": 21986530
+        },
+        "undo": {
+          "maxRunTaskMs": 15.092,
+          "busyUnionMs": 928.695,
+          "gcSpansMsNotAdditive": 134.118,
+          "maxGCSpanMs": 14.137,
+          "sourceCaretOpportunityMs": 48.89999997615814,
+          "windowMs": 3001.211,
+          "traceSHA256": "5210509dd1388e32958c01d5be85f62192068a63ef029b7d4e2a7a770e0eaf52",
+          "traceBytes": 8090997
+        }
+      },
+      "keys": [
+        {
+          "key": 1,
+          "taskMs": 9.883,
+          "phasesMs": {
+            "atom-index-set": 0.181,
+            "siblings": 0.006,
+            "children-set": 0.004,
+            "apply-commit": 0.227,
+            "apply-operation": 0.348
+          },
+          "flags": [
+            "second-key:prepared-text-present",
+            "second-key:prepared-cache-accepted"
+          ],
+          "nestedGCNotAdditive": []
+        },
+        {
+          "key": 2,
+          "taskMs": 21.569,
+          "phasesMs": {
+            "atom-index-set": 0.179,
+            "siblings": 0.005,
+            "children-set": 12.251,
+            "apply-commit": 12.49,
+            "apply-operation": 12.698
+          },
+          "flags": [
+            "second-key:prepared-text-present",
+            "second-key:prepared-cache-accepted"
+          ],
+          "nestedGCNotAdditive": []
+        },
+        {
+          "key": 3,
+          "taskMs": 8.912,
+          "phasesMs": {
+            "atom-index-set": 0.175,
+            "siblings": 0.006,
+            "children-set": 0.003,
+            "apply-commit": 0.21,
+            "apply-operation": 0.314
+          },
+          "flags": [
+            "second-key:prepared-text-present",
+            "second-key:prepared-cache-accepted"
+          ],
+          "nestedGCNotAdditive": []
+        },
+        {
+          "key": 4,
+          "taskMs": 8.474,
+          "phasesMs": {
+            "atom-index-set": 0.192,
+            "siblings": 0.004,
+            "children-set": 0.002,
+            "apply-commit": 0.222,
+            "apply-operation": 0.336
+          },
+          "flags": [
+            "second-key:prepared-text-present",
+            "second-key:prepared-cache-accepted"
+          ],
+          "nestedGCNotAdditive": []
+        },
+        {
+          "key": 5,
+          "taskMs": 8.177,
+          "phasesMs": {
+            "atom-index-set": 0.178,
+            "siblings": 0.005,
+            "children-set": 0.003,
+            "apply-commit": 0.206,
+            "apply-operation": 0.299
+          },
+          "flags": [
+            "second-key:prepared-text-present",
+            "second-key:prepared-cache-accepted"
+          ],
+          "nestedGCNotAdditive": []
+        },
+        {
+          "key": 6,
+          "taskMs": 8.499,
+          "phasesMs": {
+            "atom-index-set": 0.185,
+            "siblings": 0.005,
+            "children-set": 0.003,
+            "apply-commit": 0.215,
+            "apply-operation": 0.297
+          },
+          "flags": [
+            "second-key:prepared-text-present",
+            "second-key:prepared-cache-accepted"
+          ],
+          "nestedGCNotAdditive": []
+        },
+        {
+          "key": 7,
+          "taskMs": 6.784,
+          "phasesMs": {
+            "atom-index-set": 0.179,
+            "siblings": 0.004,
+            "children-set": 0.003,
+            "apply-commit": 0.207,
+            "apply-operation": 0.283
+          },
+          "flags": [
+            "second-key:prepared-text-present",
+            "second-key:prepared-cache-accepted"
+          ],
+          "nestedGCNotAdditive": []
+        },
+        {
+          "key": 8,
+          "taskMs": 6.245,
+          "phasesMs": {
+            "atom-index-set": 0.188,
+            "siblings": 0.005,
+            "children-set": 0.003,
+            "apply-commit": 0.224,
+            "apply-operation": 0.313
+          },
+          "flags": [
+            "second-key:prepared-text-present",
+            "second-key:prepared-cache-accepted"
+          ],
+          "nestedGCNotAdditive": []
+        }
+      ],
+      "fixture": {
+        "characters": 1048576,
+        "bytes": 1048576,
+        "realNewlines": 20767,
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+      },
+      "receipts": {
+        "seedReceipt": {
+          "stage": "receipt",
+          "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+          "characters": 1048577,
+          "log": "c0fdede1-1a37-4863-b445-008c57931f74:36",
+          "actionSha256": "9dcdd863fff3a30bf09255d6a89c701cdb9124a0efb5e515d610d14071d245ec",
+          "historyCount": 9
+        },
+        "editedReceipt": {
+          "sha256": "bcf3b98ac55a7ba2d80e7dbda81c4c160d972a25f481fb6c9d5f145c50af5aaf",
+          "characters": 1048585,
+          "log": "c0fdede1-1a37-4863-b445-008c57931f74:44"
+        },
+        "undoReceipt": {
+          "sha256": "31afa0bd439b3a96aeed38caeb34e38b35583efe289884e9cacaece57f3d2bfa",
+          "characters": 1048584,
+          "log": "c0fdede1-1a37-4863-b445-008c57931f74:45"
+        }
+      }
+    },
+    {
+      "arm": "candidate",
+      "status": "measured-complete",
+      "windows": {
+        "input": {
+          "maxRunTaskMs": 14.043,
+          "busyUnionMs": 940.271,
+          "gcSpansMsNotAdditive": 122.759,
+          "maxGCSpanMs": 13.884,
+          "sourceCaretOpportunityMs": 731.8000000119209,
+          "windowMs": 3002.02,
+          "traceSHA256": "f53cc2ef25f9f706304f045576180e30ddf566fb368c260fe9fac374732f132d",
+          "traceBytes": 17614599
+        },
+        "undo": {
+          "maxRunTaskMs": 15.086,
+          "busyUnionMs": 773.855,
+          "gcSpansMsNotAdditive": 116.604,
+          "maxGCSpanMs": 14.048,
+          "sourceCaretOpportunityMs": 46.30000001192093,
+          "windowMs": 3001.379,
+          "traceSHA256": "403076197c44f96907d9518a1ec18011439df43ab0ce7ca42b9e008ca4be0327",
+          "traceBytes": 7753278
+        }
+      },
+      "keys": [
+        {
+          "key": 1,
+          "taskMs": 9.532,
+          "phasesMs": {
+            "atom-index-set": 0.179,
+            "siblings": 0.007,
+            "children-set": 0.012,
+            "apply-commit": 0.234,
+            "apply-operation": 0.346
+          },
+          "flags": [
+            "second-key:prepared-text-present",
+            "second-key:prepared-cache-accepted"
+          ],
+          "nestedGCNotAdditive": []
+        },
+        {
+          "key": 2,
+          "taskMs": 8.508,
+          "phasesMs": {
+            "atom-index-set": 0.199,
+            "siblings": 0.007,
+            "children-set": 0.181,
+            "apply-commit": 0.42,
+            "apply-operation": 0.604
+          },
+          "flags": [
+            "second-key:prepared-text-present",
+            "second-key:prepared-cache-accepted"
+          ],
+          "nestedGCNotAdditive": []
+        },
+        {
+          "key": 3,
+          "taskMs": 8.869,
+          "phasesMs": {
+            "atom-index-set": 0.178,
+            "siblings": 0.004,
+            "children-set": 0.171,
+            "apply-commit": 0.379,
+            "apply-operation": 0.495
+          },
+          "flags": [
+            "second-key:prepared-text-present",
+            "second-key:prepared-cache-accepted"
+          ],
+          "nestedGCNotAdditive": []
+        },
+        {
+          "key": 4,
+          "taskMs": 8.592,
+          "phasesMs": {
+            "atom-index-set": 0.181,
+            "siblings": 0.006,
+            "children-set": 0.17,
+            "apply-commit": 0.378,
+            "apply-operation": 0.475
+          },
+          "flags": [
+            "second-key:prepared-text-present",
+            "second-key:prepared-cache-accepted"
+          ],
+          "nestedGCNotAdditive": []
+        },
+        {
+          "key": 5,
+          "taskMs": 9.811,
+          "phasesMs": {
+            "atom-index-set": 0.181,
+            "siblings": 0.006,
+            "children-set": 0.172,
+            "apply-commit": 0.383,
+            "apply-operation": 0.491
+          },
+          "flags": [
+            "second-key:prepared-text-present",
+            "second-key:prepared-cache-accepted"
+          ],
+          "nestedGCNotAdditive": []
+        },
+        {
+          "key": 6,
+          "taskMs": 7.838,
+          "phasesMs": {
+            "atom-index-set": 0.181,
+            "siblings": 0.008,
+            "children-set": 0.172,
+            "apply-commit": 0.386,
+            "apply-operation": 0.473
+          },
+          "flags": [
+            "second-key:prepared-text-present",
+            "second-key:prepared-cache-accepted"
+          ],
+          "nestedGCNotAdditive": []
+        },
+        {
+          "key": 7,
+          "taskMs": 8.189,
+          "phasesMs": {
+            "atom-index-set": 0.176,
+            "siblings": 0.005,
+            "children-set": 0.17,
+            "apply-commit": 0.378,
+            "apply-operation": 0.46
+          },
+          "flags": [
+            "second-key:prepared-text-present",
+            "second-key:prepared-cache-accepted"
+          ],
+          "nestedGCNotAdditive": []
+        },
+        {
+          "key": 8,
+          "taskMs": 8.101,
+          "phasesMs": {
+            "atom-index-set": 0.177,
+            "siblings": 0.005,
+            "children-set": 0.171,
+            "apply-commit": 0.375,
+            "apply-operation": 0.458
+          },
+          "flags": [
+            "second-key:prepared-text-present",
+            "second-key:prepared-cache-accepted"
+          ],
+          "nestedGCNotAdditive": []
+        }
+      ],
+      "fixture": {
+        "characters": 1048576,
+        "bytes": 1048576,
+        "realNewlines": 20767,
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+      },
+      "receipts": {
+        "seedReceipt": {
+          "stage": "receipt",
+          "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+          "characters": 1048577,
+          "log": "c0fdede1-1a37-4863-b445-008c57931f74:36",
+          "actionSha256": "5b63df061643a277c8d8b4eab63c2d9a0a3bc029dcc418bd4ec312fa79eb3cd3",
+          "historyCount": 9
+        },
+        "editedReceipt": {
+          "sha256": "bcf3b98ac55a7ba2d80e7dbda81c4c160d972a25f481fb6c9d5f145c50af5aaf",
+          "characters": 1048585,
+          "log": "c0fdede1-1a37-4863-b445-008c57931f74:44"
+        },
+        "undoReceipt": {
+          "sha256": "31afa0bd439b3a96aeed38caeb34e38b35583efe289884e9cacaece57f3d2bfa",
+          "characters": 1048584,
+          "log": "c0fdede1-1a37-4863-b445-008c57931f74:45"
+        }
+      }
+    }
+  ]
+}

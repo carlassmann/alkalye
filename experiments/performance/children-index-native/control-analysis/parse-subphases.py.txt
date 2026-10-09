@@ -1,0 +1,20 @@
+from pathlib import Path
+import json
+r=Path('/tmp/alkalye-children-index-native-pilot/control-analysis');a=json.loads((r/'phase-attribution.json').read_text());payload=json.loads(Path(a['tracePath']).read_text());events=payload.get('traceEvents',[]) if isinstance(payload,dict) else payload
+marks=sorted([e for e in events if [e.get('pid'),e.get('tid')]==a['owner'] and e.get('name','').startswith('second-key:')],key=lambda e:e['ts'])
+rows=[]
+for key in a['keys']:
+ lo=key['phases'][0]['start'];hi=key['phases'][-1]['end'];pending={};phases=[]
+ for e in marks:
+  if not lo<=e['ts']<=hi:continue
+  name,state=e['name'].removeprefix('second-key:').rsplit('-',1)
+  if state=='start':
+   if name in pending:raise RuntimeError('double start')
+   pending[name]=e['ts']
+  elif state=='end':
+   if name not in pending:raise RuntimeError('end without start')
+   start=pending.pop(name);phases.append({'phase':name,'start':start,'end':e['ts'],'ms':(e['ts']-start)/1000})
+ if pending:raise RuntimeError('unpaired subphase')
+ rows.append({'keyOrdinal':key['keyOrdinal'],'taskMs':key['taskDurationMs'],'subphases':phases,'preparedFlags':[e['name'] for e in marks if lo<=e['ts']<=hi and e['name'] in ['second-key:prepared-text-present','second-key:prepared-text-missing','second-key:prepared-cache-accepted','second-key:prepared-cache-rejected']],'indexCounts':[e['name'] for e in marks if lo<=e['ts']<=hi and (e['name'].startswith('second-key:children-count:') or e['name'].startswith('second-key:atom-bucket-count:') or e['name'] in ['second-key:atom-bucket-owned','second-key:atom-bucket-shared'])],'nestedGCNotAdditive':key['nestedGCSpansNotAdditive']})
+(r/'subphase-attribution.json').write_text(json.dumps({'scope':'n1 diagnostic; spans inclusive and nested, not additive; all8 native/public accepted/reload gates passed','keys':rows},indent=2)+'\n')
+print(json.dumps([{'key':x['keyOrdinal'],'applyMs':next(p['ms'] for p in x['subphases'] if p['phase']=='apply-operation')} for x in rows]))

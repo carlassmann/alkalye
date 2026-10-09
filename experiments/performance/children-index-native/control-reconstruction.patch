@@ -1,0 +1,304 @@
+--- a/src/client/components/editor.ts
++++ b/src/client/components/editor.ts
+@@ -263,12 +263,21 @@
+ 	textarea.readOnly = !editable
+ 	textarea.oninput = () => {
+ 		releaseTab = false
++		performance.mark("second-key:text-input-start")
+ 		let source = text.input()
++		performance.mark("second-key:text-input-end")
+ 		updateHighlight()
+ 		if (composing) return
+-		let edit = options.change(source, atoms, text.takeReplacements())
++		performance.mark("second-key:change-start")
++		performance.mark("second-key:take-replacements-start")
++		let replacements = text.takeReplacements()
++		performance.mark("second-key:take-replacements-end")
++		let edit = options.change(source, atoms, replacements)
++		performance.mark("second-key:change-end")
++		performance.mark("second-key:update-start")
+ 		if (edit) update(edit.content, edit.atoms, editable)
+ 		else text.sync()
++		performance.mark("second-key:update-end")
+ 		if (options.preferences.autocomplete) showCompletions()
+ 	}
+ 	textarea.addEventListener(
+--- a/src/client/document-app.ts
++++ b/src/client/document-app.ts
+@@ -1867,7 +1867,9 @@
+ 						let edit = replacements
+ 							? selected.opened.session.replace(replacements, base)
+ 							: selected.opened.session.edit(content, base)
++						performance.mark("second-key:launch-saved-start")
+ 						launch(edit.saved)
++						performance.mark("second-key:launch-saved-end")
+ 						requestRefresh(true)
+ 						return edit
+ 					},
+--- a/src/client/source-textarea.ts
++++ b/src/client/source-textarea.ts
+@@ -304,6 +304,7 @@
+ 		) {
+ 			previous.start = active.start
+ 			previous.end = active.end
++			performance.mark("undo-residual:projection-current-hit")
+ 			return previous.value
+ 		}
+ 		let restored = this.previousProjected
+@@ -318,8 +319,10 @@
+ 		) {
+ 			this.previousProjected = previous
+ 			this.projected = restored
++			performance.mark("undo-residual:projection-inverse-hit")
+ 			return restored.value
+ 		}
++		performance.mark("undo-residual:projection-fallback-start")
+ 		let value =
+ 			mode === "raw" || !source.includes("[")
+ 				? identity(source)
+@@ -335,6 +338,7 @@
+ 			prefix: iconPrefix,
+ 			value,
+ 		}
++		performance.mark("undo-residual:projection-fallback-end")
+ 		return value
+ 	}
+ 	private apply(
+@@ -342,6 +346,7 @@
+ 		selection: { start: number; end: number; direction?: Direction },
+ 		reveal = false,
+ 	) {
++		performance.mark("undo-residual:apply-start")
+ 		if (next.source !== this.current.source) {
+ 			let edit = difference(this.current.source, next.source)
+ 			this.sourceIndex.replace({
+@@ -351,6 +356,7 @@
+ 			})
+ 		}
+ 		this.current = next
++		performance.mark("undo-residual:model-source-assigned")
+ 		this.viewport.render(
+ 			next.text,
+ 			{
+@@ -360,6 +366,7 @@
+ 			},
+ 			{ revealSelection: reveal },
+ 		)
++		performance.mark("undo-residual:native-render-return")
+ 		this.options.painted()
+ 	}
+ }
+--- a/src/shared/crdt.ts
++++ b/src/shared/crdt.ts
+@@ -38,6 +38,7 @@
+ let sourceViews = new WeakMap<Atom[], Atom[]>()
+ let sourceOffsets = new WeakMap<Atom[], TextIndex>()
+ let sourceStrings = new WeakMap<Atom[], string>()
++let inputIndexMarkers = false
+ let terminalRemovals = new WeakMap<
+ 	Atom[],
+ 	WeakMap<Atom[], { id: string; offset: number }>
+@@ -240,12 +241,17 @@
+ 			replacement &&
+ 			input.every(operation => this.operations.has(operation.id)) &&
+ 			this.matchesReplacementReceipt(replacement)
++		performance.mark(edit ? "second-key:prepared-text-present" : "second-key:prepared-text-missing")
++		performance.mark("second-key:apply-prepare-start")
+ 		let commit = this.prepare(input)
++		performance.mark("second-key:apply-prepare-end")
+ 		return () => {
+ 			this.preparedEdit = undefined
+ 			this.insertionReceipt = undefined
+ 			this.replacementReceipt = undefined
++			performance.mark("second-key:apply-commit-start")
+ 			commit()
++			performance.mark("second-key:apply-commit-end")
+ 			if (acknowledge && receipt)
+ 				this.insertionReceipt = { ...receipt, generation: this.generation }
+ 			if (acknowledgeReplacement && replacement)
+@@ -253,7 +259,9 @@
+ 					...replacement,
+ 					generation: this.generation,
+ 				}
++			performance.mark("second-key:apply-cache-start")
+ 			this.cachePreparedText(input, edit)
++			performance.mark("second-key:apply-cache-end")
+ 		}
+ 	}
+ 	private matchesReplacementReceipt(receipt: ReplacementReceipt) {
+@@ -742,8 +750,11 @@
+ 			operation.id !== edit.id ||
+ 			this.generation !== edit.generation + 1 ||
+ 			textEditSignature(operation) !== edit.signature
+-		)
++		) {
++			performance.mark("second-key:prepared-cache-rejected")
+ 			return
++		}
++		performance.mark("second-key:prepared-cache-accepted")
+ 		if (edit.replacementInverse) {
+ 			let receipt = edit.replacementInverse
+ 			let view = receipt.applied ? receipt.before : receipt.after
+@@ -1802,12 +1813,18 @@
+ 						"Replica changed while its snapshot was being captured",
+ 					)
+ 			}
++			performance.mark("undo-residual:checkpoint-borrowed-start")
+ 			let borrowed = yield* cooperative("replica.checkpoint", () =>
+ 				source.checkpointSteps(true, true),
+ 			)
+ 			unchanged()
+-			let compact = yield* compactCheckpointEffect(borrowed)
++			performance.mark("undo-residual:checkpoint-borrowed-end")
++			performance.mark("undo-residual:checkpoint-compact-start")
++			let compact = yield* compactCheckpointEffect(borrowed).pipe(
++				Effect.ensuring(Effect.sync(() => performance.mark("undo-residual:checkpoint-compact-end"))),
++			)
+ 			unchanged()
++			performance.mark("undo-residual:checkpoint-output-start")
+ 			let owned = yield* cooperative("replica.checkpoint.output", function* () {
+ 				if (compact.format === "alkalye-state-v3") {
+ 					let targets: (typeof compact.targets)[number][] = []
+@@ -1841,6 +1858,7 @@
+ 				return { ...compact, targets }
+ 			})
+ 			unchanged()
++			performance.mark("undo-residual:checkpoint-output-end")
+ 			return owned
+ 		})
+ 	}
+@@ -2279,14 +2297,20 @@
+ 			this.legacyTextTargets.add(target)
+ 		if (this.atomIndex.has(atom.id)) return
+ 		freezeTextAtom(atom)
++		if (inputIndexMarkers) performance.mark("second-key:atom-index-set-start")
+ 		this.atomIndex.set(atom.id, Object.freeze({ target, atom }))
++		if (inputIndexMarkers) performance.mark("second-key:atom-index-set-end")
+ 		let owner = atom.id.slice(0, -9)
+ 		this.ownedAtomCounts.set(owner, (this.ownedAtomCounts.get(owner) ?? 0) + 1)
++		if (inputIndexMarkers) performance.mark("second-key:siblings-start")
+ 		let children = this.children.get(target) ?? new Map<string, Atom[]>()
+ 		let siblings = [...(children.get(atom.after) ?? [])]
+ 		let index = siblings.findIndex(sibling => sibling.id < atom.id)
+ 		siblings.splice(index < 0 ? siblings.length : index, 0, atom)
++		if (inputIndexMarkers) performance.mark("second-key:siblings-end")
++		if (inputIndexMarkers) performance.mark("second-key:children-set-start")
+ 		children.set(atom.after, siblings)
++		if (inputIndexMarkers) performance.mark("second-key:children-set-end")
+ 		this.children.set(target, children)
+ 	}
+ 	private requireHistory() {
+@@ -2322,6 +2346,8 @@
+ 		let bucket = atomIndexBucket(id)
+ 		let entries = this.buckets[bucket]
+ 		if (!entries) throw new Error("Missing atom index partition")
++		if (inputIndexMarkers) performance.mark("second-key:atom-bucket-count:" + entries.size)
++		if (inputIndexMarkers) performance.mark(this.ownedBuckets[bucket] ? "second-key:atom-bucket-owned" : "second-key:atom-bucket-shared")
+ 		if (!this.ownedBuckets[bucket]) {
+ 			entries = new Map(entries)
+ 			this.buckets[bucket] = entries
+@@ -2462,3 +2488,13 @@
+ 	}
+ 	return changes
+ }
++
++export function applyWithInputMarkers(replica: Replica, input: Operation[]) {
++	let previous = inputIndexMarkers
++	inputIndexMarkers = true
++	try {
++		replica.apply(input)
++	} finally {
++		inputIndexMarkers = previous
++	}
++}
+--- a/src/shared/document-session.ts
++++ b/src/shared/document-session.ts
+@@ -45,7 +45,7 @@
+ import { partitionDocumentActions } from "./document-dependencies"
+ import { validateTextCausality } from "./document-causality"
+ import { compactCheckpoint } from "./checkpoint"
+-import { Replica } from "./crdt"
++import { Replica, applyWithInputMarkers } from "./crdt"
+ import type { TextReplacement } from "./crdt"
+ import {
+ 	CommittedActionSchema,
+@@ -479,11 +479,13 @@
+ 			}
+ 		}
+ 		function submitEdit(operation: Operation | null, target: string) {
++			performance.mark("second-key:before-view-start")
+ 			let unchanged = {
+ 				operation: null,
+ 				content: view.text(target),
+ 				atoms: view.visible(target),
+ 			}
++			performance.mark("second-key:before-view-end")
+ 			if (!operation) return { ...unchanged, saved: Effect.void }
+ 			let decoded = Schema.decodeUnknownResult(DocumentActionSchema)({
+ 				id: operation.id,
+@@ -506,16 +508,27 @@
+ 					...unchanged,
+ 					saved: conflict("This document session is closed"),
+ 				}
+-			projection.replica.apply([operation])
++			performance.mark("second-key:apply-operation-start")
++			applyWithInputMarkers(projection.replica, [operation])
++			performance.mark("second-key:apply-operation-end")
++			performance.mark("second-key:add-draft-start")
+ 			projection.addDraft(decoded.success)
++			performance.mark("second-key:add-draft-end")
++			performance.mark("second-key:update-drafts-start")
+ 			drafts.update()
++			performance.mark("second-key:update-drafts-end")
++			performance.mark("second-key:advance-view-start")
+ 			advanceView()
+-			return {
++			performance.mark("second-key:advance-view-end")
++			performance.mark("second-key:after-view-start")
++			let result = {
+ 				operation: freezeOperation(operation),
+ 				content: view.text(target),
+ 				atoms: view.visible(target),
+ 				saved: flush,
+ 			}
++			performance.mark("second-key:after-view-end")
++			return result
+ 		}
+ 
+ 		return {
+@@ -573,10 +586,13 @@
+ 				)
+ 					return oversizedEdit(target)
+ 				try {
+-					return submitEdit(
+-						projection.replica.prepareReplacements(target, replacements, base),
+-						target,
+-					)
++					performance.mark("second-key:prepare-replacements-start")
++					let operation = projection.replica.prepareReplacements(target, replacements, base)
++					performance.mark("second-key:prepare-replacements-end")
++					performance.mark("second-key:submit-edit-start")
++					let result = submitEdit(operation, target)
++					performance.mark("second-key:submit-edit-end")
++					return result
+ 				} catch (error) {
+ 					if (!(error instanceof RangeError)) throw error
+ 					return {
+--- a/src/shared/projection.ts
++++ b/src/shared/projection.ts
+@@ -269,6 +269,7 @@
+ 		let active = activeSelection && selectionBounds(nextSource, activeSelection)
+ 		let viewDelta = 0,
+ 			editView = start
++		performance.mark("undo-residual:certified-token-metadata-start")
+ 		let tokens: LinkToken[] = [],
+ 			links: ProjectedLink[] = []
+ 		for (let token of this.tokens) {
+@@ -296,6 +297,7 @@
+ 			viewDelta += prefix.length + next.label.length - (next.end - next.start)
+ 			if (token.end < start) editView = start + viewDelta
+ 		}
++		performance.mark("undo-residual:certified-token-metadata-end")
+ 		let projectedText =
+ 			this.projectedText.slice(0, editView) +
+ 			insert +

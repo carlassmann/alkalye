@@ -1,0 +1,98 @@
+--- a/src/shared/crdt.ts
++++ b/src/shared/crdt.ts
+@@ -119,8 +119,8 @@
+ 	operations = new Map<string, Operation>()
+ 	clock = 0
+ 	historyLoaded = true
+-	private atomIndex = new AtomIndex()
+-	private children = new Map<string, Map<string, Atom[]>>()
++	private atomIndex = new AtomMap<AtomIndexEntry>()
++	private children = new Map<string, AtomMap<Atom[]>>()
+ 	private visibility = new Map<string, TextVisibility>()
+ 	private textOwners = new Map<string, string>()
+ 	private ownedAtomCounts = new Map<string, number>()
+@@ -178,7 +178,7 @@
+ 		)
+ 		replica.atomIndex = this.atomIndex.fork()
+ 		for (let [target, children] of this.children)
+-			replica.children.set(target, yield* copyMapSteps(children, cooperative))
++			replica.children.set(target, children.fork())
+ 		for (let [target, visibility] of this.visibility)
+ 			replica.visibility.set(target, yield* visibility.forkSteps(cooperative))
+ 		replica.textOwners = yield* copyMapSteps(this.textOwners, cooperative)
+@@ -1535,7 +1535,7 @@
+ 		let cached = this.textCache.get(target)
+ 		if (until === Infinity && cached) return cached
+ 		if (until === Infinity) {
+-			let children = this.children.get(target) ?? new Map<string, Atom[]>()
++			let children = this.children.get(target) ?? new AtomMap<Atom[]>()
+ 			let visibility = this.visibility.get(target)
+ 			let result: Atom[] = [],
+ 				stack = [...(children.get("") ?? [])].reverse()
+@@ -1558,7 +1558,7 @@
+ 			return result
+ 		}
+ 		this.requireHistory()
+-		let children = new Map<string, Atom[]>()
++		let children = new AtomMap<Atom[]>()
+ 		let visibility = new TextVisibility()
+ 		let known = new Set<string>()
+ 		for (let operation of this.targets.get(target) ?? []) {
+@@ -2282,7 +2282,7 @@
+ 		this.atomIndex.set(atom.id, Object.freeze({ target, atom }))
+ 		let owner = atom.id.slice(0, -9)
+ 		this.ownedAtomCounts.set(owner, (this.ownedAtomCounts.get(owner) ?? 0) + 1)
+-		let children = this.children.get(target) ?? new Map<string, Atom[]>()
++		let children = this.children.get(target) ?? new AtomMap<Atom[]>()
+ 		let siblings = [...(children.get(atom.after) ?? [])]
+ 		let index = siblings.findIndex(sibling => sibling.id < atom.id)
+ 		siblings.splice(index < 0 ? siblings.length : index, 0, atom)
+@@ -2300,17 +2300,16 @@
+ 	readonly atom: Atom
+ }
+ 
+-class AtomIndex {
+-	private buckets: Map<string, AtomIndexEntry>[]
++class AtomMap<Value> {
++	private buckets: (Map<string, Value> | undefined)[]
+ 	private ownedBuckets = new Uint8Array(256)
+-	constructor(buckets?: Map<string, AtomIndexEntry>[]) {
+-		this.buckets = buckets ?? Array.from({ length: 256 }, () => new Map())
+-		if (!buckets) this.ownedBuckets.fill(1)
++	constructor(buckets?: (Map<string, Value> | undefined)[]) {
++		this.buckets = buckets ?? new Array<Map<string, Value> | undefined>(256)
+ 	}
+ 	fork() {
+ 		// Both replicas must copy a shared bucket before their next write.
+ 		this.ownedBuckets.fill(0)
+-		return new AtomIndex(this.buckets.slice())
++		return new AtomMap<Value>(this.buckets.slice())
+ 	}
+ 	get(id: string) {
+ 		return this.buckets[atomIndexBucket(id)]?.get(id)
+@@ -2318,19 +2317,21 @@
+ 	has(id: string) {
+ 		return this.buckets[atomIndexBucket(id)]?.has(id) ?? false
+ 	}
+-	set(id: string, entry: AtomIndexEntry) {
++	set(id: string, entry: Value) {
+ 		let bucket = atomIndexBucket(id)
+ 		let entries = this.buckets[bucket]
+-		if (!entries) throw new Error("Missing atom index partition")
+-		if (!this.ownedBuckets[bucket]) {
++		if (!entries || !this.ownedBuckets[bucket]) {
+ 			entries = new Map(entries)
+ 			this.buckets[bucket] = entries
+ 			this.ownedBuckets[bucket] = 1
+ 		}
+ 		entries.set(id, entry)
+ 	}
++	*values() {
++		for (let bucket of this.buckets) if (bucket) yield* bucket.values()
++	}
+ 	*[Symbol.iterator]() {
+-		for (let bucket of this.buckets) yield* bucket
++		for (let bucket of this.buckets) if (bucket) yield* bucket
+ 	}
+ }
+ 

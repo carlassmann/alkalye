@@ -1,0 +1,9 @@
+{"stage":"pair-live","pid":89700}
+{"stage":"arm-live","arm":"control","pid":89702,"run":"/tmp/alkalye-children-index-native-pilot/pilot-control-b5a21b6a-c701-44cb-8c01-b4849a2fa950"}
+started web pid=89725
+{"stage":"complete","arm":"control","fixture":"rich1m","resultDirectory":"/tmp/alkalye-children-index-native-pilot/pilot-control-b5a21b6a-c701-44cb-8c01-b4849a2fa950/results","timing":"separate-input-and-undo-3s-windows"}
+stopped alkalye-children-index-native-pilot/main/web
+{"stage":"arm-live","arm":"candidate","pid":92200,"run":"/tmp/alkalye-children-index-native-pilot/pilot-candidate-0b52a27e-2129-415a-831c-7b3121b68b31"}
+started web pid=92228
+{"stage":"complete","arm":"candidate","fixture":"rich1m","resultDirectory":"/tmp/alkalye-children-index-native-pilot/pilot-candidate-0b52a27e-2129-415a-831c-7b3121b68b31/results","timing":"separate-input-and-undo-3s-windows"}
+stopped alkalye-children-index-native-pilot/main/web

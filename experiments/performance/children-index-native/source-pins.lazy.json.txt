@@ -1,0 +1,9 @@
+{
+  "baseline": "b5577ba899b46ef5900b21328535409a6c5fe99c",
+  "cleanControlCRDTSHA256": "4a0aa7553a0de7fbfc2d8eb9a6332313b04bcf0dc68e558de6add25ea6e71b7d",
+  "cleanLazyCandidateCRDTSHA256": "f49b6f40c1e2d5ec93650ff446d19f63b7b7650a0097c9dfe559d74d23a51da5",
+  "markedControlCRDTSHA256": "6f0ee82c7623e44e56fb45ea2d12d50fec5bf3c88e0a98e05a96cf0743510a4a",
+  "markedLazyCandidateCRDTSHA256": "1b98abda116bec454938347f6750ad8e265a8b96e2b86074d3e32ea86ee836c4",
+  "execution": "PREPARATION ONLY",
+  "optionalBucketMarker": "count entries?.size??0; no forced allocation"
+}
