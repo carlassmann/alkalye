@@ -1,0 +1,36 @@
+{"stage":"live","pid":5144,"run":"/tmp/alkalye-production-undo-residual/current-7d7df3d/fixed-origin-6612d48b-485f-40bb-8925-082f6e7b224f"}
+started web pid=5158
+84 | 	throw Error("Samples must be 1–5")
+85 | if (!resolve(manifest.output).startsWith("/tmp/alkalye-production-undo-residual/current-7d7df3d/")) throw Error("Controlled fixture output required")
+86 | for (let version of manifest.versions) {
+87 |  if (version.kind !== "rewrite") throw Error("Current production rewrite adapter only")
+88 |  if (!resolve(version.seedProfile).startsWith("/tmp/alkalye-production-undo-residual/current-7d7df3d/") || !(await stat(version.seedProfile)).isDirectory() || !(await realpath(version.seedProfile)).startsWith("/private/tmp/alkalye-production-undo-residual/current-7d7df3d/")) throw Error("Controlled fixture profile required")
+89 |  for (let path of [version.seedProfile, ...version.oracle.filter(value => value.startsWith("/")), ...version.fixtures.map(value => value.sourceFile), join(import.meta.dir,"network.js"), join(import.meta.dir,"block-sockets.js")]) if (!await Bun.file(path).exists() && path !== version.seedProfile) throw Error("Preflight missing dependency: " + path)
+                                                                                                                                                                                                                                                                                                                    ^
+error: Preflight missing dependency: /private/tmp/alkalye-production-undo-residual/current-7d7df3d/app-runtime/experiments/performance/interaction-matrix/block-sockets.js
+      at /private/tmp/alkalye-production-undo-residual/current-7d7df3d/app-runtime/experiments/performance/interaction-matrix/runner.ts:89:304
+
+Bun v1.4.0 (macOS arm64)
+stopped alkalye-production-undo-residual/codex-undo-residual/web
+53 | let stage = "prepare"
+54 | let failure = false
+55 | async function command(args: string[], variables: Record<string, string> = {}) {
+56 |  let child = Bun.spawn(args, { cwd: import.meta.dir, env: { ...process.env, WORK_STATE_ROOT: stateRoot, ...variables }, stdout: "inherit", stderr: "inherit" })
+57 |  let exit = await child.exited
+58 |  if (exit !== 0) throw Error("Owned command failed: " + args[0] + " (" + exit + ")")
+                            ^
+error: Owned command failed: bun (1)
+      at command (/private/tmp/alkalye-production-undo-residual/current-7d7df3d/app-runtime/production-body-gate.ts:58:24)
+
+Bun v1.4.0 (macOS arm64)
+ 5 | let run = root + "/fixed-origin-" + crypto.randomUUID()
+ 6 | let child = Bun.spawn(["bun", "production-body-gate.ts", "candidate", "rich1m", "--measure"], { cwd: root + "/app-runtime", env: { ...process.env, PRODUCTION_BODY_RUN: run }, stdout: "inherit", stderr: "inherit" })
+ 7 | console.log(JSON.stringify({ stage: "live", pid: child.pid, run }))
+ 8 | let exit = await child.exited
+ 9 | await Bun.write(root + "/fixed-origin-terminal.json", JSON.stringify({ exit, run }))
+10 | if (exit) throw Error("Diagnostic failed; preserve attempt")
+                     ^
+error: Diagnostic failed; preserve attempt
+      at /private/tmp/alkalye-production-undo-residual/current-7d7df3d/run-fixed-origin.ts:10:17
+
+Bun v1.4.0 (macOS arm64)

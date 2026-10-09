@@ -1,0 +1,218 @@
+[
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/markers.patch",
+    "archive": "markers.patch",
+    "bytes": 4297,
+    "sha256": "007f624a22ee1e7269dc2a5c9f98c655eba57c09fc8580bb4ba1958e6937bb55"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/source-pins.json",
+    "archive": "source-pins.json.txt",
+    "bytes": 1460,
+    "sha256": "1f41212f91385d930a12a014a01be2e72092b3e78aebb5037c0e44ae876940c0"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/diagnostic-build-pins.json",
+    "archive": "diagnostic-build-pins.json.txt",
+    "bytes": 198235,
+    "sha256": "a4596bfedb791fa0728c669acfc1e15cbaddec72bbbb6e5602a7dcf6ecfd8ec4"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/bundle-parity.py",
+    "archive": "bundle-parity.py",
+    "bytes": 2606,
+    "sha256": "026f2a3b32161416759c1f75fb774221ad6af771bd412b54387ff8a477e98619"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/bundle-parity.json",
+    "archive": "bundle-parity.json.txt",
+    "bytes": 48787,
+    "sha256": "5aed32bf9798bf72348b2be379d7ab6cf8352efbfadcff62f57dafc589de655c"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/preparation.log",
+    "archive": "preparation.log.txt",
+    "bytes": 63,
+    "sha256": "44501223287d008d16802901159a4cf978fc421294da4b0f2a32af638be99424"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/marked-types.log",
+    "archive": "marked-types.log.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/marked-build.log",
+    "archive": "marked-build.log.txt",
+    "bytes": 15,
+    "sha256": "a1e1ec9bdb36d7dd3f2aa0b8ef9ca9120691b4a84ccf5f8d8bac12f2ba04504c"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/preparation-ready.json",
+    "archive": "preparation-ready.json.txt",
+    "bytes": 290,
+    "sha256": "66a4df673102731c4284e9ba00ccf3a34ad250a7324046b321b48fcce26e2d60"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/diagnostic.log",
+    "archive": "diagnostic.log.txt",
+    "bytes": 3350,
+    "sha256": "ae755811187bc2f668a087a415b6e96c8165d3fd724cde746b83e3f165d130db"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/fixed-origin.log",
+    "archive": "fixed-origin.log.txt",
+    "bytes": 3279,
+    "sha256": "614479539f75a884292ae846a5be65308ba5e207496c6344591ba6e45d2949b1"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/dependencies-ready.log",
+    "archive": "dependencies-ready.log.txt",
+    "bytes": 474,
+    "sha256": "099185d0ff7077eff90c0f5055a8b80a2bde2fe38133159f90e25de06d8a3ea8"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/diagnostic-terminal.json",
+    "archive": "diagnostic-terminal.json.txt",
+    "bytes": 120,
+    "sha256": "1afa95f388d0ba9ee8567e3af52b58264bddafcbb3c8a5a07675154dbc09e691"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/fixed-origin-terminal.json",
+    "archive": "fixed-origin-terminal.json.txt",
+    "bytes": 122,
+    "sha256": "169e570cf13b087700a7a89a82a67e8304fa7696a5872b8a99e70904f8a86d30"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/dependencies-ready-terminal.json",
+    "archive": "dependencies-ready-terminal.json.txt",
+    "bytes": 128,
+    "sha256": "9c01a227ef580d8092d3ed92543892d3b7842b1277c7269c90afc84c798c02ef"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/parse-marked.py",
+    "archive": "parse-marked.py",
+    "bytes": 2901,
+    "sha256": "1581d1ff958a366037c4068c242e4496b1d4950fb8ae905cdd0118e20e64c6c1"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/marked-analysis.log",
+    "archive": "marked-analysis.log.txt",
+    "bytes": 1251,
+    "sha256": "100ac8bb2d0bfb3f74de00802d7464e2caf2d378bac86f679015c8995be2fdb3"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/marked-analysis-final.log",
+    "archive": "marked-analysis-final.log.txt",
+    "bytes": 2400,
+    "sha256": "4a5014f6cf21d6c14a280048ed0f8382ef83d977d3ae521d69486f4d1c49d3e3"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/marked-analysis.json",
+    "archive": "marked-analysis.json.txt",
+    "bytes": 13194,
+    "sha256": "21e083170c03e9da512d7aca6b7bccf55fbb0f9c72dd7fe581bf0041c7bbc975"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/production-body-gate.ts",
+    "archive": "production-body-gate.ts.txt",
+    "bytes": 8663,
+    "sha256": "3375cde650aa28c51a45fc2a3b3181e74c07690609e8347c7da62184368c7077"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/server-journey.ts",
+    "archive": "server-journey.ts.txt",
+    "bytes": 614,
+    "sha256": "9f7f9815413c99aab5a169637988bbdad8b0c0da0c06b9bb4f2c47b96f156890"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/run.ts",
+    "archive": "run.ts.txt",
+    "bytes": 986,
+    "sha256": "a74b1ff0da3fa3375615ca337d52771ff4e43c46ab8472206b400777efc29757"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/run-fixed-origin.ts",
+    "archive": "run-fixed-origin.ts.txt",
+    "bytes": 994,
+    "sha256": "ef01b3713c83fb0bba4759c81603e5e47d9bd49dd1568fae9c834750b1e7a7d0"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/run-dependencies-ready.ts",
+    "archive": "run-dependencies-ready.ts.txt",
+    "bytes": 1018,
+    "sha256": "34d89dacf54cac3f46b808492ce23a42938b99f948c7c5d7a0fff0326e6acb67"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/prepare.sh",
+    "archive": "prepare.sh",
+    "bytes": 2166,
+    "sha256": "28e5b5f0b54e5a91af907d151051bdc2215afc4a4a52c4356a9a300c413cdaed"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/README.md",
+    "archive": "README.md.txt",
+    "bytes": 2667,
+    "sha256": "45bc05ba4ba5795d2ca18f46dd327b889a284e785929a95ef48edc88653691d8"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/marked/src/shared/projection.ts",
+    "archive": "marked/src/shared/projection.ts.txt",
+    "bytes": 21906,
+    "sha256": "e802609eb0ab5546d6fd72feadeac64441d6d0d37fd76f5534367cccc219a802"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/marked/src/shared/document-session.ts",
+    "archive": "marked/src/shared/document-session.ts.txt",
+    "bytes": 67831,
+    "sha256": "b4352ea8f1710d7c9662a231271f0a4d99838df474fc5be0fb555eee96db50ec"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/marked/src/shared/crdt.ts",
+    "archive": "marked/src/shared/crdt.ts.txt",
+    "bytes": 77049,
+    "sha256": "60807d62277a0136b587c2d7f5b7c9cfe86535de4a8d5ae0fc076094201d7256"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/marked/src/client/document-app.ts",
+    "archive": "marked/src/client/document-app.ts.txt",
+    "bytes": 127851,
+    "sha256": "af22539869fc5c3eb187c9438e6013c8dfabad4a358c241a1ad50adc4bf2a574"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/marked/src/client/source-textarea.ts",
+    "archive": "marked/src/client/source-textarea.ts.txt",
+    "bytes": 11591,
+    "sha256": "43003b9a98815301c4f872805b479a984d96f871cae9950de5a6e5b06fbf7235"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/baseline/src/shared/projection.ts",
+    "archive": "baseline/src/shared/projection.ts.txt",
+    "bytes": 21774,
+    "sha256": "b6af74ddc2d20e9bc9d740deaa2cdb0cb214a323b3a7e681d0e10726bd67c93f"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/baseline/src/shared/document-session.ts",
+    "archive": "baseline/src/shared/document-session.ts.txt",
+    "bytes": 67632,
+    "sha256": "643001563d7f322103197af6e821541b9b0907c6a6d94a1b7dbf50143b40e9f4"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/baseline/src/shared/crdt.ts",
+    "archive": "baseline/src/shared/crdt.ts.txt",
+    "bytes": 76683,
+    "sha256": "4a0aa7553a0de7fbfc2d8eb9a6332313b04bcf0dc68e558de6add25ea6e71b7d"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/baseline/src/client/document-app.ts",
+    "archive": "baseline/src/client/document-app.ts.txt",
+    "bytes": 127792,
+    "sha256": "31a2fa7465d3fc2fcf6a64e5635c64c30d11128daa8918c8708d7d833c223a27"
+  },
+  {
+    "producer": "/tmp/alkalye-production-undo-residual/current-7d7df3d/baseline/src/client/source-textarea.ts",
+    "archive": "baseline/src/client/source-textarea.ts.txt",
+    "bytes": 11186,
+    "sha256": "ea21278c971230d2e6444d11b54c3c6180f1022e777f84f254f01531c15e40ec"
+  }
+]

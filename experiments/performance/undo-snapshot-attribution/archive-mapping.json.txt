@@ -1,0 +1,282 @@
+[
+  {
+    "path": "README.md",
+    "bytes": 4239,
+    "sha256": "f17b30d96e61425d592f2bd2e00700d1aa30c40554c32ae187ef485a33edeecc",
+    "retained": true,
+    "archive": "producer-readme.md.txt"
+  },
+  {
+    "path": "README.md.txt",
+    "bytes": 2667,
+    "sha256": "45bc05ba4ba5795d2ca18f46dd327b889a284e785929a95ef48edc88653691d8",
+    "retained": true,
+    "archive": "preparation-readme.md.txt"
+  },
+  {
+    "path": "baseline/src/client/document-app.ts.txt",
+    "bytes": 127792,
+    "sha256": "31a2fa7465d3fc2fcf6a64e5635c64c30d11128daa8918c8708d7d833c223a27",
+    "retained": false,
+    "reconstruction": "git baseline plus markers.patch; independently verified byte-exact"
+  },
+  {
+    "path": "baseline/src/client/source-textarea.ts.txt",
+    "bytes": 11186,
+    "sha256": "ea21278c971230d2e6444d11b54c3c6180f1022e777f84f254f01531c15e40ec",
+    "retained": false,
+    "reconstruction": "git baseline plus markers.patch; independently verified byte-exact"
+  },
+  {
+    "path": "baseline/src/shared/crdt.ts.txt",
+    "bytes": 76683,
+    "sha256": "4a0aa7553a0de7fbfc2d8eb9a6332313b04bcf0dc68e558de6add25ea6e71b7d",
+    "retained": false,
+    "reconstruction": "git baseline plus markers.patch; independently verified byte-exact"
+  },
+  {
+    "path": "baseline/src/shared/document-session.ts.txt",
+    "bytes": 67632,
+    "sha256": "643001563d7f322103197af6e821541b9b0907c6a6d94a1b7dbf50143b40e9f4",
+    "retained": false,
+    "reconstruction": "git baseline plus markers.patch; independently verified byte-exact"
+  },
+  {
+    "path": "baseline/src/shared/projection.ts.txt",
+    "bytes": 21774,
+    "sha256": "b6af74ddc2d20e9bc9d740deaa2cdb0cb214a323b3a7e681d0e10726bd67c93f",
+    "retained": false,
+    "reconstruction": "git baseline plus markers.patch; independently verified byte-exact"
+  },
+  {
+    "path": "bundle-parity.json.txt",
+    "bytes": 48787,
+    "sha256": "5aed32bf9798bf72348b2be379d7ab6cf8352efbfadcff62f57dafc589de655c",
+    "retained": true,
+    "archive": "bundle-parity.json.txt"
+  },
+  {
+    "path": "bundle-parity.py",
+    "bytes": 2606,
+    "sha256": "026f2a3b32161416759c1f75fb774221ad6af771bd412b54387ff8a477e98619",
+    "retained": true,
+    "archive": "bundle-parity.py"
+  },
+  {
+    "path": "dependencies-ready-terminal.json.txt",
+    "bytes": 128,
+    "sha256": "9c01a227ef580d8092d3ed92543892d3b7842b1277c7269c90afc84c798c02ef",
+    "retained": true,
+    "archive": "dependencies-ready-terminal.json.txt"
+  },
+  {
+    "path": "dependencies-ready.log.txt",
+    "bytes": 474,
+    "sha256": "099185d0ff7077eff90c0f5055a8b80a2bde2fe38133159f90e25de06d8a3ea8",
+    "retained": true,
+    "archive": "dependencies-ready.log.txt"
+  },
+  {
+    "path": "diagnostic-build-pins.json.txt",
+    "bytes": 198235,
+    "sha256": "a4596bfedb791fa0728c669acfc1e15cbaddec72bbbb6e5602a7dcf6ecfd8ec4",
+    "retained": true,
+    "archive": "diagnostic-build-pins.json.txt"
+  },
+  {
+    "path": "diagnostic-terminal.json.txt",
+    "bytes": 120,
+    "sha256": "1afa95f388d0ba9ee8567e3af52b58264bddafcbb3c8a5a07675154dbc09e691",
+    "retained": true,
+    "archive": "diagnostic-terminal.json.txt"
+  },
+  {
+    "path": "diagnostic.log.txt",
+    "bytes": 3280,
+    "sha256": "a494abe5306c604208e8c41b15fd30ff0a52e1f6f9cfbd705b186abf15029876",
+    "retained": true,
+    "archive": "diagnostic.log.txt"
+  },
+  {
+    "path": "fixed-origin-terminal.json.txt",
+    "bytes": 122,
+    "sha256": "169e570cf13b087700a7a89a82a67e8304fa7696a5872b8a99e70904f8a86d30",
+    "retained": true,
+    "archive": "fixed-origin-terminal.json.txt"
+  },
+  {
+    "path": "fixed-origin.log.txt",
+    "bytes": 3279,
+    "sha256": "614479539f75a884292ae846a5be65308ba5e207496c6344591ba6e45d2949b1",
+    "retained": true,
+    "archive": "fixed-origin.log.txt"
+  },
+  {
+    "path": "marked/src/client/document-app.ts.txt",
+    "bytes": 127851,
+    "sha256": "af22539869fc5c3eb187c9438e6013c8dfabad4a358c241a1ad50adc4bf2a574",
+    "retained": false,
+    "reconstruction": "git baseline plus markers.patch; independently verified byte-exact"
+  },
+  {
+    "path": "marked/src/client/source-textarea.ts.txt",
+    "bytes": 11591,
+    "sha256": "43003b9a98815301c4f872805b479a984d96f871cae9950de5a6e5b06fbf7235",
+    "retained": false,
+    "reconstruction": "git baseline plus markers.patch; independently verified byte-exact"
+  },
+  {
+    "path": "marked/src/shared/crdt.ts.txt",
+    "bytes": 77049,
+    "sha256": "60807d62277a0136b587c2d7f5b7c9cfe86535de4a8d5ae0fc076094201d7256",
+    "retained": false,
+    "reconstruction": "git baseline plus markers.patch; independently verified byte-exact"
+  },
+  {
+    "path": "marked/src/shared/document-session.ts.txt",
+    "bytes": 67831,
+    "sha256": "b4352ea8f1710d7c9662a231271f0a4d99838df474fc5be0fb555eee96db50ec",
+    "retained": false,
+    "reconstruction": "git baseline plus markers.patch; independently verified byte-exact"
+  },
+  {
+    "path": "marked/src/shared/projection.ts.txt",
+    "bytes": 21906,
+    "sha256": "e802609eb0ab5546d6fd72feadeac64441d6d0d37fd76f5534367cccc219a802",
+    "retained": false,
+    "reconstruction": "git baseline plus markers.patch; independently verified byte-exact"
+  },
+  {
+    "path": "marked-analysis-final.log.txt",
+    "bytes": 2400,
+    "sha256": "4a5014f6cf21d6c14a280048ed0f8382ef83d977d3ae521d69486f4d1c49d3e3",
+    "retained": true,
+    "archive": "marked-analysis-final.log.txt"
+  },
+  {
+    "path": "marked-analysis.json.txt",
+    "bytes": 13383,
+    "sha256": "8b036c72ab6a271600fa86e068a1e7e22eb1d410432b72984a841422c9ca2e2c",
+    "retained": true,
+    "archive": "marked-analysis.json.txt"
+  },
+  {
+    "path": "marked-analysis.log.txt",
+    "bytes": 1251,
+    "sha256": "100ac8bb2d0bfb3f74de00802d7464e2caf2d378bac86f679015c8995be2fdb3",
+    "retained": true,
+    "archive": "marked-analysis.log.txt"
+  },
+  {
+    "path": "marked-build.log.txt",
+    "bytes": 15,
+    "sha256": "a1e1ec9bdb36d7dd3f2aa0b8ef9ca9120691b4a84ccf5f8d8bac12f2ba04504c",
+    "retained": true,
+    "archive": "marked-build.log.txt"
+  },
+  {
+    "path": "marked-types.log.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "retained": true,
+    "archive": "marked-types.log.txt"
+  },
+  {
+    "path": "markers.patch",
+    "bytes": 4297,
+    "sha256": "007f624a22ee1e7269dc2a5c9f98c655eba57c09fc8580bb4ba1958e6937bb55",
+    "retained": true,
+    "archive": "markers.patch"
+  },
+  {
+    "path": "parse-marked.py",
+    "bytes": 2901,
+    "sha256": "1581d1ff958a366037c4068c242e4496b1d4950fb8ae905cdd0118e20e64c6c1",
+    "retained": true,
+    "archive": "parse-marked.py"
+  },
+  {
+    "path": "preparation-ready.json.txt",
+    "bytes": 290,
+    "sha256": "66a4df673102731c4284e9ba00ccf3a34ad250a7324046b321b48fcce26e2d60",
+    "retained": true,
+    "archive": "preparation-ready.json.txt"
+  },
+  {
+    "path": "preparation.log.txt",
+    "bytes": 63,
+    "sha256": "44501223287d008d16802901159a4cf978fc421294da4b0f2a32af638be99424",
+    "retained": true,
+    "archive": "preparation.log.txt"
+  },
+  {
+    "path": "prepare.sh",
+    "bytes": 2166,
+    "sha256": "28e5b5f0b54e5a91af907d151051bdc2215afc4a4a52c4356a9a300c413cdaed",
+    "retained": true,
+    "archive": "prepare.sh"
+  },
+  {
+    "path": "producer-manifest.json.txt",
+    "bytes": 9032,
+    "sha256": "5ae05ede308083f91360fb97f22ecef64f6e3046427a6ca096fe4bb12ba7826c",
+    "retained": true,
+    "archive": "producer-manifest.json.txt"
+  },
+  {
+    "path": "production-body-gate.ts.txt",
+    "bytes": 8663,
+    "sha256": "3375cde650aa28c51a45fc2a3b3181e74c07690609e8347c7da62184368c7077",
+    "retained": true,
+    "archive": "production-body-gate.ts.txt"
+  },
+  {
+    "path": "result.json.txt",
+    "bytes": 19807,
+    "sha256": "b3c10349095018fb14c9f50d1470f57b7e9408d8e52e523e6a0bee84cc924cf0",
+    "retained": true,
+    "archive": "result.json.txt"
+  },
+  {
+    "path": "run-dependencies-ready.ts.txt",
+    "bytes": 1018,
+    "sha256": "34d89dacf54cac3f46b808492ce23a42938b99f948c7c5d7a0fff0326e6acb67",
+    "retained": true,
+    "archive": "run-dependencies-ready.ts.txt"
+  },
+  {
+    "path": "run-fixed-origin.ts.txt",
+    "bytes": 994,
+    "sha256": "ef01b3713c83fb0bba4759c81603e5e47d9bd49dd1568fae9c834750b1e7a7d0",
+    "retained": true,
+    "archive": "run-fixed-origin.ts.txt"
+  },
+  {
+    "path": "run.ts.txt",
+    "bytes": 986,
+    "sha256": "a74b1ff0da3fa3375615ca337d52771ff4e43c46ab8472206b400777efc29757",
+    "retained": true,
+    "archive": "run.ts.txt"
+  },
+  {
+    "path": "served-assets.json.txt",
+    "bytes": 4665,
+    "sha256": "697d1fc1188a490136ed3d00e0965facdcf0f36fbee9928a12ccd86e8983b708",
+    "retained": true,
+    "archive": "served-assets.json.txt"
+  },
+  {
+    "path": "server-journey.ts.txt",
+    "bytes": 614,
+    "sha256": "9f7f9815413c99aab5a169637988bbdad8b0c0da0c06b9bb4f2c47b96f156890",
+    "retained": true,
+    "archive": "server-journey.ts.txt"
+  },
+  {
+    "path": "source-pins.json.txt",
+    "bytes": 1460,
+    "sha256": "1f41212f91385d930a12a014a01be2e72092b3e78aebb5037c0e44ae876940c0",
+    "retained": true,
+    "archive": "source-pins.json.txt"
+  }
+]

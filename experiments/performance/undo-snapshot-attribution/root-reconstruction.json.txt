@@ -1,0 +1,31 @@
+{
+  "baseCommit": "7d7df3dcfb8179915c5b214e1392e955e63d7430",
+  "files": [
+    {
+      "path": "src/client/source-textarea.ts",
+      "baselineSHA256": "ea21278c971230d2e6444d11b54c3c6180f1022e777f84f254f01531c15e40ec",
+      "markedSHA256": "43003b9a98815301c4f872805b479a984d96f871cae9950de5a6e5b06fbf7235"
+    },
+    {
+      "path": "src/client/document-app.ts",
+      "baselineSHA256": "31a2fa7465d3fc2fcf6a64e5635c64c30d11128daa8918c8708d7d833c223a27",
+      "markedSHA256": "af22539869fc5c3eb187c9438e6013c8dfabad4a358c241a1ad50adc4bf2a574"
+    },
+    {
+      "path": "src/shared/projection.ts",
+      "baselineSHA256": "b6af74ddc2d20e9bc9d740deaa2cdb0cb214a323b3a7e681d0e10726bd67c93f",
+      "markedSHA256": "e802609eb0ab5546d6fd72feadeac64441d6d0d37fd76f5534367cccc219a802"
+    },
+    {
+      "path": "src/shared/crdt.ts",
+      "baselineSHA256": "4a0aa7553a0de7fbfc2d8eb9a6332313b04bcf0dc68e558de6add25ea6e71b7d",
+      "markedSHA256": "60807d62277a0136b587c2d7f5b7c9cfe86535de4a8d5ae0fc076094201d7256"
+    },
+    {
+      "path": "src/shared/document-session.ts",
+      "baselineSHA256": "643001563d7f322103197af6e821541b9b0907c6a6d94a1b7dbf50143b40e9f4",
+      "markedSHA256": "b4352ea8f1710d7c9662a231271f0a4d99838df474fc5be0fb555eee96db50ec"
+    }
+  ],
+  "result": "all five baseline and reconstructed marked sources match producer bytes"
+}

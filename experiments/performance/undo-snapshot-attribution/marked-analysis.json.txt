@@ -1,0 +1,560 @@
+{
+  "phases": [
+    {
+      "phase": "input",
+      "status": "measured-complete",
+      "traceSHA256": "0220ec7e0fec30359a40c65838ee0146ad1da16758bd93dfa5b257977bf425ef",
+      "traceBytes": 8472664,
+      "owner": [
+        5599,
+        20715486
+      ],
+      "markers": [
+        {
+          "name": "undo-residual:certified-token-metadata-start",
+          "ms": 1.499
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-end",
+          "ms": 3.569
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 6.265
+        },
+        {
+          "name": "interaction:ready",
+          "ms": 12.675
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 13.801
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 15.293
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 29.392
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 247.01
+        },
+        {
+          "name": "undo-residual:snapshot-start",
+          "ms": 251.67
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 264.227
+        },
+        {
+          "name": "undo-residual:checkpoint-borrowed-start",
+          "ms": 404.174
+        },
+        {
+          "name": "undo-residual:checkpoint-borrowed-end",
+          "ms": 430.587
+        },
+        {
+          "name": "undo-residual:checkpoint-compact-start",
+          "ms": 430.601
+        },
+        {
+          "name": "undo-residual:checkpoint-compact-end",
+          "ms": 602.481
+        },
+        {
+          "name": "undo-residual:checkpoint-output-start",
+          "ms": 602.498
+        },
+        {
+          "name": "undo-residual:checkpoint-output-end",
+          "ms": 602.612
+        },
+        {
+          "name": "undo-residual:snapshot-encode-start",
+          "ms": 602.619
+        },
+        {
+          "name": "undo-residual:snapshot-encode-end",
+          "ms": 602.708
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 745.271
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 761.807
+        }
+      ],
+      "stages": [
+        {
+          "stage": "checkpoint-borrowed",
+          "startMs": 404.174,
+          "endMs": 430.587,
+          "wallMs": 26.41300000000001,
+          "minorGCCount": 3,
+          "largestMinorGCSpanMs": 0.712
+        },
+        {
+          "stage": "checkpoint-compact",
+          "startMs": 430.601,
+          "endMs": 602.481,
+          "wallMs": 171.88,
+          "minorGCCount": 9,
+          "largestMinorGCSpanMs": 9.587
+        },
+        {
+          "stage": "checkpoint-output",
+          "startMs": 602.498,
+          "endMs": 602.612,
+          "wallMs": 0.11399999999991905,
+          "minorGCCount": 0,
+          "largestMinorGCSpanMs": 0
+        },
+        {
+          "stage": "snapshot-encode",
+          "startMs": 602.619,
+          "endMs": 602.708,
+          "wallMs": 0.08899999999994179,
+          "minorGCCount": 0,
+          "largestMinorGCSpanMs": 0
+        },
+        {
+          "stage": "certified-token-metadata",
+          "startMs": 1.499,
+          "endMs": 3.569,
+          "wallMs": 2.07,
+          "minorGCCount": 0,
+          "largestMinorGCSpanMs": 0
+        }
+      ],
+      "minorGC": [
+        {
+          "name": "MinorGC",
+          "ms": 15.528,
+          "durationMs": 0.946
+        },
+        {
+          "name": "MinorGC",
+          "ms": 319.84,
+          "durationMs": 1.001
+        },
+        {
+          "name": "MinorGC",
+          "ms": 346.689,
+          "durationMs": 1.383
+        },
+        {
+          "name": "MinorGC",
+          "ms": 354.334,
+          "durationMs": 0.255
+        },
+        {
+          "name": "MinorGC",
+          "ms": 359.22,
+          "durationMs": 0.161
+        },
+        {
+          "name": "MinorGC",
+          "ms": 364.276,
+          "durationMs": 0.205
+        },
+        {
+          "name": "MinorGC",
+          "ms": 375.679,
+          "durationMs": 1.261
+        },
+        {
+          "name": "MinorGC",
+          "ms": 391.014,
+          "durationMs": 0.922
+        },
+        {
+          "name": "MinorGC",
+          "ms": 409.795,
+          "durationMs": 0.517
+        },
+        {
+          "name": "MinorGC",
+          "ms": 419.508,
+          "durationMs": 0.657
+        },
+        {
+          "name": "MinorGC",
+          "ms": 427.518,
+          "durationMs": 0.712
+        },
+        {
+          "name": "MinorGC",
+          "ms": 438.524,
+          "durationMs": 8.181
+        },
+        {
+          "name": "MinorGC",
+          "ms": 456.719,
+          "durationMs": 9.251
+        },
+        {
+          "name": "MinorGC",
+          "ms": 475.532,
+          "durationMs": 9.587
+        },
+        {
+          "name": "MinorGC",
+          "ms": 494.676,
+          "durationMs": 9.013
+        },
+        {
+          "name": "MinorGC",
+          "ms": 514.418,
+          "durationMs": 8.957
+        },
+        {
+          "name": "MinorGC",
+          "ms": 533.369,
+          "durationMs": 8.841
+        },
+        {
+          "name": "MinorGC",
+          "ms": 552.491,
+          "durationMs": 8.644
+        },
+        {
+          "name": "MinorGC",
+          "ms": 571.17,
+          "durationMs": 7.894
+        },
+        {
+          "name": "MinorGC",
+          "ms": 588.943,
+          "durationMs": 8.175
+        },
+        {
+          "name": "MinorGC",
+          "ms": 647.292,
+          "durationMs": 3.415
+        },
+        {
+          "name": "MinorGC",
+          "ms": 689.83,
+          "durationMs": 0.897
+        },
+        {
+          "name": "MinorGC",
+          "ms": 700.435,
+          "durationMs": 0.262
+        },
+        {
+          "name": "MinorGC",
+          "ms": 704.839,
+          "durationMs": 0.224
+        },
+        {
+          "name": "MinorGC",
+          "ms": 710.243,
+          "durationMs": 0.614
+        },
+        {
+          "name": "MinorGC",
+          "ms": 721.584,
+          "durationMs": 0.901
+        }
+      ],
+      "mainMaxTaskMs": 10.056,
+      "mainBusyUnionMs": 725.395,
+      "sourceSelection": {
+        "start": 524289,
+        "end": 524289
+      }
+    },
+    {
+      "phase": "undo",
+      "status": "measured-complete",
+      "traceSHA256": "50856971d20aad40b6cab21a8ddbe6bd34c0b1ab3c00ebdcee13446be28668f1",
+      "traceBytes": 9609194,
+      "owner": [
+        5599,
+        20715486
+      ],
+      "markers": [
+        {
+          "name": "undo-residual:durable-completion",
+          "ms": 20.048
+        },
+        {
+          "name": "undo-residual:projection-inverse-hit",
+          "ms": 21.231
+        },
+        {
+          "name": "undo-residual:apply-start",
+          "ms": 21.238
+        },
+        {
+          "name": "undo-residual:model-source-assigned",
+          "ms": 21.335
+        },
+        {
+          "name": "undo-residual:native-render-return",
+          "ms": 26.8
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 27.685
+        },
+        {
+          "name": "interaction:ready",
+          "ms": 28.782
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 29.151
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 246.008
+        },
+        {
+          "name": "undo-residual:snapshot-start",
+          "ms": 259.102
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 264.165
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 278.993
+        },
+        {
+          "name": "undo-residual:checkpoint-borrowed-start",
+          "ms": 387.4
+        },
+        {
+          "name": "undo-residual:checkpoint-borrowed-end",
+          "ms": 418.965
+        },
+        {
+          "name": "undo-residual:checkpoint-compact-start",
+          "ms": 418.983
+        },
+        {
+          "name": "undo-residual:checkpoint-compact-end",
+          "ms": 604.639
+        },
+        {
+          "name": "undo-residual:checkpoint-output-start",
+          "ms": 604.657
+        },
+        {
+          "name": "undo-residual:checkpoint-output-end",
+          "ms": 604.696
+        },
+        {
+          "name": "undo-residual:snapshot-encode-start",
+          "ms": 604.7
+        },
+        {
+          "name": "undo-residual:snapshot-encode-end",
+          "ms": 604.734
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 746.0
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 761.931
+        },
+        {
+          "name": "undo-residual:projection-current-hit",
+          "ms": 778.692
+        }
+      ],
+      "stages": [
+        {
+          "stage": "checkpoint-borrowed",
+          "startMs": 387.4,
+          "endMs": 418.965,
+          "wallMs": 31.564999999999998,
+          "minorGCCount": 3,
+          "largestMinorGCSpanMs": 1.082
+        },
+        {
+          "stage": "checkpoint-compact",
+          "startMs": 418.983,
+          "endMs": 604.639,
+          "wallMs": 185.656,
+          "minorGCCount": 9,
+          "largestMinorGCSpanMs": 10.709
+        },
+        {
+          "stage": "checkpoint-output",
+          "startMs": 604.657,
+          "endMs": 604.696,
+          "wallMs": 0.03899999999998727,
+          "minorGCCount": 0,
+          "largestMinorGCSpanMs": 0
+        },
+        {
+          "stage": "snapshot-encode",
+          "startMs": 604.7,
+          "endMs": 604.734,
+          "wallMs": 0.033999999999991815,
+          "minorGCCount": 0,
+          "largestMinorGCSpanMs": 0
+        }
+      ],
+      "minorGC": [
+        {
+          "name": "MinorGC",
+          "ms": 325.868,
+          "durationMs": 1.028
+        },
+        {
+          "name": "MinorGC",
+          "ms": 348.784,
+          "durationMs": 0.994
+        },
+        {
+          "name": "MinorGC",
+          "ms": 356.508,
+          "durationMs": 0.199
+        },
+        {
+          "name": "MinorGC",
+          "ms": 363.809,
+          "durationMs": 0.909
+        },
+        {
+          "name": "MinorGC",
+          "ms": 376.311,
+          "durationMs": 0.854
+        },
+        {
+          "name": "MinorGC",
+          "ms": 392.791,
+          "durationMs": 0.73
+        },
+        {
+          "name": "MinorGC",
+          "ms": 404.955,
+          "durationMs": 0.656
+        },
+        {
+          "name": "MinorGC",
+          "ms": 416.042,
+          "durationMs": 1.082
+        },
+        {
+          "name": "MinorGC",
+          "ms": 429.002,
+          "durationMs": 8.995
+        },
+        {
+          "name": "MinorGC",
+          "ms": 449.899,
+          "durationMs": 9.85
+        },
+        {
+          "name": "MinorGC",
+          "ms": 472.245,
+          "durationMs": 10.709
+        },
+        {
+          "name": "MinorGC",
+          "ms": 495.478,
+          "durationMs": 10.637
+        },
+        {
+          "name": "MinorGC",
+          "ms": 516.212,
+          "durationMs": 8.654
+        },
+        {
+          "name": "MinorGC",
+          "ms": 534.762,
+          "durationMs": 7.391
+        },
+        {
+          "name": "MinorGC",
+          "ms": 552.426,
+          "durationMs": 7.932
+        },
+        {
+          "name": "MinorGC",
+          "ms": 570.583,
+          "durationMs": 8.901
+        },
+        {
+          "name": "MinorGC",
+          "ms": 589.841,
+          "durationMs": 8.973
+        },
+        {
+          "name": "MinorGC",
+          "ms": 649.714,
+          "durationMs": 3.713
+        },
+        {
+          "name": "MinorGC",
+          "ms": 687.853,
+          "durationMs": 1.084
+        },
+        {
+          "name": "MinorGC",
+          "ms": 699.076,
+          "durationMs": 0.257
+        },
+        {
+          "name": "MinorGC",
+          "ms": 704.399,
+          "durationMs": 0.166
+        },
+        {
+          "name": "MinorGC",
+          "ms": 714.48,
+          "durationMs": 0.829
+        },
+        {
+          "name": "MinorGC",
+          "ms": 747.055,
+          "durationMs": 1.065
+        }
+      ],
+      "mainMaxTaskMs": 11.346,
+      "mainBusyUnionMs": 684.063,
+      "sourceSelection": null
+    }
+  ],
+  "receipts": {
+    "seedReceipt": {
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+      "characters": 1048576,
+      "logIdentitySHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+      "position": "28"
+    },
+    "editedReceipt": {
+      "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+      "characters": 1048577,
+      "logIdentitySHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+      "position": "36"
+    },
+    "undoReceipt": {
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+      "characters": 1048576,
+      "logIdentitySHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+      "position": "37"
+    }
+  },
+  "fixture": {
+    "characters": 1048576,
+    "bytes": 1048576,
+    "realNewlines": 20767,
+    "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+  }
+}

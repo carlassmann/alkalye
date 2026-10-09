@@ -1,0 +1,10 @@
+let root = "/tmp/alkalye-production-undo-residual/current-7d7df3d"
+if (!(await Bun.file(root + "/preparation-ready.json").exists())) throw Error("Strict/build readiness required before keys")
+if (await Bun.file(root + "/fixed-origin-pending.json").exists()) throw Error("Retained attempt; inspect, never repeat unknown keys")
+await Bun.write(root + "/fixed-origin-pending.json", JSON.stringify({ stage: "before-keys", sourceCommit: "7d7df3dcfb8179915c5b214e1392e955e63d7430" }))
+let run = root + "/fixed-origin-" + crypto.randomUUID()
+let child = Bun.spawn(["bun", "production-body-gate.ts", "candidate", "rich1m", "--measure"], { cwd: root + "/app-runtime", env: { ...process.env, PRODUCTION_BODY_RUN: run }, stdout: "inherit", stderr: "inherit" })
+console.log(JSON.stringify({ stage: "live", pid: child.pid, run }))
+let exit = await child.exited
+await Bun.write(root + "/fixed-origin-terminal.json", JSON.stringify({ exit, run }))
+if (exit) throw Error("Diagnostic failed; preserve attempt")

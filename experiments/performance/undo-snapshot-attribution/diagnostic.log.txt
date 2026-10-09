@@ -1,0 +1,48 @@
+{"stage":"live","pid":4710,"run":"/tmp/alkalye-production-undo-residual/current-7d7df3d/diagnostic-82896ba2-93bd-40b8-9d83-8bf200fe7307"}
+started web pid=4725
+pcg-0df9cbb3 {
+  appearance: "dark",
+  library: "\n\t\t\t\t\tYour next thought starts here.\n\t\t\t\t",
+  path: "/app/spaces/<fixture>/doc/<fixture>",
+  profile: "Anonymous writerOffline or disconnected",
+  retry: true,
+  size: "18px",
+  status: "Saved",
+  toast: "",
+  tools: "",
+}
+stopped alkalye-production-undo-residual/codex-undo-residual/web
+174 | 			evaluate(
+175 | 				session,
+176 | 				'({readOnly:document.querySelector("#editor")?.readOnly,tools:document.querySelector("#inspector-body")?.textContent,source:document.querySelector("alkalye-editor")?.source?.value.slice(0,500),sourceLength:document.querySelector("alkalye-editor")?.source?.value.length,view:document.querySelector("#editor")?.value.slice(0,500),status:document.querySelector("#save-status")?.textContent,retry:document.querySelector("#retry-save")?.hidden,toast:document.querySelector("#toast")?.textContent,results:window.documentApiResults?.slice(-8),failure:window.documentApiFailure,discussion:window.documentDiscussionStage,library:document.querySelector("#document-list")?.textContent,path:location.pathname+location.search,page:document.querySelector("[data-settings-page],[data-workspace-settings]")?.querySelector(".settings-content")?.id,appearance:document.documentElement.dataset.appearance,size:document.documentElement.style.getPropertyValue("--editor-size"),profile:document.querySelector(".profile-name")?.textContent.tri
+177 | 			),
+178 | 		)
+179 | 		throw new Error("Browser condition failed: " + source, { cause: error })
+                  ^
+error: Browser condition failed: document.querySelector('alkalye-editor')?.source?.value.length===1048576&&document.querySelector('#editor')?.readOnly===false
+      at wait (/private/tmp/alkalye-production-undo-residual/current-7d7df3d/app-runtime/tests/browser-driver.ts:179:13)
+
+43 | 			},
+44 | 		},
+45 | 	)
+46 | 	if (result.status !== 0) {
+47 | 		let failure = result.error?.message || result.stderr || result.stdout
+48 | 		throw new Error(`${session} ${args[0]}: ${failure}`)
+                 ^
+error: pcg-0df9cbb3 wait: {"success":false,"data":null,"error":"Wait timed out after 20000ms"}
+
+      at browser (/private/tmp/alkalye-production-undo-residual/current-7d7df3d/app-runtime/tests/browser-driver.ts:48:13)
+      at wait (/private/tmp/alkalye-production-undo-residual/current-7d7df3d/app-runtime/tests/browser-driver.ts:170:3)
+
+Bun v1.4.0 (macOS arm64)
+ 5 | let run = root + "/diagnostic-" + crypto.randomUUID()
+ 6 | let child = Bun.spawn(["bun", "production-body-gate.ts", "candidate", "rich1m", "--measure"], { cwd: root + "/app-runtime", env: { ...process.env, PRODUCTION_BODY_RUN: run }, stdout: "inherit", stderr: "inherit" })
+ 7 | console.log(JSON.stringify({ stage: "live", pid: child.pid, run }))
+ 8 | let exit = await child.exited
+ 9 | await Bun.write(root + "/diagnostic-terminal.json", JSON.stringify({ exit, run }))
+10 | if (exit) throw Error("Diagnostic failed; preserve attempt")
+                     ^
+error: Diagnostic failed; preserve attempt
+      at /private/tmp/alkalye-production-undo-residual/current-7d7df3d/run.ts:10:17
+
+Bun v1.4.0 (macOS arm64)
