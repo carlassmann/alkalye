@@ -5,9 +5,18 @@ import * as FetchHttpClient from "effect/http/FetchHttpClient"
 import * as HttpServer from "effect/http/HttpServer"
 import * as Layer from "effect/Layer"
 import * as ManagedRuntime from "effect/ManagedRuntime"
+import * as SqlClient from "effect/sql/SqlClient"
+import { blobDigest } from "../src/shared/document-blobs"
+import { CloudflareBlobBudget } from "../src/cloudflare/blob-budget"
+import { makeWorkspaceUploads } from "../src/cloudflare/workspace-uploads"
+import type { WorkspaceRequest } from "../src/cloudflare/workspace-rpc"
 import { sqliteLayer } from "../src/platform/sqlite"
 import { webCryptoLayer } from "../src/platform/web-crypto"
-import { WorkspaceStore } from "../src/server/document-store"
+import { WorkspaceTransfers } from "../src/server/workspace-transfer"
+import {
+	DocumentMaintenance,
+	WorkspaceStore,
+} from "../src/server/document-store"
 import { RequestOrigin } from "../src/server/request-origin"
 import { DocumentObservability } from "../src/shared/document-observability"
 import { Identity } from "../src/shared/workspace"
@@ -34,7 +43,13 @@ class TestHandler extends Context.Service<
 function remoteStorage() {
 	return ManagedRuntime.make(
 		Layer.effect(TestHandler, makeWorkspaceHandler()).pipe(
-			Layer.provideMerge(WorkspaceStore.live),
+			Layer.provideMerge(
+				Layer.mergeAll(
+					WorkspaceStore.live,
+					WorkspaceTransfers.live,
+					DocumentMaintenance.live,
+				),
+			),
 			Layer.provideMerge(sqliteLayer(":memory:")),
 			Layer.provideMerge(webCryptoLayer),
 			Layer.provideMerge(HttpServer.layerServices),
@@ -366,6 +381,161 @@ test("federated public stores preserve isolated authority, discovery, profiles a
 			first.dispose(),
 			second.dispose(),
 			directoryRuntime.dispose(),
+		])
+	}
+})
+
+test("federated uploads pin authorized workspace and retain global quota across moves", async () => {
+	let local = storage()
+	let first = remoteStorage()
+	let second = remoteStorage()
+	let authority = ManagedRuntime.make(
+		Layer.mergeAll(WorkspaceDirectory.live, CloudflareBlobBudget.live).pipe(
+			Layer.provideMerge(sqliteLayer(":memory:")),
+			Layer.provideMerge(webCryptoLayer),
+		),
+	)
+	try {
+		let localStore = await local.runPromise(
+			Effect.gen(function* () {
+				return yield* WorkspaceStore
+			}),
+		)
+		let directory = await authority.runPromise(
+			Effect.gen(function* () {
+				return yield* WorkspaceDirectory
+			}),
+		)
+		let firstHandler = await first.runPromise(
+			Effect.gen(function* () {
+				return yield* TestHandler
+			}),
+		)
+		let secondHandler = await second.runPromise(
+			Effect.gen(function* () {
+				return yield* TestHandler
+			}),
+		)
+		let freezeUpload = false
+		let uploadWorkspaces: string[] = []
+		let request: WorkspaceRequest = async (workspace, identity, request) => {
+			if (
+				request.method === "PUT" &&
+				new URL(request.url).pathname.includes("/blobs/")
+			) {
+				uploadWorkspaces.push(workspace)
+				if (freezeUpload) {
+					freezeUpload = false
+					await first.runPromise(
+						principal(
+							WorkspaceTransfers.use(transfers =>
+								transfers.stageDocumentMove(
+									"upload-doc",
+									"second",
+									"race-move",
+								),
+							),
+						),
+					)
+				}
+			}
+			return (workspace === "first" ? firstHandler : secondHandler)(
+				request,
+				Context.make(Identity, identity),
+			)
+		}
+		let adapter = await Effect.runPromise(
+			makeFederatedWorkspaceStore({ local: localStore, directory, request }),
+		)
+		let upload = await authority.runPromise(
+			makeWorkspaceUploads(request, adapter.putBlob),
+		)
+		await local.runPromise(
+			principal(
+				Effect.gen(function* () {
+					yield* adapter.create("first", "First", "upload-first")
+					yield* adapter.create("second", "Second", "upload-second")
+					let action = yield* buildAction(
+						new Replica("owner-edit"),
+						"upload-doc",
+						"Create",
+						r => newDocument(r, "upload-doc", "Upload", "body"),
+					)
+					yield* adapter.createDocument("first", action)
+					yield* adapter.membership(
+						"first",
+						"reader",
+						"reader",
+						"upload-reader",
+					)
+				}),
+			),
+		)
+		let bytes = new Uint8Array([1, 2, 3])
+		let digest = await authority.runPromise(blobDigest(bytes))
+		expect(
+			(
+				await authority.runPromise(
+					principal(upload("upload-doc", digest, bytes), "reader").pipe(
+						Effect.exit,
+					),
+				)
+			)._tag,
+		).toBe("Failure")
+		expect(uploadWorkspaces).toEqual([])
+		await authority.runPromise(principal(upload("upload-doc", digest, bytes)))
+		expect(uploadWorkspaces).toEqual(["first"])
+		expect(
+			Array.from(
+				await local.runPromise(
+					principal(adapter.getBlob("upload-doc", digest)),
+				),
+			),
+		).toEqual([1, 2, 3])
+		let nextBytes = new Uint8Array([4, 5, 6])
+		let nextDigest = await authority.runPromise(blobDigest(nextBytes))
+		freezeUpload = true
+		let refused = await authority.runPromise(
+			principal(upload("upload-doc", nextDigest, nextBytes)).pipe(Effect.exit),
+		)
+		expect(refused._tag).toBe("Failure")
+		expect(uploadWorkspaces).toEqual(["first", "first"])
+		let budget = await authority.runPromise(
+			Effect.gen(function* () {
+				return yield* CloudflareBlobBudget
+			}),
+		)
+		let rows = await authority.runPromise(
+			SqlClient.SqlClient.use(
+				sql =>
+					sql<{
+						document: string
+						digest: string
+						state: string
+					}>`SELECT document,digest,state FROM cloudflare_blob_budget ORDER BY digest`,
+			),
+		)
+		expect(rows).toHaveLength(2)
+		expect(rows.find(row => row.digest === nextDigest)?.state).toBe("pending")
+		expect(rows.find(row => row.digest === digest)?.state).toBe("confirmed")
+		await authority.runPromise(
+			budget.reassignDocument("upload-doc", "owner", "next-owner"),
+		)
+		await authority.runPromise(
+			budget.reassignDocument("upload-doc", "owner", "next-owner"),
+		)
+		let owners = await authority.runPromise(
+			SqlClient.SqlClient.use(
+				sql => sql<{ owner: string }>`SELECT owner FROM cloudflare_blob_budget`,
+			),
+		)
+		expect(owners).toEqual([{ owner: "next-owner" }, { owner: "next-owner" }])
+	} finally {
+		await Promise.all([
+			local.dispose(),
+			first.dispose(),
+			second.dispose(),
+			authority.dispose(),
 		])
 	}
 })
