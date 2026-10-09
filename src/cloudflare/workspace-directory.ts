@@ -89,6 +89,47 @@ function makeDirectory() {
 				}),
 			)
 		}
+		function relocateDocument(
+			document: string,
+			from: string,
+			destination: string,
+			request: string,
+			invitations: readonly string[],
+		) {
+			return sql.withTransaction(
+				Effect.gen(function* () {
+					yield* requireWorkspace(destination)
+					yield* sql`CREATE TABLE IF NOT EXISTS directory_document_moves (document TEXT NOT NULL,request TEXT NOT NULL,source TEXT NOT NULL,destination TEXT NOT NULL,PRIMARY KEY(document,request))`
+					let previous = yield* sql<{
+						source: string
+						destination: string
+					}>`SELECT source,destination FROM directory_document_moves WHERE document=${document} AND request=${request}`
+					if (previous[0]) {
+						if (
+							previous[0].source !== from ||
+							previous[0].destination !== destination
+						)
+							return yield* conflict("Move routing receipt conflicts")
+						return
+					}
+					let rows = yield* sql<{
+						workspace: string
+					}>`SELECT workspace FROM directory_documents WHERE document=${document}`
+					if (rows[0]?.workspace !== from)
+						return yield* conflict("Document routing source changed")
+					for (let invitation of invitations) {
+						let owners = yield* sql<{
+							workspace: string
+						}>`SELECT workspace FROM directory_invitations WHERE invitation=${invitation}`
+						if (owners[0] && owners[0].workspace !== from)
+							return yield* conflict("Invitation routing source changed")
+						yield* sql`INSERT INTO directory_invitations(invitation,workspace) VALUES(${invitation},${destination}) ON CONFLICT(invitation) DO UPDATE SET workspace=excluded.workspace`
+					}
+					yield* sql`UPDATE directory_documents SET workspace=${destination} WHERE document=${document} AND workspace=${from}`
+					yield* sql`INSERT INTO directory_document_moves VALUES(${document},${request},${from},${destination})`
+				}),
+			)
+		}
 		function requireWorkspace(id: string) {
 			return Effect.gen(function* () {
 				let route = yield* workspace(id)
@@ -122,6 +163,7 @@ function makeDirectory() {
 			invitation,
 			registerWorkspace,
 			registerDocument,
+			relocateDocument,
 			registerInvitation,
 			rememberMember,
 			subjectWorkspaces: (subject: string) =>

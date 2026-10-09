@@ -44,6 +44,44 @@ test("workspace routing preserves mappings and generation boundaries", async () 
 			expect(
 				(yield* directory.activateWorkspace("workspace", 1)).generation,
 			).toBe(2)
+			yield* directory.relocateDocument(
+				"document",
+				"workspace",
+				"other",
+				"out",
+				["invitation"],
+			)
+			expect((yield* directory.document("document"))?.workspace).toBe("other")
+			expect((yield* directory.invitation("invitation"))?.workspace).toBe(
+				"other",
+			)
+			yield* directory.relocateDocument(
+				"document",
+				"other",
+				"workspace",
+				"back",
+				["invitation"],
+			)
+			yield* directory.relocateDocument(
+				"document",
+				"workspace",
+				"other",
+				"out",
+				["invitation"],
+			)
+			expect((yield* directory.document("document"))?.workspace).toBe(
+				"workspace",
+			)
+			expect((yield* directory.invitation("invitation"))?.workspace).toBe(
+				"workspace",
+			)
+			expect(
+				(yield* directory
+					.relocateDocument("document", "other", "workspace", "invalid", [
+						"invitation",
+					])
+					.pipe(Effect.exit))._tag,
+			).toBe("Failure")
 			yield* directory.registerWorkspace("legacy", "owner", "legacy")
 			expect((yield* directory.freezeWorkspace("legacy", 0)).state).toBe(
 				"frozen",
