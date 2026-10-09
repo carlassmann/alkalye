@@ -16,12 +16,20 @@
 				"name": "RELAY",
 				"class_name": "AlkalyeRelay",
 			},
+			{
+				"name": "WORKSPACES",
+				"class_name": "AlkalyeWorkspace",
+			},
 		],
 	},
 	"migrations": [
 		{
 			"tag": "v1",
 			"new_sqlite_classes": ["AlkalyeRelay"],
+		},
+		{
+			"tag": "v2",
+			"new_sqlite_classes": ["AlkalyeWorkspace"],
 		},
 	],
 	"r2_buckets": [

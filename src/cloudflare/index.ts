@@ -4,6 +4,7 @@ import * as Effect from "effect/Effect"
 import * as FetchHttpClient from "effect/http/FetchHttpClient"
 import * as Layer from "effect/Layer"
 import * as ManagedRuntime from "effect/ManagedRuntime"
+import * as Schema from "effect/Schema"
 import { Cipher } from "../platform/cipher"
 import { cloudflareSqliteLayer } from "../platform/cloudflare-sqlite"
 import { cloudflareBlobObjectsLayer } from "../platform/cloudflare-blob-objects"
@@ -23,6 +24,12 @@ import { cloudflareClientMetadataLayer } from "./client-metadata"
 import { makeCloudflareLiveServer } from "./live"
 import { cloudflareSecretsLayer, cloudflareSettingsLayer } from "./settings"
 import type { DeploymentEnvironment } from "./settings"
+import { WorkspaceNotices, WorkspaceNoticeSchema } from "./workspace-notices"
+import { WorkspaceDirectory } from "./workspace-directory"
+import { federatedWorkspaceLayer } from "./federation"
+import { WorkspaceTransfers } from "../server/workspace-transfer"
+
+export { AlkalyeWorkspace } from "./workspace-object"
 
 function relayLayer(
 	storage: DurableObjectStorage,
@@ -35,7 +42,17 @@ function relayLayer(
 		WorkspaceStore.live,
 		EmailAuthentication.live,
 	).pipe(Layer.provideMerge(database))
-	let credentials = AgentCredentials.layer.pipe(Layer.provideMerge(stores))
+	let federation = federatedWorkspaceLayer(environment).pipe(
+		Layer.provideMerge(stores),
+		Layer.provideMerge(
+			WorkspaceTransfers.live.pipe(Layer.provideMerge(database)),
+		),
+		Layer.provideMerge(
+			WorkspaceDirectory.live.pipe(Layer.provideMerge(database)),
+		),
+		Layer.provideMerge(WorkspaceNotices.layer),
+	)
+	let credentials = AgentCredentials.layer.pipe(Layer.provideMerge(federation))
 	let accounts = AccountApplication.layer.pipe(Layer.provideMerge(credentials))
 	return Application.layer.pipe(
 		Layer.provideMerge(accounts),
@@ -91,6 +108,19 @@ export class AlkalyeRelay extends DurableObject<DeploymentEnvironment> {
 			{ signal: request.signal },
 		)
 		return response ?? new Response("Upgrade failed", { status: 500 })
+	}
+
+	async notify(messages: ReadonlyArray<typeof WorkspaceNoticeSchema.Type>) {
+		await this.ready
+		return this.runtime.runPromise(
+			Effect.gen(function* () {
+				let notices = yield* WorkspaceNotices
+				let decoded = yield* Schema.decodeUnknownEffect(
+					Schema.Array(WorkspaceNoticeSchema).check(Schema.isMaxLength(64)),
+				)(messages)
+				for (let message of decoded) yield* notices.publish(message)
+			}),
+		)
 	}
 }
 

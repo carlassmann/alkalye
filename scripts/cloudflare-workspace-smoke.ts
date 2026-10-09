@@ -1,10 +1,11 @@
-import { mkdtemp, symlink } from "node:fs/promises"
+import { copyFile, mkdtemp, symlink } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join, resolve } from "node:path"
 import { Database } from "bun:sqlite"
 import * as Effect from "effect/Effect"
 import * as Redacted from "effect/Redacted"
 import * as Schema from "effect/Schema"
+import * as SchemaBinary from "effect/encoding/SchemaBinary"
 import * as HttpApiClient from "effect/http-api/HttpApiClient"
 import * as FetchHttpClient from "effect/http/FetchHttpClient"
 import * as HttpClient from "effect/http/HttpClient"
@@ -15,39 +16,47 @@ import { encode } from "../src/shared/base64"
 import { DocumentApi } from "../src/shared/document-api"
 import {
 	buildAction,
+	CommittedActionSchema,
 	restoreSnapshot,
 	undoAction,
 } from "../src/shared/document-actions"
 import { cookieLogin, livePoll, liveSocket } from "../tests/live-fixture"
-import type {
-	LiveLogin,
-	LiveMessage,
-	LivePeerFixture,
-} from "../tests/live-fixture"
-import { object } from "../src/shared/model"
+import type { LivePeerFixture } from "../tests/live-fixture"
+import { object, parseOperation } from "../src/shared/model"
 import type * as Crypto from "effect/Crypto"
 import { Replica } from "../src/shared/crdt"
 import { newDocument } from "../src/shared/documents"
 import { invitationDigest } from "../src/shared/invitations"
 
 let root = resolve(import.meta.dir, "..")
-let directory = await mkdtemp(join(tmpdir(), "alkalye-cloudflare-workspaces-"))
+let resumedDirectory =
+	Bun.argv[2] === "--resume-migration" ? Bun.argv[3] : undefined
+let directory =
+	resumedDirectory ??
+	(await mkdtemp(join(tmpdir(), "alkalye-cloudflare-workspaces-")))
 let probeOnly = Bun.argv[2] === "--rpc-probe"
-let legacyMigration = Bun.argv[2] === "--legacy-migration"
+let largeMove = Bun.argv[2] === "--moves-large"
+let moveOnly = Bun.argv[2] === "--moves" || largeMove
+let largeMigration = Bun.argv[2] === "--legacy-migration-large"
+let legacyMigration = Bun.argv[2] === "--legacy-migration" || largeMigration
 let requestedOrigin = Bun.argv[2] === "--origin" ? Bun.argv[3] : undefined
 if (
 	!probeOnly &&
+	!moveOnly &&
 	!legacyMigration &&
+	!resumedDirectory &&
 	Bun.argv.length > 2 &&
 	(!requestedOrigin || Bun.argv.length !== 4)
 )
 	throw Error(
-		"Usage: bun scripts/cloudflare-workspace-smoke.ts [--rpc-probe|--legacy-migration]",
+		"Usage: bun scripts/cloudflare-workspace-smoke.ts [--rpc-probe|--legacy-migration|--legacy-migration-large|--moves|--moves-large]",
 	)
 let remote = requestedOrigin !== undefined
 let origin = requestedOrigin
 	? new URL(requestedOrigin).origin
-	: "http://127.0.0.1:18803"
+	: moveOnly
+		? "http://127.0.0.1:18804"
+		: "http://127.0.0.1:18803"
 if (remote && !origin.startsWith("https://"))
 	throw Error("Remote mode requires HTTPS")
 let config = join(directory, "wrangler.json")
@@ -95,7 +104,7 @@ await Bun.write(
 		).text()
 	).replaceAll("../src/", root + "/src/"),
 )
-if (!remote) {
+if (!remote && !resumedDirectory) {
 	let configurationSchema = Schema.StructWithRest(
 		Schema.Struct({
 			main: Schema.String,
@@ -149,8 +158,40 @@ async function start() {
 			main: legacyMigration && runs === 1 ? legacyGateway : gateway,
 		}),
 	)
+	let bundleDirectory = join(directory, `bundle-${runs}-${Date.now()}`)
+	let bundleLog = Bun.file(bundleDirectory + ".log")
+	let build = Bun.spawn(
+		[
+			"bun",
+			"x",
+			"--no-install",
+			"wrangler",
+			"deploy",
+			"--dry-run",
+			"--config",
+			config,
+			"--outdir",
+			bundleDirectory,
+		],
+		{ cwd: root, stdout: bundleLog, stderr: bundleLog },
+	)
+	ensure(
+		(await build.exited) === 0,
+		`Worker bundle failed; retained log ${bundleLog.name}`,
+	)
+	let entries: string[] = []
+	for await (let entry of new Bun.Glob("*.js").scan({
+		cwd: bundleDirectory,
+		absolute: true,
+	}))
+		entries.push(entry)
+	ensure(entries.length === 1, "Worker bundle entry unavailable")
+	await Bun.write(
+		config,
+		JSON.stringify({ ...configuration, main: entries[0] }),
+	)
 
-	let log = Bun.file(join(directory, `worker-${runs}.log`))
+	let log = Bun.file(join(directory, `worker-${runs}-${Date.now()}.log`))
 	child = Bun.spawn(
 		[
 			"bun",
@@ -158,13 +199,14 @@ async function start() {
 			"--no-install",
 			"wrangler",
 			"dev",
+			"--no-bundle",
 			"--config",
 			config,
 			"--local",
 			"--ip",
 			"127.0.0.1",
 			"--port",
-			"18803",
+			new URL(origin).port,
 			"--inspector-port",
 			"0",
 			"--persist-to",
@@ -281,6 +323,137 @@ try {
 		console.log("Private RPC probe retained", directory)
 		process.exit(response.ok ? 0 : 1)
 	}
+	if (resumedDirectory) {
+		phase = "immutable-frozen-migration-retry"
+		let fixture = Schema.decodeUnknownSync(
+			Schema.Struct({
+				document: Schema.String,
+				largeDocuments: Schema.optionalKey(Schema.Array(Schema.String)),
+			}),
+		)(
+			JSON.parse(
+				await Bun.file(join(directory, "fixture.private.json")).text(),
+			),
+		)
+		let expected: { log: string; position: number; state: string } | undefined
+		let tail: { position: number; entry: Uint8Array }[] = []
+		for await (let path of new Bun.Glob("**/*.sqlite").scan({
+			cwd: join(directory, "state", "v3", "do"),
+			absolute: true,
+		})) {
+			let db = new Database(path, { readonly: true })
+			try {
+				let tables = db
+					.query<{ name: string }, []>(
+						"SELECT name FROM sqlite_master WHERE type='table'",
+					)
+					.all()
+					.map(row => row.name)
+				if (
+					tables.includes("document_heads") &&
+					!tables.includes("cloudflare_workspace_identity")
+				) {
+					expected =
+						db
+							.query<
+								{ log: string; position: number; state: string },
+								[string]
+							>(
+								"SELECT log,position,state FROM document_heads WHERE document=?",
+							)
+							.get(fixture.document) ?? undefined
+					if (expected)
+						tail = db
+							.query<{ position: number; entry: Uint8Array }, [string, number]>(
+								"SELECT a.position,j.payload entry FROM document_actions a JOIN effect_event_journal j ON j.id=a.entry WHERE a.document=? AND a.position>? ORDER BY a.position",
+							)
+							.all(fixture.document, expected.position)
+				}
+			} finally {
+				db.close()
+			}
+		}
+		ensure(expected !== undefined, "Retained frozen source missing")
+		if (!expected) throw Error("Retained frozen source missing")
+		let original = await run(
+			restoreSnapshot(
+				{
+					format: "document-state-v1",
+					document: fixture.document,
+					...expected,
+				},
+				"readonly-fixture",
+			),
+		)
+		for (let row of tail) {
+			let action = Schema.decodeUnknownSync(
+				SchemaBinary.toCodec(CommittedActionSchema),
+			)(row.entry)
+			ensure(
+				action.document === fixture.document,
+				"Retained action belongs to another document",
+			)
+			original.apply(action.changes.map(parseOperation))
+			expected.position = row.position
+		}
+		let owner = await run(client(201))
+		let result = await run(snapshot(owner, fixture.document))
+		let replica = await run(restoreSnapshot(result, crypto.randomUUID()))
+		await Bun.write(
+			join(directory, `retry-agreement-${Date.now()}.json`),
+			JSON.stringify({
+				expectedLength: original.text(fixture.document).length,
+				actualLength: replica.text(fixture.document).length,
+				sourceEqual:
+					replica.text(fixture.document) === original.text(fixture.document),
+				logEqual: result.log === expected.log,
+				expectedPosition: expected.position,
+				actualPosition: result.position,
+				tailCount: tail.length,
+			}),
+		)
+		ensure(
+			replica.text(fixture.document) === original.text(fixture.document) &&
+				result.log === expected.log &&
+				result.position === expected.position,
+			"Migration retry changed source/log/position",
+		)
+		async function verifyLargeDocuments() {
+			for (let [index, document] of (fixture.largeDocuments ?? []).entries()) {
+				let actual = await run(
+					restoreSnapshot(
+						await run(snapshot(owner, document)),
+						crypto.randomUUID(),
+					),
+				)
+				ensure(
+					actual.text(document) ===
+						"Migration body " + index + "\n" + "x".repeat(32768),
+					"Large migration changed document source",
+				)
+			}
+		}
+		await verifyLargeDocuments()
+		await stop()
+		await start()
+		owner = await run(client(201))
+		await verifyLargeDocuments()
+		await stop()
+		await Bun.write(
+			join(directory, "retry-result.json"),
+			JSON.stringify({
+				passed: true,
+				phase,
+				largeDocuments: fixture.largeDocuments?.length ?? 0,
+				coldRestart: true,
+				sourceSHA: new Bun.CryptoHasher("sha256")
+					.update(replica.text(fixture.document))
+					.digest("hex"),
+			}),
+		)
+		console.log("PASS immutable migration retry", directory)
+		process.exit(0)
+	}
 	phase = "authenticated-clients"
 	let [owner, writer, reader] = await Promise.all([
 		run(client(201)),
@@ -291,6 +464,9 @@ try {
 		document = crypto.randomUUID(),
 		otherWorkspace = crypto.randomUUID(),
 		otherDocument = crypto.randomUUID()
+	let largeDocuments = largeMigration
+		? Array.from({ length: 40 }, () => crypto.randomUUID())
+		: []
 	await Bun.write(
 		join(directory, "fixture.private.json"),
 		JSON.stringify({
@@ -299,6 +475,7 @@ try {
 			otherWorkspace,
 			otherDocument,
 			stage: "allocated-before-first-mutation",
+			largeDocuments,
 		}),
 	)
 	await run(
@@ -382,6 +559,63 @@ try {
 			payload: { workspace: otherWorkspace, action: otherBirth },
 		}),
 	)
+	if (moveOnly) {
+		phase = "cross-workspace-move-cycle"
+		let destinationWorkspace = crypto.randomUUID()
+		await Bun.write(
+			join(directory, "move-destination.private.json"),
+			JSON.stringify({
+				workspace: destinationWorkspace,
+				stage: "before-create",
+			}),
+		)
+		await run(
+			reader.api.workspaces.create({
+				payload: {
+					workspace: destinationWorkspace,
+					name: "Separate destination owner",
+					request: crypto.randomUUID(),
+				},
+			}),
+		)
+		await run(
+			reader.api.workspaces.membership({
+				params: { workspace: destinationWorkspace, member: owner.subject },
+				payload: { role: "writer", request: crypto.randomUUID() },
+			}),
+		)
+		await exerciseMoves(
+			owner,
+			writer,
+			reader,
+			workspace,
+			destinationWorkspace,
+			document,
+			migrationDigest,
+			migrationBlob,
+		)
+		await Bun.write(
+			join(directory, "success.json"),
+			JSON.stringify({
+				passed: true,
+				runtime: "local workerd native workspace Durable Objects",
+				phases: [
+					"source-owner-permission",
+					"destination-workspace-permission",
+					"accepted-source-and-Undo",
+					"document-invitation-routing",
+					"physical-blob-preserved",
+					"A-to-B-to-A",
+					"original-request-receipt",
+					"cold-gateway-restart",
+				],
+			}),
+		)
+		await stop()
+		if (largeMove) await verifyLargeMoveStorage(document)
+		console.log("PASS native workspace moves; proof retained", directory)
+		process.exit(0)
+	}
 	let outside = await run(snapshot(reader, otherDocument).pipe(Effect.result))
 	ensure(outside._tag === "Failure", "Workspace A reader accessed workspace B")
 	let forged = await fetch(
@@ -405,6 +639,25 @@ try {
 			encodeURIComponent(workspace),
 	)
 	ensure(direct.status === 403, "Direct workspace stub fetch admitted access")
+	if (largeMigration) {
+		phase = "legacy-many-document-seed"
+		for (let [index, extraDocument] of largeDocuments.entries()) {
+			let content = "Migration body " + index + "\n" + "x".repeat(32768)
+			let creation = await run(
+				buildAction(
+					new Replica(owner.subject + "-" + crypto.randomUUID()),
+					extraDocument,
+					"Create",
+					staged => newDocument(staged, extraDocument, "Untitled", content),
+				),
+			)
+			await run(
+				owner.api.documents.create({
+					payload: { workspace, action: creation },
+				}),
+			)
+		}
+	}
 	phase = "mcp-workspace-scope"
 	let limited = await run(
 		owner.api.agents.create({
@@ -674,6 +927,19 @@ try {
 					restoredBlob.every((byte, index) => byte === migrationBlob[index]),
 				"Migration changed blob bytes",
 			)
+			for (let [index, extraDocument] of largeDocuments.entries()) {
+				let restored = await run(
+					restoreSnapshot(
+						await run(snapshot(owner, extraDocument)),
+						crypto.randomUUID(),
+					),
+				)
+				ensure(
+					restored.text(extraDocument) ===
+						"Migration body " + index + "\n" + "x".repeat(32768),
+					"Large migration document differs",
+				)
+			}
 			let afterMigration = await run(snapshot(owner, document))
 			let receiptAfter = await run(
 				owner.api.documents.action({ params: { document, action: first.id } }),
@@ -775,6 +1041,8 @@ try {
 		second: number
 		fences: number
 		receipts: number
+		exportBytes: number
+		maximumChunk: number
 	}[] = []
 	for await (let path of new Bun.Glob("**/*.sqlite").scan({
 		cwd: join(directory, "state"),
@@ -823,7 +1091,29 @@ try {
 						)
 						.get(workspace, otherWorkspace)?.count ?? 0)
 				: 0
-			partitions.push({ workspace: binding, first, second, fences, receipts })
+			let exportBytes = tables.includes("workspace_transfer_export_manifests")
+				? (database
+						.query<{ size: number | null }, [string]>(
+							"SELECT MAX(bytes) size FROM workspace_transfer_export_manifests WHERE workspace=?",
+						)
+						.get(workspace)?.size ?? 0)
+				: 0
+			let maximumChunk = tables.includes("workspace_transfer_export_chunks")
+				? (database
+						.query<{ size: number | null }, [string]>(
+							"SELECT MAX(length(payload)) size FROM workspace_transfer_export_chunks WHERE workspace=?",
+						)
+						.get(workspace)?.size ?? 0)
+				: 0
+			partitions.push({
+				workspace: binding,
+				first,
+				second,
+				fences,
+				receipts,
+				exportBytes,
+				maximumChunk,
+			})
 		} finally {
 			database.close()
 		}
@@ -858,11 +1148,22 @@ try {
 				.every(row => row.receipts === 1),
 			"Migration receipt missing or duplicate",
 		)
+	if (largeMigration) {
+		ensure(
+			partitions.some(row => row.exportBytes > 2 * 1024 * 1024),
+			"Large migration export did not exceed native SQLite row limit",
+		)
+		ensure(
+			partitions.every(row => row.maximumChunk <= 256 * 1024),
+			"Workspace export chunk exceeded bound",
+		)
+	}
 	await Bun.write(
 		join(directory, "result.json"),
 		JSON.stringify({
 			passed: true,
 			legacyMigration,
+			largeMigration,
 			phases: [
 				"two-workspaces-isolated-native-sqlite",
 				...(legacyMigration
@@ -901,6 +1202,10 @@ try {
 				.update(otherSource)
 				.digest("hex"),
 			storage: {
+				exportBytes: Math.max(...partitions.map(row => row.exportBytes)),
+				maximumExportChunk: Math.max(
+					...partitions.map(row => row.maximumChunk),
+				),
 				workspaceDatabases: partitions.filter(row => row.workspace !== null)
 					.length,
 				primaryDocumentBodies: partitions
@@ -924,4 +1229,326 @@ try {
 } finally {
 	socket?.close()
 	await stop()
+}
+
+async function exerciseMoves(
+	owner: Client,
+	writer: Client,
+	reader: Client,
+	from: string,
+	to: string,
+	document: string,
+	digest: string,
+	bytes: Uint8Array,
+) {
+	let outward = crypto.randomUUID(),
+		back = crypto.randomUUID(),
+		invitation = crypto.randomUUID(),
+		secret = encode(crypto.getRandomValues(new Uint8Array(32)))
+	await Bun.write(
+		join(directory, "moves.private.json"),
+		JSON.stringify({
+			document,
+			from,
+			to,
+			outward,
+			back,
+			invitation,
+			secret,
+			stage: "before-mutation",
+		}),
+	)
+	if (largeMove) await seedMoveHistory(owner, document)
+	let initial = await run(snapshot(owner, document))
+	let initialSource = (await run(restoreSnapshot(initial, "reader"))).text(
+		document,
+	)
+	await run(
+		owner.api.documents.putBlob({
+			params: { document, digest },
+			payload: bytes,
+		}),
+	)
+	await run(
+		owner.api.invitations.create({
+			payload: {
+				invitation,
+				target: { document },
+				role: "reader",
+				digest: await run(invitationDigest(secret)),
+			},
+		}),
+	)
+	await run(
+		reader.api.invitations.accept({
+			params: { invitation },
+			payload: { secret, request: crypto.randomUUID() },
+		}),
+	)
+	let peer = await run(insert(writer, document, " PEER"))
+	await run(
+		writer.api.documents.commit({ params: { document }, payload: peer }),
+	)
+	let edit = await run(insert(owner, document, " OWN"))
+	await run(owner.api.documents.commit({ params: { document }, payload: edit }))
+	ensure(
+		(
+			await run(
+				writer.api.documents
+					.move({
+						params: { document },
+						payload: { workspace: to, request: crypto.randomUUID() },
+					})
+					.pipe(Effect.result),
+			)
+		)._tag === "Failure",
+		"Non-owner moved document",
+	)
+	let sourcePeer = livePoll(await cookieLogin(new URL(origin), 202))
+	await sourcePeer.open()
+	await sourcePeer.until(message => message.type === "connected")
+	ensure(
+		(await sourcePeer.send([{ type: "watch", document }])) === 204,
+		"Source peer watch failed",
+	)
+	let receipt = await run(
+		owner.api.documents.move({
+			params: { document },
+			payload: { workspace: to, request: outward },
+		}),
+	)
+	ensure(
+		(await run(
+			owner.api.documents.move({
+				params: { document },
+				payload: { workspace: to, request: outward },
+			}),
+		)) === receipt,
+		"Repeated move changed receipt",
+	)
+	await sourcePeer.until(
+		message => message.type === "unavailable" && message.document === document,
+	)
+	ensure((await sourcePeer.close()) === 204, "Source peer close failed")
+	let moved = await run(snapshot(owner, document))
+	ensure(moved.log !== initial.log, "Move did not rotate log")
+	ensure(
+		(await run(restoreSnapshot(moved, "reader"))).text(document) ===
+			initialSource + " PEER OWN",
+		"Move changed accepted source",
+	)
+	ensure(
+		(
+			await run(
+				restoreSnapshot(await run(snapshot(reader, document)), "reader"),
+			)
+		).text(document) ===
+			initialSource + " PEER OWN",
+		"Moved document invitation lost access",
+	)
+	let action = await run(
+		owner.api.documents.action({ params: { document, action: edit.id } }),
+	)
+	ensure(action.id === edit.id, "Move changed action identity")
+	let undone = await run(
+		undoAction(
+			await run(restoreSnapshot(moved, "undo")),
+			action,
+			owner.subject + "-" + crypto.randomUUID(),
+		),
+	)
+	await run(
+		owner.api.documents.commit({ params: { document }, payload: undone }),
+	)
+	ensure(
+		(
+			await run(restoreSnapshot(await run(snapshot(owner, document)), "reader"))
+		).text(document) ===
+			initialSource + " PEER",
+		"Moved Undo lost peer edit",
+	)
+	let blob = await run(
+		owner.api.documents.getBlob({ params: { document, digest } }),
+	)
+	ensure(
+		blob.length === bytes.length &&
+			blob.every((byte, index) => byte === bytes[index]),
+		"Move lost blob bytes",
+	)
+	await stop()
+	await start()
+	ensure(
+		(await run(
+			owner.api.documents.move({
+				params: { document },
+				payload: { workspace: to, request: outward },
+			}),
+		)) === receipt,
+		"Cold gateway lost original receipt",
+	)
+	let beforeBack = await run(snapshot(owner, document))
+	let returned = await run(
+		owner.api.documents.move({
+			params: { document },
+			payload: { workspace: from, request: back },
+		}),
+	)
+	ensure(returned > 0, "Return move receipt invalid")
+	let returnedSnapshot = await run(snapshot(owner, document))
+	ensure(
+		returnedSnapshot.log !== beforeBack.log,
+		"Return move did not rotate log",
+	)
+	ensure(
+		(await run(restoreSnapshot(returnedSnapshot, "reader"))).text(document) ===
+			initialSource + " PEER",
+		"Cyclic move changed source",
+	)
+	ensure(
+		(await run(
+			owner.api.documents.move({
+				params: { document },
+				payload: { workspace: to, request: outward },
+			}),
+		)) === receipt,
+		"Historical retry moved current pointer",
+	)
+	let description = await run(
+		owner.api.invitations.describe({
+			params: { invitation },
+			payload: { secret },
+		}),
+	)
+	ensure(description.kind === "document", "Moved invitation target changed")
+	await stop()
+	await start()
+	ensure(
+		(await run(
+			owner.api.documents.move({
+				params: { document },
+				payload: { workspace: from, request: back },
+			}),
+		)) === returned,
+		"Cold cycle lost return receipt",
+	)
+	ensure(
+		(
+			await run(restoreSnapshot(await run(snapshot(owner, document)), "reader"))
+		).text(document) ===
+			initialSource + " PEER",
+		"Cold cycle changed source",
+	)
+	let restoredBlob = await run(
+		owner.api.documents.getBlob({ params: { document, digest } }),
+	)
+	ensure(
+		restoredBlob.length === bytes.length &&
+			restoredBlob.every((byte, index) => byte === bytes[index]),
+		"Cold cycle lost blob",
+	)
+}
+
+async function seedMoveHistory(owner: Client, document: string) {
+	for (let index = 0; index < 32; index++) {
+		let action = await run(
+			buildAction(
+				await run(
+					restoreSnapshot(
+						await run(snapshot(owner, document)),
+						owner.subject + "-" + crypto.randomUUID(),
+					),
+				),
+				document,
+				"Edit body and presentation note",
+				staged => [
+					staged.edit(document, (index % 2 ? "a" : "b").repeat(8192)),
+					staged.set(
+						document,
+						"presentationNote",
+						String(index).padStart(4, "0") + "note ".repeat(13107),
+					),
+				],
+			),
+		)
+		await Bun.write(
+			join(directory, "move-history-" + index + ".private.json"),
+			JSON.stringify({ action: action.id, stage: "before-commit" }),
+		)
+		await run(
+			owner.api.documents.commit({ params: { document }, payload: action }),
+		)
+	}
+}
+async function verifyLargeMoveStorage(document: string) {
+	let copies = await mkdtemp(join(tmpdir(), "alkalye-move-readback-"))
+	let file = 0
+	let witnesses: {
+		historyBytes: number
+		exportBytes: number
+		maximumChunk: number
+		chunks: number
+	}[] = []
+	for await (let path of new Bun.Glob("**/*.sqlite").scan({
+		cwd: join(directory, "state", "v3", "do"),
+		absolute: true,
+	})) {
+		if (path.endsWith("/metadata.sqlite")) continue
+		let copied = join(copies, String(file++) + ".sqlite")
+		await copyFile(path, copied)
+		if (await Bun.file(path + "-wal").exists())
+			await copyFile(path + "-wal", copied + "-wal")
+		let database = new Database(copied, { readwrite: true, create: false })
+		try {
+			let tables = database
+				.query<{ name: string }, []>(
+					"SELECT name FROM sqlite_master WHERE type='table'",
+				)
+				.all()
+				.map(row => row.name)
+			if (!tables.includes("document_move_export_chunks")) continue
+			let historyBytes =
+				database
+					.query<{ bytes: number }, [string]>(
+						"SELECT COALESCE(SUM(length(j.payload)),0) bytes FROM document_actions a JOIN effect_event_journal j ON j.id=a.entry WHERE a.document=?",
+					)
+					.get(document)?.bytes ?? 0
+			let exports = database
+				.query<{ bytes: number; maximum: number; chunks: number }, [string]>(
+					"SELECT COALESCE(SUM(length(payload)),0) bytes,COALESCE(MAX(length(payload)),0) maximum,COUNT(*) chunks FROM document_move_export_chunks WHERE document=?",
+				)
+				.get(document)
+			if (exports && exports.chunks > 0)
+				witnesses.push({
+					historyBytes,
+					exportBytes: exports.bytes,
+					maximumChunk: exports.maximum,
+					chunks: exports.chunks,
+				})
+		} finally {
+			database.close()
+		}
+	}
+	ensure(witnesses.length >= 2, "Both workspace move caches missing")
+	ensure(
+		witnesses.every(
+			row =>
+				row.historyBytes > 2 * 1024 * 1024 &&
+				row.exportBytes > 2 * 1024 * 1024 &&
+				row.maximumChunk <= 256 * 1024,
+		),
+		"Large history/chunk mechanism gate failed",
+	)
+	await Bun.write(
+		join(directory, "large-move-storage.json"),
+		JSON.stringify(
+			{
+				passed: true,
+				seedActions: 32,
+				history: "body replacement plus presentation-note register",
+				witnesses,
+			},
+			null,
+			2,
+		),
+	)
 }
