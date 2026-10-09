@@ -1,0 +1,22 @@
+import json,pathlib,hashlib
+root=pathlib.Path('/tmp/alkalye-current-interaction-parity');run=root/'timed-primary-results/710da17c-7ea7-433d-8479-8ca5de0231b4'
+def union(xs):
+ total=0;end=None
+ for a,b in sorted(xs):
+  if end is None or a>end:total+=b-a;end=b
+  elif b>end:total+=b-end;end=b
+ return total/1000
+rows=[]
+for result in json.loads((run/'results.json').read_text()):
+ for phase,key,obs in [('action','trace','observation'),('undo','undoTrace','undoObservation')]:
+  path=pathlib.Path(result[key])
+  if not path.exists():continue
+  raw=json.loads(path.read_text());events=raw.get('traceEvents',[])if isinstance(raw,dict)else raw
+  marks=[e for e in events if e.get('name')=='interaction:start']
+  if not marks:continue
+  start=marks[0]['ts'];owner=(marks[0]['pid'],marks[0]['tid']);ends=[e['ts']for e in events if e.get('name')=='interaction:end'and e['ts']>start and(e['pid'],e['tid'])==owner]
+  end=ends[0]if ends else start+3000000
+  es=[e for e in events if(e.get('pid'),e.get('tid'))==owner and e.get('ts',0)<end and e.get('ts',0)+e.get('dur',0)>start]
+  tasks=[e for e in es if e.get('name')=='RunTask'and e.get('dur')];gc=[e for e in es if e.get('dur')and('GC'in e.get('name','')or'CollectGarbage'in e.get('name',''))]
+  probe=result.get(obs,{}).get('probe',{});row={'version':result['version'],'cell':result['cell'],'phase':phase,'status':result['status'],'trace':path.name,'sha256':hashlib.sha256(path.read_bytes()).hexdigest(),'windowMs':(end-start)/1000,'mainMaxTaskMs':max([e['dur']/1000 for e in tasks],default=0),'mainBusyMs':union([(max(start,e['ts']),min(end,e['ts']+e['dur']))for e in tasks]),'mainGCUnionMs':union([(max(start,e['ts']),min(end,e['ts']+e['dur']))for e in gc]),'largestGCSpanMs':max([e['dur']/1000 for e in gc],default=0),'tasksOver833':sum(e['dur']>8333 for e in tasks),'readyFromStartMs':probe.get('ready',0)-probe.get('start',0)if probe.get('ready')else None,'readyFromTrustedEventMs':probe.get('ready',0)-probe.get('events',[{}])[0].get('time',0)if probe.get('ready')else None};rows.append(row);print(json.dumps(row),flush=True)
+(root/'timed-primary-analysis.json').write_text(json.dumps(rows,indent=2)+'\n')

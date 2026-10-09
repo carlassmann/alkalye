@@ -1,0 +1,105 @@
+import type { EditorElement } from '../../../src/client/components/editor'
+
+type TrustedRecord = {
+ type: string; inputType?: string; data?: string | null; editor: boolean
+ x?:number; y?:number; deltaX?:number; deltaY?:number; target?:string
+ ownedHost?:boolean; defaultPrevented?:boolean; modifiers?:string[]
+ hostScroll?:number; nativeScroll?:number
+}
+declare global {
+ interface Window {
+  interactionTrusted?: TrustedRecord[]
+  interactionTrustedController?: AbortController
+ }
+}
+export function nativeCaretProbe(raw: number, focused: boolean) {
+ let editor = document.querySelector<EditorElement>('alkalye-editor')
+ let input = document.querySelector('#editor')
+ if (!editor || !(input instanceof HTMLTextAreaElement)) return false
+ let source = editor.source
+ if (!source || !Number.isSafeInteger(raw) || raw < 0 || raw > source.value.length) return false
+ let view = source.toView(raw), frame = source.viewport.viewport, projected = source.viewport.value
+ function normalize(value: string) { return value.replaceAll('\r\n','\n').replaceAll('\r','\n') }
+ let prefix = frame.direction === 'rtl' ? '\u200f' : frame.direction === 'ltr' ? '\u200e' : ''
+ let fragment = normalize(projected.slice(frame.start, frame.end))
+ let native = prefix.length + normalize(projected.slice(frame.start, view)).length
+ return source.selectionStart === raw && source.selectionEnd === raw && frame.start <= view && view <= frame.end && input.value === prefix + fragment && input.selectionStart === native && input.selectionEnd === native && (!focused || document.activeElement === input)
+}
+export function savedVersionProbe() {
+ let value = document.querySelector<HTMLElement>('#save-status')?.dataset.version
+ return typeof value === 'string' && value !== '' && Number.isSafeInteger(Number(value)) && Number(value) >= 0 ? value : null
+}
+export function savedStateProbe(before: string | null, readback: boolean) {
+ let status = document.querySelector<HTMLElement>('#save-status')
+ let retry = document.querySelector<HTMLElement>('#retry-save'), recovery = document.querySelector<HTMLElement>('[data-recovery]')
+ let version = status?.dataset.version
+ let validVersion = typeof version === 'string' && version !== '' && Number.isSafeInteger(Number(version)) && Number(version) >= 0
+ return !!status && validVersion && status.dataset.pending === '0' && status.getAttribute('aria-busy') === 'false' && retry?.hidden !== false && recovery?.hidden !== false && status.dataset.state !== 'error' && !status.title && (readback || (before !== null && version !== before))
+}
+export function installTrustedProbe(kind: "rewrite" | "original" = "rewrite") {
+ window.interactionTrustedController?.abort()
+ let controller = new AbortController()
+ window.interactionTrustedController = controller
+ window.interactionTrusted = []
+ for (let type of ['keydown','beforeinput','pointerdown','wheel']) document.addEventListener(type,event=>{
+  if (!event.isTrusted || event.timeStamp === 0) return
+  let host=kind==='original'?document.querySelector('.cm-content')?.closest('.cm-editor')?.querySelector('.cm-scroller'):document.querySelector('[data-editor-viewport]'),input=document.querySelector('#editor')
+  let record:TrustedRecord={type,inputType:event instanceof InputEvent?event.inputType:undefined,data:event instanceof InputEvent?event.data:undefined,editor:kind==='original'?event.target instanceof Element&&!!event.target.closest('.cm-content'):event.target===input}
+  if(event instanceof WheelEvent){
+   record.x=event.clientX;record.y=event.clientY;record.deltaX=event.deltaX;record.deltaY=event.deltaY
+   record.target=event.target instanceof Element?event.target.tagName+'#'+event.target.id:undefined
+   record.ownedHost=event.target instanceof Element&&event.target.closest(kind==='original'?'.cm-scroller':'[data-editor-viewport]')===host
+   record.modifiers=[event.ctrlKey?'ctrl':'',event.metaKey?'meta':'',event.shiftKey?'shift':'',event.altKey?'alt':''].filter(Boolean)
+   queueMicrotask(()=>{record.defaultPrevented=event.defaultPrevented;record.hostScroll=host instanceof HTMLElement?host.scrollTop:undefined;record.nativeScroll=input instanceof HTMLTextAreaElement?input.scrollTop:undefined})
+  }
+  window.interactionTrusted?.push(record)
+ },{capture:true,passive:true,signal:controller.signal})
+ return true
+}
+export function trustedMutationProbe(expected = "x") {
+ return window.interactionTrusted?.some(event=>event.type==='beforeinput' && event.inputType==='insertText' && event.data===expected && event.editor) ?? false
+}
+export function removeTrustedProbe() { window.interactionTrustedController?.abort(); return true }
+export function wheelPositionProbe(kind: "rewrite" | "original" = "rewrite") {
+ let host = kind==='original'?document.querySelector('.cm-content')?.closest('.cm-editor')?.querySelector('.cm-scroller'):document.querySelector('[data-editor-viewport]')
+ let editor = document.querySelector<EditorElement>('alkalye-editor')
+ if (!(host instanceof HTMLElement) || (kind==='rewrite' && editor?.source?.viewport.scrollElement !== host)) return null
+ let bounds = host.getBoundingClientRect()
+ let left = Math.max(0,bounds.left), right = Math.min(innerWidth,bounds.right)
+ let top = Math.max(0,bounds.top), bottom = Math.min(innerHeight,bounds.bottom)
+ let x = Math.floor((left+right)/2), y = Math.floor((top+bottom)/2)
+ let hit = document.elementFromPoint(x,y)
+ if (right<=left || bottom<=top || !hit || !host.contains(hit) || host.scrollHeight<=host.clientHeight) return null
+ return {x,y,scrollTop:host.scrollTop,scrollHeight:host.scrollHeight,clientHeight:host.clientHeight}
+}
+export function resetWheelProbe(kind: "rewrite" | "original" = "rewrite") {
+ let host = kind==='original'?document.querySelector('.cm-content')?.closest('.cm-editor')?.querySelector('.cm-scroller'):document.querySelector('[data-editor-viewport]')
+ if (!(host instanceof HTMLElement)) return false
+ host.scrollTop = 0
+ return host.scrollHeight > host.clientHeight && host.scrollTop === 0
+}
+export function wheelMovedProbe(kind: "rewrite" | "original" = "rewrite") {
+ let host = kind==='original'?document.querySelector('.cm-content')?.closest('.cm-editor')?.querySelector('.cm-scroller'):document.querySelector('[data-editor-viewport]')
+ return host instanceof HTMLElement && host.scrollHeight>host.clientHeight && host.scrollTop>0
+}
+export function wheelSnapshotProbe(kind: "rewrite" | "original" = "rewrite", primary?: {start:number;end:number}) {
+ let host=kind==='original'?document.querySelector('.cm-content')?.closest('.cm-editor')?.querySelector('.cm-scroller'):document.querySelector('[data-editor-viewport]')
+ if(!(host instanceof HTMLElement))return null
+ let bounds=host.getBoundingClientRect(),x=Math.floor((Math.max(0,bounds.left)+Math.min(innerWidth,bounds.right))/2),y=Math.floor((Math.max(0,bounds.top)+Math.min(innerHeight,bounds.bottom))/2)
+ let geometry={hostScroll:host.scrollTop,scrollHeight:host.scrollHeight,clientHeight:host.clientHeight,x,y,hit:document.elementFromPoint(x,y)?.tagName,trusted:window.interactionTrusted}
+ if(kind==='original')return primary?{...geometry,caret:[primary.start,primary.end]}:null
+ let input=document.querySelector('#editor'),source=document.querySelector<EditorElement>('alkalye-editor')?.source
+ if(!(input instanceof HTMLTextAreaElement)||!source)return null
+ return {...geometry,inputScroll:input.scrollTop,caret:[source.selectionStart,source.selectionEnd],frame:source.viewport.viewport}
+}
+export async function sourceHashProbe(expected: string, length: number) {
+ let editor=document.querySelector<EditorElement>('alkalye-editor'),source=editor?.source
+ if(!source||source.value.length!==length)return false
+ let digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(source.value))
+ return [...new Uint8Array(digest)].map(value=>value.toString(16).padStart(2,'0')).join('')===expected
+}
+export function localSavedProbe(before:string|null,readback:boolean) {
+ let status=document.querySelector<HTMLElement>('#save-status'),retry=document.querySelector<HTMLElement>('#retry-save')
+ let raw=status?.dataset.version
+ return !!status&&typeof raw==='string'&&raw!==''&&Number.isSafeInteger(Number(raw))&&Number(raw)>=0&&status.getAttribute('aria-busy')==='false'&&retry?.hidden!==false&&(readback||(before!==null&&raw!==before))
+}

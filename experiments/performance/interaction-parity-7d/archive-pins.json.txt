@@ -1,0 +1,92 @@
+[
+  {
+    "source": "/tmp/alkalye-current-interaction-parity/timed-primary-analysis.json",
+    "archive": "timed-primary-analysis.json.txt",
+    "bytes": 10964,
+    "sha256": "1587b0b71d0f4198ca9b8504c75e538010aec337bd0d00de694f374076074ae4"
+  },
+  {
+    "source": "/tmp/alkalye-current-interaction-parity/timed-primary-analysis.log",
+    "archive": "timed-primary-analysis.log.txt",
+    "bytes": 9575,
+    "sha256": "cc5220361b6a6adb5bf0afa9c45a959984fb3b9bdd068baccef39e618b3db35e"
+  },
+  {
+    "source": "/tmp/alkalye-current-interaction-parity/parse-primary.py",
+    "archive": "parse-primary.py.txt",
+    "bytes": 2155,
+    "sha256": "58856bda8db0d8d639b57e0bdf4acd5aef95aba6e636f3216c656e618ca6226e"
+  },
+  {
+    "source": "/tmp/alkalye-current-interaction-parity/timed-primary-plan-frozen.json",
+    "archive": "timed-primary-plan-frozen.json.txt",
+    "bytes": 10962,
+    "sha256": "5dcfeab0ac11b37bed80390add46906e4c7f15fa8008e6d4bef63d1d7e5019bf"
+  },
+  {
+    "source": "/tmp/alkalye-current-interaction-parity/timed-primary.log",
+    "archive": "timed-primary.log.txt",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "/tmp/alkalye-current-interaction-parity/readonly-mc2048-results.json",
+    "archive": "readonly-mc2048-results.json.txt",
+    "bytes": 646,
+    "sha256": "188cbbb0fbdef37a0bfa1b59cdf90850cb2daeaca53f4ba4a7ad3022bcfbe5cd"
+  },
+  {
+    "source": "/tmp/alkalye-current-interaction-parity/readonly-mc2048.log",
+    "archive": "readonly-mc2048.log.txt",
+    "bytes": 503,
+    "sha256": "cf73320a94586ff922dc8cd4dc25ac1e8c5283b44a904eb7eb559499311c4a0f"
+  },
+  {
+    "source": "/tmp/alkalye-current-interaction-parity/next-close-find-results.json",
+    "archive": "next-close-find-results.json.txt",
+    "bytes": 826,
+    "sha256": "a926900fa17e80ccf8263fd1253cc8492676147d94a8f5d4d9243db72bb39214"
+  },
+  {
+    "source": "/tmp/alkalye-current-interaction-parity/timed-primary-results/710da17c-7ea7-433d-8479-8ca5de0231b4/results.json",
+    "archive": "raw-results.json.txt",
+    "bytes": 257600,
+    "sha256": "cbafd3fb814c7380793b5401ff0e2acc305ed088710163cd6963a4f0f42e7de0"
+  },
+  {
+    "source": "/tmp/alkalye-current-interaction-parity/runtime/experiments/performance/current-journeys/runner.ts",
+    "archive": "runner.ts.txt",
+    "bytes": 36205,
+    "sha256": "1bb2108b7e673bd624212a7f7d6fe74a6e9b28329e43e57cf92493ff9e7e8eeb"
+  },
+  {
+    "source": "/tmp/alkalye-current-interaction-parity/runtime/experiments/performance/current-journeys/browser-probes.ts",
+    "archive": "browser-probes.ts.txt",
+    "bytes": 8284,
+    "sha256": "5bf978efec2796bb27754d44d2b51b4b6d9e7e12d9015e0ba07424753ba0d55d"
+  },
+  {
+    "source": "/tmp/alkalye-current-interaction-parity/runtime/experiments/performance/current-journeys/owned-wheel-cdp.ts",
+    "archive": "owned-wheel-cdp.ts.txt",
+    "bytes": 3983,
+    "sha256": "1eb48a043f303073400f74c0663477a914fd070075a66b3630537e4392a9d24c"
+  },
+  {
+    "source": "/tmp/alkalye-current-interaction-parity/runtime/experiments/performance/current-journeys/rewrite-oracle.ts",
+    "archive": "rewrite-oracle.ts.txt",
+    "bytes": 2048,
+    "sha256": "c8f15b4b5aedd3b23d00b28b86bce76194a205e061448bcf3c7cc894272cd8e2"
+  },
+  {
+    "source": "/tmp/alkalye-current-interaction-parity/runtime/experiments/performance/current-journeys/network.js",
+    "archive": "network.js.txt",
+    "bytes": 726,
+    "sha256": "7a94ec05710f749d5e1c689181b00078c62e0fbbcd1e596f2d3fa9fa4b0747c0"
+  },
+  {
+    "source": "/tmp/alkalye-current-interaction-parity/runtime/experiments/performance/current-journeys/block-sockets.js",
+    "archive": "block-sockets.js.txt",
+    "bytes": 131,
+    "sha256": "b0b5373552c29a69d14151ec6a3d50ecb27b8dbf55e892a99e3089219f537469"
+  }
+]
