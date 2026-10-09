@@ -1,4 +1,3 @@
-import type { Server, ServerWebSocket } from "bun"
 import type * as Cause from "effect/Cause"
 import * as Clock from "effect/Clock"
 import * as Data from "effect/Data"
@@ -29,7 +28,6 @@ import type {
 } from "../shared/document-live"
 import { presentationPresence } from "./presentation-presence"
 import { Identity } from "../shared/workspace"
-import type { Connection } from "./application"
 import { WorkspaceStore } from "./document-store"
 import { Sessions } from "./sessions"
 import { RelaySettings } from "./settings"
@@ -42,6 +40,20 @@ export interface LiveConnection {
 	documents: Set<string>
 	presence: Map<string, LivePresence>
 	lastPresence: Map<string, number>
+}
+export interface LiveSocket {
+	readonly data: { readonly live: LiveConnection }
+	send(message: string): number | void
+	close(code?: number, reason?: string): void
+}
+export interface LiveUpgradeServer {
+	upgrade(
+		request: Request,
+		options: { data: { live: LiveConnection } },
+	): boolean | Response
+}
+export interface LivePollServer {
+	timeout(request: Request, seconds: number): void
 }
 // One participant in live sync, whether it speaks WebSocket or long polling,
 // so access checks, presence and notifications are written once.
@@ -79,7 +91,7 @@ export function makeDocumentLive() {
 		let pollAbandoned = 2 * pollWait + 5_000
 		let run = yield* FiberSet.makeRuntime()
 		let peers = new Set<LivePeer>()
-		let sockets = new WeakMap<ServerWebSocket<Connection>, LivePeer>()
+		let sockets = new WeakMap<LiveSocket, LivePeer>()
 		let socketPeers = new Set<LivePeer>()
 		let heartbeatSent = yield* Clock.currentTimeMillis
 		let polls = new Map<string, PollSession>()
@@ -196,7 +208,7 @@ export function makeDocumentLive() {
 
 		function upgrade(
 			request: Request,
-			server: Server<Connection>,
+			server: LiveUpgradeServer,
 			origin: string,
 		) {
 			return Effect.gen(function* () {
@@ -206,11 +218,13 @@ export function makeDocumentLive() {
 					new URL(request.url).searchParams.get("account"),
 				)
 				let live = yield* connection(account)
-				if (server.upgrade(request, { data: { live } })) return
+				let upgraded = server.upgrade(request, { data: { live } })
+				if (upgraded instanceof Response) return upgraded
+				if (upgraded) return
 				return new Response("WebSocket required", { status: 426 })
 			}).pipe(Effect.catchTag("LiveRejected", rejection))
 		}
-		function open(socket: ServerWebSocket<Connection>) {
+		function open(socket: LiveSocket) {
 			let peer: LivePeer = {
 				live: socket.data.live,
 				gate: Semaphore.makeUnsafe(1),
@@ -224,10 +238,7 @@ export function makeDocumentLive() {
 			socketPeers.add(peer)
 			join(peer)
 		}
-		function message(
-			socket: ServerWebSocket<Connection>,
-			input: string | Buffer,
-		) {
+		function message(socket: LiveSocket, input: string | Uint8Array) {
 			let peer = sockets.get(socket)
 			if (!peer) return Effect.void
 			let sender = peer
@@ -237,7 +248,7 @@ export function makeDocumentLive() {
 						return sender.close(1009, "Live message too large")
 					let message = yield* Schema.decodeUnknownEffect(
 						Schema.fromJsonString(LiveClientMessageSchema),
-					)(String(input))
+					)(typeof input === "string" ? input : new TextDecoder().decode(input))
 					yield* receive(sender, message)
 				}).pipe(
 					Effect.catchCause(() =>
@@ -246,7 +257,7 @@ export function makeDocumentLive() {
 				),
 			)
 		}
-		function close(socket: ServerWebSocket<Connection>) {
+		function close(socket: LiveSocket) {
 			let peer = sockets.get(socket)
 			if (!peer) return Effect.void
 			sockets.delete(socket)
@@ -256,11 +267,7 @@ export function makeDocumentLive() {
 
 		// Long polling carries the same messages over plain HTTP for networks
 		// that block WebSockets: poll receives, send transmits, close leaves.
-		function poll(
-			request: Request,
-			server: Server<Connection>,
-			origin: string,
-		) {
+		function poll(request: Request, server: LivePollServer, origin: string) {
 			return Effect.gen(function* () {
 				let path = new URL(request.url).pathname
 				if (request.method !== "POST")

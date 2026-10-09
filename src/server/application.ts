@@ -1,5 +1,4 @@
 import * as HttpClient from "effect/http/HttpClient"
-import type { Server, ServerWebSocket } from "bun"
 import * as Cause from "effect/Cause"
 import * as Context from "effect/Context"
 import * as Effect from "effect/Effect"
@@ -13,7 +12,12 @@ import { AgentStore } from "./agent-store"
 import { makeMcpHandler } from "./mcp-server"
 import { makeDocuments } from "./agent-documents"
 import { makeDocumentLive } from "./document-live"
-import type { LiveConnection } from "./document-live"
+import type {
+	LiveConnection,
+	LiveSocket,
+	LiveUpgradeServer,
+	LivePollServer,
+} from "./document-live"
 import { AccountApplication } from "./account-api"
 import { AgentCredentials } from "./agent-credentials"
 import { OAuth } from "./oauth"
@@ -43,7 +47,10 @@ function makeApplication() {
 		let oauth = new OAuth(database.oauth, mcp, cipher, settings.publicOrigin)
 		yield* startOAuthMaintenance(database.oauth.cleanup())
 		let assets = yield* StaticAssets
-		function handleRequest(request: Request, server: Server<Connection>) {
+		function handleRequest(
+			request: Request,
+			server: LiveUpgradeServer & LivePollServer,
+		) {
 			return Effect.gen(function* () {
 				let url = new URL(request.url)
 				let origin = request.headers.get("Origin")
@@ -116,13 +123,13 @@ function makeApplication() {
 				maxPayloadLength: 8192,
 				backpressureLimit: 16000000,
 				closeOnBackpressureLimit: true,
-				open(socket: ServerWebSocket<Connection>) {
+				open(socket: LiveSocket) {
 					live.open(socket)
 				},
-				message(socket: ServerWebSocket<Connection>, data: string | Buffer) {
+				message(socket: LiveSocket, data: string | Uint8Array) {
 					runMessage(live.message(socket, data))
 				},
-				close(socket: ServerWebSocket<Connection>) {
+				close(socket: LiveSocket) {
 					runMessage(live.close(socket))
 				},
 			},
