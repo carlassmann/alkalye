@@ -1,0 +1,4 @@
+im-mv0ipmta {
+  path: "/app/doc/co_zRJZ55VPjcy2HjepCgR8e1z6AZP",
+  size: "",
+}

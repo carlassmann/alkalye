@@ -1,0 +1,69 @@
+		baseContent: string,
+	) {
+		let save = backgroundSave.current
+		if (!save) {
+			persistContentOnMain(pendingContent, cursor, baseContent)
+			return
+		}
+		setOptimisticContent(pendingContent)
+		void save
+			.save(pendingContent, baseContent)
+			.then(appliedContent => {
+				setOptimisticContent(current =>
+					current === pendingContent ? null : current,
+				)
+				syncBacklinks(appliedContent)
+				if (me.$isLoaded) void syncThemeFromSource(me, docId, appliedContent)
+				if (cursor) updateCursor(cursor.from, cursor.to)
+				signalDocumentSaved(docId, appliedContent)
+			})
+			.catch(async error => {
+				setOptimisticContent(current =>
+					current === pendingContent ? null : current,
+				)
+				console.error("Background document save failed", error)
+				if (editor.current?.getContent() !== pendingContent) return
+				let appliedContent = persistContentOnMain(
+					pendingContent,
+					cursor,
+					baseContent,
+				)
+				await waitForDocumentStorageSync(liveDoc ?? doc)
+				signalDocumentSaved(docId, appliedContent)
+			})
+	}
+
+	function getEditorContent(persistedContent: string) {
+		if (pendingSave.current) {
+			return editor.current?.getContent() ?? persistedContent
+		}
+		return optimisticContent ?? persistedContent
+	}
+
+	function persistContentOnMain(
+		pendingContent: string,
+		cursor: { from: number; to?: number } | null,
+		baseContent: string,
+	) {
+		let currentDoc = liveDoc ?? doc
+		let appliedContent = persistDocumentContentSynchronously(
+			currentDoc,
+			pendingContent,
+			baseContent,
+		)
+		syncBacklinks(appliedContent)
+		if (me.$isLoaded) void syncThemeFromSource(me, docId, appliedContent)
+		if (cursor) updateCursor(cursor.from, cursor.to)
+		return appliedContent
+	}
+
+	function queueSave(readContent: () => string) {
+		let queuedSave = pendingSave.current
+		if (queuedSave) clearTimeout(queuedSave.timeoutId)
+		let baseContent = queuedSave?.baseContent ?? editorBaseContent.current
+		pendingSave.current = {
+			baseContent,
+			readContent,
+			cursor: queuedSave?.cursor ?? null,
+			timeoutId: setTimeout(() => {
+				let pendingContent = pendingSave.current?.readContent()

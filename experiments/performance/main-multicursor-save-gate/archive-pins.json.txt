@@ -1,0 +1,50 @@
+[
+  {
+    "source": "/tmp/alkalye-current-interaction-parity/main-mc512-current-receipt.json",
+    "archive": "main-mc512-current-receipt.json.txt",
+    "bytes": 99,
+    "sha256": "dca5c02399139f6ba0a8492d42596181960c8a329374d615cd59a0121ddeba29"
+  },
+  {
+    "source": "/tmp/alkalye-current-interaction-parity/main-mc512-shape-analysis.json",
+    "archive": "main-mc512-shape-analysis.json.txt",
+    "bytes": 1058,
+    "sha256": "89056ae3c2cb224339c307b57abf2970995e39998c0e20b0284202ce47342fd5"
+  },
+  {
+    "source": "/tmp/alkalye-current-interaction-parity/mc512-gate0.log",
+    "archive": "mc512-gate0.log.txt",
+    "bytes": 79,
+    "sha256": "d10682c80622931959cea4f84b9506c5306b44d34d779d89ff30c3c3f809a672"
+  },
+  {
+    "source": "src/app/features/documents/lib/document-diff.ts",
+    "repositoryHead": "a749728a8f9a1cb984c980a5ea2daf984d60ae68",
+    "fullSourceSha256": "897bee1b9cb5ca094056482342acbb7e8f483a6849debd6361ff310eab6dce8e",
+    "archive": "document-diff.ts.excerpt.txt",
+    "sourceLines": [
+      1,
+      46
+    ]
+  },
+  {
+    "source": "src/app/features/comments/lib/comments.ts",
+    "repositoryHead": "a749728a8f9a1cb984c980a5ea2daf984d60ae68",
+    "fullSourceSha256": "9f394f63c30e08a24f8f9d4e3e83e92e5226e209f5a365f9f37be46887439f29",
+    "archive": "comments.ts.excerpt.txt",
+    "sourceLines": [
+      363,
+      388
+    ]
+  },
+  {
+    "source": "src/app/features/documents/screens/doc-screen.tsx",
+    "repositoryHead": "a749728a8f9a1cb984c980a5ea2daf984d60ae68",
+    "fullSourceSha256": "988a06ae5caccc182063d1e240f592ae8c3319bb4118949af09fe781cfffb3c6",
+    "archive": "doc-screen.tsx.excerpt.txt",
+    "sourceLines": [
+      520,
+      588
+    ]
+  }
+]

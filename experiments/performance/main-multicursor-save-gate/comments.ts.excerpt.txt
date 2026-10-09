@@ -1,0 +1,26 @@
+function applyContentPatchesInBoundedTransactions(
+	content: LoadedAnchorDocument["content"],
+	patches: DocumentContentPatch[],
+) {
+	let raw = content.$jazz.raw
+
+	raw.core.pauseNotifyUpdate()
+	try {
+		for (let { from, to, inserted } of patches.reverse()) {
+			let deleteTo = to
+			while (deleteTo > from) {
+				let deleteFrom = Math.max(
+					from,
+					deleteTo - MAX_DELETE_GRAPHEMES_PER_TRANSACTION,
+				)
+				content.deleteRange({ from: deleteFrom, to: deleteTo })
+				deleteTo = deleteFrom
+			}
+			if (inserted.length > 0) {
+				content.insertBefore(from, inserted)
+			}
+		}
+	} finally {
+		raw.core.resumeNotifyUpdate()
+	}
+}

@@ -1,0 +1,46 @@
+{
+  "seed": {
+    "length": 1048585,
+    "newlines": 515,
+    "CR": 0,
+    "tokens": 512,
+    "x": 1,
+    "paddingSpaces": 149723,
+    "nonWhitespace": 898347,
+    "sha256": "90ed5d32297282b1d1692bf98a30088f305db700a5d33fd963ba9d0e2c240bf8"
+  },
+  "intended": {
+    "length": 1046025,
+    "newlines": 515,
+    "CR": 0,
+    "tokens": 0,
+    "x": 513,
+    "paddingSpaces": 149723,
+    "nonWhitespace": 895787,
+    "sha256": "be8a99f857e5e088af4781ea2af2d7982667d88a69ac22133bb6f888b1c2dff6"
+  },
+  "accepted": {
+    "length": 1026585,
+    "newlines": 466,
+    "CR": 0,
+    "tokens": 463,
+    "x": 1,
+    "paddingSpaces": 146588,
+    "nonWhitespace": 879531,
+    "sha256": "ca08b2f4eb6c283004fbc27f4f21c1648773004cd8bc995c8e064201e89761d9"
+  },
+  "seedVsAccepted": {
+    "firstDiff": 211055,
+    "equalSuffix": 815530,
+    "oldEnvelope": 22000,
+    "newEnvelope": 0
+  },
+  "intendedVsAccepted": {
+    "firstDiff": 33,
+    "equalSuffix": 815530,
+    "oldEnvelope": 230462,
+    "newEnvelope": 211022
+  },
+  "acceptedIsSeedPrefix": false,
+  "headersEqual": true
+}

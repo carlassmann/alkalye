@@ -1,0 +1,12 @@
+{
+  "exactSingleDeletion": {
+    "from": 211055,
+    "to": 233055,
+    "characters": 22000
+  },
+  "matchesEleven2000CharacterDeletes": true,
+  "seedSha256": "90ed5d32297282b1d1692bf98a30088f305db700a5d33fd963ba9d0e2c240bf8",
+  "acceptedSha256": "ca08b2f4eb6c283004fbc27f4f21c1648773004cd8bc995c8e064201e89761d9",
+  "acceptedEqualsSeedWithDeletion": true,
+  "doesNotEstablish": "Invoked code path, failure cause, continued save duration, or comparative timing."
+}
