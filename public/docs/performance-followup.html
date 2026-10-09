@@ -168,6 +168,25 @@
 			retaining journal durability and tests the actual browser path. Evidence:
 			<code>experiments/performance/snapshot-native-overlap</code>.
 		</p>
+		<h2>Undo before the journal write completes</h2>
+		<p>
+			An outside candidate prepares a disposable Undo certificate from the
+			current document and queues its compensation through the existing journal
+			and permission checks. In the real browser, a single-character Undo on
+			2KiB and 1MiB documents restored exact source, projection, native caret
+			and overlay while the actual journal lock remained held. Trusted Unicode
+			typed afterward survived independent server acceptance and cold reload.
+			The 2KiB control showed no early restoration in eight observations while
+			the lock remained held.
+		</p>
+		<p>
+			This proves early visible publication under blocked persistence; it is not
+			a latency result. Preparing certificates adds work after journal writes,
+			so normal typing and Undo still need a matched cost comparison. Grouped
+			typing Undo and Redo need their own browser proof. The candidate is
+			outside production. Earlier storage, interruption and refusal checks
+			remain in <code>experiments/performance/optimistic-undo-boundaries</code>.
+		</p>
 		<h2>Skip unchanged viewport repainting</h2>
 		<p>
 			Production change <code>754c9d6</code> skips repainting the visible editor
