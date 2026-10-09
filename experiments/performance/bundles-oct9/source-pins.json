@@ -1,0 +1,28 @@
+{
+	"originalCommit": "a749728a8f9a1cb984c980a5ea2daf984d60ae68",
+	"rewriteCommit": "514e1bb",
+	"originalSourceArchive": {
+		"bytes": 5079040,
+		"sha256": "6733bd51a93faf8ce83a692fe91dc7d49088332fb67fb9a318f2758c7f855e19"
+	},
+	"originalLock": {
+		"bytes": 470138,
+		"sha256": "2ca570021f1998a336bf5681b33e5eac3863cf77f5dc67e259a4199e2d03754f"
+	},
+	"rewriteSource": {
+		"bytes": 76683,
+		"sha256": "4a0aa7553a0de7fbfc2d8eb9a6332313b04bcf0dc68e558de6add25ea6e71b7d"
+	},
+	"rewriteLock": {
+		"bytes": 63811,
+		"sha256": "74414c2247aa75a465b7dc0fb3ef2070cd0a378ef8790f425665b9f4d3e26a8d"
+	},
+	"calculator": {
+		"bytes": 4834,
+		"sha256": "10104d068bfd3894840fb098bf98dbceb88852dc9f1a51f0474a64313c3a8d5d"
+	},
+	"environment": {
+		"PUBLIC_JAZZ_SYNC_SERVER": "ws://127.0.0.1:4202"
+	},
+	"dependencyReuse": "Main build reuses /tmp/alkalye-main-rebench/node_modules; exported main lock byte-identical to that checkout. No dependency installation or upgrade."
+}

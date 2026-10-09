@@ -1,0 +1,226 @@
+$ astro check && astro build
+03:40:47 [vite] Re-optimizing dependencies because vite config has changed
+03:40:47 [content] Syncing content
+03:40:47 [content] Synced content
+03:40:47 [types] Generated 137ms
+03:40:47 [check] Getting diagnostics for Astro files in /private/tmp/alkalye-root-bundles-oct9/main...
+[96msrc/app/features/agents/lib/agent-api.test.ts[0m:[93m20[0m:[93m33[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(init: { clientId: string; clientName: string; credential: string; createdAt: Date; revokedAt?: Date | undefined; }, options?: CoValueCreateOptions<{}, Group | Account>): { ...; } & CoMap' of 'McpConnection.create' is deprecated.
+
+[7m20[0m  let connection = McpConnection.create(
+[7m  [0m [93m                                ~~~~~~[0m
+
+[96msrc/app/features/agents/lib/schema.test.ts[0m:[93m30[0m:[93m32[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(this: CoValueClass<...>, id: string, options?: { resolve?: RefsToResolve<Group, 10, []> | undefined; loadAs?: Account | AnonymousJazzAgent | undefined; } | undefined): Promise<...>' of 'Group.load' is deprecated.
+
+[7m30[0m   let otherOwner = await Group.load(owner.$jazz.id, { loadAs: other })
+[7m  [0m [93m                               ~~~~[0m
+
+[96msrc/app/features/agents/lib/schema.ts[0m:[93m36[0m:[93m16[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(items: readonly (({ readonly clientId: string; readonly clientName: string; readonly credential: string; readonly createdAt: Date; readonly revokedAt: Date | undefined; } & CoMap) | { ...; })[], options?: CoValueCreateOptions<...>): CoListInstance<...>' of 'schema.create' is deprecated.
+
+[7m36[0m  return schema.create([], { owner, unique: "mcp-connections" })
+[7m  [0m [93m               ~~~~~~[0m
+[96msrc/app/features/agents/lib/schema.ts[0m:[93m26[0m:[93m18[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(unique: Uniqueness, ownerID: string, as?: Group | Account | AnonymousJazzAgent | undefined): string' of 'schema.findUnique' is deprecated.
+
+[7m26[0m  let id = schema.findUnique("mcp-connections", owner.$jazz.id, owner)
+[7m  [0m [93m                 ~~~~~~~~~~[0m
+
+[96msrc/app/features/assets/lib/asset-view-models.test.ts[0m:[93m89[0m:[93m5[0m - [93mwarning[0m[90m ts(6385): [0m'(blob: Blob | File, options?: Group | Account | { owner?: Group | Account | undefined; onProgress?: ((progress: number) => void) | undefined; } | undefined): Promise<...>' is deprecated.
+
+[7m89[0m    .createFromBlob(new ReadableBlob(content, type), { owner: account })
+[7m  [0m [93m    ~~~~~~~~~~~~~~[0m
+[96msrc/app/features/assets/lib/asset-view-models.test.ts[0m:[93m64[0m:[93m31[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(init: { type: "video"; name: string; video: FileStream; mimeType: string; createdAt: Date; muteAudio?: boolean | undefined; }, options?: CoValueCreateOptions<{}, Group | Account>): { ...; } & CoMap' of 'VideoAsset.create' is deprecated.
+
+[7m64[0m   let videoAsset = VideoAsset.create(
+[7m  [0m [93m                              ~~~~~~[0m
+[96msrc/app/features/assets/lib/asset-view-models.test.ts[0m:[93m54[0m:[93m37[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(init: { type: "tldraw"; name: string; revision: ({ readonly snapshot: MaybeLoaded<FileStream>; readonly lightPreview: MaybeLoaded<{ readonly original: MaybeLoaded<FileStream>; readonly originalSize: [...]; readonly placeholderDataURL: string | undefined; readonly progressive: boolean; } & { ...; } & CoMap>; readonly darkPreview: MaybeLoaded<...>; readonly createdAt: Date; } & CoMap) | { ...; }; createdAt: Date; version?: 1 | undefined; presence?: CoFeed<...> | ... 1 more ... | undefined; }, options?: CoValueCreateOptions<...>): { ...; } & CoMap' of 'TldrawAsset.create' is deprecated.
+
+[7m54[0m   let whiteboardAsset = TldrawAsset.create(
+[7m  [0m [93m                                    ~~~~~~[0m
+[96msrc/app/features/assets/lib/asset-view-models.test.ts[0m:[93m45[0m:[93m33[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(init: { snapshot: FileStream; lightPreview: ({ readonly original: MaybeLoaded<FileStream>; readonly originalSize: [number, number]; readonly placeholderDataURL: string | undefined; readonly progressive: boolean; } & { ...; } & CoMap) | { ...; }; darkPreview: ({ ...; } & ... 1 more ... & CoMap) | { ...; }; createdAt: Date; }, options?: CoValueCreateOptions<...>): { ...; } & CoMap' of 'TldrawRevision.create' is deprecated.
+
+[7m45[0m   let revision = TldrawRevision.create(
+[7m  [0m [93m                                ~~~~~~[0m
+[96msrc/app/features/assets/lib/asset-view-models.test.ts[0m:[93m40[0m:[93m31[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(init: { type: "image"; name: string; image: ({ readonly original: MaybeLoaded<FileStream>; readonly originalSize: [number, number]; readonly placeholderDataURL: string | undefined; readonly progressive: boolean; } & { ...; } & CoMap) | { ...; }; createdAt: Date; }, options?: CoValueCreateOptions<...>): { ...; } & CoMap' of 'ImageAsset.create' is deprecated.
+
+[7m40[0m   let imageAsset = ImageAsset.create(
+[7m  [0m [93m                              ~~~~~~[0m
+[96msrc/app/features/assets/lib/asset-view-models.test.ts[0m:[93m32[0m:[93m26[0m - [93mwarning[0m[90m ts(6385): [0m'(init: { original: FileStream; originalSize: [number, number]; progressive: boolean; placeholderDataURL?: string | undefined; }, options?: CoValueCreateOptions<{}, Group | Account>): { ...; } & ... 1 more ... & CoMap' is deprecated.
+
+[7m32[0m   let image = co.image().create(
+[7m  [0m [93m                         ~~~~~~[0m
+
+[96msrc/app/features/documents/lib/background-document-save.ts[0m:[93m130[0m:[93m11[0m - [93mwarning[0m[90m ts(80006): [0mThis may be converted to an async function.
+
+[7m130[0m  function calculateDiff(
+[7m   [0m [93m          ~~~~~~~~~~~~~[0m
+
+[96msrc/app/features/presentation/lib/laser-channel.test.ts[0m:[93m364[0m:[93m3[0m - [93mwarning[0m[90m ts(80007): [0m'await' has no effect on the type of this expression.
+
+[7m364[0m   await remote.done()
+[7m   [0m [93m  ~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/app/features/presentation/lib/laser-channel.test.ts[0m:[93m295[0m:[93m3[0m - [93mwarning[0m[90m ts(80007): [0m'await' has no effect on the type of this expression.
+
+[7m295[0m   await remote.done()
+[7m   [0m [93m  ~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/app/features/settings/screens/settings-screen.tsx[0m:[93m1777[0m:[93m24[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(commandId: string, showUI?: boolean | undefined, value?: string | undefined): boolean' of 'document.execCommand' is deprecated.
+
+[7m1777[0m  let copied = document.execCommand("copy")
+[7m    [0m [93m                       ~~~~~~~~~~~[0m
+
+[96msrc/app/features/themes/screens/theme-workbench-screen.tsx[0m:[93m803[0m:[93m19[0m - [93mwarning[0m[90m ts(6385): [0m'MutableRefObject' is deprecated.
+
+[7m803[0m  sourceSyncState: MutableRefObject<{ content: string; sequence: number }>,
+[7m   [0m [93m                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/app/features/themes/screens/theme-workbench-screen.tsx[0m:[93m638[0m:[93m45[0m - [93mwarning[0m[90m ts(6385): [0m'MutableRefObject' is deprecated.
+
+[7m638[0m function makeSeparatorPointerUp(isResizing: MutableRefObject<boolean>) {
+[7m   [0m [93m                                            ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/app/features/themes/screens/theme-workbench-screen.tsx[0m:[93m627[0m:[93m14[0m - [93mwarning[0m[90m ts(6385): [0m'MutableRefObject' is deprecated.
+
+[7m627[0m  isResizing: MutableRefObject<boolean>,
+[7m   [0m [93m             ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/app/features/themes/screens/theme-workbench-screen.tsx[0m:[93m612[0m:[93m14[0m - [93mwarning[0m[90m ts(6385): [0m'MutableRefObject' is deprecated.
+
+[7m612[0m  isResizing: MutableRefObject<boolean>,
+[7m   [0m [93m             ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/app/features/themes/screens/theme-workbench-screen.tsx[0m:[93m577[0m:[93m14[0m - [93mwarning[0m[90m ts(6385): [0m'MutableRefObject' is deprecated.
+
+[7m577[0m  isResizing: MutableRefObject<boolean>
+[7m   [0m [93m             ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/app/features/themes/screens/theme-workbench-screen.tsx[0m:[93m6[0m:[93m2[0m - [93mwarning[0m[90m ts(6385): [0m'MutableRefObject' is deprecated.
+
+[7m6[0m  type MutableRefObject,
+[7m [0m [93m ~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/app/features/time-machine/lib/time-machine.test.ts[0m:[93m304[0m:[93m24[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(init: { snapshot: FileStream; lightPreview: ({ readonly original: MaybeLoaded<FileStream>; readonly originalSize: [number, number]; readonly placeholderDataURL: string | undefined; readonly progressive: boolean; } & { ...; } & CoMap) | { ...; }; darkPreview: ({ ...; } & ... 1 more ... & CoMap) | { ...; }; createdAt: Date; }, options?: CoValueCreateOptions<...>): { ...; } & CoMap' of 'TldrawRevision.create' is deprecated.
+
+[7m304[0m  return TldrawRevision.create(
+[7m   [0m [93m                       ~~~~~~[0m
+[96msrc/app/features/time-machine/lib/time-machine.test.ts[0m:[93m296[0m:[93m27[0m - [93mwarning[0m[90m ts(6385): [0m'(init: { original: FileStream; originalSize: [number, number]; progressive: boolean; placeholderDataURL?: string | undefined; }, options?: CoValueCreateOptions<{}, Group | Account>): { ...; } & ... 1 more ... & CoMap' is deprecated.
+
+[7m296[0m  let preview = co.image().create(
+[7m   [0m [93m                          ~~~~~~[0m
+[96msrc/app/features/time-machine/lib/time-machine.test.ts[0m:[93m293[0m:[93m39[0m - [93mwarning[0m[90m ts(6385): [0m'(blob: Blob | File, options?: Group | Account | { owner?: Group | Account | undefined; onProgress?: ((progress: number) => void) | undefined; } | undefined): Promise<...>' is deprecated.
+
+[7m293[0m  let original = await co.fileStream().createFromBlob(new ReadableBlob(""), {
+[7m   [0m [93m                                      ~~~~~~~~~~~~~~[0m
+[96msrc/app/features/time-machine/lib/time-machine.test.ts[0m:[93m290[0m:[93m4[0m - [93mwarning[0m[90m ts(6385): [0m'(blob: Blob | File, options?: Group | Account | { owner?: Group | Account | undefined; onProgress?: ((progress: number) => void) | undefined; } | undefined): Promise<...>' is deprecated.
+
+[7m290[0m   .createFromBlob(new ReadableBlob(content, "application/vnd.tldraw+json"), {
+[7m   [0m [93m   ~~~~~~~~~~~~~~[0m
+[96msrc/app/features/time-machine/lib/time-machine.test.ts[0m:[93m232[0m:[93m42[0m - [93mwarning[0m[90m ts(6385): [0m'(items: readonly (({ readonly type: "image"; readonly name: string; readonly image: MaybeLoaded<{ readonly original: MaybeLoaded<FileStream>; readonly originalSize: [number, number]; readonly placeholderDataURL: string | undefined; readonly progressive: boolean; } & { ...; } & CoMap>; readonly createdAt: Date; } & CoMap) | ... 4 more ... | { ...; })[], options?: CoValueCreateOptions<...>): CoListInstance<...>' is deprecated.
+
+[7m232[0m   doc.$jazz.set("assets", co.list(Asset).create([asset], adminAccount))
+[7m   [0m [93m                                         ~~~~~~[0m
+[96msrc/app/features/time-machine/lib/time-machine.test.ts[0m:[93m222[0m:[93m27[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(init: { type: "tldraw"; name: string; revision: ({ readonly snapshot: MaybeLoaded<FileStream>; readonly lightPreview: MaybeLoaded<{ readonly original: MaybeLoaded<FileStream>; readonly originalSize: [...]; readonly placeholderDataURL: string | undefined; readonly progressive: boolean; } & { ...; } & CoMap>; readonly darkPreview: MaybeLoaded<...>; readonly createdAt: Date; } & CoMap) | { ...; }; createdAt: Date; version?: 1 | undefined; presence?: CoFeed<...> | ... 1 more ... | undefined; }, options?: CoValueCreateOptions<...>): { ...; } & CoMap' of 'TldrawAsset.create' is deprecated.
+
+[7m222[0m   let asset = TldrawAsset.create(
+[7m   [0m [93m                          ~~~~~~[0m
+[96msrc/app/features/time-machine/lib/time-machine.test.ts[0m:[93m197[0m:[93m42[0m - [93mwarning[0m[90m ts(6385): [0m'(items: readonly (({ readonly type: "image"; readonly name: string; readonly image: MaybeLoaded<{ readonly original: MaybeLoaded<FileStream>; readonly originalSize: [number, number]; readonly placeholderDataURL: string | undefined; readonly progressive: boolean; } & { ...; } & CoMap>; readonly createdAt: Date; } & CoMap) | ... 4 more ... | { ...; })[], options?: CoValueCreateOptions<...>): CoListInstance<...>' is deprecated.
+
+[7m197[0m   doc.$jazz.set("assets", co.list(Asset).create([], adminAccount))
+[7m   [0m [93m                                         ~~~~~~[0m
+[96msrc/app/features/time-machine/lib/time-machine.test.ts[0m:[93m187[0m:[93m27[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(init: { type: "tldraw"; name: string; revision: ({ readonly snapshot: MaybeLoaded<FileStream>; readonly lightPreview: MaybeLoaded<{ readonly original: MaybeLoaded<FileStream>; readonly originalSize: [...]; readonly placeholderDataURL: string | undefined; readonly progressive: boolean; } & { ...; } & CoMap>; readonly darkPreview: MaybeLoaded<...>; readonly createdAt: Date; } & CoMap) | { ...; }; createdAt: Date; version?: 1 | undefined; presence?: CoFeed<...> | ... 1 more ... | undefined; }, options?: CoValueCreateOptions<...>): { ...; } & CoMap' of 'TldrawAsset.create' is deprecated.
+
+[7m187[0m   let asset = TldrawAsset.create(
+[7m   [0m [93m                          ~~~~~~[0m
+
+[96msrc/schema/migrations.test.ts[0m:[93m830[0m:[93m34[0m - [93mwarning[0m[90m ts(6385): [0m'(items: readonly (({ readonly version: 1; readonly name: string; readonly author: string | undefined; readonly description: string | undefined; readonly type: "preview" | "slideshow" | "both"; ... 9 more ...; readonly updatedAt: Date; } & CoMap) | { ...; })[], options?: CoValueCreateOptions<...>): CoListInstance<...>' is deprecated.
+
+[7m830[0m  let realThemes = co.list(Theme).create([], account)
+[7m   [0m [93m                                 ~~~~~~[0m
+[96msrc/schema/migrations.test.ts[0m:[93m829[0m:[93m34[0m - [93mwarning[0m[90m ts(6385): [0m'(items: readonly (({ readonly name: string; readonly avatar: MaybeLoaded<{ readonly original: MaybeLoaded<FileStream>; readonly originalSize: [number, number]; readonly placeholderDataURL: string | undefined; readonly progressive: boolean; } & { ...; } & CoMap> | undefined; readonly documents: MaybeLoaded<...>; readonly createdAt: Date; readonly updatedAt: Date; } & CoMap) | { ...; })[], options?: CoValueCreateOptions<...>): CoListInstance<...>' is deprecated.
+
+[7m829[0m  let realSpaces = co.list(Space).create([], account)
+[7m   [0m [93m                                 ~~~~~~[0m
+[96msrc/schema/migrations.test.ts[0m:[93m822[0m:[93m33[0m - [93mwarning[0m[90m ts(6385): [0m'(items: readonly (({ readonly version: 1; readonly content: MaybeLoaded<CoPlainText>; readonly archivedContent: MaybeLoaded<CoList<MaybeLoaded<{ readonly content: MaybeLoaded<CoPlainText>; ... 7 more ...; readonly successorId: string; } & CoMap>>> | undefined; ... 16 more ...; readonly updatedAt: Date; } & CoMap) | { ...; })[], options?: CoValueCreateOptions<...>): CoListInstance<...>' is deprecated.
+
+[7m822[0m    documents: co.list(Document).create([doc], account),
+[7m   [0m [93m                                ~~~~~~[0m
+[96msrc/schema/migrations.test.ts[0m:[93m820[0m:[93m26[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(init: { documents: CoList<MaybeLoaded<{ readonly version: 1; readonly content: MaybeLoaded<CoPlainText>; readonly archivedContent: MaybeLoaded<CoList<MaybeLoaded<{ readonly content: MaybeLoaded<CoPlainText>; ... 7 more ...; readonly successorId: string; } & CoMap>>> | undefined; ... 16 more ...; readonly updatedAt: Date; } & CoMap>> | readonly (({ ...; } & CoMap) | { ...; })[]; ... 11 more ...; lastOpenedSpaceId?: string | undefined; }, options?: CoValueCreateOptions<...>): { ...; } & CoMap' of 'UserRoot.create' is deprecated.
+
+[7m820[0m  let realRoot = UserRoot.create(
+[7m   [0m [93m                         ~~~~~~[0m
+[96msrc/schema/migrations.test.ts[0m:[93m814[0m:[93m28[0m - [93mwarning[0m[90m ts(6385): [0m'(text: string, options?: Group | Account | { owner: Group | Account; } | undefined): CoPlainText' is deprecated.
+
+[7m814[0m    content: co.plainText().create("real content", account),
+[7m   [0m [93m                           ~~~~~~[0m
+[96msrc/schema/migrations.test.ts[0m:[93m811[0m:[93m21[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(init: { version: 1; content: string | CoPlainText; createdAt: Date; updatedAt: Date; archivedContent?: CoList<MaybeLoaded<{ readonly content: MaybeLoaded<CoPlainText>; ... 7 more ...; readonly successorId: string; } & CoMap>> | readonly (({ ...; } & CoMap) | { ...; })[] | undefined; ... 14 more ...; spaceId?: string | undefined; }, options?: CoValueCreateOptions<...>): { ...; } & CoMap' of 'Document.create' is deprecated.
+
+[7m811[0m  let doc = Document.create(
+[7m   [0m [93m                    ~~~~~~[0m
+[96msrc/schema/migrations.test.ts[0m:[93m668[0m:[93m47[0m - [93mwarning[0m[90m ts(6385): [0m'(items: readonly (({ readonly version: 1; readonly name: string; readonly author: string | undefined; readonly description: string | undefined; readonly type: "preview" | "slideshow" | "both"; ... 9 more ...; readonly updatedAt: Date; } & CoMap) | { ...; })[], options?: CoValueCreateOptions<...>): CoListInstance<...>' is deprecated.
+
+[7m668[0m   realRoot.$jazz.set("themes", co.list(Theme).create([], account))
+[7m   [0m [93m                                              ~~~~~~[0m
+[96msrc/schema/migrations.test.ts[0m:[93m667[0m:[93m47[0m - [93mwarning[0m[90m ts(6385): [0m'(items: readonly (({ readonly name: string; readonly avatar: MaybeLoaded<{ readonly original: MaybeLoaded<FileStream>; readonly originalSize: [number, number]; readonly placeholderDataURL: string | undefined; readonly progressive: boolean; } & { ...; } & CoMap> | undefined; readonly documents: MaybeLoaded<...>; readonly createdAt: Date; readonly updatedAt: Date; } & CoMap) | { ...; })[], options?: CoValueCreateOptions<...>): CoListInstance<...>' is deprecated.
+
+[7m667[0m   realRoot.$jazz.set("spaces", co.list(Space).create([], account))
+[7m   [0m [93m                                              ~~~~~~[0m
+[96msrc/schema/migrations.test.ts[0m:[93m661[0m:[93m33[0m - [93mwarning[0m[90m ts(6385): [0m'(items: readonly (({ readonly version: 1; readonly content: MaybeLoaded<CoPlainText>; readonly archivedContent: MaybeLoaded<CoList<MaybeLoaded<{ readonly content: MaybeLoaded<CoPlainText>; ... 7 more ...; readonly successorId: string; } & CoMap>>> | undefined; ... 16 more ...; readonly updatedAt: Date; } & CoMap) | { ...; })[], options?: CoValueCreateOptions<...>): CoListInstance<...>' is deprecated.
+
+[7m661[0m    documents: co.list(Document).create([doc], account),
+[7m   [0m [93m                                ~~~~~~[0m
+[96msrc/schema/migrations.test.ts[0m:[93m659[0m:[93m26[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(init: { documents: CoList<MaybeLoaded<{ readonly version: 1; readonly content: MaybeLoaded<CoPlainText>; readonly archivedContent: MaybeLoaded<CoList<MaybeLoaded<{ readonly content: MaybeLoaded<CoPlainText>; ... 7 more ...; readonly successorId: string; } & CoMap>>> | undefined; ... 16 more ...; readonly updatedAt: Date; } & CoMap>> | readonly (({ ...; } & CoMap) | { ...; })[]; ... 11 more ...; lastOpenedSpaceId?: string | undefined; }, options?: CoValueCreateOptions<...>): { ...; } & CoMap' of 'UserRoot.create' is deprecated.
+
+[7m659[0m  let realRoot = UserRoot.create(
+[7m   [0m [93m                         ~~~~~~[0m
+[96msrc/schema/migrations.test.ts[0m:[93m653[0m:[93m28[0m - [93mwarning[0m[90m ts(6385): [0m'(text: string, options?: Group | Account | { owner: Group | Account; } | undefined): CoPlainText' is deprecated.
+
+[7m653[0m    content: co.plainText().create("real content", account),
+[7m   [0m [93m                           ~~~~~~[0m
+[96msrc/schema/migrations.test.ts[0m:[93m650[0m:[93m21[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(init: { version: 1; content: string | CoPlainText; createdAt: Date; updatedAt: Date; archivedContent?: CoList<MaybeLoaded<{ readonly content: MaybeLoaded<CoPlainText>; ... 7 more ...; readonly successorId: string; } & CoMap>> | readonly (({ ...; } & CoMap) | { ...; })[] | undefined; ... 14 more ...; spaceId?: string | undefined; }, options?: CoValueCreateOptions<...>): { ...; } & CoMap' of 'Document.create' is deprecated.
+
+[7m650[0m  let doc = Document.create(
+[7m   [0m [93m                    ~~~~~~[0m
+[96msrc/schema/migrations.test.ts[0m:[93m495[0m:[93m34[0m - [93mwarning[0m[90m ts(6385): [0m'(items: readonly ({ name: string; documents: readonly ({ version: 1; content: string | CoPlainText; createdAt: Date; updatedAt: Date; assets?: CoList<MaybeLoaded<{ readonly type: "image"; readonly name: string; readonly image: MaybeLoaded<...>; readonly createdAt: Date; } & CoMap> | MaybeLoaded<...> | MaybeLoaded<...>> | readonly (({ ...; } & CoMap) | ... 4 more ... | { ...; })[] | undefined; ... 6 more ...; spaceId?: string | undefined; } | ({ ...; } & CoMap))[] | CoList<...>; createdAt: Date; updatedAt: Date; avatar?: ({ ...; } & ... 1 more ... & CoMap) | ... 1 more ... | undefined; } | ({ ...; } & CoMap))[], options?: CoValueCreateOptions<...>): CoListInstance<...>' is deprecated.
+
+[7m495[0m     spaces: co.list(LegacySpace).create(spaces, legacyAccount),
+[7m   [0m [93m                                 ~~~~~~[0m
+[96msrc/schema/migrations.test.ts[0m:[93m494[0m:[93m7[0m - [93mwarning[0m[90m ts(6385): [0m'(items: readonly ({ version: 1; content: string | CoPlainText; createdAt: Date; updatedAt: Date; assets?: CoList<MaybeLoaded<{ readonly type: "image"; readonly name: string; readonly image: MaybeLoaded<{ ...; } & ... 1 more ... & CoMap>; readonly createdAt: Date; } & CoMap> | MaybeLoaded<...> | MaybeLoaded<...>> | readonly (({ ...; } & CoMap) | ... 4 more ... | { ...; })[] | undefined; ... 6 more ...; spaceId?: string | undefined; } | ({ ...; } & CoMap))[], options?: CoValueCreateOptions<...>): CoListInstance<...>' is deprecated.
+
+[7m494[0m      .create(personalDocuments, legacyAccount),
+[7m   [0m [93m      ~~~~~~[0m
+[96msrc/schema/migrations.test.ts[0m:[93m490[0m:[93m31[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(init: { documents: readonly ({ version: 1; content: string | CoPlainText; createdAt: Date; updatedAt: Date; assets?: CoList<MaybeLoaded<{ readonly type: "image"; readonly name: string; readonly image: MaybeLoaded<...>; readonly createdAt: Date; } & CoMap> | MaybeLoaded<...> | MaybeLoaded<...>> | readonly (({ ...; } & CoMap) | ... 4 more ... | { ...; })[] | undefined; ... 6 more ...; spaceId?: string | undefined; } | ({ ...; } & CoMap))[] | CoList<...>; ... 7 more ...; lastOpenedSpaceId?: string | undefined; }, options?: CoValueCreateOptions<...>): { ...; } & CoMap' of 'LegacyRoot.create' is deprecated.
+
+[7m490[0m   let legacyRoot = LegacyRoot.create(
+[7m   [0m [93m                              ~~~~~~[0m
+
+[96msrc/schema/migrations.ts[0m:[93m87[0m:[93m35[0m - [93mwarning[0m[90m ts(6385): [0m'(items: readonly (({ readonly version: 1; readonly content: MaybeLoaded<CoPlainText>; readonly archivedContent: MaybeLoaded<CoList<MaybeLoaded<{ readonly content: MaybeLoaded<CoPlainText>; ... 7 more ...; readonly successorId: string; } & CoMap>>> | undefined; ... 16 more ...; readonly updatedAt: Date; } & CoMap) | { ...; })[], options?: CoValueCreateOptions<...>): CoListInstance<...>' is deprecated.
+
+[7m87[0m      documents: co.list(Document).create([], account),
+[7m  [0m [93m                                  ~~~~~~[0m
+[96msrc/schema/migrations.ts[0m:[93m85[0m:[93m13[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(init: { documents: CoList<MaybeLoaded<{ readonly version: 1; readonly content: MaybeLoaded<CoPlainText>; readonly archivedContent: MaybeLoaded<CoList<MaybeLoaded<{ readonly content: MaybeLoaded<CoPlainText>; ... 7 more ...; readonly successorId: string; } & CoMap>>> | undefined; ... 16 more ...; readonly updatedAt: Date; } & CoMap>> | readonly (({ ...; } & CoMap) | { ...; })[]; ... 11 more ...; lastOpenedSpaceId?: string | undefined; }, options?: CoValueCreateOptions<...>): { ...; } & CoMap' of 'UserRoot.create' is deprecated.
+
+[7m85[0m    UserRoot.create(
+[7m  [0m [93m            ~~~~~~[0m
+
+Result (464 files): 
+- 0 errors
+- 0 warnings
+- 45 hints
+
+03:41:05 [vite] Re-optimizing dependencies because vite config has changed
+03:41:05 [content] Syncing content
+03:41:05 [content] Synced content
+03:41:05 [types] Generated 112ms
+03:41:05 [build] output: "static"
+03:41:05 [build] mode: "server"
+03:41:05 [build] directory: /private/tmp/alkalye-root-bundles-oct9/main/dist/
+03:41:05 [build] adapter: @astrojs/vercel
+03:41:05 [build] Collecting build info...
+03:41:05 [build] ✓ Completed in 126ms.
+03:41:05 [build] Building server entrypoints...
+03:41:05 [ERROR] [vite] ✗ Build failed in 254ms
+[EnvInvalidVariables] [astro-env-plugin] Could not load  astro:env/server (imported by src/pages/.well-known/openai-apps-challenge.ts): The following environment variables defined in `env.schema` are invalid:
+
+- PUBLIC_JAZZ_SYNC_SERVER is missing
+
+  Error reference:
+    https://docs.astro.build/en/reference/errors/env-invalid-variables/
+  Stack trace:
+    at validatePublicVariables (file:///private/tmp/alkalye-main-rebench/node_modules/astro/dist/env/vite-plugin-env.js:103:11)
+    at Object.handler (file:///private/tmp/alkalye-main-rebench/node_modules/astro/node_modules/vite/dist/node/chunks/dep-D4NMHUTW.js:46513:15)
+    at async PluginDriver.hookFirstAndGetPlugin (file:///private/tmp/alkalye-main-rebench/node_modules/rollup/dist/es/shared/node-entry.js:22409:28)
+    at async Queue.work (file:///private/tmp/alkalye-main-rebench/node_modules/rollup/dist/es/shared/node-entry.js:22637:32)
+error: script "build" exited with code 1

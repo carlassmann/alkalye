@@ -1,0 +1,459 @@
+$ astro check && astro build
+03:41:26 [vite] Re-optimizing dependencies because vite config has changed
+03:41:26 [content] Syncing content
+03:41:26 [content] Synced content
+03:41:26 [types] Generated 122ms
+03:41:26 [check] Getting diagnostics for Astro files in /private/tmp/alkalye-root-bundles-oct9/main...
+[96msrc/app/features/agents/lib/agent-api.test.ts[0m:[93m20[0m:[93m33[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(init: { clientId: string; clientName: string; credential: string; createdAt: Date; revokedAt?: Date | undefined; }, options?: CoValueCreateOptions<{}, Group | Account>): { ...; } & CoMap' of 'McpConnection.create' is deprecated.
+
+[7m20[0m  let connection = McpConnection.create(
+[7m  [0m [93m                                ~~~~~~[0m
+
+[96msrc/app/features/agents/lib/schema.test.ts[0m:[93m30[0m:[93m32[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(this: CoValueClass<...>, id: string, options?: { resolve?: RefsToResolve<Group, 10, []> | undefined; loadAs?: Account | AnonymousJazzAgent | undefined; } | undefined): Promise<...>' of 'Group.load' is deprecated.
+
+[7m30[0m   let otherOwner = await Group.load(owner.$jazz.id, { loadAs: other })
+[7m  [0m [93m                               ~~~~[0m
+
+[96msrc/app/features/agents/lib/schema.ts[0m:[93m36[0m:[93m16[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(items: readonly (({ readonly clientId: string; readonly clientName: string; readonly credential: string; readonly createdAt: Date; readonly revokedAt: Date | undefined; } & CoMap) | { ...; })[], options?: CoValueCreateOptions<...>): CoListInstance<...>' of 'schema.create' is deprecated.
+
+[7m36[0m  return schema.create([], { owner, unique: "mcp-connections" })
+[7m  [0m [93m               ~~~~~~[0m
+[96msrc/app/features/agents/lib/schema.ts[0m:[93m26[0m:[93m18[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(unique: Uniqueness, ownerID: string, as?: Group | Account | AnonymousJazzAgent | undefined): string' of 'schema.findUnique' is deprecated.
+
+[7m26[0m  let id = schema.findUnique("mcp-connections", owner.$jazz.id, owner)
+[7m  [0m [93m                 ~~~~~~~~~~[0m
+
+[96msrc/app/features/assets/lib/asset-view-models.test.ts[0m:[93m89[0m:[93m5[0m - [93mwarning[0m[90m ts(6385): [0m'(blob: Blob | File, options?: Group | Account | { owner?: Group | Account | undefined; onProgress?: ((progress: number) => void) | undefined; } | undefined): Promise<...>' is deprecated.
+
+[7m89[0m    .createFromBlob(new ReadableBlob(content, type), { owner: account })
+[7m  [0m [93m    ~~~~~~~~~~~~~~[0m
+[96msrc/app/features/assets/lib/asset-view-models.test.ts[0m:[93m64[0m:[93m31[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(init: { type: "video"; name: string; video: FileStream; mimeType: string; createdAt: Date; muteAudio?: boolean | undefined; }, options?: CoValueCreateOptions<{}, Group | Account>): { ...; } & CoMap' of 'VideoAsset.create' is deprecated.
+
+[7m64[0m   let videoAsset = VideoAsset.create(
+[7m  [0m [93m                              ~~~~~~[0m
+[96msrc/app/features/assets/lib/asset-view-models.test.ts[0m:[93m54[0m:[93m37[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(init: { type: "tldraw"; name: string; revision: ({ readonly snapshot: MaybeLoaded<FileStream>; readonly lightPreview: MaybeLoaded<{ readonly original: MaybeLoaded<FileStream>; readonly originalSize: [...]; readonly placeholderDataURL: string | undefined; readonly progressive: boolean; } & { ...; } & CoMap>; readonly darkPreview: MaybeLoaded<...>; readonly createdAt: Date; } & CoMap) | { ...; }; createdAt: Date; version?: 1 | undefined; presence?: CoFeed<...> | ... 1 more ... | undefined; }, options?: CoValueCreateOptions<...>): { ...; } & CoMap' of 'TldrawAsset.create' is deprecated.
+
+[7m54[0m   let whiteboardAsset = TldrawAsset.create(
+[7m  [0m [93m                                    ~~~~~~[0m
+[96msrc/app/features/assets/lib/asset-view-models.test.ts[0m:[93m45[0m:[93m33[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(init: { snapshot: FileStream; lightPreview: ({ readonly original: MaybeLoaded<FileStream>; readonly originalSize: [number, number]; readonly placeholderDataURL: string | undefined; readonly progressive: boolean; } & { ...; } & CoMap) | { ...; }; darkPreview: ({ ...; } & ... 1 more ... & CoMap) | { ...; }; createdAt: Date; }, options?: CoValueCreateOptions<...>): { ...; } & CoMap' of 'TldrawRevision.create' is deprecated.
+
+[7m45[0m   let revision = TldrawRevision.create(
+[7m  [0m [93m                                ~~~~~~[0m
+[96msrc/app/features/assets/lib/asset-view-models.test.ts[0m:[93m40[0m:[93m31[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(init: { type: "image"; name: string; image: ({ readonly original: MaybeLoaded<FileStream>; readonly originalSize: [number, number]; readonly placeholderDataURL: string | undefined; readonly progressive: boolean; } & { ...; } & CoMap) | { ...; }; createdAt: Date; }, options?: CoValueCreateOptions<...>): { ...; } & CoMap' of 'ImageAsset.create' is deprecated.
+
+[7m40[0m   let imageAsset = ImageAsset.create(
+[7m  [0m [93m                              ~~~~~~[0m
+[96msrc/app/features/assets/lib/asset-view-models.test.ts[0m:[93m32[0m:[93m26[0m - [93mwarning[0m[90m ts(6385): [0m'(init: { original: FileStream; originalSize: [number, number]; progressive: boolean; placeholderDataURL?: string | undefined; }, options?: CoValueCreateOptions<{}, Group | Account>): { ...; } & ... 1 more ... & CoMap' is deprecated.
+
+[7m32[0m   let image = co.image().create(
+[7m  [0m [93m                         ~~~~~~[0m
+
+[96msrc/app/features/documents/lib/background-document-save.ts[0m:[93m130[0m:[93m11[0m - [93mwarning[0m[90m ts(80006): [0mThis may be converted to an async function.
+
+[7m130[0m  function calculateDiff(
+[7m   [0m [93m          ~~~~~~~~~~~~~[0m
+
+[96msrc/app/features/presentation/lib/laser-channel.test.ts[0m:[93m364[0m:[93m3[0m - [93mwarning[0m[90m ts(80007): [0m'await' has no effect on the type of this expression.
+
+[7m364[0m   await remote.done()
+[7m   [0m [93m  ~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/app/features/presentation/lib/laser-channel.test.ts[0m:[93m295[0m:[93m3[0m - [93mwarning[0m[90m ts(80007): [0m'await' has no effect on the type of this expression.
+
+[7m295[0m   await remote.done()
+[7m   [0m [93m  ~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/app/features/settings/screens/settings-screen.tsx[0m:[93m1777[0m:[93m24[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(commandId: string, showUI?: boolean | undefined, value?: string | undefined): boolean' of 'document.execCommand' is deprecated.
+
+[7m1777[0m  let copied = document.execCommand("copy")
+[7m    [0m [93m                       ~~~~~~~~~~~[0m
+
+[96msrc/app/features/themes/screens/theme-workbench-screen.tsx[0m:[93m803[0m:[93m19[0m - [93mwarning[0m[90m ts(6385): [0m'MutableRefObject' is deprecated.
+
+[7m803[0m  sourceSyncState: MutableRefObject<{ content: string; sequence: number }>,
+[7m   [0m [93m                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/app/features/themes/screens/theme-workbench-screen.tsx[0m:[93m638[0m:[93m45[0m - [93mwarning[0m[90m ts(6385): [0m'MutableRefObject' is deprecated.
+
+[7m638[0m function makeSeparatorPointerUp(isResizing: MutableRefObject<boolean>) {
+[7m   [0m [93m                                            ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/app/features/themes/screens/theme-workbench-screen.tsx[0m:[93m627[0m:[93m14[0m - [93mwarning[0m[90m ts(6385): [0m'MutableRefObject' is deprecated.
+
+[7m627[0m  isResizing: MutableRefObject<boolean>,
+[7m   [0m [93m             ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/app/features/themes/screens/theme-workbench-screen.tsx[0m:[93m612[0m:[93m14[0m - [93mwarning[0m[90m ts(6385): [0m'MutableRefObject' is deprecated.
+
+[7m612[0m  isResizing: MutableRefObject<boolean>,
+[7m   [0m [93m             ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/app/features/themes/screens/theme-workbench-screen.tsx[0m:[93m577[0m:[93m14[0m - [93mwarning[0m[90m ts(6385): [0m'MutableRefObject' is deprecated.
+
+[7m577[0m  isResizing: MutableRefObject<boolean>
+[7m   [0m [93m             ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/app/features/themes/screens/theme-workbench-screen.tsx[0m:[93m6[0m:[93m2[0m - [93mwarning[0m[90m ts(6385): [0m'MutableRefObject' is deprecated.
+
+[7m6[0m  type MutableRefObject,
+[7m [0m [93m ~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/app/features/time-machine/lib/time-machine.test.ts[0m:[93m304[0m:[93m24[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(init: { snapshot: FileStream; lightPreview: ({ readonly original: MaybeLoaded<FileStream>; readonly originalSize: [number, number]; readonly placeholderDataURL: string | undefined; readonly progressive: boolean; } & { ...; } & CoMap) | { ...; }; darkPreview: ({ ...; } & ... 1 more ... & CoMap) | { ...; }; createdAt: Date; }, options?: CoValueCreateOptions<...>): { ...; } & CoMap' of 'TldrawRevision.create' is deprecated.
+
+[7m304[0m  return TldrawRevision.create(
+[7m   [0m [93m                       ~~~~~~[0m
+[96msrc/app/features/time-machine/lib/time-machine.test.ts[0m:[93m296[0m:[93m27[0m - [93mwarning[0m[90m ts(6385): [0m'(init: { original: FileStream; originalSize: [number, number]; progressive: boolean; placeholderDataURL?: string | undefined; }, options?: CoValueCreateOptions<{}, Group | Account>): { ...; } & ... 1 more ... & CoMap' is deprecated.
+
+[7m296[0m  let preview = co.image().create(
+[7m   [0m [93m                          ~~~~~~[0m
+[96msrc/app/features/time-machine/lib/time-machine.test.ts[0m:[93m293[0m:[93m39[0m - [93mwarning[0m[90m ts(6385): [0m'(blob: Blob | File, options?: Group | Account | { owner?: Group | Account | undefined; onProgress?: ((progress: number) => void) | undefined; } | undefined): Promise<...>' is deprecated.
+
+[7m293[0m  let original = await co.fileStream().createFromBlob(new ReadableBlob(""), {
+[7m   [0m [93m                                      ~~~~~~~~~~~~~~[0m
+[96msrc/app/features/time-machine/lib/time-machine.test.ts[0m:[93m290[0m:[93m4[0m - [93mwarning[0m[90m ts(6385): [0m'(blob: Blob | File, options?: Group | Account | { owner?: Group | Account | undefined; onProgress?: ((progress: number) => void) | undefined; } | undefined): Promise<...>' is deprecated.
+
+[7m290[0m   .createFromBlob(new ReadableBlob(content, "application/vnd.tldraw+json"), {
+[7m   [0m [93m   ~~~~~~~~~~~~~~[0m
+[96msrc/app/features/time-machine/lib/time-machine.test.ts[0m:[93m232[0m:[93m42[0m - [93mwarning[0m[90m ts(6385): [0m'(items: readonly (({ readonly type: "image"; readonly name: string; readonly image: MaybeLoaded<{ readonly original: MaybeLoaded<FileStream>; readonly originalSize: [number, number]; readonly placeholderDataURL: string | undefined; readonly progressive: boolean; } & { ...; } & CoMap>; readonly createdAt: Date; } & CoMap) | ... 4 more ... | { ...; })[], options?: CoValueCreateOptions<...>): CoListInstance<...>' is deprecated.
+
+[7m232[0m   doc.$jazz.set("assets", co.list(Asset).create([asset], adminAccount))
+[7m   [0m [93m                                         ~~~~~~[0m
+[96msrc/app/features/time-machine/lib/time-machine.test.ts[0m:[93m222[0m:[93m27[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(init: { type: "tldraw"; name: string; revision: ({ readonly snapshot: MaybeLoaded<FileStream>; readonly lightPreview: MaybeLoaded<{ readonly original: MaybeLoaded<FileStream>; readonly originalSize: [...]; readonly placeholderDataURL: string | undefined; readonly progressive: boolean; } & { ...; } & CoMap>; readonly darkPreview: MaybeLoaded<...>; readonly createdAt: Date; } & CoMap) | { ...; }; createdAt: Date; version?: 1 | undefined; presence?: CoFeed<...> | ... 1 more ... | undefined; }, options?: CoValueCreateOptions<...>): { ...; } & CoMap' of 'TldrawAsset.create' is deprecated.
+
+[7m222[0m   let asset = TldrawAsset.create(
+[7m   [0m [93m                          ~~~~~~[0m
+[96msrc/app/features/time-machine/lib/time-machine.test.ts[0m:[93m197[0m:[93m42[0m - [93mwarning[0m[90m ts(6385): [0m'(items: readonly (({ readonly type: "image"; readonly name: string; readonly image: MaybeLoaded<{ readonly original: MaybeLoaded<FileStream>; readonly originalSize: [number, number]; readonly placeholderDataURL: string | undefined; readonly progressive: boolean; } & { ...; } & CoMap>; readonly createdAt: Date; } & CoMap) | ... 4 more ... | { ...; })[], options?: CoValueCreateOptions<...>): CoListInstance<...>' is deprecated.
+
+[7m197[0m   doc.$jazz.set("assets", co.list(Asset).create([], adminAccount))
+[7m   [0m [93m                                         ~~~~~~[0m
+[96msrc/app/features/time-machine/lib/time-machine.test.ts[0m:[93m187[0m:[93m27[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(init: { type: "tldraw"; name: string; revision: ({ readonly snapshot: MaybeLoaded<FileStream>; readonly lightPreview: MaybeLoaded<{ readonly original: MaybeLoaded<FileStream>; readonly originalSize: [...]; readonly placeholderDataURL: string | undefined; readonly progressive: boolean; } & { ...; } & CoMap>; readonly darkPreview: MaybeLoaded<...>; readonly createdAt: Date; } & CoMap) | { ...; }; createdAt: Date; version?: 1 | undefined; presence?: CoFeed<...> | ... 1 more ... | undefined; }, options?: CoValueCreateOptions<...>): { ...; } & CoMap' of 'TldrawAsset.create' is deprecated.
+
+[7m187[0m   let asset = TldrawAsset.create(
+[7m   [0m [93m                          ~~~~~~[0m
+
+[96msrc/schema/migrations.test.ts[0m:[93m830[0m:[93m34[0m - [93mwarning[0m[90m ts(6385): [0m'(items: readonly (({ readonly version: 1; readonly name: string; readonly author: string | undefined; readonly description: string | undefined; readonly type: "preview" | "slideshow" | "both"; ... 9 more ...; readonly updatedAt: Date; } & CoMap) | { ...; })[], options?: CoValueCreateOptions<...>): CoListInstance<...>' is deprecated.
+
+[7m830[0m  let realThemes = co.list(Theme).create([], account)
+[7m   [0m [93m                                 ~~~~~~[0m
+[96msrc/schema/migrations.test.ts[0m:[93m829[0m:[93m34[0m - [93mwarning[0m[90m ts(6385): [0m'(items: readonly (({ readonly name: string; readonly avatar: MaybeLoaded<{ readonly original: MaybeLoaded<FileStream>; readonly originalSize: [number, number]; readonly placeholderDataURL: string | undefined; readonly progressive: boolean; } & { ...; } & CoMap> | undefined; readonly documents: MaybeLoaded<...>; readonly createdAt: Date; readonly updatedAt: Date; } & CoMap) | { ...; })[], options?: CoValueCreateOptions<...>): CoListInstance<...>' is deprecated.
+
+[7m829[0m  let realSpaces = co.list(Space).create([], account)
+[7m   [0m [93m                                 ~~~~~~[0m
+[96msrc/schema/migrations.test.ts[0m:[93m822[0m:[93m33[0m - [93mwarning[0m[90m ts(6385): [0m'(items: readonly (({ readonly version: 1; readonly content: MaybeLoaded<CoPlainText>; readonly archivedContent: MaybeLoaded<CoList<MaybeLoaded<{ readonly content: MaybeLoaded<CoPlainText>; ... 7 more ...; readonly successorId: string; } & CoMap>>> | undefined; ... 16 more ...; readonly updatedAt: Date; } & CoMap) | { ...; })[], options?: CoValueCreateOptions<...>): CoListInstance<...>' is deprecated.
+
+[7m822[0m    documents: co.list(Document).create([doc], account),
+[7m   [0m [93m                                ~~~~~~[0m
+[96msrc/schema/migrations.test.ts[0m:[93m820[0m:[93m26[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(init: { documents: CoList<MaybeLoaded<{ readonly version: 1; readonly content: MaybeLoaded<CoPlainText>; readonly archivedContent: MaybeLoaded<CoList<MaybeLoaded<{ readonly content: MaybeLoaded<CoPlainText>; ... 7 more ...; readonly successorId: string; } & CoMap>>> | undefined; ... 16 more ...; readonly updatedAt: Date; } & CoMap>> | readonly (({ ...; } & CoMap) | { ...; })[]; ... 11 more ...; lastOpenedSpaceId?: string | undefined; }, options?: CoValueCreateOptions<...>): { ...; } & CoMap' of 'UserRoot.create' is deprecated.
+
+[7m820[0m  let realRoot = UserRoot.create(
+[7m   [0m [93m                         ~~~~~~[0m
+[96msrc/schema/migrations.test.ts[0m:[93m814[0m:[93m28[0m - [93mwarning[0m[90m ts(6385): [0m'(text: string, options?: Group | Account | { owner: Group | Account; } | undefined): CoPlainText' is deprecated.
+
+[7m814[0m    content: co.plainText().create("real content", account),
+[7m   [0m [93m                           ~~~~~~[0m
+[96msrc/schema/migrations.test.ts[0m:[93m811[0m:[93m21[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(init: { version: 1; content: string | CoPlainText; createdAt: Date; updatedAt: Date; archivedContent?: CoList<MaybeLoaded<{ readonly content: MaybeLoaded<CoPlainText>; ... 7 more ...; readonly successorId: string; } & CoMap>> | readonly (({ ...; } & CoMap) | { ...; })[] | undefined; ... 14 more ...; spaceId?: string | undefined; }, options?: CoValueCreateOptions<...>): { ...; } & CoMap' of 'Document.create' is deprecated.
+
+[7m811[0m  let doc = Document.create(
+[7m   [0m [93m                    ~~~~~~[0m
+[96msrc/schema/migrations.test.ts[0m:[93m668[0m:[93m47[0m - [93mwarning[0m[90m ts(6385): [0m'(items: readonly (({ readonly version: 1; readonly name: string; readonly author: string | undefined; readonly description: string | undefined; readonly type: "preview" | "slideshow" | "both"; ... 9 more ...; readonly updatedAt: Date; } & CoMap) | { ...; })[], options?: CoValueCreateOptions<...>): CoListInstance<...>' is deprecated.
+
+[7m668[0m   realRoot.$jazz.set("themes", co.list(Theme).create([], account))
+[7m   [0m [93m                                              ~~~~~~[0m
+[96msrc/schema/migrations.test.ts[0m:[93m667[0m:[93m47[0m - [93mwarning[0m[90m ts(6385): [0m'(items: readonly (({ readonly name: string; readonly avatar: MaybeLoaded<{ readonly original: MaybeLoaded<FileStream>; readonly originalSize: [number, number]; readonly placeholderDataURL: string | undefined; readonly progressive: boolean; } & { ...; } & CoMap> | undefined; readonly documents: MaybeLoaded<...>; readonly createdAt: Date; readonly updatedAt: Date; } & CoMap) | { ...; })[], options?: CoValueCreateOptions<...>): CoListInstance<...>' is deprecated.
+
+[7m667[0m   realRoot.$jazz.set("spaces", co.list(Space).create([], account))
+[7m   [0m [93m                                              ~~~~~~[0m
+[96msrc/schema/migrations.test.ts[0m:[93m661[0m:[93m33[0m - [93mwarning[0m[90m ts(6385): [0m'(items: readonly (({ readonly version: 1; readonly content: MaybeLoaded<CoPlainText>; readonly archivedContent: MaybeLoaded<CoList<MaybeLoaded<{ readonly content: MaybeLoaded<CoPlainText>; ... 7 more ...; readonly successorId: string; } & CoMap>>> | undefined; ... 16 more ...; readonly updatedAt: Date; } & CoMap) | { ...; })[], options?: CoValueCreateOptions<...>): CoListInstance<...>' is deprecated.
+
+[7m661[0m    documents: co.list(Document).create([doc], account),
+[7m   [0m [93m                                ~~~~~~[0m
+[96msrc/schema/migrations.test.ts[0m:[93m659[0m:[93m26[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(init: { documents: CoList<MaybeLoaded<{ readonly version: 1; readonly content: MaybeLoaded<CoPlainText>; readonly archivedContent: MaybeLoaded<CoList<MaybeLoaded<{ readonly content: MaybeLoaded<CoPlainText>; ... 7 more ...; readonly successorId: string; } & CoMap>>> | undefined; ... 16 more ...; readonly updatedAt: Date; } & CoMap>> | readonly (({ ...; } & CoMap) | { ...; })[]; ... 11 more ...; lastOpenedSpaceId?: string | undefined; }, options?: CoValueCreateOptions<...>): { ...; } & CoMap' of 'UserRoot.create' is deprecated.
+
+[7m659[0m  let realRoot = UserRoot.create(
+[7m   [0m [93m                         ~~~~~~[0m
+[96msrc/schema/migrations.test.ts[0m:[93m653[0m:[93m28[0m - [93mwarning[0m[90m ts(6385): [0m'(text: string, options?: Group | Account | { owner: Group | Account; } | undefined): CoPlainText' is deprecated.
+
+[7m653[0m    content: co.plainText().create("real content", account),
+[7m   [0m [93m                           ~~~~~~[0m
+[96msrc/schema/migrations.test.ts[0m:[93m650[0m:[93m21[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(init: { version: 1; content: string | CoPlainText; createdAt: Date; updatedAt: Date; archivedContent?: CoList<MaybeLoaded<{ readonly content: MaybeLoaded<CoPlainText>; ... 7 more ...; readonly successorId: string; } & CoMap>> | readonly (({ ...; } & CoMap) | { ...; })[] | undefined; ... 14 more ...; spaceId?: string | undefined; }, options?: CoValueCreateOptions<...>): { ...; } & CoMap' of 'Document.create' is deprecated.
+
+[7m650[0m  let doc = Document.create(
+[7m   [0m [93m                    ~~~~~~[0m
+[96msrc/schema/migrations.test.ts[0m:[93m495[0m:[93m34[0m - [93mwarning[0m[90m ts(6385): [0m'(items: readonly ({ name: string; documents: readonly ({ version: 1; content: string | CoPlainText; createdAt: Date; updatedAt: Date; assets?: CoList<MaybeLoaded<{ readonly type: "image"; readonly name: string; readonly image: MaybeLoaded<...>; readonly createdAt: Date; } & CoMap> | MaybeLoaded<...> | MaybeLoaded<...>> | readonly (({ ...; } & CoMap) | ... 4 more ... | { ...; })[] | undefined; ... 6 more ...; spaceId?: string | undefined; } | ({ ...; } & CoMap))[] | CoList<...>; createdAt: Date; updatedAt: Date; avatar?: ({ ...; } & ... 1 more ... & CoMap) | ... 1 more ... | undefined; } | ({ ...; } & CoMap))[], options?: CoValueCreateOptions<...>): CoListInstance<...>' is deprecated.
+
+[7m495[0m     spaces: co.list(LegacySpace).create(spaces, legacyAccount),
+[7m   [0m [93m                                 ~~~~~~[0m
+[96msrc/schema/migrations.test.ts[0m:[93m494[0m:[93m7[0m - [93mwarning[0m[90m ts(6385): [0m'(items: readonly ({ version: 1; content: string | CoPlainText; createdAt: Date; updatedAt: Date; assets?: CoList<MaybeLoaded<{ readonly type: "image"; readonly name: string; readonly image: MaybeLoaded<{ ...; } & ... 1 more ... & CoMap>; readonly createdAt: Date; } & CoMap> | MaybeLoaded<...> | MaybeLoaded<...>> | readonly (({ ...; } & CoMap) | ... 4 more ... | { ...; })[] | undefined; ... 6 more ...; spaceId?: string | undefined; } | ({ ...; } & CoMap))[], options?: CoValueCreateOptions<...>): CoListInstance<...>' is deprecated.
+
+[7m494[0m      .create(personalDocuments, legacyAccount),
+[7m   [0m [93m      ~~~~~~[0m
+[96msrc/schema/migrations.test.ts[0m:[93m490[0m:[93m31[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(init: { documents: readonly ({ version: 1; content: string | CoPlainText; createdAt: Date; updatedAt: Date; assets?: CoList<MaybeLoaded<{ readonly type: "image"; readonly name: string; readonly image: MaybeLoaded<...>; readonly createdAt: Date; } & CoMap> | MaybeLoaded<...> | MaybeLoaded<...>> | readonly (({ ...; } & CoMap) | ... 4 more ... | { ...; })[] | undefined; ... 6 more ...; spaceId?: string | undefined; } | ({ ...; } & CoMap))[] | CoList<...>; ... 7 more ...; lastOpenedSpaceId?: string | undefined; }, options?: CoValueCreateOptions<...>): { ...; } & CoMap' of 'LegacyRoot.create' is deprecated.
+
+[7m490[0m   let legacyRoot = LegacyRoot.create(
+[7m   [0m [93m                              ~~~~~~[0m
+
+[96msrc/schema/migrations.ts[0m:[93m87[0m:[93m35[0m - [93mwarning[0m[90m ts(6385): [0m'(items: readonly (({ readonly version: 1; readonly content: MaybeLoaded<CoPlainText>; readonly archivedContent: MaybeLoaded<CoList<MaybeLoaded<{ readonly content: MaybeLoaded<CoPlainText>; ... 7 more ...; readonly successorId: string; } & CoMap>>> | undefined; ... 16 more ...; readonly updatedAt: Date; } & CoMap) | { ...; })[], options?: CoValueCreateOptions<...>): CoListInstance<...>' is deprecated.
+
+[7m87[0m      documents: co.list(Document).create([], account),
+[7m  [0m [93m                                  ~~~~~~[0m
+[96msrc/schema/migrations.ts[0m:[93m85[0m:[93m13[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(init: { documents: CoList<MaybeLoaded<{ readonly version: 1; readonly content: MaybeLoaded<CoPlainText>; readonly archivedContent: MaybeLoaded<CoList<MaybeLoaded<{ readonly content: MaybeLoaded<CoPlainText>; ... 7 more ...; readonly successorId: string; } & CoMap>>> | undefined; ... 16 more ...; readonly updatedAt: Date; } & CoMap>> | readonly (({ ...; } & CoMap) | { ...; })[]; ... 11 more ...; lastOpenedSpaceId?: string | undefined; }, options?: CoValueCreateOptions<...>): { ...; } & CoMap' of 'UserRoot.create' is deprecated.
+
+[7m85[0m    UserRoot.create(
+[7m  [0m [93m            ~~~~~~[0m
+
+Result (464 files): 
+- 0 errors
+- 0 warnings
+- 45 hints
+
+03:41:44 [vite] Re-optimizing dependencies because vite config has changed
+03:41:44 [content] Syncing content
+03:41:44 [content] Synced content
+03:41:44 [types] Generated 114ms
+03:41:44 [build] output: "static"
+03:41:44 [build] mode: "server"
+03:41:44 [build] directory: /private/tmp/alkalye-root-bundles-oct9/main/dist/
+03:41:44 [build] adapter: @astrojs/vercel
+03:41:44 [build] Collecting build info...
+03:41:44 [build] ✓ Completed in 128ms.
+03:41:44 [build] Building server entrypoints...
+03:41:47 [WARN] [vite] "useCallback" is imported from external module "react" but never used in "src/app/features/editor/hooks/use-find-panel.ts" and "src/app/features/sharing/lib/presence.ts".
+03:41:47 [WARN] [vite] "FileStream" is imported from external module "jazz-tools" but never used in "src/app/features/themes/lib/export.ts".
+03:41:47 [WARN] [vite] Circular chunk: index -> astro/server -> index. Consider disabling the "output.onlyExplicitManualChunks" option, as enabling it causes the static dependencies of the manual chunk "astro/server" to be bundled into the chunk "index".
+03:41:48 [vite] ✓ built in 3.69s
+03:41:48 [build] ✓ Completed in 3.73s.
+
+ building client (vite) 
+03:41:48 [vite] transforming...
+03:41:55 [vite] ✓ 4177 modules transformed.
+03:41:55 [WARN] [vite] Circular chunk: tldraw-file -> tldraw -> tldraw-editor -> tldraw-file. Consider disabling the "output.onlyExplicitManualChunks" option, as enabling it causes the static dependencies of the manual chunk "tldraw-editor" to be bundled into the chunk "tldraw-file".
+03:41:55 [WARN] [vite] Circular chunk: tldraw-file -> tldraw -> tldraw-editor -> tldraw-utils -> tldraw-file. Consider disabling the "output.onlyExplicitManualChunks" option, as enabling it causes the static dependencies of the manual chunk "tldraw-utils" to be bundled into the chunk "tldraw-file".
+03:41:55 [WARN] [vite] Circular chunk: tldraw-file -> tldraw -> tldraw-editor -> tldraw-store -> tldraw-file. Consider disabling the "output.onlyExplicitManualChunks" option, as enabling it causes the static dependencies of the manual chunk "tldraw-store" to be bundled into the chunk "tldraw-file".
+03:41:55 [WARN] [vite] Circular chunk: tldraw-file -> tldraw -> tldraw-file. Consider disabling the "output.onlyExplicitManualChunks" option, as enabling it causes the static dependencies of the manual chunk "tldraw" to be bundled into the chunk "tldraw-file".
+03:41:55 [vite] rendering chunks...
+03:41:56 [vite] computing gzip size...
+03:41:56 [vite] dist/client/manifest.webmanifest                                               0.63 kB
+03:41:56 [vite] dist/client/_astro/geist-latin-wght-normal.Dm3htQBi.woff2                     28.40 kB
+03:41:56 [vite] dist/client/_astro/geist-mono-latin-wght-normal.Cjtb1TV-.woff2                31.37 kB
+03:41:56 [vite] dist/client/_astro/document-save.worker-BQTqGf7x.js                           45.73 kB
+03:41:56 [vite] dist/client/_astro/mcp.C-yZ6QuE.css                                            6.71 kB │ gzip:     1.77 kB
+03:41:56 [vite] dist/client/_astro/tldraw.eCjzm0t1.css                                        77.43 kB │ gzip:    14.44 kB
+03:41:56 [vite] dist/client/_astro/main.Cu2MfVRX.js                                            0.17 kB │ gzip:     0.15 kB
+03:41:56 [vite] dist/client/_astro/diff.DbItnlRl.js                                            0.31 kB │ gzip:     0.24 kB
+03:41:56 [vite] dist/client/_astro/brainfuck.C4LP7Hcl.js                                       0.61 kB │ gzip:     0.33 kB
+03:41:56 [vite] dist/client/_astro/properties.C78fOPTZ.js                                      0.67 kB │ gzip:     0.35 kB
+03:41:56 [vite] dist/client/_astro/cmake.BQqOBYOt.js                                           0.78 kB │ gzip:     0.46 kB
+03:41:56 [vite] dist/client/_astro/asciiarmor.Df11BRmG.js                                      0.79 kB │ gzip:     0.41 kB
+03:41:56 [vite] dist/client/_astro/http.DBlCnlav.js                                            0.85 kB │ gzip:     0.41 kB
+03:41:56 [vite] dist/client/_astro/protobuf.ChK-085T.js                                        0.86 kB │ gzip:     0.52 kB
+03:41:56 [vite] dist/client/_astro/solr.DehyRSwq.js                                            0.87 kB │ gzip:     0.46 kB
+03:41:56 [vite] dist/client/_astro/troff.wAsdV37c.js                                           0.96 kB │ gzip:     0.44 kB
+03:41:56 [vite] dist/client/_astro/virtual_pwa-register.SMIJYkK2.js                            1.01 kB │ gzip:     0.60 kB
+03:41:56 [vite] dist/client/_astro/spreadsheet.BCZA_wO0.js                                     1.14 kB │ gzip:     0.54 kB
+03:41:56 [vite] dist/client/_astro/toml.Bm5Em-hy.js                                            1.14 kB │ gzip:     0.54 kB
+03:41:56 [vite] dist/client/_astro/mbox.CNhZ1qSd.js                                            1.40 kB │ gzip:     0.66 kB
+03:41:56 [vite] dist/client/_astro/sieve.C3Gn_uJK.js                                           1.62 kB │ gzip:     0.77 kB
+03:41:56 [vite] dist/client/_astro/rpm.CTu-6PCP.js                                             1.62 kB │ gzip:     0.83 kB
+03:41:56 [vite] dist/client/_astro/factor.XCvu78D9.js                                          1.67 kB │ gzip:     0.61 kB
+03:41:56 [vite] dist/client/_astro/client.CMSwgtGj.js                                          1.74 kB │ gzip:     0.89 kB
+03:41:56 [vite] dist/client/_astro/z80.Hz9HOZM7.js                                             1.75 kB │ gzip:     0.81 kB
+03:41:56 [vite] dist/client/_astro/eiffel.CnydiIhH.js                                          1.81 kB │ gzip:     0.92 kB
+03:41:56 [vite] dist/client/_astro/tldraw-state-react.YQFQjIPp.js                              1.88 kB │ gzip:     0.92 kB
+03:41:56 [vite] dist/client/_astro/elm.vLlmbW-K.js                                             1.89 kB │ gzip:     0.82 kB
+03:41:56 [vite] dist/client/_astro/startup-diagnostic-labels.6-fHxEsE.js                       1.91 kB │ gzip:     0.85 kB
+03:41:56 [vite] dist/client/_astro/mathematica.DTrFuWx2.js                                     1.92 kB │ gzip:     0.82 kB
+03:41:56 [vite] dist/client/_astro/dockerfile.BNmZX-Cu.js                                      1.95 kB │ gzip:     0.67 kB
+03:41:56 [vite] dist/client/_astro/turtle.B1tBg_DP.js                                          1.98 kB │ gzip:     0.90 kB
+03:41:56 [vite] dist/client/_astro/ebnf.CDyGwa7X.js                                            1.99 kB │ gzip:     0.81 kB
+03:41:56 [vite] dist/client/_astro/smalltalk.CnHTOXQT.js                                       2.01 kB │ gzip:     0.85 kB
+03:41:56 [vite] dist/client/_astro/dtd.DF_7sFjM.js                                             2.06 kB │ gzip:     0.87 kB
+03:41:56 [vite] dist/client/_astro/mumps.BT43cFF4.js                                           2.07 kB │ gzip:     0.98 kB
+03:41:56 [vite] dist/client/_astro/fcl.Kvtd6kyn.js                                             2.08 kB │ gzip:     0.95 kB
+03:41:56 [vite] dist/client/_astro/ntriples.BfvgReVJ.js                                        2.10 kB │ gzip:     0.75 kB
+03:41:56 [vite] dist/client/_astro/yacas.BJ4BC0dw.js                                           2.15 kB │ gzip:     1.09 kB
+03:41:56 [vite] dist/client/_astro/simple-mode.GW_nhZxv.js                                     2.28 kB │ gzip:     1.09 kB
+03:41:56 [vite] dist/client/_astro/apl.B4CMkyY2.js                                             2.30 kB │ gzip:     1.23 kB
+03:41:56 [vite] dist/client/_astro/pascal.-L3eBynH.js                                          2.30 kB │ gzip:     1.19 kB
+03:41:56 [vite] dist/client/_astro/octave.Ck1zUtKM.js                                          2.31 kB │ gzip:     1.09 kB
+03:41:56 [vite] dist/client/_astro/commonlisp.DBKNyK5s.js                                      2.32 kB │ gzip:     1.10 kB
+03:41:56 [vite] dist/client/_astro/tcl.DVfN8rqt.js                                             2.36 kB │ gzip:     1.23 kB
+03:41:56 [vite] dist/client/_astro/index.D-OxXCsT.js                                           2.51 kB │ gzip:     1.55 kB
+03:41:56 [vite] dist/client/_astro/webidl.ZXfAyPTL.js                                          2.52 kB │ gzip:     1.26 kB
+03:41:56 [vite] dist/client/_astro/pig.CevX1Tat.js                                             2.53 kB │ gzip:     1.38 kB
+03:41:56 [vite] dist/client/_astro/puppet.DMA9R1ak.js                                          2.54 kB │ gzip:     1.20 kB
+03:41:56 [vite] dist/client/_astro/forth.Ffai-XNe.js                                           2.54 kB │ gzip:     1.33 kB
+03:41:56 [vite] dist/client/_astro/shell.CjFT_Tl9.js                                           2.57 kB │ gzip:     1.21 kB
+03:41:56 [vite] dist/client/_astro/velocity.D8B20fx6.js                                        2.67 kB │ gzip:     1.11 kB
+03:41:56 [vite] dist/client/_astro/index.k6SqCU2r.js                                           2.72 kB │ gzip:     1.56 kB
+03:41:56 [vite] dist/client/_astro/tiddlywiki.DO-Gjzrf.js                                      2.78 kB │ gzip:     1.07 kB
+03:41:56 [vite] dist/client/_astro/modelica.Dc1JOy9r.js                                        2.79 kB │ gzip:     1.29 kB
+03:41:56 [vite] dist/client/_astro/oz.BzwKVEFT.js                                              2.90 kB │ gzip:     1.28 kB
+03:41:56 [vite] dist/client/_astro/r.B6wPVr8A.js                                               2.94 kB │ gzip:     1.36 kB
+03:41:56 [vite] dist/client/_astro/stex.C3f8Ysf7.js                                            3.12 kB │ gzip:     1.20 kB
+03:41:56 [vite] dist/client/_astro/tldraw-canvas.4XaI10iB.js                                   3.18 kB │ gzip:     1.53 kB
+03:41:56 [vite] dist/client/_astro/tiki.DGYXhP31.js                                            3.25 kB │ gzip:     1.26 kB
+03:41:56 [vite] dist/client/_astro/vhdl.lSbBsy5d.js                                            3.35 kB │ gzip:     1.51 kB
+03:41:56 [vite] dist/client/_astro/index.DNak08no.js                                           3.37 kB │ gzip:     1.73 kB
+03:41:56 [vite] dist/client/_astro/lua.BgMRiT3U.js                                             3.40 kB │ gzip:     1.44 kB
+03:41:56 [vite] dist/client/_astro/index.astro_astro_type_script_index_0_lang.DkMI-E-L.js      3.46 kB │ gzip:     1.51 kB
+03:41:56 [vite] dist/client/_astro/mscgen.BA5vi2Kp.js                                          3.51 kB │ gzip:     0.98 kB
+03:41:56 [vite] dist/client/_astro/sparql.DkYu6x3z.js                                          3.55 kB │ gzip:     1.63 kB
+03:41:56 [vite] dist/client/_astro/cypher.C_CwsFkJ.js                                          3.56 kB │ gzip:     1.52 kB
+03:41:56 [vite] dist/client/_astro/d.pRatUO7H.js                                               3.72 kB │ gzip:     1.68 kB
+03:41:56 [vite] dist/client/_astro/coffeescript.S37ZYGWr.js                                    3.87 kB │ gzip:     1.69 kB
+03:41:56 [vite] dist/client/_astro/vb.CmGdzxic.js                                              3.90 kB │ gzip:     1.79 kB
+03:41:56 [vite] dist/client/_astro/swift.BzpIVaGY.js                                           3.96 kB │ gzip:     1.79 kB
+03:41:56 [vite] dist/client/_astro/asn1.EdZsLKOL.js                                            3.98 kB │ gzip:     1.96 kB
+03:41:56 [vite] dist/client/_astro/q.pXgVlZs6.js                                               4.03 kB │ gzip:     1.67 kB
+03:41:56 [vite] dist/client/_astro/ttcn-cfg.B9xdYoR4.js                                        4.05 kB │ gzip:     1.71 kB
+03:41:56 [vite] dist/client/_astro/dylan.DwRh75JA.js                                           4.05 kB │ gzip:     1.65 kB
+03:41:56 [vite] dist/client/_astro/livescript.BwQOo05w.js                                      4.09 kB │ gzip:     1.64 kB
+03:41:56 [vite] dist/client/_astro/groovy.D9Dt4D0W.js                                          4.14 kB │ gzip:     1.77 kB
+03:41:56 [vite] dist/client/_astro/haskell.Cw1EW3IL.js                                         4.17 kB │ gzip:     1.89 kB
+03:41:56 [vite] dist/client/_astro/asterisk.B-8jnY81.js                                        4.48 kB │ gzip:     1.78 kB
+03:41:56 [vite] dist/client/_astro/gas.Bneqetm1.js                                             4.57 kB │ gzip:     1.28 kB
+03:41:56 [vite] dist/client/_astro/fortran.DYz_wnZ1.js                                         4.65 kB │ gzip:     2.01 kB
+03:41:56 [vite] dist/client/_astro/mllike.CXdrOF99.js                                          4.79 kB │ gzip:     1.53 kB
+03:41:56 [vite] dist/client/_astro/ttcn.CfJYG6tj.js                                            4.80 kB │ gzip:     2.13 kB
+03:41:56 [vite] dist/client/_astro/index.uk-QVv6W.js                                           5.04 kB │ gzip:     2.41 kB
+03:41:56 [vite] dist/client/_astro/ecl.Cabwm37j.js                                             5.13 kB │ gzip:     2.31 kB
+03:41:56 [vite] dist/client/_astro/crystal.SjHAIU92.js                                         5.13 kB │ gzip:     2.07 kB
+03:41:56 [vite] dist/client/_astro/ruby.B2Rjki9n.js                                            5.16 kB │ gzip:     2.15 kB
+03:41:56 [vite] dist/client/_astro/julia.DuME0IfC.js                                           5.39 kB │ gzip:     2.14 kB
+03:41:56 [vite] dist/client/_astro/workbox-window.prod.es5.BIl4cyR9.js                         5.76 kB │ gzip:     2.37 kB
+03:41:56 [vite] dist/client/_astro/vbscript.BuJXcnF6.js                                        5.82 kB │ gzip:     2.57 kB
+03:41:56 [vite] dist/client/_astro/mirc.CjQqDB4T.js                                            5.92 kB │ gzip:     2.68 kB
+03:41:56 [vite] dist/client/_astro/cobol.CWcv1MsR.js                                           6.20 kB │ gzip:     2.96 kB
+03:41:56 [vite] dist/client/_astro/min-dark.CafNBF8u.js                                        6.29 kB │ gzip:     1.71 kB
+03:41:56 [vite] dist/client/_astro/browser-startup-instrumentation.hp2BeFIz.js                 6.36 kB │ gzip:     2.14 kB
+03:41:56 [vite] dist/client/_astro/scheme.C41bIUwD.js                                          6.37 kB │ gzip:     2.39 kB
+03:41:56 [vite] dist/client/_astro/python.BuPzkPfP.js                                          6.48 kB │ gzip:     2.73 kB
+03:41:56 [vite] dist/client/_astro/solarized-light.L9t79GZl.js                                 6.48 kB │ gzip:     1.73 kB
+03:41:56 [vite] dist/client/_astro/xquery.DzFWVndE.js                                          6.62 kB │ gzip:     2.56 kB
+03:41:56 [vite] dist/client/_astro/pug.C8cW77Mm.js                                             6.67 kB │ gzip:     1.94 kB
+03:41:56 [vite] dist/client/_astro/textile.CnDTJFAw.js                                         6.80 kB │ gzip:     2.44 kB
+03:41:56 [vite] dist/client/_astro/nsis.D5ISOQms.js                                            6.81 kB │ gzip:     2.99 kB
+03:41:56 [vite] dist/client/_astro/solarized-dark.DXbdFlpD.js                                  6.85 kB │ gzip:     1.80 kB
+03:41:56 [vite] dist/client/_astro/min-light.CTRr51gU.js                                       6.97 kB │ gzip:     1.89 kB
+03:41:56 [vite] dist/client/_astro/nginx.DdIZxoE0.js                                           7.34 kB │ gzip:     2.72 kB
+03:41:56 [vite] dist/client/_astro/powershell.CFHJl5sT.js                                      7.77 kB │ gzip:     3.33 kB
+03:41:56 [vite] dist/client/_astro/haxe.H-WmDvRZ.js                                            7.89 kB │ gzip:     2.95 kB
+03:41:56 [vite] dist/client/_astro/erlang.BNw1qcRV.js                                          8.10 kB │ gzip:     2.89 kB
+03:41:56 [vite] dist/client/_astro/verilog.C6RDOZhf.js                                         8.24 kB │ gzip:     3.52 kB
+03:41:56 [vite] dist/client/_astro/dark-plus.C3mMm8J8.js                                       9.10 kB │ gzip:     2.10 kB
+03:41:56 [vite] dist/client/_astro/slack-dark.BthQWCQV.js                                      9.12 kB │ gzip:     1.97 kB
+03:41:56 [vite] dist/client/_astro/sas.B4kiWyti.js                                             9.33 kB │ gzip:     4.11 kB
+03:41:56 [vite] dist/client/_astro/slack-ochin.DqwNpetd.js                                     9.43 kB │ gzip:     2.10 kB
+03:41:56 [vite] dist/client/_astro/perl.CdXCOZ3F.js                                            9.75 kB │ gzip:     3.46 kB
+03:41:56 [vite] dist/client/_astro/light-plus.B7mTdjB0.js                                      9.94 kB │ gzip:     2.27 kB
+03:41:56 [vite] dist/client/_astro/gherkin.heZmZLOM.js                                        10.16 kB │ gzip:     5.09 kB
+03:41:56 [vite] dist/client/_astro/clojure.BMjYHr_A.js                                        10.82 kB │ gzip:     3.99 kB
+03:41:56 [vite] dist/client/_astro/github-light.DAi9KRSo.js                                   11.18 kB │ gzip:     2.51 kB
+03:41:56 [vite] dist/client/_astro/tldraw-validate.DCoUb-ws.js                                11.28 kB │ gzip:     3.22 kB
+03:41:56 [vite] dist/client/_astro/github-dark.DHJKELXO.js                                    11.41 kB │ gzip:     2.55 kB
+03:41:56 [vite] dist/client/_astro/idl.BEugSyMb.js                                            11.63 kB │ gzip:     4.52 kB
+03:41:56 [vite] dist/client/_astro/index.BJJFgUIs.js                                          12.35 kB │ gzip:     4.45 kB
+03:41:56 [vite] dist/client/_astro/index.CrWGpuYw.js                                          12.78 kB │ gzip:     5.66 kB
+03:41:56 [vite] dist/client/_astro/tldraw-state.BgZIPzMu.js                                   12.83 kB │ gzip:     4.08 kB
+03:41:56 [vite] dist/client/_astro/vitesse-light.CVO1_9PV.js                                  13.62 kB │ gzip:     3.04 kB
+03:41:56 [vite] dist/client/_astro/vitesse-black.Bkuqu6BP.js                                  13.68 kB │ gzip:     3.06 kB
+03:41:56 [vite] dist/client/_astro/vitesse-dark.D0r3Knsf.js                                   13.76 kB │ gzip:     3.06 kB
+03:41:56 [vite] dist/client/_astro/github-light-default.D7oLnXFd.js                           14.16 kB │ gzip:     3.04 kB
+03:41:56 [vite] dist/client/_astro/github-light-high-contrast.BfjtVDDH.js                     14.28 kB │ gzip:     3.02 kB
+03:41:56 [vite] dist/client/_astro/github-dark-dimmed.DH5Ifo-i.js                             14.43 kB │ gzip:     3.13 kB
+03:41:56 [vite] dist/client/_astro/github-dark-default.Cuk6v7N8.js                            14.44 kB │ gzip:     3.13 kB
+03:41:56 [vite] dist/client/_astro/github-dark-high-contrast.E3gJ1_iC.js                      14.60 kB │ gzip:     3.09 kB
+03:41:56 [vite] dist/client/_astro/index.cUNarR_D.js                                          14.75 kB │ gzip:     6.00 kB
+03:41:56 [vite] dist/client/_astro/index.Bny511n7.js                                          16.34 kB │ gzip:     7.48 kB
+03:41:56 [vite] dist/client/_astro/javascript.iXu5QeM3.js                                     17.08 kB │ gzip:     5.75 kB
+03:41:56 [vite] dist/client/_astro/kanagawa-wave.DWedfzmr.js                                  17.12 kB │ gzip:     2.93 kB
+03:41:56 [vite] dist/client/_astro/kanagawa-lotus.CfQXZHmo.js                                 17.13 kB │ gzip:     2.93 kB
+03:41:56 [vite] dist/client/_astro/kanagawa-dragon.CkXjmgJE.js                                17.13 kB │ gzip:     2.95 kB
+03:41:56 [vite] dist/client/_astro/material-theme.D5KoaKCx.js                                 18.62 kB │ gzip:     3.11 kB
+03:41:56 [vite] dist/client/_astro/material-theme-darker.BfHTSMKl.js                          18.63 kB │ gzip:     3.11 kB
+03:41:56 [vite] dist/client/_astro/material-theme-ocean.CyktbL80.js                           18.63 kB │ gzip:     3.14 kB
+03:41:56 [vite] dist/client/_astro/material-theme-lighter.B0m2ddpp.js                         18.63 kB │ gzip:     3.11 kB
+03:41:56 [vite] dist/client/_astro/material-theme-palenight.Csfq5Kiy.js                       18.64 kB │ gzip:     3.13 kB
+03:41:56 [vite] dist/client/_astro/index.pn3M-fMI.js                                          19.67 kB │ gzip:     9.31 kB
+03:41:56 [vite] dist/client/_astro/index.CX5cmMed.js                                          20.92 kB │ gzip:     9.37 kB
+03:41:56 [vite] dist/client/_astro/rose-pine.qdsjHGoJ.js                                      21.74 kB │ gzip:     3.87 kB
+03:41:56 [vite] dist/client/_astro/rose-pine-moon.D4_iv3hh.js                                 21.75 kB │ gzip:     3.89 kB
+03:41:56 [vite] dist/client/_astro/rose-pine-dawn.DHQR4-dF.js                                 21.75 kB │ gzip:     3.89 kB
+03:41:56 [vite] dist/client/_astro/clike.B9uivgTg.js                                          22.30 kB │ gzip:     7.86 kB
+03:41:56 [vite] dist/client/_astro/gruvbox-dark-hard.CFHQjOhq.js                              22.63 kB │ gzip:     4.18 kB
+03:41:56 [vite] dist/client/_astro/gruvbox-dark-soft.CVdnzihN.js                              22.63 kB │ gzip:     4.17 kB
+03:41:56 [vite] dist/client/_astro/gruvbox-light-hard.CH1njM8p.js                             22.64 kB │ gzip:     4.18 kB
+03:41:56 [vite] dist/client/_astro/gruvbox-light-soft.hJgmCMqR.js                             22.64 kB │ gzip:     4.18 kB
+03:41:56 [vite] dist/client/_astro/gruvbox-dark-medium.GsRaNv29.js                            22.64 kB │ gzip:     4.18 kB
+03:41:56 [vite] dist/client/_astro/gruvbox-light-medium.DRw_LuNl.js                           22.64 kB │ gzip:     4.18 kB
+03:41:56 [vite] dist/client/_astro/index.B-NGdkwd.js                                          23.08 kB │ gzip:    10.41 kB
+03:41:56 [vite] dist/client/_astro/one-light.PoHY5YXO.js                                      25.30 kB │ gzip:     3.68 kB
+03:41:56 [vite] dist/client/_astro/stylus.B533Al4x.js                                         25.80 kB │ gzip:     8.60 kB
+03:41:56 [vite] dist/client/_astro/css.BnMrqG3P.js                                            27.13 kB │ gzip:     8.47 kB
+03:41:56 [vite] dist/client/_astro/tldraw-utils.C1aEnCuo.js                                   27.23 kB │ gzip:    11.20 kB
+03:41:56 [vite] dist/client/_astro/index.yym42Bk0.js                                          30.88 kB │ gzip:    12.70 kB
+03:41:56 [vite] dist/client/_astro/index.BhlorlHb.js                                          32.38 kB │ gzip:    13.10 kB
+03:41:56 [vite] dist/client/_astro/one-dark-pro.DVMEJ2y_.js                                   33.79 kB │ gzip:     5.52 kB
+03:41:56 [vite] dist/client/_astro/sql.D0XecflT.js                                            37.05 kB │ gzip:    10.94 kB
+03:41:56 [vite] dist/client/_astro/tldraw-store.Dh-OI9yL.js                                   38.75 kB │ gzip:    12.19 kB
+03:41:56 [vite] dist/client/_astro/index.BPrRLUtq.js                                          40.82 kB │ gzip:    16.80 kB
+03:41:56 [vite] dist/client/_astro/index.CVW4hsfY.js                                          45.18 kB │ gzip:    19.21 kB
+03:41:56 [vite] dist/client/_astro/catppuccin-mocha.D87Tk5Gz.js                               47.26 kB │ gzip:     8.00 kB
+03:41:56 [vite] dist/client/_astro/catppuccin-latte.C9dUb6Cb.js                               47.26 kB │ gzip:     8.00 kB
+03:41:56 [vite] dist/client/_astro/catppuccin-frappe.DFWUc33u.js                              47.26 kB │ gzip:     8.02 kB
+03:41:56 [vite] dist/client/_astro/catppuccin-macchiato.DQyhUUbL.js                           47.26 kB │ gzip:     8.01 kB
+03:41:56 [vite] dist/client/_astro/tldraw-tlschema.CPCZtUn4.js                                50.62 kB │ gzip:    15.12 kB
+03:41:56 [vite] dist/client/_astro/everforest-dark.BgDCqdQA.js                                53.75 kB │ gzip:     8.42 kB
+03:41:56 [vite] dist/client/_astro/everforest-light.C8M2exoo.js                               53.75 kB │ gzip:     8.42 kB
+03:41:56 [vite] dist/client/_astro/index.M9zgdDMG.js                                          70.89 kB │ gzip:    25.90 kB
+03:41:56 [vite] dist/client/_astro/jszip.min.CKDIplGq.js                                      97.54 kB │ gzip:    30.32 kB
+03:41:56 [vite] dist/client/_astro/index.BkqYI8Qp.js                                          97.86 kB │ gzip:    28.48 kB
+03:41:56 [vite] dist/client/_astro/index.BUriD-ge.js                                         100.64 kB │ gzip:    33.68 kB
+03:41:56 [vite] dist/client/_astro/client.-iLz22eX.js                                        180.96 kB │ gzip:    56.86 kB
+03:41:56 [vite] dist/client/_astro/tldraw-editor.CsiXezTD.js                                 381.69 kB │ gzip:   117.13 kB
+03:41:56 [vite] dist/client/_astro/index.Bu-KJocH.js                                         387.40 kB │ gzip:    95.82 kB
+03:41:56 [vite] dist/client/_astro/tldraw-file.DIppYtJ7.js                                   552.29 kB │ gzip:   173.54 kB
+03:41:56 [vite] dist/client/_astro/tldraw.Bb0Lh1In.js                                        611.21 kB │ gzip:   174.87 kB
+03:41:56 [vite] dist/client/_astro/syntax-highlighter.CVr00Ptv.js                          1,331.35 kB │ gzip:   194.65 kB
+03:41:56 [vite] dist/client/_astro/main.DGj5rG7w.js                                        3,725.27 kB │ gzip: 1,213.07 kB
+03:41:56 [WARN] [vite] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+03:41:56 [vite] ✓ built in 8.35s
+
+ prerendering static routes 
+03:41:56 λ src/pages/.well-known/alkalye-cli.json.ts
+03:41:56   └─ /.well-known/alkalye-cli.json (+3ms) 
+03:41:56 ▶ src/pages/app/index.astro
+03:41:56   └─ /app/index.html (+3ms) 
+03:41:56 ▶ src/pages/changelog.astro
+03:41:56   └─ /changelog/index.html (+4ms) 
+03:41:56 ▶ src/pages/de/index.astro
+03:41:56   └─ /de/index.html (+1ms) 
+03:41:56 ▶ src/pages/en/index.astro
+03:41:56   └─ /en/index.html (+1ms) 
+03:41:56 ▶ src/pages/imprint.astro
+03:41:56   └─ /imprint/index.html (+0ms) 
+03:41:56 ▶ src/pages/invite.astro
+03:41:56   └─ /invite/index.html (+0ms) 
+03:41:56 ▶ src/pages/privacy.astro
+03:41:56   └─ /privacy/index.html (+1ms) 
+03:41:56 ▶ src/pages/support.astro
+03:41:56   └─ /support/index.html (+0ms) 
+03:41:56 ▶ src/pages/terms.astro
+03:41:56   └─ /terms/index.html (+0ms) 
+03:41:56 ▶ src/pages/index.astro
+03:41:56   └─ /index.html (+0ms) 
+03:41:56 ✓ Completed in 55ms.
+
+03:41:56 [build] Rearranging server assets...
+03:41:56 [@astrojs/vercel] Bundling function ../../../../dist/server/entry.mjs
+Browserslist: browsers data (caniuse-lite) is 9 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+
+PWA v1.2.0
+mode      generateSW
+precache  202 entries (10072.56 KiB)
+files generated
+  dist/client/sw.js
+  dist/client/workbox-8950c063.js
+03:41:57 [@astrojs/vercel] Copying static files to .vercel/output/static
+03:41:57 [build] Server built in 13.14s
+03:41:57 [build] Complete!

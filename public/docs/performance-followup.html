@@ -49,6 +49,23 @@
 			sections compare rewrite revisions or implementation paths and follow the
 			<a href="performance-interaction.html">previous comparison with main</a>.
 		</p>
+		<h2>Fresh bundle comparison</h2>
+		<p>
+			Fresh production builds of main <code>a749728</code> and rewrite
+			<code>514e1bb</code> contain 1,280,352 and 352,170 gzip bytes of initial
+			JavaScript respectively: 72.5% smaller in the rewrite. Additional lazy
+			whiteboard JavaScript is 514,060 versus 592,188 gzip bytes: 15.2% larger
+			in the rewrite. Main includes whiteboard CSS in its initial styles; the
+			rewrite loads another 19,289 gzip bytes of whiteboard CSS asynchronously.
+			All emitted JavaScript totals 2,692,986 versus 1,029,457 gzip bytes.
+		</p>
+		<p>
+			These totals follow static imports and HTML preloads and gzip each file
+			independently. They exclude fonts, images and network framing and do not
+			measure ready-document network traffic or loading latency. Exact file
+			sets, source pins and both build logs are retained in
+			<code>experiments/performance/bundles-oct9</code>.
+		</p>
 		<h2>Partitioned document index</h2>
 		<p>
 			The document's private atom index now shares 256 native Map partitions
