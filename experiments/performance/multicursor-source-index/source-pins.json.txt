@@ -1,0 +1,6 @@
+{
+  "baselineCommit": "d9fed83",
+  "baselineSHA256": "ea21278c971230d2e6444d11b54c3c6180f1022e777f84f254f01531c15e40ec",
+  "candidateSHA256": "8ea551c916688194d1adde155c44d79e0fa945c28c0d91dae23b95b8fb6f83e3",
+  "status": "source-only; untyped, untested, unmeasured"
+}

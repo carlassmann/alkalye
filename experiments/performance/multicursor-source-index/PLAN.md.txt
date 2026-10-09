@@ -1,0 +1,9 @@
+# Preserve exact multicursor edits in the source index
+
+Source-only candidate: `SourceTextarea.replace` already receives exact original-coordinate edits from `multiInput`, but `apply` currently collapses them to one broad difference and rebuilds that entire text-index span. Candidate certifies the edits against both source strings, then applies them backwards to preserve unchanged tree nodes. Invalid, overlapping, stale or untrusted ranges keep the original broad fallback.
+
+Do not adopt on source inspection. First compare the real TextIndex public interface for sparse 64, 512 and 2048 edits across a rich one-MiB fixture. Exact final text, line/native/Unicode addressing and fork independence must hold. Descending persistent edits may allocate more branches than a bulk rebuild and lose at high counts.
+
+A favorable module result only admits the candidate to a background browser journey. Verify source/native caret and every selection, distinct accepted revision and receipt, peer edits, Undo and reload. Capture whole interaction tasks and observed exact-state frame opportunities, with actual source/asset hashes. No narrow module timing proves 120Hz app behavior.
+
+Production root is untouched. Candidate is untyped, untested and unmeasured; no gain claimed.

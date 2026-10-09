@@ -1,0 +1,47 @@
+import { TextIndex } from "/Users/carlassmann/.codex/worktrees/b513/alkalye/src/shared/text-index"
+
+let paragraph = "it alpha 😀 beta\r\n[link](https://example.test) and **markdown**\n"
+let source = paragraph.repeat(Math.ceil(1048576 / paragraph.length)).slice(0, 1048576)
+let template = new TextIndex(source)
+let results = []
+for (let count of [64, 512, 2048]) {
+	let positions = Array.from({ length: count }, (_, index) => Math.floor(index * (source.length - paragraph.length) / count / paragraph.length) * paragraph.length)
+	let edits = positions.map(start => ({ start, end: start + 2, insert: "x" }))
+	let pieces = []
+	let copied = 0
+	for (let edit of edits) {
+		pieces.push(source.slice(copied, edit.start), edit.insert)
+		copied = edit.end
+	}
+	pieces.push(source.slice(copied))
+	let expected = pieces.join("")
+	let last = edits.at(-1)
+	if (!last) throw Error("Missing final edit")
+	let broadEnd = last.end
+	let broadInsert = expected.slice(0, broadEnd - count)
+	let samples: { broad: number[]; narrow: number[] } = { broad: [], narrow: [] }
+	for (let trial = 0; trial < 15; trial++) {
+		for (let strategy of trial % 2 ? ["narrow", "broad"] : ["broad", "narrow"]) {
+			let index = template.fork()
+			let start = performance.now()
+			if (strategy === "broad") index.replace({ start: 0, end: broadEnd, insert: broadInsert })
+			else for (let cursor = edits.length - 1; cursor >= 0; cursor--) {
+				let edit = edits[cursor]
+				if (edit) index.replace(edit)
+			}
+			let elapsed = performance.now() - start
+			if (index.value !== expected || template.value !== source) throw Error("Source or immutable fork changed")
+			let oracle = new TextIndex(expected)
+			for (let offset of [0, Math.floor(expected.length / 2), expected.length]) {
+				if (index.codePointOffset(offset) !== oracle.codePointOffset(offset) || index.lineAt(offset) !== oracle.lineAt(offset) || index.nativeLineAt(offset) !== oracle.nativeLineAt(offset)) throw Error("Unicode/line addressing mismatch")
+			}
+			if (trial >= 3) {
+				if (strategy === "broad") samples.broad.push(elapsed)
+				else samples.narrow.push(elapsed)
+			}
+		}
+	}
+	function median(values: number[]) { let sorted = [...values].sort((a, b) => a - b); return ((sorted[5] ?? 0) + (sorted[6] ?? 0)) / 2 }
+	results.push({ count, broadMedianMs: median(samples.broad), narrowMedianMs: median(samples.narrow), samples })
+}
+console.log(JSON.stringify({ scope: "Bun TextIndex mutation only; certification, projection, browser rendering and CRDT excluded", results }, null, 2))

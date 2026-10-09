@@ -1,0 +1,75 @@
+--- a/src/client/source-textarea.ts
++++ b/src/client/source-textarea.ts
+@@ -150,7 +150,7 @@
+ 			this.pending = replacements ?? [difference(this.current.source, source)]
+ 			this.transaction = Boolean(replacements)
+ 		}
+-		this.render(source, { start, end })
++		this.render(source, { start, end }, false, replacements)
+ 	}
+ 	reconcile(source: string, start: number, end = start) {
+ 		this.pending = undefined
+@@ -273,6 +273,7 @@
+ 		source: string,
+ 		selection: { start: number; end: number; direction?: Direction },
+ 		reveal = false,
++		replacements?: SourceReplacement[],
+ 	) {
+ 		let length = source.length
+ 		let bounded = {
+@@ -280,7 +281,7 @@
+ 			end: Math.max(0, Math.min(length, selection.end)),
+ 			direction: selection.direction,
+ 		}
+-		this.apply(this.projectionFor(source, bounded), bounded, reveal)
++		this.apply(this.projectionFor(source, bounded), bounded, reveal, replacements)
+ 	}
+ 	private projectionFor(
+ 		source: string,
+@@ -341,14 +342,18 @@
+ 		next: Projection,
+ 		selection: { start: number; end: number; direction?: Direction },
+ 		reveal = false,
++		replacements?: SourceReplacement[],
+ 	) {
+ 		if (next.source !== this.current.source) {
+-			let edit = difference(this.current.source, next.source)
+-			this.sourceIndex.replace({
+-				start: edit.start,
+-				end: edit.start + edit.remove,
+-				insert: edit.text,
+-			})
++			if (replacements && matchesReplacements(this.current.source, next.source, replacements)) {
++				for (let index = replacements.length - 1; index >= 0; index--) {
++					let edit = replacements[index]
++					if (edit) this.sourceIndex.replace({ start: edit.start, end: edit.start + edit.remove, insert: edit.text })
++				}
++			} else {
++				let edit = difference(this.current.source, next.source)
++				this.sourceIndex.replace({ start: edit.start, end: edit.start + edit.remove, insert: edit.text })
++			}
+ 		}
+ 		this.current = next
+ 		this.viewport.render(
+@@ -362,6 +367,21 @@
+ 		)
+ 		this.options.painted()
+ 	}
++}
++
++function matchesReplacements(before: string, after: string, replacements: SourceReplacement[]) {
++	let copied = 0
++	let offset = 0
++	for (let edit of replacements) {
++		if (!Number.isSafeInteger(edit.start) || !Number.isSafeInteger(edit.remove) || edit.remove < 0 || edit.start < copied || edit.start + edit.remove > before.length) return false
++		let unchanged = edit.start - copied
++		if (before.slice(copied, edit.start) !== after.slice(offset, offset + unchanged)) return false
++		offset += unchanged
++		if (after.slice(offset, offset + edit.text.length) !== edit.text) return false
++		offset += edit.text.length
++		copied = edit.start + edit.remove
++	}
++	return before.slice(copied) === after.slice(offset)
+ }
+ 
+ function difference(before: string, after: string): SourceReplacement {

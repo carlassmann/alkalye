@@ -1,0 +1,32 @@
+[
+  {
+    "producer": "/tmp/alkalye-multicursor-source-index/candidate.patch",
+    "archive": "candidate.patch.txt",
+    "sha256": "3cafeed2bb4114ef723c9979439cfd3ba134d4506676993c178b6874cdf521f2"
+  },
+  {
+    "producer": "/tmp/alkalye-multicursor-source-index/source-pins.json",
+    "archive": "source-pins.json.txt",
+    "sha256": "f96509e9185f5e7374a2b9d25069b8a9b4f1c2ffdcefa55a9ce6396fb2249622"
+  },
+  {
+    "producer": "/tmp/alkalye-multicursor-source-index/PLAN.md",
+    "archive": "PLAN.md.txt",
+    "sha256": "710572cac4a45de56efe97608a05d461455ed4fd271e76c80aca3be570d659b1"
+  },
+  {
+    "producer": "/tmp/alkalye-multicursor-source-index/probe.ts",
+    "archive": "probe.ts.txt",
+    "sha256": "f9ba9510e16228635a7de49ee08d982600820ac9df975cc355344a2a3206c45d"
+  },
+  {
+    "producer": "/tmp/alkalye-multicursor-source-index/probe-first.json",
+    "archive": "probe-first.json.txt",
+    "sha256": "7eead4091bbf1140bd60e93a0e299a46f7c7461600ec7119df45101bc741d234"
+  },
+  {
+    "producer": "/tmp/alkalye-multicursor-source-index/probe-first.stderr",
+    "archive": "probe-first.stderr.txt",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

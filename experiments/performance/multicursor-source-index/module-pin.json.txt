@@ -1,0 +1,6 @@
+{
+  "commit": "825827101789da544b371395b4d469ca363a03c6",
+  "path": "src/shared/text-index.ts",
+  "sha256": "79e7ea2f341bd5aa93462f8b93235ca10a36010000f66f397ef4c5fa7221a8e8",
+  "runtime": "1.4.0"
+}
