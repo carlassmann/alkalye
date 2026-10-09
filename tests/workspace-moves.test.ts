@@ -5,9 +5,16 @@ import { join } from "node:path"
 import { Replica } from "../src/shared/crdt"
 import * as Context from "effect/Context"
 import * as Effect from "effect/Effect"
+import * as ConfigProvider from "effect/ConfigProvider"
+import { CloudflareBlobBudget } from "../src/cloudflare/blob-budget"
+import { blobDigest } from "../src/shared/document-blobs"
+import { DocumentConflict } from "../src/shared/document-actions"
 import * as HttpServer from "effect/http/HttpServer"
 import * as Layer from "effect/Layer"
 import * as ManagedRuntime from "effect/ManagedRuntime"
+import * as PubSub from "effect/PubSub"
+import * as Scope from "effect/Scope"
+import * as Exit from "effect/Exit"
 import { sqliteLayer } from "../src/platform/sqlite"
 import { webCryptoLayer } from "../src/platform/web-crypto"
 import {
@@ -63,9 +70,37 @@ function gateway(request: WorkspaceRequest, file: string) {
 	return ManagedRuntime.make(
 		Layer.effect(
 			Moves,
-			makeWorkspaceMoves(request, route => Effect.succeed(route)),
+			Effect.gen(function* () {
+				let budget = yield* CloudflareBlobBudget
+				return yield* makeWorkspaceMoves(
+					request,
+					route => Effect.succeed(route),
+					(document, from, to) => {
+						let original = from === "first" ? "owner" : "destination-owner",
+							next = to === "first" ? "owner" : "destination-owner"
+						return budget
+							.reassignDocument(document, original, next)
+							.pipe(
+								Effect.as(
+									budget.restoreDocumentOwner(document, next, original),
+								),
+							)
+					},
+				)
+			}),
 		).pipe(
-			Layer.provideMerge(WorkspaceDirectory.live),
+			Layer.provideMerge(
+				Layer.merge(WorkspaceDirectory.live, CloudflareBlobBudget.live),
+			),
+			Layer.provideMerge(webCryptoLayer),
+			Layer.provideMerge(
+				ConfigProvider.layer(
+					ConfigProvider.fromUnknown({
+						ALKALYE_ACCOUNT_BLOB_BYTES: 8,
+						ALKALYE_SERVER_BLOB_BYTES: 32,
+					}),
+				),
+			),
 			Layer.provideMerge(sqliteLayer(file)),
 		),
 	)
@@ -118,12 +153,19 @@ test("durable gateway moves resume unknown target acceptance and preserve cyclic
 	let directory = mkdtempSync(join(tmpdir(), "alkalye-workspace-moves-"))
 	let file = join(directory, "gateway.sqlite")
 	let central = gateway(requests, file)
+	let scope = await Effect.runPromise(Scope.make())
 	try {
 		await first.runPromise(
 			owner(
 				Effect.gen(function* () {
 					let s = yield* WorkspaceStore
 					yield* s.create("first", "First", "create-first")
+					yield* s.membership(
+						"first",
+						"source-writer",
+						"writer",
+						"source-grant",
+					)
 					yield* s.createDocument(
 						"first",
 						yield* buildAction(new Replica("owner"), "moving", "Create", r =>
@@ -155,6 +197,54 @@ test("durable gateway moves resume unknown target acceptance and preserve cyclic
 				}),
 			),
 		)
+		let digest = await Effect.runPromise(
+			blobDigest(new Uint8Array([1, 2, 3, 4])).pipe(
+				Effect.provide(webCryptoLayer),
+			),
+		)
+		let allocation = await central.runPromise(
+			CloudflareBlobBudget.use(b =>
+				b.reserve({ document: "moving", owner: "owner", digest, size: 4 }),
+			),
+		)
+		let occupied = await central.runPromise(
+			CloudflareBlobBudget.use(b =>
+				b.reserve({
+					document: "occupied",
+					owner: "destination-owner",
+					digest,
+					size: 8,
+				}),
+			),
+		)
+		let quota = await central.runPromise(
+			owner(Moves.use(m => m("moving", "second", "quota")).pipe(Effect.flip)),
+		)
+		expect(quota instanceof DocumentConflict).toBe(true)
+		expect(
+			await first.runPromise(
+				owner(WorkspaceStore.use(s => s.snapshot("moving"))),
+			),
+		).toBeDefined()
+		expect(
+			(
+				await second.runPromise(
+					owner(
+						WorkspaceStore.use(s => s.snapshot("moving")).pipe(Effect.exit),
+					),
+				)
+			)._tag,
+		).toBe("Failure")
+		expect(
+			(
+				await central.runPromise(
+					CloudflareBlobBudget.use(b => b.reserve({ ...allocation })),
+				)
+			).receipt,
+		).toBe(allocation.receipt)
+		await central.runPromise(
+			CloudflareBlobBudget.use(b => b.release(occupied, "notCommitted")),
+		)
 		await second.runPromise(
 			destination(
 				WorkspaceStore.use(s =>
@@ -181,6 +271,13 @@ test("durable gateway moves resume unknown target acceptance and preserve cyclic
 				owner(WorkspaceStore.use(s => s.snapshot("moving"))),
 			),
 		).toBeDefined()
+		expect(
+			(
+				await central.runPromise(
+					CloudflareBlobBudget.use(b => b.reserve({ ...allocation })),
+				)
+			).receipt,
+		).toBe(allocation.receipt)
 		await second.runPromise(
 			destination(
 				WorkspaceStore.use(s =>
@@ -197,6 +294,11 @@ test("durable gateway moves resume unknown target acceptance and preserve cyclic
 				)
 			)._tag,
 		).toBe("Failure")
+		let sourceChanges = await first.runPromise(
+			WorkspaceStore.use(s => s.changes).pipe(
+				Effect.provideService(Scope.Scope, scope),
+			),
+		)
 		let interrupted = await central.runPromise(
 			owner(Moves.use(m => m("moving", "second", "out")).pipe(Effect.exit)),
 		)
@@ -227,6 +329,17 @@ test("durable gateway moves resume unknown target acceptance and preserve cyclic
 				owner(Moves.use(m => m("moving", "second", "out"))),
 			),
 		).toBe(receipt)
+		let retiredNotices = await first.runPromise(
+			PubSub.takeUpTo(sourceChanges, 64),
+		)
+		expect(
+			retiredNotices.some(
+				notice =>
+					notice.kind === "workspace" &&
+					notice.documents.has("moving") &&
+					notice.subjects.has("source-writer"),
+			),
+		).toBe(true)
 		let saved = await second.runPromise(
 			owner(
 				Effect.gen(function* () {
@@ -286,6 +399,7 @@ test("durable gateway moves resume unknown target acceptance and preserve cyclic
 			),
 		).toBe(receipt)
 	} finally {
+		await Effect.runPromise(Scope.close(scope, Exit.void))
 		await central.dispose()
 		await first.dispose()
 		await second.dispose()

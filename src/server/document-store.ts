@@ -603,7 +603,7 @@ function makeDocumentStore() {
 		let wakeups = yield* PubSub.sliding<LiveNotice>(64)
 		yield* Effect.addFinalizer(() => PubSub.shutdown(wakeups))
 		return {
-			maintenance: { recordImportedMove },
+			maintenance: { recordImportedMove, notifyRetiredMove },
 			documentFixture: {
 				commit: commitProposal,
 				withdraw: withdrawProposal,
@@ -1735,6 +1735,29 @@ function makeDocumentStore() {
 					),
 				)
 			})
+		}
+		function notifyRetiredMove(document: string, request: string) {
+			return Identity.use(identity =>
+				Effect.gen(function* () {
+					if (identity.access) return yield* forbidden()
+					let rows = yield* readSql<{
+						subject: string
+						workspace: string
+					}>`SELECT f.subject,d.workspace FROM document_transfer_fences f JOIN workspace_documents d ON d.document=f.document WHERE f.document=${document} AND f.request=${request} AND f.phase='retired'`
+					let row = rows[0]
+					if (!row || row.subject !== identity.subject)
+						return yield* forbidden()
+					let subjects = yield* workspaceRecipients(row.workspace)
+					for (let subject of yield* documentRecipients(document))
+						subjects.add(subject)
+					let notice: LiveNotice = {
+						kind: "workspace",
+						subjects,
+						documents: new Set([document]),
+					}
+					yield* PubSub.publish(wakeups, notice)
+				}),
+			)
 		}
 		function recordImportedMove(
 			document: string,

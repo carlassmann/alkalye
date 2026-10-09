@@ -11,6 +11,7 @@ import {
 	DocumentConflict,
 } from "../shared/document-actions"
 import { Identity } from "../shared/workspace"
+import { BlobQuotaExceeded } from "../shared/document-errors"
 import { WorkspaceDirectory } from "./workspace-directory"
 import type { WorkspaceRoute } from "./workspace-directory"
 import { workspaceRpc } from "./workspace-rpc"
@@ -41,11 +42,15 @@ export function makeWorkspaceMoves(
 	resolveRoute: (
 		route: WorkspaceRoute,
 	) => Effect.Effect<WorkspaceRoute, SqlError.SqlError>,
-	beforePublish?: (
+	beforeImport?: (
 		document: string,
 		source: string,
 		destination: string,
-	) => Effect.Effect<void, SqlError.SqlError>,
+	) => Effect.Effect<
+		Effect.Effect<void, SqlError.SqlError>,
+		BlobQuotaExceeded | SqlError.SqlError,
+		Identity
+	>,
 ) {
 	return Effect.gen(function* () {
 		let directory = yield* WorkspaceDirectory
@@ -185,6 +190,39 @@ export function makeWorkspaceMoves(
 										},
 									),
 								)
+								let rollback = yield* (
+									beforeImport
+										? beforeImport(document, originalSource, destination)
+										: Effect.succeed(Effect.void)
+								).pipe(
+									Effect.catch(
+										(
+											error,
+										): Effect.Effect<
+											never,
+											typeof failures.Type | SqlError.SqlError
+										> => {
+											if (!(error instanceof BlobQuotaExceeded))
+												return Effect.fail(error)
+											return remote(originalSource, c =>
+												c.internal.abortDocumentMove({
+													payload: { document, request: command },
+												}),
+											).pipe(
+												Effect.andThen(
+													sql`UPDATE gateway_document_moves SET phase='aborted' WHERE subject=${identity.subject} AND request=${command}`,
+												),
+												Effect.andThen(
+													Effect.fail(
+														new DocumentConflict({
+															message: "Destination attachment quota exceeded",
+														}),
+													),
+												),
+											)
+										},
+									),
+								)
 								yield* remote(destination, c =>
 									c.internal.importDocumentMove({ payload: bundle }),
 								).pipe(
@@ -200,11 +238,14 @@ export function makeWorkspaceMoves(
 												!(error instanceof ResourceUnavailable)
 											)
 												return Effect.fail(error)
-											return remote(originalSource, c =>
-												c.internal.abortDocumentMove({
-													payload: { document, request: command },
-												}),
-											).pipe(
+											return rollback.pipe(
+												Effect.andThen(
+													remote(originalSource, c =>
+														c.internal.abortDocumentMove({
+															payload: { document, request: command },
+														}),
+													),
+												),
 												Effect.andThen(
 													sql`UPDATE gateway_document_moves SET phase='aborted' WHERE subject=${identity.subject} AND request=${command}`,
 												),
@@ -222,8 +263,6 @@ export function makeWorkspaceMoves(
 										payload: { document, destination, request: command },
 									}),
 								)
-								if (beforePublish)
-									yield* beforePublish(document, originalSource, destination)
 								yield* directory.relocateDocument(
 									document,
 									originalSource,
