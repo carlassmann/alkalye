@@ -1,0 +1,14 @@
+#!/bin/zsh
+set -eu
+let_snapshot_root=/tmp/alkalye-snapshot-input-preemption
+let_snapshot_repo=/Users/carlassmann/.codex/worktrees/b513/alkalye
+let_snapshot_runtime="$let_snapshot_root/runtime"
+[[ ! -e "$let_snapshot_runtime" ]]
+mkdir "$let_snapshot_runtime"
+git -C "$let_snapshot_repo" archive 7d7df3dcfb8179915c5b214e1392e955e63d7430 src package.json tsconfig.json bun.lock | tar -x -C "$let_snapshot_runtime"
+ln -s "$let_snapshot_repo/node_modules" "$let_snapshot_runtime/node_modules"
+mkdir "$let_snapshot_runtime/tests"
+cp "$let_snapshot_root/candidate/src/platform/background-work.ts" "$let_snapshot_runtime/src/platform/background-work.ts"
+cp "$let_snapshot_root/candidate/src/shared/document-session.ts" "$let_snapshot_runtime/src/shared/document-session.ts"
+cp "$let_snapshot_root/tests/snapshot-input-session.test.ts" "$let_snapshot_runtime/tests/snapshot-input-session.test.ts"
+cp "$let_snapshot_root/tsconfig.snapshot.json" "$let_snapshot_runtime/tsconfig.snapshot.json"

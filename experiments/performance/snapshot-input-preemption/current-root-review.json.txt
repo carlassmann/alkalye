@@ -1,0 +1,18 @@
+{
+  "baselineCommit": "7d7df3dcfb8179915c5b214e1392e955e63d7430",
+  "currentRootFilesIdentical": true,
+  "status": "source-only; checks forbidden during root lease",
+  "testsSHA256": "d8bb608a0f48f6c0a1e8829eb00a02236e2fdd987fd85df25d8e28becae6b962",
+  "files": {
+    "src/platform/background-work.ts": {
+      "baselineSHA256": "db2845852c680feca095209d00b263111deea8f7526651557d340e063d022151",
+      "currentRootSHA256": "db2845852c680feca095209d00b263111deea8f7526651557d340e063d022151",
+      "identical": true
+    },
+    "src/shared/document-session.ts": {
+      "baselineSHA256": "643001563d7f322103197af6e821541b9b0907c6a6d94a1b7dbf50143b40e9f4",
+      "currentRootSHA256": "643001563d7f322103197af6e821541b9b0907c6a6d94a1b7dbf50143b40e9f4",
+      "identical": true
+    }
+  }
+}

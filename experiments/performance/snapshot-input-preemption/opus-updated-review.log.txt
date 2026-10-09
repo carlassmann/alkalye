@@ -1,0 +1,41 @@
+The candidate source has no blocking defects. The test draft needs fixes: as written it can hang, and it doesn't prove the preemption it claims to.
+
+## Candidate source: what I checked
+
+- **`raceFirst`**: it awaits the losing branch before returning (`internal/effect.ts:1691`, interrupt-all then await). So when input wins, the capture fiber's `gate.withPermit` is released before `Effect.scoped` closes, and persistence runs after the subscriber is released.
+- **Parent interruption**: the race interrupts both branches and returns an interrupt, and `track`'s `catchCause` returns `Effect.interrupt` for it. There is no path where it becomes a fake `Option.none`.
+- **`PubSub.end` ordering**:
+  - `closed=true` is set synchronously before `end`, so a `subscribe` after close can't happen; `Effect.never` covers that case.
+  - A taker already waiting gets `"closed"` and then `never`, and the capture branch continues after `idle.open`.
+  - Input buffered before `end` is still taken first, so input wins, which is fine.
+  - `end` clears the subscribers map, and each subscription is still released by its local scope (`unsubscribe`). Nothing is retained and nothing hangs.
+  - The PubSub's own scope is never closed. It's harmless and gets garbage-collected.
+- **Owner close and parent interrupt at the same moment**: both end safely. Either the parent is interrupted (the scoped unsubscribe can't be interrupted), or the race keeps only the capture branch.
+- **Input winner while a snapshot failure is pending**: `track` returns `fail(pendingFailure)`, so the failure is never cleared. During continuous input, the retry loop re-subscribes about every 30s (exponential backoff, capped). This is bounded and acceptable.
+- **No-replay**: an input in the gap between the outer `ready` and `subscribe` is still caught by the inner `beforeSnapshot` (the idle latch is closed). That is correct.
+- **Optional cleanup, not required**: `forkUnsafe(..., uninterruptible=false)` makes the race branches interruptible even inside an uninterruptible region. Only the background path uses the race, so it doesn't matter today.
+
+Without types or a run, I can't confirm whether interrupting `materializeDocument` or `durableCheckpointEffect` mid-way leaves `accepted` intact. `durableCheckpointEffect` only reads the generation, so it's likely fine, but it needs a runtime test.
+
+## Test draft: corrections
+
+1. **Possible hang.** The first automatic run (the version-change debounce about 500ms after open) can be the run whose second `beforeSnapshot` call blocks on `admission` while it holds `cacheWrites`. If that happens before `value.save` takes `cacheWrites`, `value.save` waits forever and the test hits its 30s timeout. Otherwise it preempts a stale, unrelated run.
+   - **Fix:** add `let armed = false` and set it to `true` only after `edit.saved` and `sync`. Block inside the `snapshotInput` tap (after subscribing, before the race) only when `armed`, and resolve `subscribed` from there. Drop the `admissionCount===2` logic.
+   - Input published while the run is blocked is then buffered in the subscription, so the preemption proven is the real "after subscription, before capture" case.
+2. **Before arming, assert there is something to capture**: the cache position is below the latest accepted position.
+3. **The "interrupted" assertions are trivially true**: capture never started, so the unchanged cache proves only that admission was preempted. Rename the test so it doesn't claim active-capture interruption.
+4. **No deterministic proof of interrupting an active capture.** `betweenChunks` is not used during capture. `cooperative` steps call `yieldNow` with no public barrier. Add a separate test that accepts either branch:
+   - fork `interact()` once `projected` is unset, then assert exactly one of `preempted` or `projected`;
+   - then `edit.saved` must complete, which proves the gate is free;
+   - the cache must be either the prior or the exact edited state.
+   
+   Don't enlarge fixtures to make this pass.
+5. **The quiet recapture doesn't prove "periodic 2s".** A later run could come from a version change. Only claim "without another edit": `armed=false` after preemption, then wait for `projected`.
+6. **Missing gates:**
+   - The session's scope is closed while a run is blocked in the armed tap: assert `failures.snapshot` is undefined and the reopened cache equals the prior state (an interrupt, not a success).
+   - BackgroundWork is created in an inner scope that closes before the session: the next automatic snapshot still persists.
+   - A stale `interact()` before arming doesn't cancel the next quiet capture.
+   - A cache-write failure stays a typed snapshot failure.
+   - The reopen check should also compare cache position, Undo and identity, not only `replica.text`.
+
+None of this was compiled or run.

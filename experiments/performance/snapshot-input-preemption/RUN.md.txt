@@ -1,0 +1,16 @@
+# Prepared, unrun
+
+Only after root releases CPU correctness lane:
+
+```sh
+zsh /tmp/alkalye-snapshot-input-preemption/prepare-runtime.sh
+cd /tmp/alkalye-snapshot-input-preemption/runtime
+bun /Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/typescript/bin/tsc --noEmit -p tsconfig.snapshot.json
+bun test tests/snapshot-input-session.test.ts
+```
+
+Preparation refuses an existing runtime; preserve failed runtime/logs before choosing any new path. No browser/server/API accounts involved: real SQLite journal and WorkspaceStore with public identity/transport, real Effect scopes. Maximum test timeout30s percase, six prepared cases. Source rooted7d; both changed modules remain byte-identical to current root baseline. Types/runtime currently UNRUN.
+
+Cases: admission preemption→quiet recapture without newedit; owner shutdown; simultaneous owner shutdown/parent interruption; typed cache failure+input-preempted retry retaining failure→healedcache; input while cache persistence parked with concurrent durable edit; real cooperative capture completed-or-preempted outcome. All then cold cache+accepted exactsource/metadata/position/ownoperationidentity once, reopened ownUndoRedo preserves identities and independent accepted text.
+
+The cooperative outcome test does NOT expose a public capture-start signal. It may execute admission cancellation or already-completed capture. Do not label it proven active-mid-checkpoint cancellation without marked actualruntime chronology. Existing marker-only checkpoint begin/end diagnostic is the smallest subsequent witness if this branch remains ambiguous. No latency claim from these tests.

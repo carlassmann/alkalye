@@ -1,0 +1,11 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/snapshot-input-session.test.ts:
+{"scenario":"active-marked","phases":[{"name":"snapshot:permit-enter","time":513.030333},{"name":"snapshot:checkpoint-active","time":513.4365},{"name":"snapshot:test-input","time":513.523541},{"name":"snapshot:capture-interrupted","time":513.81725},{"name":"snapshot:permit-return","time":513.822208},{"name":"snapshot:permit-enter","time":1951.8051249999999},{"name":"snapshot:checkpoint-active","time":1952.217333},{"name":"snapshot:permit-return","time":1958.0555409999997}]}
+(pass) snapshot preemption preserves SQLite authority and scope release (active-marked) [2768.73ms]
+
+ 1 pass
+ 6 filtered out
+ 0 fail
+ 18 expect() calls
+Ran 1 test across 1 file. [2.82s]

@@ -1,0 +1,45 @@
+I found 4 real problems, ranked below. Nothing was run, as you asked. I read the patch and the Effect sources at `/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/src`.
+
+**These parts of the plan hold up:**
+- **Subscription timing:** `PubSub.subscribe` registers the subscriber right away, not lazily. It runs inside `cacheWrites`, after the `ready` wait and before the second idle check.
+- **Permit release:** when input wins, `raceFirst` interrupts the losing capture and waits for it to finish before returning. So the `gate` permit is released before `persistSnapshot` runs.
+- **Interrupting capture is safe:** `captureSnapshot`/`captureState` only read state. `cooperative` steps have no `finally` blocks that would be skipped.
+- **Failures aren't masked:** when input wins, the result is `Option.none`. `track` then treats it as nothing to do, or re-fails with the existing snapshot failure, so a failure is never wrongly cleared.
+- **Other behaviour:** real capture errors and interruption of the caller propagate correctly. Forced `save` / `hidden` still use `saveSnapshot` directly, so they are unchanged.
+
+## Findings
+
+**1. Closing the PubSub turns into a stray interrupt that kills workers (high)**
+- `PubSub.shutdown` closes all subscription scopes, and that interrupts any waiting `take` (`PubSub.ts:1714`, `unsubscribe`). A `take` on an already-closed subscription also returns `Effect.interrupt`.
+- `raceFirst` then hands that interrupt back as the result, even though nothing interrupted the caller. `track` re-raises it with `Effect.interrupt`.
+- `recovery.run`'s `Effect.catch` doesn't catch interrupts. So the periodic `runForEach` fiber stops quietly, and the retry worker's `Effect.forever` loop also stops. Automatic snapshots end for the rest of the session.
+- It happens whenever the BackgroundWork scope closes before the session's scope (layer teardown order, tests). `snapshotInput` also isn't guarded by `closed`.
+- **Smallest fix (`background-work.ts`):** if `closed`, return `Effect.succeed(Effect.never)`. Otherwise turn an interrupt from `take` into `Effect.never`, e.g. `Effect.catchCause(c => Cause.hasInterruptsOnly(c) ? Effect.never : Effect.failCause(c))`. Interrupting the caller still works, because `never` can be interrupted. Nothing becomes a fake success.
+
+**2. A sliding PubSub plus `publishUnsafe` silently drops input (medium)**
+- `publishUnsafe` skips the overflow strategy. On a full bounded hub it returns `false` (`PubSub.ts:1393`, `isFull`), so "sliding" does nothing here.
+- The subscription stays alive through `persistSnapshot`, because persistence is inside `Effect.scoped`. Inputs during persistence fill the 1-slot hub.
+- While it's full, every other session's subscription misses input, so their captures aren't preempted. One session's own window between `subscribe` and the forked `take` can fill it too.
+- **Fix:** move `Effect.scoped` so it covers only subscribe + race, and run `persistSnapshot` outside it. Use `PubSub.unbounded<void>()`: subscriptions are short-lived and each takes once, so it stays small.
+
+**3. Continuous input starves automatic snapshots (medium; this changes behaviour)**
+- Today the 10s timeout on `beforeSnapshot` guarantees a snapshot within about 10s of busy input. Now `ready` times out, then the recheck inside the race waits up to another 10s, and any input preempts.
+- The input sources include `scroll`, `wheel` and `touchmove`. `scroll` also fires for programmatic scrolls (scrollIntoView, scroll anchoring on remote edits), so it isn't always genuine input.
+- Result: during long typing or reading sessions, automatic snapshots may never happen. The journal is unaffected, but replay after a crash grows without limit.
+- **Fix:** keep a session-local count of consecutive preemptions, reset after a successful capture. After N preemptions (e.g. 3), run `snapshotCapture` without the race. That restores the existing guarantee with no scheduler change.
+
+**4. The catalogue summary depends on the same snapshot path (medium)**
+- `activity.projected(state)` (`client/local-documents.ts:205`) updates the document's title, excerpt, links and `updated`, and notifies other tabs. It now only runs when no input preempts the snapshot.
+- So under input, the sidebar, backlinks and other tabs go stale until a pause or `hidden`. Fix #3 bounds this. Decide whether that is acceptable, or whether a preempted run should still project the last state it captured.
+
+**Minor:** with a pending retryable failure, each preemption re-fails with the old failure, so the retry worker backs off toward 30s under input. That's acceptable; just know it happens.
+
+## Tests needed (real SQLite, public session API, test BackgroundWork exposing `interact`)
+1. Input during a cooperative capture of a large document: no cache row at that position, and a concurrent edit commits without waiting for the capture. `failures.snapshot` stays undefined, and the next quiet tick writes the snapshot.
+2. Input before the subscription doesn't cancel: `interact`, wait for idle, trigger → snapshot written.
+3. Forced `hidden` save under continuous `interact` writes the snapshot.
+4. Injected capture error during the race sets `failures.snapshot`.
+5. Closing the session scope mid-capture: close completes, the finalizer `save` writes, no hang.
+6. Close the BackgroundWork scope before the session's: later version changes still produce snapshots (catches #1).
+7. Continuous `interact` every 50ms: a snapshot is still written within N ticks (catches #3).
+8. Two sessions sharing one BackgroundWork, with session A persisting: input still preempts session B (catches #2).

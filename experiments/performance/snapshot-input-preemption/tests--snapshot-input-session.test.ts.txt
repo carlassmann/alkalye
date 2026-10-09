@@ -1,0 +1,409 @@
+import { expect, test } from "bun:test"
+import { mkdtemp, rm } from "node:fs/promises"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
+import * as Context from "effect/Context"
+import * as Effect from "effect/Effect"
+import * as Layer from "effect/Layer"
+import * as Schema from "effect/Schema"
+import * as Deferred from "effect/Deferred"
+import * as Latch from "effect/Latch"
+import * as Scope from "effect/Scope"
+import * as Fiber from "effect/Fiber"
+import * as Exit from "effect/Exit"
+import * as Cause from "effect/Cause"
+import * as Stream from "effect/Stream"
+import { PerformanceObserver } from "node:perf_hooks"
+import * as EventJournal from "effect/eventlog/EventJournal"
+import { LocalDocumentFailure } from "../src/shared/document-failures"
+import { makeBackgroundWork } from "../src/platform/background-work"
+import { BackgroundWork } from "../src/platform/background-work"
+import { DocumentJournal } from "../src/platform/document-journal"
+import { cliDocumentPlatform } from "../src/cli/document-platform"
+import {
+	DocumentSession,
+	documentDatabaseName,
+} from "../src/shared/document-session"
+import type { DocumentTransport, DocumentProjectionState } from "../src/shared/document-session"
+import { Replica } from "../src/shared/crdt"
+import {
+	buildAction,
+	DocumentActionSchema,
+	ResourceUnavailable,
+	restoreSnapshot,
+} from "../src/shared/document-actions"
+import { newDocument } from "../src/shared/documents"
+import { Identity } from "../src/shared/workspace"
+import { WorkspaceStore } from "../src/server/document-store"
+
+function required<A>(value: A | undefined) {
+	return value === undefined
+		? Effect.fail(new ResourceUnavailable({ message: "Document unavailable" }))
+		: Effect.succeed(value)
+}
+
+let scenarios = ["quiet", "owner-close", "simultaneous-close", "failure-retry", "persistence-input", "cooperative-outcome"]
+if (process.env.SNAPSHOT_MARKERS === "1") scenarios.push("active-marked")
+
+test.each(scenarios)(
+	"snapshot preemption preserves SQLite authority and scope release (%s)",
+	async scenario => {
+		let cooperativeWork = true
+		let directory = await mkdtemp(join(tmpdir(), "alkalye-compact-session-"))
+		try {
+			await Effect.runPromise(
+				Effect.scoped(
+					Effect.gen(function* () {
+						let services = yield* Layer.build(
+							WorkspaceStore.layer(join(directory, "server.sqlite")),
+						)
+						let store = Context.get(services, WorkspaceStore)
+						let subject = "compact-owner"
+						let workScope = yield* Scope.make()
+						yield* Effect.addFinalizer(() => Scope.close(workScope, Exit.void))
+						let backgroundWork = yield* makeBackgroundWork().pipe(
+							Effect.provideService(Scope.Scope, workScope),
+						)
+						let subscribed = yield* Deferred.make<void>()
+						let projected = yield* Deferred.make<void>()
+						let preempted = yield* Deferred.make<void>()
+						let admission = yield* Latch.make(false)
+						let armed = false
+						let watchProjection = false
+						let failureArmed = false
+						let persistenceArmed = false
+						let persistenceReached = yield* Deferred.make<void>()
+						let persistenceRelease = yield* Latch.make(false)
+						let expectedSource = ""
+						let editIDs: string[] = []
+						function edit(value: DocumentSession["Service"], content: string) {
+							return Effect.gen(function* () {
+								let receipt = value.edit(content)
+								if (receipt.operation) editIDs.push(receipt.operation.id)
+								yield* receipt.saved
+							})
+						}
+						let snapshotWork = {
+							...backgroundWork,
+							snapshotInput: backgroundWork.snapshotInput.pipe(
+								Effect.tap(() => Effect.suspend(() => armed
+									? Deferred.succeed(subscribed, undefined).pipe(Effect.andThen(
+										(scenario === "cooperative-outcome" || scenario === "active-marked") ? Effect.void : admission.await,
+									))
+									: Effect.void)),
+								Effect.map(nextInput => nextInput.pipe(
+									Effect.tap(() => Effect.gen(function* () {
+										admission.closeUnsafe()
+										yield* Deferred.succeed(preempted, undefined)
+									})),
+								)),
+							),
+						}
+						let source =
+							'---\ntitle: "Compaction"\n---\n' + "AB😀\n".repeat(8192)
+						let birth = new Replica("compact-birth")
+						let creation = yield* buildAction(
+							birth,
+							"doc",
+							"Create document",
+							staged => newDocument(staged, "doc", "Compaction", source),
+						)
+						function request<A, E>(effect: Effect.Effect<A, E, Identity>) {
+							return effect.pipe(
+								Effect.provideService(Identity, { subject, actors: [] }),
+							)
+						}
+						yield* request(store.create("space", "Compaction", "compact-space"))
+						yield* store.createDocument("space", creation).pipe(
+							Effect.provideService(Identity, {
+								subject,
+								actors: [creation.actor],
+							}),
+						)
+						let transport: DocumentTransport = {
+							create: () => Effect.fail(new Error("Already created")),
+							snapshot: document =>
+								request(store.snapshot(document)).pipe(
+									Effect.flatMap(required),
+								),
+							commit: action =>
+								store.commit(action).pipe(
+									Effect.provideService(Identity, {
+										subject,
+										actors: [action.actor],
+									}),
+								),
+							history: (document, after, log, limit) =>
+								request(store.history(document, after, log, limit)),
+							action: (document, action) =>
+								request(store.action(document, action)).pipe(
+									Effect.flatMap(required),
+								),
+							chain: (document, action) =>
+								request(store.chain(document, action)).pipe(
+									Effect.flatMap(required),
+								),
+						}
+						function session<A, E>(
+							work: (value: DocumentSession["Service"]) => Effect.Effect<A, E, Scope.Scope>,
+						) {
+							return Effect.scoped(
+								Effect.gen(function* () {
+									let options = {
+										document: "doc", subject, transport, cooperativeWork,
+										activity: {
+											proposing: Effect.void,
+											settled: Effect.void,
+											projected: (state: DocumentProjectionState) =>
+												watchProjection && state.record?.content === expectedSource
+													? Deferred.succeed(projected, undefined) : Effect.void,
+										},
+									}
+									let platform = cliDocumentPlatform(directory)
+									let journalContext = yield* Layer.build(platform.journal(documentDatabaseName(options)))
+									let storage = Context.get(journalContext, DocumentJournal)
+									let observedStorage = {
+										...storage,
+										saveCache: (position: number, value: unknown) => Effect.gen(function* () {
+											if (failureArmed) {
+												failureArmed = false
+												armed = true
+												return yield* Effect.fail(new EventJournal.EventJournalError({
+													method: "saveCache", cause: new DOMException("Temporary snapshot failure", "UnknownError"),
+												}))
+											}
+											if (persistenceArmed) {
+												persistenceArmed = false
+												yield* Deferred.succeed(persistenceReached, undefined)
+												yield* persistenceRelease.await
+											}
+											return yield* storage.saveCache(position, value)
+										}),
+									}
+									let context = yield* Layer.build(DocumentSession.layer(options).pipe(
+										Layer.provide(platform.lifecycle),
+										Layer.provide(Layer.succeedContext(Context.add(journalContext, DocumentJournal, observedStorage))),
+									)).pipe(
+										Effect.provideService(BackgroundWork, snapshotWork),
+									)
+									return yield* work(Context.get(context, DocumentSession))
+								}),
+							)
+						}
+						function readSnapshot() {
+							return Effect.scoped(
+								Effect.gen(function* () {
+									let context = yield* Layer.build(
+										cliDocumentPlatform(directory).journal(
+											documentDatabaseName({
+												document: "doc",
+												subject,
+												transport,
+											}),
+										),
+									)
+									let cache = yield* Context.get(context, DocumentJournal).cache
+									if (!cache) throw new Error("Snapshot was not durably saved")
+									let value = Schema.decodeUnknownSync(
+										Schema.Struct({ checkpoint: Schema.Unknown, document: Schema.String, subject: Schema.String,
+											log: Schema.String, remotePosition: Schema.Natural, pending: Schema.Array(DocumentActionSchema) }),
+									)(cache.value)
+									let replica = yield* Replica.fromCheckpointEffect(
+										value.checkpoint,
+										"snapshot-audit",
+									)
+									return { replica, position: cache.position, identity: value }
+								}),
+							)
+						}
+						let edited = source + "Quiet recapture 😀"
+						expectedSource = edited
+						if (scenario === "failure-retry" || scenario === "persistence-input" || scenario === "cooperative-outcome" || scenario === "active-marked") {
+							yield* session(value => Effect.gen(function* () {
+								yield* value.save
+								let prior = yield* readSnapshot()
+								watchProjection = true
+								failureArmed = scenario === "failure-retry"
+								persistenceArmed = scenario === "persistence-input"
+								armed = scenario === "cooperative-outcome" || scenario === "active-marked"
+								let phaseStart = performance.now()
+								if (scenario === "active-marked") {
+									let inputSent = false
+									yield* Effect.acquireRelease(Effect.sync(() => {
+										let observer = new PerformanceObserver(entries => {
+											if (!inputSent && entries.getEntries().some(entry => entry.name === "snapshot:checkpoint-active")) {
+												inputSent = true
+												performance.mark("snapshot:test-input")
+												backgroundWork.interact()
+											}
+										})
+										observer.observe({ entryTypes: ["mark"] })
+										return observer
+									}), observer => Effect.sync(() => observer.disconnect()))
+								}
+								yield* edit(value, edited)
+								yield* value.sync
+								if (scenario === "failure-retry") {
+									let failed = yield* value.failures.changes.pipe(
+										Stream.filter(state => Boolean(state.snapshot)), Stream.take(1), Stream.runCollect,
+										Effect.timeout("5 seconds"),
+									)
+									let failure = failed[0]?.snapshot
+									expect(failure).toBeInstanceOf(LocalDocumentFailure)
+									if (!(failure instanceof LocalDocumentFailure)) throw new Error("Missing typed snapshot failure")
+									expect(failure.retryable).toBe(true)
+									yield* Deferred.await(subscribed).pipe(Effect.timeout("5 seconds"))
+									backgroundWork.interact()
+									yield* admission.open
+									yield* Deferred.await(preempted).pipe(Effect.timeout("5 seconds"))
+									expect(value.failures.current().snapshot).toBe(failure)
+									let unchanged = yield* readSnapshot()
+									expect(unchanged.position).toBe(prior.position)
+									armed = false
+									yield* admission.open
+								} else if (scenario === "persistence-input") {
+									yield* Deferred.await(persistenceReached).pipe(Effect.timeout("5 seconds"))
+									backgroundWork.interact()
+									edited += "More durable input 😀"
+									expectedSource = edited
+									yield* edit(value, edited).pipe(Effect.timeout("5 seconds"))
+									yield* value.sync
+									yield* persistenceRelease.open
+								} else if (scenario === "active-marked") {
+									yield* Deferred.await(preempted).pipe(Effect.timeout("5 seconds"))
+									armed = false
+									yield* admission.open
+									let observed = yield* readSnapshot()
+									expect(observed.position).toBe(prior.position)
+									expect(observed.replica.text("doc")).toBe(source)
+									edited += "Foreground after cancellation 😀"
+									expectedSource = edited
+									yield* edit(value, edited).pipe(Effect.timeout("5 seconds"))
+									performance.mark("snapshot:foreground-saved")
+									yield* value.sync
+								} else {
+									yield* Deferred.await(subscribed).pipe(Effect.timeout("5 seconds"))
+									backgroundWork.interact()
+									let outcome = yield* Effect.raceFirst(
+										Deferred.await(preempted).pipe(Effect.as("preempted")),
+										Deferred.await(projected).pipe(Effect.as("completed")),
+									).pipe(Effect.timeout("5 seconds"))
+									let observed = yield* readSnapshot()
+									expect([source, edited]).toContain(observed.replica.text("doc"))
+									expect(["preempted", "completed"]).toContain(outcome)
+									armed = false
+									yield* admission.open
+								}
+								yield* Deferred.await(projected).pipe(Effect.timeout("5 seconds"))
+								let cached = yield* readSnapshot()
+								expect(cached.replica.text("doc")).toBe(edited)
+								expect(cached.position).toBeGreaterThan(prior.position)
+								if (scenario === "active-marked") {
+									let phases = performance.getEntriesByType("mark").filter(entry => entry.startTime >= phaseStart && entry.name.startsWith("snapshot:"))
+									let active = phases.find(entry => entry.name === "snapshot:checkpoint-active")
+									let input = phases.find(entry => entry.name === "snapshot:test-input")
+									let interrupted = phases.find(entry => entry.name === "snapshot:capture-interrupted")
+									if (!active || !input || !interrupted) throw new Error("Actual active capture interruption not witnessed")
+									expect(input.startTime).toBeGreaterThanOrEqual(active.startTime)
+									expect(interrupted.startTime).toBeGreaterThanOrEqual(input.startTime)
+									let returned = phases.find(entry => entry.name === "snapshot:permit-return" && entry.startTime >= input.startTime)
+									let saved = phases.find(entry => entry.name === "snapshot:foreground-saved")
+									if (!returned || !saved) throw new Error("Foreground permit release witness missing")
+									expect(saved.startTime).toBeGreaterThanOrEqual(returned.startTime)
+									console.log(JSON.stringify({ scenario, phases: phases.map(entry => ({ name: entry.name, time: entry.startTime - phaseStart })) }))
+								}
+								yield* value.failures.changes.pipe(
+									Stream.filter(state => !state.snapshot), Stream.take(1), Stream.runCollect,
+									Effect.timeout("5 seconds"),
+								)
+							}))
+						} else if (scenario === "simultaneous-close") {
+							let editedReady = yield* Deferred.make<void>()
+							let active = yield* Effect.forkChild(session(value => Effect.gen(function* () {
+								yield* value.save
+								yield* edit(value, edited)
+								yield* value.sync
+								armed = true
+								yield* Deferred.succeed(editedReady, undefined)
+								return yield* Effect.never
+							})))
+							yield* Deferred.await(editedReady).pipe(Effect.timeout("5 seconds"))
+							yield* Deferred.await(subscribed).pipe(Effect.timeout("5 seconds"))
+							yield* Effect.all([
+								Scope.close(workScope, Exit.void),
+								Fiber.interrupt(active),
+							], { concurrency: "unbounded" }).pipe(Effect.timeout("5 seconds"))
+							let exit = yield* Fiber.await(active)
+							if (!Exit.isFailure(exit)) throw new Error("Parent interruption became successful completion")
+							expect(Cause.hasInterruptsOnly(exit.cause)).toBe(true)
+							let closed = yield* readSnapshot()
+							expect(closed.replica.text("doc")).toBe(edited)
+						} else {
+						yield* session(value => Effect.gen(function* () {
+							yield* value.save
+							let prior = yield* readSnapshot()
+							expect(prior.replica.text("doc")).toBe(source)
+							yield* edit(value, edited)
+							yield* value.sync
+							armed = true
+							yield* Deferred.await(subscribed).pipe(Effect.timeout("5 seconds"))
+							if (scenario === "owner-close") {
+								yield* Scope.close(workScope, Exit.void)
+							} else {
+								backgroundWork.interact()
+								yield* admission.open
+								yield* Deferred.await(preempted).pipe(Effect.timeout("5 seconds"))
+							}
+							let interrupted = yield* readSnapshot()
+							expect(interrupted.position).toBe(prior.position)
+							expect(interrupted.replica.text("doc")).toBe(source)
+							watchProjection = true
+							armed = false
+							yield* admission.open
+							yield* Deferred.await(projected).pipe(Effect.timeout("5 seconds"))
+							let cached = yield* readSnapshot()
+							expect(cached.replica.text("doc")).toBe(edited)
+							expect(cached.position).toBeGreaterThan(prior.position)
+							expect(value.failures.current().snapshot).toBeUndefined()
+							expect(value.replica.text("doc")).toBe(edited)
+						}))
+						}
+						yield* session(value => Effect.sync(() => {
+							expect(value.replica.text("doc")).toBe(edited)
+						}))
+						let accepted = yield* request(store.snapshot("doc")).pipe(Effect.flatMap(required))
+						let independent = yield* restoreSnapshot(accepted, "accepted-audit")
+						expect(independent.text("doc")).toBe(edited)
+						let finalCache = yield* readSnapshot()
+						expect(finalCache.identity.document).toBe("doc")
+						expect(finalCache.identity.subject).toBe(subject)
+						expect(finalCache.identity.log).toBe(accepted.log)
+						expect(finalCache.identity.remotePosition).toBe(accepted.position)
+						expect(finalCache.identity.pending).toHaveLength(0)
+						expect(finalCache.replica.metadata("doc").title).toBe("Compaction")
+						let history = yield* request(store.history("doc", 0, accepted.log, 1000))
+						for (let id of editIDs) expect(history.filter(entry => entry.action.id === id)).toHaveLength(1)
+						let originalEdit = editIDs.at(-1)
+						if (!originalEdit) throw new Error("Eligible edit missing")
+						yield* session(value => Effect.gen(function* () {
+							yield* value.undo()
+							yield* value.sync
+							let undone = yield* transport.snapshot("doc")
+							let expectedUndo = scenario === "persistence-input" || scenario === "active-marked" ? source + "Quiet recapture 😀" : source
+							expect((yield* restoreSnapshot(undone, "undo-audit")).text("doc")).toBe(expectedUndo)
+							let undoHistory = yield* request(store.history("doc", accepted.position, accepted.log, 1000))
+							expect(undoHistory.filter(entry => entry.action.undoOf === originalEdit)).toHaveLength(1)
+							yield* value.redo()
+							yield* value.sync
+							expect((yield* restoreSnapshot(yield* transport.snapshot("doc"), "redo-audit")).text("doc")).toBe(edited)
+							yield* value.save
+						}))
+					}),
+				),
+			)
+		} finally {
+			await rm(directory, { recursive: true, force: true })
+		}
+	},
+	30_000,
+)

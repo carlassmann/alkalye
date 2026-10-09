@@ -1,0 +1,34 @@
+--- a/src/shared/crdt.ts
++++ b/src/shared/crdt.ts
+@@ -1861,6 +1861,7 @@
+ 			for (let siblings of this.children.get(id)?.values() ?? [])
+ 				for (let atom of siblings) {
+ 					atoms.push(borrowAtoms ? atom : copyAtom(atom))
++					if (borrowAtoms && cooperative && work === 8191) performance.mark("snapshot:checkpoint-active")
+ 					if (cooperative && ++work % 512 === 0) yield
+ 				}
+ 			let visibility = yield* (
+--- a/src/shared/document-session.ts
++++ b/src/shared/document-session.ts
+@@ -295,12 +295,15 @@
+ 			channel => Effect.sync(() => channel.close()),
+ 		)
+ 		let snapshotCapture = gate.withPermit(
+-			Effect.all([
+-				projection.captureSnapshot,
+-				options.activity
+-					? projection.captureState
+-					: Effect.succeed(undefined),
+-			]),
++			Effect.sync(() => performance.mark("snapshot:permit-enter")).pipe(Effect.andThen(
++				Effect.all([
++					projection.captureSnapshot,
++					options.activity ? projection.captureState : Effect.succeed(undefined),
++				]),
++			)),
++		).pipe(
++			Effect.onInterrupt(() => Effect.sync(() => performance.mark("snapshot:capture-interrupted"))),
++			Effect.ensuring(Effect.sync(() => performance.mark("snapshot:permit-return"))),
+ 		)
+ 		let saveSnapshot = snapshotCapture.pipe(Effect.flatMap(persistSnapshot))
+ 		let snapshotInput = backgroundWork.snapshotInput

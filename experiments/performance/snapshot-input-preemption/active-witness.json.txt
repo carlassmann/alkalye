@@ -1,0 +1,46 @@
+{
+  "scenario": "active-marked",
+  "phases": [
+    {
+      "name": "snapshot:permit-enter",
+      "time": 511.919625
+    },
+    {
+      "name": "snapshot:checkpoint-active",
+      "time": 512.512
+    },
+    {
+      "name": "snapshot:test-input",
+      "time": 512.644291
+    },
+    {
+      "name": "snapshot:capture-interrupted",
+      "time": 513.070875
+    },
+    {
+      "name": "snapshot:permit-return",
+      "time": 513.077916
+    },
+    {
+      "name": "snapshot:foreground-saved",
+      "time": 559.186708
+    },
+    {
+      "name": "snapshot:permit-enter",
+      "time": 1065.21975
+    },
+    {
+      "name": "snapshot:checkpoint-active",
+      "time": 1065.682708
+    },
+    {
+      "name": "snapshot:permit-return",
+      "time": 1071.217791
+    }
+  ],
+  "scope": "real SQLite diagnostic; public interact not trusted browser input; no latency comparison",
+  "assertions": 20,
+  "runtimeExit": 0,
+  "strictExit": 0,
+  "cleanTestStrippedAfterRun": "not rerun/typechecked; derived marker-free six cases; no fake verified claim"
+}

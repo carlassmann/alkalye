@@ -1,0 +1,18 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/snapshot-input-session.test.ts:
+(pass) snapshot preemption preserves SQLite authority and scope release (quiet) [2886.45ms]
+(pass) snapshot preemption preserves SQLite authority and scope release (owner-close) [1323.00ms]
+(pass) snapshot preemption preserves SQLite authority and scope release (simultaneous-close) [1215.29ms]
+[06:30:18.333] ERROR (#506): Document recovery required {
+  category: "storage",
+  operation: "snapshot",
+}
+(pass) snapshot preemption preserves SQLite authority and scope release (failure-retry) [1451.60ms]
+(pass) snapshot preemption preserves SQLite authority and scope release (persistence-input) [1746.35ms]
+(pass) snapshot preemption preserves SQLite authority and scope release (cooperative-outcome) [2634.51ms]
+
+ 6 pass
+ 0 fail
+ 101 expect() calls
+Ran 6 tests across 1 file. [11.35s]

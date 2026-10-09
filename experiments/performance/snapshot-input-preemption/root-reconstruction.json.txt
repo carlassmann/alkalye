@@ -1,0 +1,15 @@
+{
+  "baseline": "754c9d6",
+  "files": [
+    {
+      "path": "src/platform/background-work.ts",
+      "sha256": "625ec1b9af735d16c69b56b7a75692adbb4262268dffd3805d493be51e994ac6",
+      "matchesCandidate": true
+    },
+    {
+      "path": "src/shared/document-session.ts",
+      "sha256": "be2d252efff88e585926b0a7a6981f625ea0a9983557753d927d93b3540a39e8",
+      "matchesCandidate": true
+    }
+  ]
+}

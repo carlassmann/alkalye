@@ -1,0 +1,122 @@
+[
+  {
+    "path": "candidate.patch",
+    "bytes": 4373,
+    "sha256": "cd8ad8ff96eedbf320f3e09c43037d75f0f386a924a7613ff6c291ae244461d7",
+    "archive": "candidate.patch.txt"
+  },
+  {
+    "path": "candidate-source-pins.json",
+    "bytes": 547,
+    "sha256": "30a6ddbf1c028808d438e7a01f39b985410bed9ade998d87c82001fa59fa8154",
+    "archive": "candidate-source-pins.json.txt"
+  },
+  {
+    "path": "active-markers.patch",
+    "bytes": 1315,
+    "sha256": "bd5baa86d513b563b3bce1556668d5fa656dc1b48c6543cacef8845a53f6435d",
+    "archive": "active-markers.patch.txt"
+  },
+  {
+    "path": "active-witness.json",
+    "bytes": 1038,
+    "sha256": "9c8c330901ca07060f6fd09e81d6d5bd8d422f95f5f513d2e2019ca69a74b187",
+    "archive": "active-witness.json.txt"
+  },
+  {
+    "path": "candidate/tests/snapshot-input-session.test.ts",
+    "bytes": 15509,
+    "sha256": "abd2afb729574bc61f966f2a449ffb02b78ed799fcbc376eeeac7df617cfb548",
+    "archive": "candidate--tests--snapshot-input-session.test.ts.txt"
+  },
+  {
+    "path": "tests/snapshot-input-session.test.ts",
+    "bytes": 18232,
+    "sha256": "5b8eeaf424e38e930f56916bf28576ad8b6ab0f46672e8c4b7794b0d03ec73be",
+    "archive": "tests--snapshot-input-session.test.ts.txt"
+  },
+  {
+    "path": "opus-review.log",
+    "bytes": 5654,
+    "sha256": "1e154d86d3db9d9a2d3ae768fa643fbcaad597b1264f762e22995bedfaf56549",
+    "archive": "opus-review.log.txt"
+  },
+  {
+    "path": "opus-updated-review.log",
+    "bytes": 4832,
+    "sha256": "e268ee6e38cb519d75f5066c916c35a1a81041cc6bdfbb1ef568eeb71fd69229",
+    "archive": "opus-updated-review.log.txt"
+  },
+  {
+    "path": "types-first.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archive": "types-first.log.txt"
+  },
+  {
+    "path": "public-first.log",
+    "bytes": 9300,
+    "sha256": "f9f4b8be053b56eb682c1783f8c90c88f83d254f7c7b1e399be724419d9988ff",
+    "archive": "public-first.log.txt"
+  },
+  {
+    "path": "public-metadata-corrected.log",
+    "bytes": 853,
+    "sha256": "b8e2e08797b0de5a1ba01ea5a04552e4aeeeeecbd345591b5cc030a14576b683",
+    "archive": "public-metadata-corrected.log.txt"
+  },
+  {
+    "path": "types-marked.log",
+    "bytes": 204,
+    "sha256": "2cb2269454cd71039436a5d81f3d52d9f3cf08d89f9e2b912035d7bb06f413f8",
+    "archive": "types-marked.log.txt"
+  },
+  {
+    "path": "types-marked-corrected.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archive": "types-marked-corrected.log.txt"
+  },
+  {
+    "path": "active-marked-first.log",
+    "bytes": 732,
+    "sha256": "5dfb9abe88aea2891bc2ed8bb8a953f036be9853b17cd9a7259655fba78feeaa",
+    "archive": "active-marked-first.log.txt"
+  },
+  {
+    "path": "active-marked-foreground.log",
+    "bytes": 772,
+    "sha256": "f9a3dbf8eb254306245beac6723f70d068b749a88f2d3e5e1b530b709daf52b2",
+    "archive": "active-marked-foreground.log.txt"
+  },
+  {
+    "path": "CONTRACTS.md",
+    "bytes": 6629,
+    "sha256": "20f0a0bd15c0ad9c10feb9a54de9f7b0e21516560486c5d43b9fa0dcb270323f",
+    "archive": "CONTRACTS.md.txt"
+  },
+  {
+    "path": "RUN.md",
+    "bytes": 1646,
+    "sha256": "ca684000eb93d25b49e139f3fcec261089d45b9424b83afc3209daa601d126d6",
+    "archive": "RUN.md.txt"
+  },
+  {
+    "path": "prepare-runtime.sh",
+    "bytes": 982,
+    "sha256": "b99d952e5c3b4860584081f4a56b0e49cfd20e364c0506c7a5315ae25bbc36cb",
+    "archive": "prepare-runtime.sh.txt"
+  },
+  {
+    "path": "tsconfig.snapshot.json",
+    "bytes": 98,
+    "sha256": "06cd8778249d22eea4f55851a3258655b554dc11bbc594e347f425df689c5359",
+    "archive": "tsconfig.snapshot.json.txt"
+  },
+  {
+    "path": "current-root-review.json",
+    "bytes": 786,
+    "sha256": "dad4d6dc7f306ab6b16d52faf43afc115bd268aedbe65562d1fac7b8ef0d523c",
+    "archive": "current-root-review.json.txt"
+  }
+]

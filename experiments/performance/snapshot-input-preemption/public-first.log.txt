@@ -1,0 +1,132 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/snapshot-input-session.test.ts:
+333 | 						expect(finalCache.identity.document).toBe("doc")
+334 | 						expect(finalCache.identity.subject).toBe(subject)
+335 | 						expect(finalCache.identity.log).toBe(accepted.log)
+336 | 						expect(finalCache.identity.remotePosition).toBe(accepted.position)
+337 | 						expect(finalCache.identity.pending).toHaveLength(0)
+338 | 						expect(finalCache.replica.fields("doc").title).toBe("Compaction")
+                                                           ^
+error: expect(received).toBe(expected)
+
+Expected: "Compaction"
+Received: undefined
+
+      at <anonymous> (/private/tmp/alkalye-snapshot-input-preemption/runtime/tests/snapshot-input-session.test.ts:338:54)
+      at ~effect/Effect/successCont (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:987:28)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:737:13)
+      at runTasks (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:169:15)
+      at afterScheduled (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:159:10)
+(fail) snapshot preemption preserves SQLite authority and scope release (quiet) [2624.20ms]
+333 | 						expect(finalCache.identity.document).toBe("doc")
+334 | 						expect(finalCache.identity.subject).toBe(subject)
+335 | 						expect(finalCache.identity.log).toBe(accepted.log)
+336 | 						expect(finalCache.identity.remotePosition).toBe(accepted.position)
+337 | 						expect(finalCache.identity.pending).toHaveLength(0)
+338 | 						expect(finalCache.replica.fields("doc").title).toBe("Compaction")
+                                                           ^
+error: expect(received).toBe(expected)
+
+Expected: "Compaction"
+Received: undefined
+
+      at <anonymous> (/private/tmp/alkalye-snapshot-input-preemption/runtime/tests/snapshot-input-session.test.ts:338:54)
+      at ~effect/Effect/successCont (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:987:28)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:737:13)
+      at runTasks (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:169:15)
+      at afterScheduled (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:159:10)
+(fail) snapshot preemption preserves SQLite authority and scope release (owner-close) [1230.74ms]
+333 | 						expect(finalCache.identity.document).toBe("doc")
+334 | 						expect(finalCache.identity.subject).toBe(subject)
+335 | 						expect(finalCache.identity.log).toBe(accepted.log)
+336 | 						expect(finalCache.identity.remotePosition).toBe(accepted.position)
+337 | 						expect(finalCache.identity.pending).toHaveLength(0)
+338 | 						expect(finalCache.replica.fields("doc").title).toBe("Compaction")
+                                                           ^
+error: expect(received).toBe(expected)
+
+Expected: "Compaction"
+Received: undefined
+
+      at <anonymous> (/private/tmp/alkalye-snapshot-input-preemption/runtime/tests/snapshot-input-session.test.ts:338:54)
+      at ~effect/Effect/successCont (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:987:28)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:737:13)
+      at runTasks (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:169:15)
+      at afterScheduled (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:159:10)
+(fail) snapshot preemption preserves SQLite authority and scope release (simultaneous-close) [1259.18ms]
+[06:29:40.295] ERROR (#350): Document recovery required {
+  category: "storage",
+  operation: "snapshot",
+}
+333 | 						expect(finalCache.identity.document).toBe("doc")
+334 | 						expect(finalCache.identity.subject).toBe(subject)
+335 | 						expect(finalCache.identity.log).toBe(accepted.log)
+336 | 						expect(finalCache.identity.remotePosition).toBe(accepted.position)
+337 | 						expect(finalCache.identity.pending).toHaveLength(0)
+338 | 						expect(finalCache.replica.fields("doc").title).toBe("Compaction")
+                                                           ^
+error: expect(received).toBe(expected)
+
+Expected: "Compaction"
+Received: undefined
+
+      at <anonymous> (/private/tmp/alkalye-snapshot-input-preemption/runtime/tests/snapshot-input-session.test.ts:338:54)
+      at ~effect/Effect/successCont (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:987:28)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:737:13)
+      at runTasks (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:169:15)
+      at afterScheduled (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:159:10)
+(fail) snapshot preemption preserves SQLite authority and scope release (failure-retry) [1573.85ms]
+333 | 						expect(finalCache.identity.document).toBe("doc")
+334 | 						expect(finalCache.identity.subject).toBe(subject)
+335 | 						expect(finalCache.identity.log).toBe(accepted.log)
+336 | 						expect(finalCache.identity.remotePosition).toBe(accepted.position)
+337 | 						expect(finalCache.identity.pending).toHaveLength(0)
+338 | 						expect(finalCache.replica.fields("doc").title).toBe("Compaction")
+                                                           ^
+error: expect(received).toBe(expected)
+
+Expected: "Compaction"
+Received: undefined
+
+      at <anonymous> (/private/tmp/alkalye-snapshot-input-preemption/runtime/tests/snapshot-input-session.test.ts:338:54)
+      at ~effect/Effect/successCont (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:987:28)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:737:13)
+      at runTasks (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:169:15)
+      at afterScheduled (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:159:10)
+(fail) snapshot preemption preserves SQLite authority and scope release (persistence-input) [1938.69ms]
+333 | 						expect(finalCache.identity.document).toBe("doc")
+334 | 						expect(finalCache.identity.subject).toBe(subject)
+335 | 						expect(finalCache.identity.log).toBe(accepted.log)
+336 | 						expect(finalCache.identity.remotePosition).toBe(accepted.position)
+337 | 						expect(finalCache.identity.pending).toHaveLength(0)
+338 | 						expect(finalCache.replica.fields("doc").title).toBe("Compaction")
+                                                           ^
+error: expect(received).toBe(expected)
+
+Expected: "Compaction"
+Received: undefined
+
+      at <anonymous> (/private/tmp/alkalye-snapshot-input-preemption/runtime/tests/snapshot-input-session.test.ts:338:54)
+      at ~effect/Effect/successCont (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:987:28)
+      at runLoop (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:463:86)
+      at evaluate (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:414:23)
+      at <anonymous> (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/internal/effect.js:737:13)
+      at runTasks (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:169:15)
+      at afterScheduled (/Users/carlassmann/.codex/worktrees/b513/alkalye/node_modules/effect/dist/Scheduler.js:159:10)
+(fail) snapshot preemption preserves SQLite authority and scope release (cooperative-outcome) [2920.45ms]
+
+ 0 pass
+ 6 fail
+ 76 expect() calls
+Ran 6 tests across 1 file. [11.61s]

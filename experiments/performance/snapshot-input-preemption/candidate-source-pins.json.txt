@@ -1,0 +1,13 @@
+{
+  "baselineCommit": "7d7df3dcfb8179915c5b214e1392e955e63d7430",
+  "files": {
+    "src/platform/background-work.ts": {
+      "baselineSHA256": "db2845852c680feca095209d00b263111deea8f7526651557d340e063d022151",
+      "candidateSHA256": "625ec1b9af735d16c69b56b7a75692adbb4262268dffd3805d493be51e994ac6"
+    },
+    "src/shared/document-session.ts": {
+      "baselineSHA256": "643001563d7f322103197af6e821541b9b0907c6a6d94a1b7dbf50143b40e9f4",
+      "candidateSHA256": "be2d252efff88e585926b0a7a6981f625ea0a9983557753d927d93b3540a39e8"
+    }
+  }
+}
