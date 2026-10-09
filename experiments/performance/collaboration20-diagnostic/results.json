@@ -1,0 +1,74 @@
+{
+  "status": "correctness-complete",
+  "phases": [
+    {
+      "phase": "presence-only",
+      "started": 353.743917,
+      "sessionChecks": 1849,
+      "roleChecks": 1839,
+      "sessionSql": 1849,
+      "roleSql": 14352,
+      "sessionMilliseconds": 21.770038999998008,
+      "roleMilliseconds": 290.63239199999964,
+      "deliveries": {
+        "advanced": 0,
+        "presence": 1140,
+        "gone": 0,
+        "unavailable": 0,
+        "other": 0
+      }
+    },
+    {
+      "phase": "edit-only",
+      "started": 1315.784792,
+      "sessionChecks": 1800,
+      "roleChecks": 1200,
+      "sessionSql": 1800,
+      "roleSql": 9360,
+      "sessionMilliseconds": 23.705478999999514,
+      "roleMilliseconds": 55.2133890000016,
+      "deliveries": {
+        "advanced": 1200,
+        "presence": 0,
+        "gone": 0,
+        "unavailable": 0,
+        "other": 0
+      }
+    },
+    {
+      "phase": "combined",
+      "started": 2639.407667,
+      "sessionChecks": 3413,
+      "roleChecks": 2815,
+      "sessionSql": 3413,
+      "roleSql": 21956,
+      "sessionMilliseconds": 42.501943999991454,
+      "roleMilliseconds": 996.2001280000131,
+      "deliveries": {
+        "advanced": 1200,
+        "presence": 1140,
+        "gone": 0,
+        "unavailable": 0,
+        "other": 0
+      }
+    },
+    {
+      "phase": "offline-reconnect-reader",
+      "started": 3665.948042,
+      "sessionChecks": 523,
+      "roleChecks": 444,
+      "sessionSql": 523,
+      "roleSql": 3520,
+      "sessionMilliseconds": 61.47949800000242,
+      "roleMilliseconds": 107.92421399999785,
+      "deliveries": {
+        "advanced": 80,
+        "presence": 70,
+        "gone": 76,
+        "unavailable": 0,
+        "other": 5
+      }
+    }
+  ],
+  "scope": "20 signed accounts; mixed real live transports; persisted SQLite sessions; server diagnostic, no BrowserLibrary/phone DOM"
+}

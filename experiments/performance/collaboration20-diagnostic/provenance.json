@@ -1,0 +1,16 @@
+{
+  "baseline": "679f04c45bcc719edfd052d3274d300af97e54c7",
+  "servedBrowser": false,
+  "sourceSha256": {
+    "src/server/document-live.ts": "11c2ad9c225712cebc57c4cbba3a0497930354df6aead453f29f69cb46d1559d",
+    "src/server/collaboration-diagnostic.ts": "ce283c0545f12e8f5bf076b5c6c83f805459763f6b35c57dae23780c41fddd6d",
+    "tests/document-live-poll.test.ts": "2b2a63ce865cfa4fe51e1f9f835ef4e3f948a6f922f4c63e161690af63044db7"
+  },
+  "runtime": "Bun1.4.0",
+  "commands": [
+    "bunx tsc --noEmit",
+    "bun test tests/document-live-poll.test.ts"
+  ],
+  "initialFailure": "undefined round in generated commit closure; no runtime attempted before correction",
+  "scopedAdvancedCandidate": "excluded; rejected/HOLD"
+}

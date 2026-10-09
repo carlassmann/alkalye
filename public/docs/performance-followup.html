@@ -59,6 +59,19 @@
 			latency comparison, separate-account permission test or twenty-writer
 			capacity claim.
 		</p>
+		<h2>Twenty-account transport diagnostic</h2>
+		<p>
+			One instrumented server integration passed 699 assertions with twenty
+			distinct signed writers, ten WebSocket peers, ten polling peers and twenty
+			independently persisted document sessions. It covered 120 online edits,
+			four offline writers reconnecting, exact convergence, reader rejection and
+			closed polling sessions. Instrumented HTTP commit p95 was about 221ms,
+			maximum 300ms. This exercises real transports and storage, but sessions
+			explicitly synchronize in each round: it does not measure browser wakeups,
+			phone rendering or sustained 25Hz cursor traffic. The first presence phase
+			includes session opening; its authorization counts cannot be attributed
+			solely to cursor delivery.
+		</p>
 		<h2>Production children-index comparison</h2>
 		<p>
 			Twelve actual production trials passed exact native text, caret,

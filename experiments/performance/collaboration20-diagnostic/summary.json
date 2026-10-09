@@ -1,0 +1,120 @@
+{
+  "baseline": "679f04c45bcc719edfd052d3274d300af97e54c7",
+  "status": "PASS",
+  "assertions": 699,
+  "writers": 20,
+  "distinctAccounts": 21,
+  "documentBodyKiB": 8,
+  "writerTransports": {
+    "WebSocket": 10,
+    "HTTPpoll": 10
+  },
+  "editCommits": 120,
+  "offlineWriters": 4,
+  "phases": {
+    "presence-only": [
+      {
+        "rounds": [
+          42.33099999999996,
+          26.825333999999998,
+          43.886540999999966
+        ],
+        "counts": {
+          "phase": "presence-only",
+          "started": 353.743917,
+          "sessionChecks": 1818,
+          "roleChecks": 1818,
+          "sessionSql": 1818,
+          "roleSql": 14176,
+          "sessionMilliseconds": 21.317914999998095,
+          "roleMilliseconds": 286.9000159999997,
+          "deliveries": {
+            "advanced": 0,
+            "presence": 1140,
+            "gone": 0,
+            "unavailable": 0,
+            "other": 0
+          }
+        }
+      }
+    ],
+    "phase": [
+      {
+        "counts": {
+          "phase": "edit-only",
+          "started": 1315.784792,
+          "sessionChecks": 1800,
+          "roleChecks": 1200,
+          "sessionSql": 1800,
+          "roleSql": 9360,
+          "sessionMilliseconds": 23.705478999999514,
+          "roleMilliseconds": 55.2133890000016,
+          "deliveries": {
+            "advanced": 1200,
+            "presence": 0,
+            "gone": 0,
+            "unavailable": 0,
+            "other": 0
+          }
+        },
+        "pulls": {
+          "snapshot": 20,
+          "history": 180
+        }
+      },
+      {
+        "counts": {
+          "phase": "combined",
+          "started": 2639.407667,
+          "sessionChecks": 3413,
+          "roleChecks": 2815,
+          "sessionSql": 3413,
+          "roleSql": 21876,
+          "sessionMilliseconds": 42.501943999991454,
+          "roleMilliseconds": 910.1032510000132,
+          "deliveries": {
+            "advanced": 1200,
+            "presence": 1140,
+            "gone": 0,
+            "unavailable": 0,
+            "other": 0
+          }
+        },
+        "pulls": {
+          "snapshot": 20,
+          "history": 360
+        }
+      }
+    ],
+    "20-writer8KBburst": [
+      {
+        "operations": 120,
+        "roundMilliseconds": [
+          272.38379199999986,
+          433.8454999999999,
+          617.3557080000003,
+          334.5306249999999,
+          315.22287499999993,
+          376.682542
+        ],
+        "commitRequestMilliseconds": {
+          "count": 120,
+          "median": 92.33525000000009,
+          "p95": 220.97962499999994,
+          "max": 300.2841249999997
+        },
+        "journeyOperationsPerSecond": 51.063372563623204
+      }
+    ]
+  },
+  "scope": "server/deep-session capacity, manual session.sync, no BrowserLibrary fanout or phone DOM",
+  "measurementLimits": [
+    "One instrumented run; not unmarked performance comparison",
+    "Live authorization statement counts only; excludes unrelated HTTP authorization/commit SQL",
+    "Authorization milliseconds sum overlapping Effect elapsed durations, not CPU time",
+    "presence phase extends through session opening before edit phase",
+    "All source/convergence/API/reader/reconnect gates use original public integration assertions; no exported final source hash",
+    "Delivery counters record authorized peer.send attempts; poll take revalidation may suppress final payloads",
+    "results phases are captured before peer cleanup; bounded concurrent checks may complete across phase boundaries"
+  ]
+}

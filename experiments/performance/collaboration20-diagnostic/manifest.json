@@ -1,0 +1,14 @@
+{
+  "src__server__document-live.ts.txt": "11c2ad9c225712cebc57c4cbba3a0497930354df6aead453f29f69cb46d1559d",
+  "summary.json": "54e0bb5aa9993c68cb9ea82883662be694b0698a4f972bcdefeaef91ec188ae9",
+  "provenance.json": "cf96b754d714455361acd629b2dabc712fb943f311b19be27311590032f7c91a",
+  "types.log.txt": "ffa781884f5ecf61c877cfc9ba37ed9d9f85e846f6a1aea58eb6abbea9bb4f0c",
+  "diagnostic.patch": "c6d4a2de04fad111b702e948e77373ba9405f56dbf063f3e6ccd4863996d4890",
+  "results.json": "5b19534e7246041b698a6db81644fd53c7b4747af045d9cf27aee638393cf27b",
+  "README.md": "83e59c14d038d74a85f67f40e9f990738633c0c05bdf1c9dcc45aa2626bd9699",
+  "final-types.log.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "runtime.log.txt": "dacc0eda6fb76932227fd42816af3d541e6719881fe4f64e83611568314773d7",
+  "src__server__collaboration-diagnostic.ts.txt": "ce283c0545f12e8f5bf076b5c6c83f805459763f6b35c57dae23780c41fddd6d",
+  "corrected-types.log.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "tests__document-live-poll.test.ts.txt": "2b2a63ce865cfa4fe51e1f9f835ef4e3f948a6f922f4c63e161690af63044db7"
+}

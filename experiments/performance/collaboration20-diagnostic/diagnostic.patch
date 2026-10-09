@@ -1,0 +1,379 @@
+--- a/src/server/document-live.ts
++++ b/src/server/document-live.ts
+@@ -1,3 +1,4 @@
++import * as Diagnostic from "./collaboration-diagnostic"
+ import type { Server, ServerWebSocket } from "bun"
+ import type * as Cause from "effect/Cause"
+ import * as Clock from "effect/Clock"
+@@ -112,8 +113,8 @@
+ 													presence,
+ 												})
+ 											}
+-											peer.send({ type: "preferences" })
+-										} else peer.send({ type: "advanced" })
++											deliver(peer, { type: "preferences" })
++										} else deliver(peer, { type: "advanced" })
+ 										return
+ 									}
+ 									for (let document of live.documents) {
+@@ -128,7 +129,7 @@
+ 											live.documents.delete(document)
+ 											live.presence.delete(document)
+ 											live.lastPresence.delete(document)
+-											peer.send({ type: "unavailable", document })
++											deliver(peer, { type: "unavailable", document })
+ 											yield* broadcast(peer, document, {
+ 												type: "gone",
+ 												document,
+@@ -151,7 +152,7 @@
+ 											}
+ 										}
+ 									}
+-									peer.send({ type: "advanced" })
++									deliver(peer, { type: "advanced" })
+ 								}),
+ 							),
+ 							Effect.catchCause(() =>
+@@ -169,7 +170,7 @@
+ 					let now = yield* Clock.currentTimeMillis
+ 					if (now - heartbeatSent >= 5_000) {
+ 						heartbeatSent = now
+-						for (let peer of socketPeers) peer.send({ type: "heartbeat" })
++						for (let peer of socketPeers) deliver(peer, { type: "heartbeat" })
+ 					}
+ 					for (let poll of polls.values())
+ 						if (!poll.waiter && now - poll.seen > pollAbandoned)
+@@ -506,7 +507,7 @@
+ 		}
+ 		function join(peer: LivePeer) {
+ 			peers.add(peer)
+-			peer.send({ type: "connected", actor: peer.live.actor })
++			deliver(peer, { type: "connected", actor: peer.live.actor })
+ 		}
+ 		function leave(peer: LivePeer) {
+ 			if (!peers.delete(peer)) return Effect.void
+@@ -543,7 +544,7 @@
+ 				}
+ 				let role = yield* accessRole(live, document)
+ 				if (!role) {
+-					peer.send({ type: "unavailable", document })
++					deliver(peer, { type: "unavailable", document })
+ 					return
+ 				}
+ 				if (message.type === "watch") {
+@@ -558,7 +559,7 @@
+ 						if (other === peer || !stored) continue
+ 						let presence = yield* currentPresence(other, stored)
+ 						if (presence)
+-							peer.send({
++							deliver(peer, {
+ 								type: "presence",
+ 								presence: {
+ 									...presence,
+@@ -597,20 +598,24 @@
+ 				Effect.map(profile => profile.name),
+ 			)
+ 		}
++		function deliver(peer: LivePeer, message: LiveServerMessage) {
++			Diagnostic.delivered(message)
++			peer.send(message)
++		}
+ 		function authorize(peer: LivePeer) {
+-			return Effect.gen(function* () {
++			return Diagnostic.authorization("session", Effect.gen(function* () {
+ 				let live = peer.live
+ 				let current = yield* sessions.current(live.session)
+ 				if (current.subject !== live.subject)
+ 					return yield* Effect.fail(new Error("Account changed"))
+ 				return live
+-			})
++			}))
+ 		}
+ 		function accessRole(live: LiveConnection, document: string) {
+-			return store.accessRole(document, live.subject).pipe(
++			return Diagnostic.authorization("role", store.accessRole(document, live.subject).pipe(
+ 				Effect.provideService(Identity, { subject: live.subject, actors: [] }),
+ 				Effect.catchTag("ResourceUnavailable", () => Effect.succeed(undefined)),
+-			)
++			))
+ 		}
+ 		function canRead(live: LiveConnection, document: string) {
+ 			return accessRole(live, document).pipe(
+@@ -644,7 +649,7 @@
+ 						Effect.andThen(canRead(live, document)),
+ 						Effect.tap(allowed =>
+ 							Effect.sync(() => {
+-								if (allowed) peer.send(delivered)
++								if (allowed) deliver(peer, delivered)
+ 							}),
+ 						),
+ 						Effect.catchCause(() =>
+--- a/src/server/collaboration-diagnostic.ts
++++ b/src/server/collaboration-diagnostic.ts
+@@ -0,0 +1,50 @@
++import * as Effect from "effect/Effect"
++import * as Statement from "effect/sql/Statement"
++import type { LiveServerMessage } from "../shared/document-live"
++
++function empty(phase: string) {
++	return {
++		phase,
++		started: performance.now(),
++		sessionChecks: 0,
++		roleChecks: 0,
++		sessionSql: 0,
++		roleSql: 0,
++		sessionMilliseconds: 0,
++		roleMilliseconds: 0,
++		deliveries: { advanced: 0, presence: 0, gone: 0, unavailable: 0, other: 0 },
++	}
++}
++let current = empty("setup")
++let phases: ReturnType<typeof empty>[] = []
++export let completed = false
++export function phase(name: string) {
++	current = empty(name)
++	phases.push(current)
++}
++export function delivered(message: LiveServerMessage) {
++	if (message.type === "advanced" || message.type === "presence" || message.type === "gone" || message.type === "unavailable") current.deliveries[message.type]++
++	else current.deliveries.other++
++}
++export function counts() { return structuredClone(current) }
++export function complete() { completed = true }
++export function results() { return structuredClone(phases) }
++export function authorization<A, E, R>(kind: "session" | "role", effect: Effect.Effect<A, E, R>): Effect.Effect<A, E, R> {
++	return Effect.suspend(() => {
++		let row = current, started = performance.now()
++		if (kind === "session") row.sessionChecks++
++		else row.roleChecks++
++		let transformer: Statement.Transformer = statement => Effect.sync(() => {
++			if (kind === "session") row.sessionSql++
++			else row.roleSql++
++			return statement
++		})
++		return effect.pipe(
++			Effect.provideService(Statement.CurrentTransformer, transformer),
++			Effect.ensuring(Effect.sync(() => {
++				if (kind === "session") row.sessionMilliseconds += performance.now() - started
++				else row.roleMilliseconds += performance.now() - started
++			})),
++		)
++	})
++}
+--- a/tests/document-live-poll.test.ts
++++ b/tests/document-live-poll.test.ts
+@@ -1,7 +1,8 @@
++import * as Diagnostic from "../src/server/collaboration-diagnostic"
+ import { Database } from "bun:sqlite"
+ import { profile } from "bun:jsc"
+ import { afterAll, beforeAll, expect, test } from "bun:test"
+-import { mkdtemp, rm } from "node:fs/promises"
++import { cp, mkdtemp, rm } from "node:fs/promises"
+ import { tmpdir } from "node:os"
+ import { join } from "node:path"
+ import type * as Crypto from "effect/Crypto"
+@@ -46,6 +47,7 @@
+ })
+ afterAll(async () => {
+ 	await Effect.runPromise(instance.close())
++	if (!Diagnostic.completed) await cp(directory, "/tmp/alkalye-collaboration20-diagnostic/failed-data", { recursive: true })
+ 	await rm(directory, { recursive: true, force: true })
+ })
+ 
+@@ -935,12 +937,12 @@
+ 
+ async function sustainedSwarm() {
+ 	let accounts = await Promise.all(
+-		Array.from({ length: 25 }, (_, index) => run(client(120 + index))),
++		Array.from({ length: 21 }, (_, index) => run(client(160 + index))),
+ 	)
+ 	let owner = accounts[0]
+-	let reader = accounts[24]
++	let reader = accounts[20]
+ 	if (!owner || !reader) throw Error("Missing swarm accounts")
+-	let writers = accounts.slice(0, 24)
++	let writers = accounts.slice(0, 20)
+ 	let document = "swarm-document"
+ 	await run(
+ 		Effect.gen(function* () {
+@@ -963,7 +965,7 @@
+ 		close(): Promise<void>
+ 	}[] = []
+ 	async function connect(index: number) {
+-		let login = await cookieLogin(instance.server.url, 120 + index)
++		let login = await cookieLogin(instance.server.url, 160 + index)
+ 		if (index % 2 === 0) {
+ 			let socket = await liveSocket(login)
+ 			return {
+@@ -1048,13 +1050,34 @@
+ 			)
+ 			actors.add(presence.actor)
+ 		}
+-		expect(actors.size).toBe(23)
++		expect(actors.size).toBe(19)
++		Diagnostic.phase("presence-only")
++		let presenceRounds: number[] = []
++		let lastPresence = Date.now()
++		for (let round = 0; round < 3; round++) {
++			await Bun.sleep(Math.max(0, lastPresence + 40 - Date.now()))
++			let started = performance.now(), position = 10000 + round * 100
++			await Promise.all(peers.map((peer, index) => peer.send({ type: "presence", presence: cursor(document, position + index) })))
++			let seen = new Set<string>()
++			while (seen.size < writers.length - 1) {
++				let message = await observer.until(message => message.type === "presence" && Number(object(message.presence).cursor) >= position)
++				seen.add(parsePresence(message.presence).actor)
++			}
++			expect(seen.size).toBe(19)
++			await Effect.runPromise(Effect.gen(function* () {
++				while (Diagnostic.counts().deliveries.presence < (round + 1) * 20 * 19) yield* Effect.sleep("10 millis")
++			}).pipe(Effect.timeout("20 seconds")))
++			lastPresence = Date.now()
++			presenceRounds.push(performance.now() - started)
++		}
++		console.info("presence-only", JSON.stringify({ rounds: presenceRounds, counts: Diagnostic.counts() }))
+ 		await run(
+ 			Effect.scoped(
+ 				Effect.gen(function* () {
+ 					let offline = new Set<number>()
+ 					let sessions: DocumentSession["Service"][] = []
+ 					let commitMilliseconds: number[] = []
++					let pulls = { snapshot: 0, history: 0 }
+ 					for (let [index, account] of writers.entries()) {
+ 						function online<A, E>(effect: Effect.Effect<A, E>) {
+ 							return Effect.suspend<A, E | Error, never>(() =>
+@@ -1064,17 +1087,19 @@
+ 							)
+ 						}
+ 						let transport: DocumentTransport = {
+-							snapshot: document =>
+-								online(
++							snapshot: document => Effect.suspend(() => {
++								pulls.snapshot++
++								return online(
+ 									account.api.documents.snapshot({
+ 										params: { document },
+ 										query: {},
+ 									}),
+-								),
++								)
++							}),
+ 							commit: action =>
+ 								online(
+ 									Effect.gen(function* () {
+-										let started = performance.now()
++						let started = performance.now()
+ 										let receipt = yield* account.api.documents.commit({
+ 											params: { document },
+ 											payload: action,
+@@ -1083,13 +1108,15 @@
+ 										return receipt
+ 									}),
+ 								),
+-							history: (document, after, log, limit) =>
+-								online(
++							history: (document, after, log, limit) => Effect.suspend(() => {
++								pulls.history++
++								return online(
+ 									account.api.documents.history({
+ 										params: { document },
+ 										query: { after, log, limit },
+ 									}),
+-								),
++								)
++							}),
+ 						}
+ 						let services = yield* Layer.build(
+ 							cliDocumentSessionLayer(
+@@ -1101,7 +1128,8 @@
+ 					}
+ 
+ 					let burstMilliseconds: number[] = []
+-					for (let round = 0; round < 8; round++) {
++					for (let round = 0; round < 6; round++) {
++						if (round === 0 || round === 3) Diagnostic.phase(round === 0 ? "edit-only" : "combined")
+ 						let started = performance.now()
+ 						yield* Effect.all(
+ 							sessions.map((session, index) => {
+@@ -1148,12 +1176,13 @@
+ 									expected.split(`writer-${index}-round-${completed}\n`),
+ 								).toHaveLength(2)
+ 						}
++						if (round >= 3) {
+ 						yield* Effect.promise(() =>
+ 							Promise.all(
+ 								peers.map((peer, index) =>
+ 									peer.send({
+ 										type: "presence",
+-										presence: cursor(document, round * 100 + index),
++										presence: cursor(document, 20000 + round * 100 + index),
+ 									}),
+ 								),
+ 							),
+@@ -1164,19 +1193,25 @@
+ 								observer.until(
+ 									message =>
+ 										message.type === "presence" &&
+-										Number(object(message.presence).cursor) >= round * 100,
++										Number(object(message.presence).cursor) >= 20000 + round * 100,
+ 								),
+ 							)
+ 							updated.add(parsePresence(frame.presence).actor)
+ 						}
+-						expect(updated.size).toBe(23)
++						expect(updated.size).toBe(19)
++						}
++						yield* Effect.gen(function* () {
++							let required = ((round % 3) + 1) * writers.length * writers.length
++							while (Diagnostic.counts().deliveries.advanced < required) yield* Effect.sleep("10 millis")
++						}).pipe(Effect.timeout("20 seconds"))
+ 						burstMilliseconds.push(performance.now() - started)
++						if (round === 2 || round === 5) console.info("phase", JSON.stringify({ counts: Diagnostic.counts(), pulls }))
+ 					}
+ 					commitMilliseconds.sort((left, right) => left - right)
+ 					console.info(
+-						"24-writer8KBburst",
++						"20-writer8KBburst",
+ 						JSON.stringify({
+-							operations: 192,
++							operations: 120,
+ 							roundMilliseconds: burstMilliseconds,
+ 							commitRequestMilliseconds: {
+ 								count: commitMilliseconds.length,
+@@ -1188,10 +1223,11 @@
+ 								max: commitMilliseconds.at(-1),
+ 							},
+ 							journeyOperationsPerSecond:
+-								192000 /
++								120000 /
+ 								burstMilliseconds.reduce((sum, duration) => sum + duration, 0),
+ 						}),
+ 					)
++					Diagnostic.phase("offline-reconnect-reader")
+ 					for (let index = 0; index < 4; index++) {
+ 						let session = sessions[index],
+ 							peer = peers[index]
+@@ -1254,7 +1290,7 @@
+ 				}),
+ 			),
+ 		)
+-		let polling = livePoll(await cookieLogin(instance.server.url, 144))
++		let polling = livePoll(await cookieLogin(instance.server.url, 180))
+ 		await polling.open()
+ 		let abort = new AbortController()
+ 		let waiting = polling.poll(abort.signal).catch(() => undefined)
+@@ -1262,11 +1298,13 @@
+ 		await waiting
+ 		expect(await polling.close()).toBe(204)
+ 		expect(await polling.poll()).toBe(410)
++		await Bun.write("/tmp/alkalye-collaboration20-diagnostic/results.json", JSON.stringify({ status: "correctness-complete", phases: Diagnostic.results(), scope: "20 signed accounts; mixed real live transports; persisted SQLite sessions; server diagnostic, no BrowserLibrary/phone DOM" }, null, 2))
++		Diagnostic.complete()
+ 	} finally {
+ 		await Promise.allSettled(peers.map(peer => peer.close()))
+ 	}
+ }
+-test("24 independently persisted writers converge over mixed live transports, reconnect and enforce reader permissions", async () => {
++test.only("20 independently persisted writers converge over mixed live transports, reconnect and enforce reader permissions", async () => {
+ 	if (process.env.PROFILE_SWARM === "1") {
+ 		let result = await profile(sustainedSwarm)
+ 		await Bun.write("/tmp/alkalye-swarm-profile.txt", result.functions)
