@@ -2,6 +2,11 @@ import { mkdtemp, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import * as Effect from "effect/Effect"
+import * as Schema from "effect/Schema"
+import {
+	DocumentSnapshotSchema,
+	restoreSnapshot,
+} from "../src/shared/document-actions"
 import { startServer } from "../src/server/index"
 import { object, string } from "../src/shared/model"
 import {
@@ -235,9 +240,11 @@ if (process.argv.includes("--serve")) {
 		)
 		assert(true, "native keyboard redo saves a fresh document compensation")
 		let comment = verifyNativeComments(session)
-		verifyNativeAssets(session, source)
-		verifyNativeDrawings(session, first)
-		verifyNativeThemes(session, first)
+		if (!process.argv.includes("--offline-data")) {
+			verifyNativeAssets(session, source)
+			verifyNativeDrawings(session, first)
+			verifyNativeThemes(session, first)
+		}
 		browser(session, "click", '[data-action="preview"]')
 		assert(
 			evaluate(
@@ -726,6 +733,72 @@ if (process.argv.includes("--serve")) {
 		)
 		evaluate(
 			reader,
+			'localStorage.setItem("live-websocket-blocked","true"); localStorage.setItem("native-preferences-offline","true")',
+		)
+		browser(reader, "reload")
+		wait(
+			reader,
+			'document.querySelector("#editor")?.value === ' + JSON.stringify(written),
+		)
+		browser(reader, "set", "offline", "on")
+		wait(
+			reader,
+			'navigator.onLine === false && document.querySelector("#editor")?.readOnly === false',
+		)
+		let offlineContribution = written + "\n\nOffline writer contribution."
+		browser(reader, "fill", "#editor", offlineContribution)
+		wait(
+			reader,
+			'document.querySelector("#editor")?.value === ' +
+				JSON.stringify(offlineContribution) +
+				' && document.querySelector("#save-status").getAttribute("aria-busy") === "false" && Number(document.querySelector("#save-status").dataset.pending) > 0',
+		)
+		let onlineContribution = written + "\n\nOnline owner contribution."
+		browser(session, "fill", "#editor", onlineContribution)
+		wait(
+			session,
+			'document.querySelector("#editor")?.value === ' +
+				JSON.stringify(onlineContribution) +
+				' && document.querySelector("#save-status")?.textContent === "Saved"',
+		)
+		browser(reader, "reload")
+		wait(
+			reader,
+			'document.querySelector("#editor")?.value === ' +
+				JSON.stringify(offlineContribution),
+		)
+		browser(reader, "set", "offline", "off")
+		evaluate(
+			reader,
+			'localStorage.removeItem("native-preferences-offline"); localStorage.removeItem("live-websocket-blocked"); delete navigator.onLine; dispatchEvent(new Event("online")); dispatchEvent(new Event("focus"))',
+		)
+		wait(
+			reader,
+			'document.querySelector("#save-status")?.dataset.pending === "0" && document.querySelector("#editor").value.includes("Offline writer contribution.") && document.querySelector("#editor").value.includes("Online owner contribution.")',
+		)
+		written = String(
+			evaluate(reader, 'document.querySelector("alkalye-editor").source.value'),
+		)
+		wait(
+			session,
+			'document.querySelector("alkalye-editor")?.source.value === ' +
+				JSON.stringify(written),
+		)
+		let mergedSnapshot = Schema.decodeUnknownSync(DocumentSnapshotSchema)(
+			evaluate(
+				session,
+				`fetch("/api/documents/${first}/snapshot").then(response=>response.json())`,
+			),
+		)
+		let merged = await Effect.runPromise(
+			restoreSnapshot(mergedSnapshot, "offline-convergence-oracle"),
+		)
+		assert(
+			merged.text(first) === written,
+			"independent online and offline writers converge to the exact accepted source after reload and reconnect",
+		)
+		evaluate(
+			reader,
 			'{let input = document.querySelector("#editor"); input.focus(); input.setSelectionRange(0, 5); input.dispatchEvent(new Event("select"))}',
 		)
 		wait(session, 'document.querySelectorAll(".remote-selection").length > 0')
@@ -767,6 +840,47 @@ if (process.argv.includes("--serve")) {
 		browser(session, "click", '[data-action="edit"]')
 		browser(reader, "click", '[data-action="edit"]')
 
+		let revokedDraft =
+			written + "\n\nRetain this offline contribution after revocation."
+		visit(reader, url + "/doc/" + first)
+		wait(
+			reader,
+			'document.querySelector("#editor")?.value === ' +
+				JSON.stringify(written) +
+				' && document.querySelector("#editor").readOnly === false',
+		)
+		evaluate(
+			reader,
+			'localStorage.setItem("live-websocket-blocked","true"); localStorage.setItem("native-preferences-offline","true")',
+		)
+		browser(reader, "reload")
+		wait(
+			reader,
+			'document.querySelector("#editor")?.value === ' + JSON.stringify(written),
+		)
+		browser(reader, "set", "offline", "on")
+		wait(
+			reader,
+			'navigator.onLine === false && document.querySelector("#editor")?.readOnly === false',
+		)
+		browser(reader, "fill", "#editor", revokedDraft)
+		wait(
+			reader,
+			'document.querySelector("#editor")?.value === ' +
+				JSON.stringify(revokedDraft) +
+				' && document.querySelector("#save-status").getAttribute("aria-busy") === "false" && Number(document.querySelector("#save-status").dataset.pending) > 0',
+		)
+		browser(reader, "reload")
+		wait(
+			reader,
+			'document.querySelector("#editor")?.value === ' +
+				JSON.stringify(revokedDraft),
+		)
+		assert(
+			true,
+			"a writer's unsynchronized source survives a complete offline reload before revocation",
+		)
+
 		assert(
 			evaluate(
 				session,
@@ -774,10 +888,18 @@ if (process.argv.includes("--serve")) {
 			),
 			"native owner revokes inherited workspace access",
 		)
-		evaluate(reader, 'window.dispatchEvent(new Event("focus"))')
-		wait(reader, 'document.querySelector("#editor")?.readOnly === true')
+		browser(reader, "set", "offline", "off")
+		evaluate(
+			reader,
+			'localStorage.removeItem("native-preferences-offline"); localStorage.removeItem("live-websocket-blocked"); delete navigator.onLine; dispatchEvent(new Event("online")); dispatchEvent(new Event("focus"))',
+		)
+		wait(
+			reader,
+			'document.querySelector("#editor")?.readOnly === true && document.querySelector("alkalye-sync-recovery")?.hidden === false',
+		)
 		assert(
-			evaluate(reader, 'document.querySelector("#editor").value') === written,
+			evaluate(reader, 'document.querySelector("#editor").value') ===
+				revokedDraft,
 			"revocation makes the editor read-only while preserving its local source for export",
 		)
 		assert(
@@ -787,6 +909,39 @@ if (process.argv.includes("--serve")) {
 			) === 404,
 			"revoked native members cannot download another document snapshot",
 		)
+		let acceptedSnapshot = Schema.decodeUnknownSync(DocumentSnapshotSchema)(
+			evaluate(
+				session,
+				`fetch("/api/documents/${first}/snapshot").then(response=>response.json())`,
+			),
+		)
+		let accepted = await Effect.runPromise(
+			restoreSnapshot(acceptedSnapshot, "offline-revocation-oracle"),
+		)
+		assert(
+			accepted.text(first) === written,
+			"revoked offline contributions remain local and never enter the owner's accepted source",
+		)
+		assert(
+			evaluate(
+				reader,
+				'document.querySelector("alkalye-sync-recovery").textContent.includes("Your edits remain on this device") && !document.querySelector("[data-action=recover-copy]").disabled',
+			),
+			"revocation exposes a usable personal-copy recovery action",
+		)
+		browser(reader, "set", "offline", "on")
+		browser(reader, "reload")
+		wait(
+			reader,
+			'document.querySelector("#editor")?.value === ' +
+				JSON.stringify(revokedDraft),
+		)
+		assert(
+			true,
+			"revoked pending source remains journal-backed across a second offline reload",
+		)
+		browser(reader, "set", "offline", "off")
+
 		verifyNativeWorkspaces(session, reader, subject, url)
 		verifyNativeAgents(session, url)
 		await verifyNativeRoutes(session, url)
