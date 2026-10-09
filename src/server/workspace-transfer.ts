@@ -169,6 +169,19 @@ let document_move_exportsRow = Schema.Struct({
 	request: Schema.String,
 	payload: Schema.Uint8Array,
 })
+let document_move_export_manifestsRow = Schema.Struct({
+	document: Schema.String,
+	request: Schema.String,
+	bytes: Schema.Natural,
+	chunks: Schema.Natural,
+	fingerprint: Schema.String,
+})
+let document_move_export_chunksRow = Schema.Struct({
+	document: Schema.String,
+	request: Schema.String,
+	part: Schema.Natural,
+	payload: Schema.Uint8Array,
+})
 let document_move_receiptsRow = Schema.Struct({
 	document: Schema.String,
 	request: Schema.String,
@@ -188,6 +201,12 @@ export let WorkspaceTransferSchema = Schema.Struct({
 	generation: Schema.Natural,
 	document_transfer_fences: Schema.Array(document_transfer_fencesRow),
 	document_move_exports: Schema.Array(document_move_exportsRow),
+	document_move_export_manifests: Schema.optionalKey(
+		Schema.Array(document_move_export_manifestsRow),
+	),
+	document_move_export_chunks: Schema.optionalKey(
+		Schema.Array(document_move_export_chunksRow),
+	),
 	document_move_receipts: Schema.Array(document_move_receiptsRow),
 	document_move_aborts: Schema.Array(document_move_abortsRow),
 
@@ -260,6 +279,8 @@ export function initializeTransferFences(sql: SqlClient.SqlClient) {
 	return Effect.gen(function* () {
 		yield* sql`CREATE TABLE IF NOT EXISTS document_transfer_fences (document TEXT PRIMARY KEY,request TEXT NOT NULL,destination TEXT NOT NULL,subject TEXT NOT NULL,phase TEXT NOT NULL CHECK(phase IN ('staged','imported','retired')))`
 		yield* sql`CREATE TABLE IF NOT EXISTS document_move_exports (document TEXT NOT NULL,request TEXT NOT NULL,payload BLOB NOT NULL,PRIMARY KEY(document,request))`
+		yield* sql`CREATE TABLE IF NOT EXISTS document_move_export_manifests (document TEXT NOT NULL,request TEXT NOT NULL,bytes INTEGER NOT NULL,chunks INTEGER NOT NULL,fingerprint TEXT NOT NULL,PRIMARY KEY(document,request))`
+		yield* sql`CREATE TABLE IF NOT EXISTS document_move_export_chunks (document TEXT NOT NULL,request TEXT NOT NULL,part INTEGER NOT NULL,payload BLOB NOT NULL,PRIMARY KEY(document,request,part))`
 		yield* sql`CREATE TABLE IF NOT EXISTS document_move_receipts (document TEXT NOT NULL,request TEXT NOT NULL,subject TEXT NOT NULL,destination TEXT NOT NULL,fingerprint TEXT NOT NULL,log TEXT NOT NULL,position INTEGER NOT NULL,source TEXT NOT NULL,PRIMARY KEY(document,request))`
 		let columns = yield* sql<{
 			name: string
@@ -466,6 +487,18 @@ function makeTransfers() {
 			execute: workspace =>
 				sql`SELECT * FROM document_move_exports WHERE document IN (SELECT document FROM workspace_documents WHERE workspace=${workspace})`,
 		})
+		let read_document_move_export_manifests = SqlSchema.findAll({
+			Request: Schema.String,
+			Result: document_move_export_manifestsRow,
+			execute: workspace =>
+				sql`SELECT * FROM document_move_export_manifests WHERE document IN (SELECT document FROM workspace_documents WHERE workspace=${workspace})`,
+		})
+		let read_document_move_export_chunks = SqlSchema.findAll({
+			Request: Schema.String,
+			Result: document_move_export_chunksRow,
+			execute: workspace =>
+				sql`SELECT * FROM document_move_export_chunks WHERE document IN (SELECT document FROM workspace_documents WHERE workspace=${workspace})`,
+		})
 		let read_document_move_receipts = SqlSchema.findAll({
 			Request: Schema.String,
 			Result: document_move_receiptsRow,
@@ -613,6 +646,10 @@ function makeTransfers() {
 						document_transfer_fences:
 							yield* read_document_transfer_fences(workspace),
 						document_move_exports: yield* read_document_move_exports(workspace),
+						document_move_export_manifests:
+							yield* read_document_move_export_manifests(workspace),
+						document_move_export_chunks:
+							yield* read_document_move_export_chunks(workspace),
 						document_move_receipts:
 							yield* read_document_move_receipts(workspace),
 						document_move_aborts: yield* read_document_move_aborts(workspace),
@@ -741,6 +778,15 @@ function makeTransfers() {
 					)
 				)
 					return yield* failure("Transfer contains a foreign document")
+				if (
+					(bundle.document_move_export_manifests ?? []).some(
+						row => !documents.has(row.document),
+					) ||
+					(bundle.document_move_export_chunks ?? []).some(
+						row => !documents.has(row.document),
+					)
+				)
+					return yield* failure("Transfer contains a foreign move cache")
 				if (
 					bundle.document_move_exports.some(row => !documents.has(row.document))
 				)
@@ -882,6 +928,10 @@ function makeTransfers() {
 						for (let row of bundle.document_move_exports)
 							yield* sql`INSERT INTO document_move_exports ${sql.insert(row)}`
 
+						for (let row of bundle.document_move_export_manifests ?? [])
+							yield* sql`INSERT INTO document_move_export_manifests ${sql.insert(row)}`
+						for (let row of bundle.document_move_export_chunks ?? [])
+							yield* sql`INSERT INTO document_move_export_chunks ${sql.insert(row)}`
 						for (let row of bundle.document_move_receipts)
 							yield* sql`INSERT INTO document_move_receipts ${sql.insert(row)}`
 
@@ -1042,6 +1092,75 @@ function makeTransfers() {
 				return identity
 			})
 		}
+		function cacheDocumentMove(
+			document: string,
+			request: string,
+			payload: Uint8Array,
+		) {
+			return Effect.gen(function* () {
+				let chunks = Math.ceil(payload.length / workspaceExportChunkBytes)
+				for (let part = 0; part < chunks; part++) {
+					let chunk = payload.subarray(
+						part * workspaceExportChunkBytes,
+						(part + 1) * workspaceExportChunkBytes,
+					)
+					yield* sql`INSERT INTO document_move_export_chunks VALUES(${document},${request},${part},${chunk})`
+				}
+				let fingerprint = encode(yield* crypto.digest("SHA-256", payload))
+				yield* sql`INSERT INTO document_move_export_manifests VALUES(${document},${request},${payload.length},${chunks},${fingerprint})`
+			})
+		}
+		function readDocumentMove(document: string, request: string) {
+			return Effect.gen(function* () {
+				let manifests = yield* sql<{
+					bytes: number
+					chunks: number
+					fingerprint: string
+				}>`SELECT bytes,chunks,fingerprint FROM document_move_export_manifests WHERE document=${document} AND request=${request}`
+				let manifest = manifests[0]
+				if (manifest) {
+					if (
+						!Number.isSafeInteger(manifest.bytes) ||
+						manifest.bytes <= 0 ||
+						!Number.isSafeInteger(manifest.chunks) ||
+						manifest.chunks !==
+							Math.ceil(manifest.bytes / workspaceExportChunkBytes)
+					)
+						return yield* failure("Document move export manifest is invalid")
+					let chunks = yield* sql<{
+						part: number
+						payload: Uint8Array
+					}>`SELECT part,payload FROM document_move_export_chunks WHERE document=${document} AND request=${request} ORDER BY part`
+					if (chunks.length !== manifest.chunks)
+						return yield* failure("Document move export chunks are incomplete")
+					let payload = new Uint8Array(manifest.bytes)
+					for (let [part, chunk] of chunks.entries()) {
+						let size = Math.min(
+							workspaceExportChunkBytes,
+							manifest.bytes - part * workspaceExportChunkBytes,
+						)
+						if (chunk.part !== part || chunk.payload.length !== size)
+							return yield* failure("Document move export chunk is invalid")
+						payload.set(chunk.payload, part * workspaceExportChunkBytes)
+					}
+					if (
+						encode(yield* crypto.digest("SHA-256", payload)) !==
+						manifest.fingerprint
+					)
+						return yield* failure("Document move export fingerprint differs")
+					return payload
+				}
+				let previous = yield* sql<{
+					payload: Uint8Array
+				}>`SELECT payload FROM document_move_exports WHERE document=${document} AND request=${request}`
+				if (!previous[0]) return undefined
+				yield* Schema.decodeUnknownEffect(documentMoveBinary)(
+					previous[0].payload,
+				)
+				yield* cacheDocumentMove(document, request, previous[0].payload)
+				return previous[0].payload
+			})
+		}
 		function stageDocumentMove(
 			document: string,
 			destination: string,
@@ -1089,13 +1208,9 @@ function makeTransfers() {
 							old[0].subject !== identity.subject)
 					)
 						return yield* failure("Document already has a different transfer")
-					let cached = yield* sql<{
-						payload: Uint8Array
-					}>`SELECT payload FROM document_move_exports WHERE document=${document} AND request=${request}`
-					if (cached[0])
-						return yield* Schema.decodeUnknownEffect(documentMoveBinary)(
-							cached[0].payload,
-						)
+					let cached = yield* readDocumentMove(document, request)
+					if (cached)
+						return yield* Schema.decodeUnknownEffect(documentMoveBinary)(cached)
 					yield* sql`INSERT INTO document_transfer_fences VALUES(${document},${request},${destination},${identity.subject},'staged')`
 					let bundle = {
 						document,
@@ -1128,7 +1243,7 @@ function makeTransfers() {
 						effect_event_remotes: yield* move_effect_event_remotes(document),
 					}
 					let payload = yield* Schema.encodeEffect(documentMoveBinary)(bundle)
-					yield* sql`INSERT INTO document_move_exports VALUES(${document},${request},${payload})`
+					yield* cacheDocumentMove(document, request, payload)
 					return bundle
 				}),
 			)
@@ -1292,7 +1407,7 @@ function makeTransfers() {
 									"Move target document already exists without a retired receipt",
 								)
 							let exports =
-								yield* sql`SELECT request FROM document_move_exports WHERE document=${bundle.document} AND request=${fence.request}`
+								yield* sql`SELECT request FROM document_move_exports WHERE document=${bundle.document} AND request=${fence.request} UNION ALL SELECT request FROM document_move_export_manifests WHERE document=${bundle.document} AND request=${fence.request}`
 							if (!exports.length)
 								return yield* failure("Retired move export receipt is missing")
 							yield* sql`DELETE FROM invitation_members WHERE invitation IN (SELECT invitation FROM invitations WHERE document=${bundle.document})`

@@ -5,6 +5,8 @@ import { join } from "node:path"
 import * as Effect from "effect/Effect"
 import * as Layer from "effect/Layer"
 import * as ManagedRuntime from "effect/ManagedRuntime"
+import * as Schema from "effect/Schema"
+import * as SchemaBinary from "effect/encoding/SchemaBinary"
 import * as SqlClient from "effect/sql/SqlClient"
 import { sqliteLayer } from "../src/platform/sqlite"
 import { webCryptoLayer } from "../src/platform/web-crypto"
@@ -12,7 +14,10 @@ import {
 	WorkspaceStore,
 	DocumentMaintenance,
 } from "../src/server/document-store"
-import { WorkspaceTransfers } from "../src/server/workspace-transfer"
+import {
+	DocumentMoveSchema,
+	WorkspaceTransfers,
+} from "../src/server/workspace-transfer"
 import { Identity } from "../src/shared/workspace"
 import { Replica } from "../src/shared/crdt"
 import {
@@ -299,6 +304,26 @@ test("document moves stage current permissions and preserve retry identities und
 				),
 			),
 		)
+		let legacyMove = Schema.encodeSync(
+			SchemaBinary.toCodec(DocumentMoveSchema),
+		)(bundle)
+		await source.runPromise(
+			Effect.gen(function* () {
+				let sql = yield* SqlClient.SqlClient
+				yield* sql`DELETE FROM document_move_export_chunks WHERE document='moving' AND request='move-one'`
+				yield* sql`DELETE FROM document_move_export_manifests WHERE document='moving' AND request='move-one'`
+				yield* sql`INSERT INTO document_move_exports VALUES('moving','move-one',${legacyMove})`
+			}),
+		)
+		expect(
+			await source.runPromise(
+				owner(
+					WorkspaceTransfers.use(t =>
+						t.stageDocumentMove("moving", "to", "move-one"),
+					),
+				),
+			),
+		).toEqual(bundle)
 		await target.runPromise(
 			destination(
 				WorkspaceStore.use(s =>
@@ -527,7 +552,8 @@ test("document moves stage current permissions and preserve retry identities und
 				row => row.document === "moving" && row.phase === "retired",
 			),
 		).toBe(true)
-		expect(frozen.document_move_exports.length).toBeGreaterThan(0)
+		expect(frozen.document_move_export_manifests?.length).toBeGreaterThan(0)
+		expect(frozen.document_move_export_chunks?.length).toBeGreaterThan(0)
 		expect(frozen.document_move_receipts.length).toBeGreaterThan(0)
 		await migrated.runPromise(
 			WorkspaceTransfers.use(t => t.importWorkspace(frozen)),
