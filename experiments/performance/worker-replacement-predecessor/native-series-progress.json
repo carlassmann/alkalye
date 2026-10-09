@@ -1,0 +1,134 @@
+[
+	{
+		"arm": "receipt-only",
+		"trial": 0,
+		"count": 1,
+		"stage": "terminal",
+		"driverPid": 60704,
+		"code": 0,
+		"gates": [
+			"native 1 exact source/all ranges/directions/primary/caret and independent edit+Undo acceptance"
+		]
+	},
+	{
+		"arm": "combined",
+		"trial": 0,
+		"count": 1,
+		"stage": "terminal",
+		"driverPid": 60923,
+		"code": 0,
+		"gates": [
+			"native 1 exact source/all ranges/directions/primary/caret and independent edit+Undo acceptance"
+		]
+	},
+	{
+		"arm": "receipt-only",
+		"trial": 0,
+		"count": 512,
+		"stage": "terminal",
+		"driverPid": 61141,
+		"code": 0,
+		"gates": [
+			"native 512 exact source/all ranges/directions/primary/caret and independent edit+Undo acceptance"
+		]
+	},
+	{
+		"arm": "combined",
+		"trial": 0,
+		"count": 512,
+		"stage": "terminal",
+		"driverPid": 61430,
+		"code": 0,
+		"gates": [
+			"native 512 exact source/all ranges/directions/primary/caret and independent edit+Undo acceptance"
+		]
+	},
+	{
+		"arm": "combined",
+		"trial": 1,
+		"count": 1,
+		"stage": "terminal",
+		"driverPid": 61654,
+		"code": 0,
+		"gates": [
+			"native 1 exact source/all ranges/directions/primary/caret and independent edit+Undo acceptance"
+		]
+	},
+	{
+		"arm": "receipt-only",
+		"trial": 1,
+		"count": 1,
+		"stage": "terminal",
+		"driverPid": 61864,
+		"code": 0,
+		"gates": [
+			"native 1 exact source/all ranges/directions/primary/caret and independent edit+Undo acceptance"
+		]
+	},
+	{
+		"arm": "combined",
+		"trial": 1,
+		"count": 512,
+		"stage": "terminal",
+		"driverPid": 62081,
+		"code": 0,
+		"gates": [
+			"native 512 exact source/all ranges/directions/primary/caret and independent edit+Undo acceptance"
+		]
+	},
+	{
+		"arm": "receipt-only",
+		"trial": 1,
+		"count": 512,
+		"stage": "terminal",
+		"driverPid": 62295,
+		"code": 0,
+		"gates": [
+			"native 512 exact source/all ranges/directions/primary/caret and independent edit+Undo acceptance"
+		]
+	},
+	{
+		"arm": "receipt-only",
+		"trial": 2,
+		"count": 1,
+		"stage": "terminal",
+		"driverPid": 62515,
+		"code": 0,
+		"gates": [
+			"native 1 exact source/all ranges/directions/primary/caret and independent edit+Undo acceptance"
+		]
+	},
+	{
+		"arm": "combined",
+		"trial": 2,
+		"count": 1,
+		"stage": "terminal",
+		"driverPid": 62727,
+		"code": 0,
+		"gates": [
+			"native 1 exact source/all ranges/directions/primary/caret and independent edit+Undo acceptance"
+		]
+	},
+	{
+		"arm": "receipt-only",
+		"trial": 2,
+		"count": 512,
+		"stage": "terminal",
+		"driverPid": 62942,
+		"code": 0,
+		"gates": [
+			"native 512 exact source/all ranges/directions/primary/caret and independent edit+Undo acceptance"
+		]
+	},
+	{
+		"arm": "combined",
+		"trial": 2,
+		"count": 512,
+		"stage": "terminal",
+		"driverPid": 63161,
+		"code": 0,
+		"gates": [
+			"native 512 exact source/all ranges/directions/primary/caret and independent edit+Undo acceptance"
+		]
+	}
+]

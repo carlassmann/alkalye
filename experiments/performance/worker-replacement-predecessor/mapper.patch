@@ -1,0 +1,61 @@
+--- /tmp/alkalye-worker-replacement-predecessor/receipt-only-src/client/worker-document/worker-editor-basis.ts	2026-10-09 01:46:24
++++ /tmp/alkalye-worker-replacement-predecessor/combined-src/client/worker-document/worker-editor-basis.ts	2026-10-09 01:46:24
+@@ -490,7 +490,57 @@
+ 	})
+ }
+ 
+-function mapSelectionBoundaries(
++function mapSelectionBoundaries(previous: Atom[], next: Atom[], offsets: number[]) {
++	let requests = [...new Set(offsets)].sort((left, right) => left - right)
++	if (previous === next) return new Map(requests.map(offset => [offset, offset]))
++	let resolved = new Map<number, number>()
++	let anchors = new Map<number, { id: string; inside: number; predecessor?: string }>()
++	let wanted = new Set<string>()
++	let request = 0
++	let position = 0
++	let predecessor: string | undefined
++	if (requests[0] === 0) {
++		resolved.set(0, 0)
++		request++
++	}
++	for (let atom of previous) {
++		let offset = requests[request]
++		while (atom.value.length && offset !== undefined && offset <= position + atom.value.length) {
++			anchors.set(offset, { id: atom.id, inside: offset - position, predecessor })
++			wanted.add(atom.id)
++			if (predecessor !== undefined) wanted.add(predecessor)
++			offset = requests[++request]
++		}
++		position += atom.value.length
++		predecessor = atom.id
++		if (request === requests.length) break
++	}
++	if (!wanted.size) return resolved
++	let positions = new Map<string, { start: number; end: number }>()
++	position = 0
++	for (let atom of next) {
++		if (wanted.has(atom.id)) {
++			positions.set(atom.id, { start: position, end: position + atom.value.length })
++			if (positions.size === wanted.size) break
++		}
++		position += atom.value.length
++	}
++	for (let [offset, anchor] of anchors) {
++		let mapped = positions.get(anchor.id)
++		if (mapped) {
++			resolved.set(offset, mapped.start + Math.min(anchor.inside, mapped.end - mapped.start))
++		} else if (anchor.predecessor === undefined) {
++			resolved.set(offset, 0)
++		} else {
++			let preceding = positions.get(anchor.predecessor)
++			if (!preceding) return mapSelectionBoundariesFallback(previous, next, offsets)
++			resolved.set(offset, preceding.end)
++		}
++	}
++	return resolved
++}
++
++function mapSelectionBoundariesFallback(
+ 	previous: readonly Atom[],
+ 	next: readonly Atom[],
+ 	offsets: number[],

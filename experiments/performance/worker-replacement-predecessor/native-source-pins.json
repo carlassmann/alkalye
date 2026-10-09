@@ -1,0 +1,18 @@
+{
+	"receipt-only": {
+		"shared/crdt.ts": "e61d7819830f0a6ab9adb4ed15b58870c50e912bc4f9564d56ab3379bdb6bc2b",
+		"shared/document-session.ts": "f49813ffb4e8dbcee1dddba26e58207efd464e14fda56d6e9b184f7b3c36420f",
+		"client/worker-document/worker-opened-capabilities.ts": "834abdd3a085cf5b3a9463bd24ffbd590c3f8672503f4d17981483edf37db004",
+		"client/worker-document/worker-session.ts": "f7a873027e50deb2f42255975f5242016021ec47f6a2b3f643c3263b5520d1da",
+		"client/worker-document/worker-opened-observation.ts": "cb697a5c684020a63ca762af21bffd1fdd701f587763f902f331a5c897e30e17",
+		"client/worker-document/worker-editor-basis.ts": "00c42f76544814d151dbb25f1b89af999d9e212cf2cd539fd00e66cbfcfe634d"
+	},
+	"combined": {
+		"shared/crdt.ts": "e61d7819830f0a6ab9adb4ed15b58870c50e912bc4f9564d56ab3379bdb6bc2b",
+		"shared/document-session.ts": "f49813ffb4e8dbcee1dddba26e58207efd464e14fda56d6e9b184f7b3c36420f",
+		"client/worker-document/worker-opened-capabilities.ts": "834abdd3a085cf5b3a9463bd24ffbd590c3f8672503f4d17981483edf37db004",
+		"client/worker-document/worker-session.ts": "f7a873027e50deb2f42255975f5242016021ec47f6a2b3f643c3263b5520d1da",
+		"client/worker-document/worker-opened-observation.ts": "cb697a5c684020a63ca762af21bffd1fdd701f587763f902f331a5c897e30e17",
+		"client/worker-document/worker-editor-basis.ts": "fa11ec4ff09406dec6300873a4883d04e21664dc5251a804f03106aaef3275ac"
+	}
+}

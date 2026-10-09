@@ -1,0 +1,115 @@
+import * as Effect from "effect/Effect"
+import { commandIntentDigest } from "./src/client/worker-document/command-intent"
+import { createWorkerSessionClient } from "./src/client/worker-document/worker-client"
+
+type Worker = Effect.Success<ReturnType<typeof createWorkerSessionClient>>
+
+export function verifyRequestedAnchors(
+ worker: Worker,
+ subject:string,document:string,
+ source: string,
+ peer: (source: string) => Effect.Effect<void, unknown>,
+ check: (condition: unknown, message: string) => void,
+) {
+ return Effect.gen(function* () {
+  if (!source.startsWith("A😀") || source.length<1536) throw Error("Dedicated Unicode512 seed required")
+  let basis = yield* worker.Begin()
+  check(basis.source === source, "real worker Begin exact seed")
+  let ranges: {start:number;end:number;direction:"forward"|"backward"|"none"}[] = []
+  for (let index=0;index<512;index++) {
+   let start=(index*3)%source.length
+   ranges.push({start,end:Math.min(source.length,start+1),direction:index%2?"backward":"forward"})
+  }
+  let unchanged = yield* worker.MergeCandidate({epoch:basis.epoch,sequence:basis.sequence,start:2,end:3,ranges})
+  check(unchanged.source===source && unchanged.start===2 && unchanged.end===3, "stable Unicode intra-atom boundaries preserved")
+  check(JSON.stringify(unchanged.ranges)===JSON.stringify(ranges), "all512 stable ranges and directions preserved")
+  yield* worker.ReleaseCandidate({candidate:unchanged.candidate})
+  yield* peer("PEER"+source)
+  yield* worker.Synchronize()
+  let inserted = yield* worker.MergeCandidate({epoch:basis.epoch,sequence:basis.sequence,start:2,end:3,ranges})
+  check(inserted.source==="PEER"+source && inserted.start===6 && inserted.end===7, "remote prefix shifts Unicode intra-atom anchors exactly")
+  let expected = ranges.map(range=>({...range,start:range.start?range.start+4:0,end:range.end?range.end+4:0}))
+  check(JSON.stringify(inserted.ranges)===JSON.stringify(expected), "all512 remote ranges preserve offset-zero affinity and directions")
+  yield* worker.Adopt({epoch:basis.epoch,sequence:basis.sequence,candidate:inserted.candidate})
+  let adopted = yield* worker.EditorRead()
+  if (adopted.epoch===undefined || adopted.sequence===undefined) throw Error("Missing adopted editor epoch")
+  check(adopted.source===inserted.source, "Adopt keeps exact source/new epoch")
+  let stale = yield* worker.MergeCandidate({epoch:basis.epoch,sequence:basis.sequence,start:0,end:0}).pipe(Effect.result)
+  check(stale._tag==="Failure", "old epoch rejected without mutation")
+  check((yield* worker.EditorRead()).source===adopted.source, "stale mapping leaves exact source unchanged")
+  yield* peer("PEER"+source.slice(1))
+  yield* worker.Synchronize()
+  let deleted = yield* worker.MergeCandidate({epoch:adopted.epoch,sequence:adopted.sequence,start:5,end:5})
+  check(deleted.source==="PEER"+source.slice(1) && deleted.start===4 && deleted.end===4, "removed anchor maps to exact surviving predecessor through original fallback")
+  yield* worker.ReleaseCandidate({candidate:deleted.candidate})
+  let input={epoch:adopted.epoch,sequence:adopted.sequence+1,admissionEpoch:0,ranges:[{start:adopted.source.length,remove:0,text:"x"}]}
+  let intentDigest=yield* commandIntentDigest({subject,document,...input})
+  let receipt=yield* worker.ReplaceReceipt({...input,intentDigest})
+  check(receipt.agreement&&receipt.intentDigest===intentDigest,"authenticated queued receipt preserves exact intent")
+  let insertedLocal=yield* worker.EditorRead()
+  check(insertedLocal.source===adopted.source+"x", "local queued basis preserves its exact stale source")
+  yield* worker.Synchronize()
+  let undone=yield* worker.UndoQueued({request:crypto.randomUUID(),epoch:adopted.epoch,sequence:adopted.sequence+2,redo:false,admissionEpoch:0})
+  check(undone.status==="applied", "real accepted local insertion Undo applies once")
+  let missing=yield* worker.MergeCandidate({epoch:adopted.epoch,sequence:adopted.sequence+2,start:insertedLocal.source.length,end:insertedLocal.source.length})
+  let final="PEER"+source.slice(1)
+  check(missing.source===final && missing.start===final.length && missing.end===final.length, "local Undo deleted-anchor fallback preserves exact tail caret and peer deletion")
+  yield* worker.ReleaseCandidate({candidate:missing.candidate})
+  let repeatedRanges:{start:number;end:number;direction:"forward"|"backward"|"none"}[]=ranges.map((range)=>({start:insertedLocal.source.length,end:insertedLocal.source.length,direction:range.direction}))
+  let repeated=yield* worker.MergeCandidate({epoch:adopted.epoch,sequence:adopted.sequence+2,start:insertedLocal.source.length,end:insertedLocal.source.length,ranges:repeatedRanges})
+  check(repeated.source===final&&JSON.stringify(repeated.ranges)===JSON.stringify(repeatedRanges.map(range=>({...range,start:final.length,end:final.length}))),"repeated released Undo candidate preserves all512 tail boundaries/directions")
+  yield* worker.ReleaseCandidate({candidate:repeated.candidate})
+  let redoInput={request:crypto.randomUUID(),epoch:adopted.epoch,sequence:adopted.sequence+3,redo:true,admissionEpoch:0}
+  let redone=yield* worker.UndoQueued(redoInput)
+  check(redone.status==="applied","accepted Redo applies after released Undo candidate")
+  let redoCandidate=yield* worker.MergeCandidate({epoch:adopted.epoch,sequence:adopted.sequence+3,start:insertedLocal.source.length,end:insertedLocal.source.length})
+  check(redoCandidate.source===final+"x"&&redoCandidate.start===final.length+1&&redoCandidate.end===final.length+1,"Redo reconciliation preserves peer deletion and tail caret")
+  yield* worker.Adopt({epoch:adopted.epoch,sequence:adopted.sequence+3,candidate:redoCandidate.candidate})
+  let fresh=yield* worker.EditorRead()
+  if(fresh.epoch===undefined||fresh.sequence===undefined)throw Error("Missing reconciled editor basis")
+  check(fresh.source===final+"x","Adopt publishes exact reconciled Redo source")
+  let retained=yield* worker.UndoQueued(redoInput)
+  check(retained.status==="applied"&&(yield* worker.EditorRead()).source===fresh.source,"cached Redo receipt cannot alter newly adopted basis")
+  let laterInput={epoch:fresh.epoch,sequence:fresh.sequence+1,admissionEpoch:0,ranges:[{start:fresh.source.length,remove:0,text:"y"}]}
+  let laterDigest=yield* commandIntentDigest({subject,document,...laterInput})
+  yield* worker.ReplaceReceipt({...laterInput,intentDigest:laterDigest})
+  check((yield* worker.EditorRead()).source===fresh.source+"y","later admitted local edit uses newly adopted exact source")
+  yield* worker.Synchronize()
+  let laterUndo=yield* worker.UndoQueued({request:crypto.randomUUID(),epoch:fresh.epoch,sequence:fresh.sequence+2,redo:false,admissionEpoch:0})
+  check(laterUndo.status==="applied","later accepted Undo applies after policy lifecycle reset")
+  let laterCandidate=yield* worker.MergeCandidate({epoch:fresh.epoch,sequence:fresh.sequence+2,start:fresh.source.length+1,end:fresh.source.length+1})
+  check(laterCandidate.source===fresh.source&&laterCandidate.start===fresh.source.length&&laterCandidate.end===fresh.source.length,"later Undo restores exact source/caret after Adopt and new edit")
+  yield* worker.ReleaseCandidate({candidate:laterCandidate.candidate})
+  yield* worker.Synchronize()
+  yield* peer("PEER"+source.slice(1020))
+  yield* worker.Synchronize()
+  let longDeleted=yield* worker.MergeCandidate({epoch:fresh.epoch,sequence:fresh.sequence+2,start:1004,end:1023})
+  check(longDeleted.source==="PEER"+source.slice(1020) && longDeleted.start===4 && longDeleted.end===4, "long removed predecessor chain maps to baseline surviving prefix")
+  yield* worker.ReleaseCandidate({candidate:longDeleted.candidate})
+
+ })
+}
+
+export function verifyReplacementInverse(worker:Worker,subject:string,document:string,count:number,check:(condition:unknown,message:string)=>void) {
+ return Effect.gen(function*(){
+   let replacementSource = "TOKEN😀\n".repeat(count)
+   let replacementBasis = yield* worker.Begin()
+   check(replacementBasis.source === replacementSource, "replacement Begin exact accepted Unicode source " + count)
+   let replacements = Array.from({length: count}, (_, index) => ({start: index * 8, remove: 5, text: "x"}))
+   let replacementInput = {epoch:replacementBasis.epoch,sequence:replacementBasis.sequence+1,admissionEpoch:0,ranges:replacements}
+   let replacementDigest = yield* commandIntentDigest({subject,document,...replacementInput})
+   yield* worker.ReplaceReceipt({...replacementInput,intentDigest:replacementDigest})
+   yield* worker.Synchronize()
+   let replacementEdited = "x😀\n".repeat(count)
+   check((yield* worker.EditorRead()).source === replacementEdited, "replacement accepted exact edited source " + count)
+   let replacementUndo = yield* worker.UndoQueued({request:crypto.randomUUID(),epoch:replacementBasis.epoch,sequence:replacementBasis.sequence+2,redo:false,admissionEpoch:0})
+   check(replacementUndo.status === "applied", "replacement accepted Undo applied " + count)
+   let replacementRanges: {start:number;end:number;direction:"backward"|"forward"}[] = Array.from({length:count},(_,index) => ({start:index*4+1,end:index*4+1,direction: index % 2 ? "backward" : "forward"}))
+   let replacementCandidate = yield* worker.MergeCandidate({epoch:replacementBasis.epoch,sequence:replacementBasis.sequence+2,start:1,end:1,ranges:replacementRanges})
+   check(replacementCandidate.source === replacementSource && replacementCandidate.start === 0 && replacementCandidate.end === 0, "replacement Undo source and primary deleted-anchor mapping " + count)
+   check(JSON.stringify(replacementCandidate.ranges) === JSON.stringify(replacementRanges.map((range,index) => ({...range,start:index*8,end:index*8}))), "replacement Undo every range/direction equals full mapper " + count)
+   yield* worker.ReleaseCandidate({candidate:replacementCandidate.candidate})
+   yield* worker.Synchronize()
+
+ })
+}

@@ -1,0 +1,32 @@
+**No semantic blockers. One real performance pitfall: in the Undo case this change targets, the fast path usually falls through to the full scan, so it costs more than receipt-only.** This was a read-only review; I ran nothing. Only `client/worker-document/worker-editor-basis.ts` differs between the two trees (pins `00c42f76…` vs `fa11ec4f…`); `crdt.ts` is `e61d7819…` in both.
+
+**Semantics: matches the full fallback in every case.**
+- **Anchor atom survives:** both give `start + inside`.
+- **Anchor deleted, immediate predecessor survives:** both give the predecessor's end. The fallback keeps the last surviving atom before the anchor, which here is that predecessor. This includes zero-length predecessors, since both track every atom.
+- **Anchor deleted, no predecessor:** both give 0.
+- **Anchor and predecessor both deleted:** the new code returns the full fallback result.
+- **Boundary offsets:** both attach an offset to the atom on its left (`<=`), so the two versions agree.
+- **Offset 0:** both special-case it the same way.
+- **Offsets past the end:** the new `previous === next` shortcut maps them to themselves, while the fallback leaves them out. Unreachable, because `MergeCandidate` checks `end ≤ length` on the selection and every range first.
+- **Unicode:** atoms hold one code point each (`Array.from` in `crdt.ts:1236`), so an offset only falls inside an atom between the two halves of a surrogate pair (`inside=1`). Both versions keep that split position, so nothing new.
+- **Duplicate atom ids in one view:** the fast path keeps the first match and the fallback the last. I found no case: the `id:""` literal atoms are only built in `inverseHeader`, and `inverse()` gives them new ids. Not proven for frontmatter reordering in `sourceAtomsSteps`.
+- **Identity shortcut:** after Adopt, `local` is a fork that shares the session's view arrays. Undo then Redo on the session puts back `receipt.after.atoms`, so `previous === next` holds. Same array means same text, so returning offsets unchanged is correct. After `ReplaceQueued`, local and session each build their own array, so expect the shortcut to fire only after Adopt with no local edit since. Count hits before crediting any speedup to it.
+
+**Performance:**
+1. **The fallback fires on the main Undo case.** After typing ≥2 code points with the caret at the end, the caret attaches to the last inserted atom. Undo deletes it and its predecessor (also inserted), so the fallback runs. The cost is then a scan of `previous` up to the anchor, a full scan of `next`, then the whole fallback (n allocations plus two scans). That is worse than receipt-only. A replacement with ≥2 inserted chars behaves the same.
+2. **The `next` scan can't stop early when an anchor atom is deleted.** It stops only when `positions.size === wanted.size`, and a deleted id is never found, so every deleted-anchor case scans all of `next`. That includes the cases that succeed through the predecessor.
+3. **The gain is fewer allocations, not fewer scans.** Allocations drop from O(n) (the fallback's `nextPositions` holds one object per atom) to O(k). Scans stay O(n) whenever the anchor is near the end of the document or deleted: the `previous` scan runs up to the last anchor, and the `next` scan up to the last id it wants or to the end. Don't describe it as O(k) overall.
+4. Without timings between the `Merge:map-start`/`map-done` marks and counts of fallback hits and shortcut hits, nothing says the mapper dominates `MergeCandidate`. That fits the earlier n1 result (predecessor mapper alone, no whole-worker gain). I'm not attributing the cause to anything.
+
+**Minor (prototype only):**
+- The parameters changed from `readonly Atom[]` to `Atom[]`.
+- The `while` line will fail the formatter.
+- The stray `performance.mark("mapping-policy:original")`, indented with spaces, is in both trees.
+
+**Before native n3:**
+- Record per call: fast path vs fallback vs shortcut, plus atoms scanned in `previous` and in `next`.
+- If item 1 shows up in the Undo journeys, the minimal fix is to check, during the `previous` scan, whether the anchor's predecessor is itself deleted, and if so go straight to the fallback. Its cost is in item 1 ("previous" scan, full `next` scan, then fallback); this saves only the full `next` scan. I didn't verify this.
+
+Not proved: whether the empty and lone-surrogate controls fail auth before mapping (as you said).
+
+Separately, several claude.ai connectors (GitHub, Slack, Notion and others) need authorizing in claude.ai connector settings before they can be used. This review didn't need them.

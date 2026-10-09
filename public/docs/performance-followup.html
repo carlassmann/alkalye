@@ -1489,6 +1489,28 @@
 			19.589ms to 20.336ms, so the frame budget remains unmet. Evidence:
 			<code>experiments/performance/open-entry-reuse</code>.
 		</p>
+		<h2>Repeated worker selection mapping comparison</h2>
+		<p>
+			Twelve fresh native cells compared the published replacement receipt alone
+			with a requested-anchor mapper that preserves the full fallback. Across
+			three repetitions per case, median worker Undo maxima improved 96→17ms
+			(one range) and 116→29ms (512 ranges). Source observer readiness improved
+			347→267ms and 378→291ms. Every source, selection/direction, caret and
+			independent server-acceptance check passed; arm order alternated.
+		</p>
+		<p>
+			Main task medians remained similar (6.23→6.32ms and 4.48→4.68ms); main
+			total work increased. Saved medians improved slightly, but the 512-range
+			tail worsened 1339→1383ms. Candidate worker tails remained 24–29ms, above
+			8.33ms, and typing worker peaks remained around 160–165ms. These are
+			experimental worker results, not a production-worker cutover or physical
+			120Hz proof. The captures contain no mapper path-hit counters.
+		</p>
+		<p>
+			Evidence:
+			<code>experiments/performance/worker-replacement-predecessor</code>. The
+			next target is the remaining queue/merge delay before source publication.
+		</p>
 		<h2>Validated replacement Undo cache</h2>
 		<p>
 			A private receipt retains the authoritative before/after views of a

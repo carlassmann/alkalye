@@ -1,0 +1,2 @@
+native-series.ts(30,200): error TS2322: Type '"stdout"' is not assignable to type 'Readable'.
+native-series.ts(35,5): error TS4104: The type 'readonly string[]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
