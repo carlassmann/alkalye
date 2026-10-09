@@ -117,6 +117,24 @@
 			<code>experiments/performance/interaction-parity-7d</code> and
 			<code>experiments/performance/main-multicursor-save-gate</code>.
 		</p>
+		<h2>Skip unchanged viewport repainting</h2>
+		<p>
+			Production change <code>754c9d6</code> skips repainting the visible editor
+			when background measurement only changes later blocks. Three alternating
+			control/candidate pairs used eight trusted wheel events on the same rich
+			1MiB document. Median main-thread work over three seconds fell from
+			223.183 to 206.779ms (7.35%). Highlight callbacks fell from about 168 to
+			eight; all cells still measured 181 blocks. Source, caret and
+			independently accepted state stayed unchanged.
+		</p>
+		<p>
+			Worst task time was 4.727ms before and 4.849ms after; this is less total
+			work, not a peak-task improvement. All six cells stayed below 8.33ms per
+			task. Same-width height growth, native selection and the production
+			viewport journey passed browser checks. The remaining measurement work
+			still runs; physical 120Hz presentation remains unmeasured. Evidence:
+			<code>experiments/performance/viewport-idle-paint</code>.
+		</p>
 		<h2>Incremental projection during typing</h2>
 		<p>
 			Three alternating production comparisons typed at the same midpoint in a
