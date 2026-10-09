@@ -97,6 +97,9 @@ export interface DocumentTransport {
 	chain?(document: string, id: string): Effect.Effect<ActionChain, unknown>
 	withdraw?(action: DocumentAction): Effect.Effect<void, unknown>
 	commit(action: DocumentAction): Effect.Effect<number, unknown>
+	commitBatch?(
+		actions: readonly DocumentAction[],
+	): Effect.Effect<readonly number[], unknown>
 	history(
 		document: string,
 		after: number,
@@ -115,6 +118,7 @@ export interface PassiveDocumentState {
 	generation?: number
 }
 export interface DocumentSessionOptions {
+	batchTyping?: boolean
 	cooperativeWork?: boolean
 	passiveState?: {
 		read: Effect.Effect<PassiveDocumentState | undefined>
@@ -366,17 +370,55 @@ function makeSession(options: DocumentSessionOptions) {
 				Effect.onError(() => projection.discardPreparedOpen),
 			)
 		let persist = (value: Recording) => gate.withPermit(persistUnlocked(value))
+		let typingGroup = 0
+		let typingSequence = 0
+		let typingGroups = new Map<string, number>()
+		let typingBatch:
+			| { action: DocumentAction; originals: readonly DocumentAction[] }
+			| undefined
 		let rawFlushUnlocked: Effect.Effect<void, DocumentFailure> = Effect.gen(
 			function* () {
 				while (Queue.sizeUnsafe(unsaved)) {
-					let action = yield* Queue.peek(unsaved)
+					let first = yield* Queue.peek(unsaved)
 					yield* recovery.attempt("projection", projection.replay)
-					if (projection.proposed(action.id))
-						yield* projection.validate({ kind: "proposed", action })
-					else yield* persistUnlocked({ kind: "proposed", action })
-					yield* Queue.take(unsaved)
-					projection.removeDraft(action.id)
-					publishDraftStatus()
+					if (!typingBatch) {
+						let originals = options.batchTyping
+							? projection.typingDrafts(
+									first,
+									id => typingGroups.get(id) === typingGroups.get(first.id),
+								)
+							: [first]
+						let last = originals.at(-1) ?? first
+						let combined = Schema.decodeUnknownResult(DocumentActionSchema)({
+							...last,
+							changes: originals.flatMap(action => action.changes),
+						})
+						typingBatch =
+							combined._tag === "Success"
+								? { action: combined.success, originals }
+								: { action: first, originals: [first] }
+					}
+					let batch = typingBatch
+					if (projection.proposed(batch.action.id))
+						yield* projection.validate({
+							kind: "proposed",
+							action: batch.action,
+						})
+					else
+						yield* persistUnlocked({ kind: "proposed", action: batch.action })
+					yield* Effect.uninterruptible(
+						Effect.gen(function* () {
+							for (let original of batch.originals) {
+								let queued = yield* Queue.take(unsaved)
+								if (queued.id !== original.id)
+									return yield* conflict("Typing batch lost its draft order")
+								projection.removeDraft(original.id)
+								typingGroups.delete(original.id)
+							}
+							typingBatch = undefined
+							publishDraftStatus()
+						}),
+					)
 				}
 			},
 		).pipe(
@@ -478,6 +520,20 @@ function makeSession(options: DocumentSessionOptions) {
 				),
 			}
 		}
+		function waitForTyping(
+			remaining = 4,
+			sequence = typingSequence,
+		): Effect.Effect<void, DocumentFailure> {
+			return Effect.sleep("250 millis").pipe(
+				Effect.andThen(
+					Effect.suspend(() =>
+						remaining === 1 || sequence === typingSequence
+							? flush
+							: waitForTyping(remaining - 1),
+					),
+				),
+			)
+		}
 		function submitEdit(operation: Operation | null, target: string) {
 			let unchanged = {
 				operation: null,
@@ -506,6 +562,8 @@ function makeSession(options: DocumentSessionOptions) {
 					...unchanged,
 					saved: conflict("This document session is closed"),
 				}
+			typingGroups.set(decoded.success.id, typingGroup)
+			typingSequence++
 			projection.replica.apply([operation])
 			projection.addDraft(decoded.success)
 			drafts.update()
@@ -514,12 +572,15 @@ function makeSession(options: DocumentSessionOptions) {
 				operation: freezeOperation(operation),
 				content: view.text(target),
 				atoms: view.visible(target),
-				saved: flush,
+				saved: options.batchTyping ? waitForTyping() : flush,
 			}
 		}
 
 		return {
 			replica: view,
+			closeTypingGroup: () => {
+				typingGroup++
+			},
 			version: () => SubscriptionRef.getUnsafe(revision),
 			changes: SubscriptionRef.changes(revision),
 			failures: recovery.failures,
@@ -641,6 +702,20 @@ function makeSession(options: DocumentSessionOptions) {
 								})
 								yield* pull()
 								continue
+							}
+							if (options.transport.commitBatch) {
+								let batch = projection.outboundBatch()
+								if (batch.length > 1) {
+									let result = yield* Effect.result(
+										options.transport.commitBatch(batch),
+									)
+									if (result._tag === "Success") {
+										yield* pull()
+										continue
+									}
+									if (!Schema.is(rejectionFailure)(result.failure))
+										return yield* Effect.fail(result.failure)
+								}
 							}
 							yield* options.transport.commit(action).pipe(
 								Effect.catch(error => {
@@ -1396,6 +1471,21 @@ function makeProjection(options: DocumentSessionOptions) {
 						closure: partition.blocked.map(action => action.id),
 					} satisfies Recording
 				}),
+			outboundBatch() {
+				let result: DocumentAction[] = []
+				let bytes = 0
+				for (let [id, proposal] of proposals) {
+					if (proposal.settled) continue
+					if (rejected.has(id)) break
+					let action = pending.get(id)
+					if (!action) break
+					let size = new TextEncoder().encode(JSON.stringify(action)).length
+					if (result.length === 64 || bytes + size > 2_000_000) break
+					bytes += size
+					result.push(action)
+				}
+				return result
+			},
 			outbound() {
 				for (let [id, proposal] of proposals) {
 					if (proposal.settled) continue
@@ -1412,6 +1502,28 @@ function makeProjection(options: DocumentSessionOptions) {
 				return undefined
 			},
 			rejected: () => Object.freeze([...rejected.values()]),
+			typingDrafts(first: DocumentAction, belongs: (id: string) => boolean) {
+				let result: DocumentAction[] = []
+				let target = first.changes[0]?.target
+				for (let action of drafts.values()) {
+					if (
+						result.length === 64 ||
+						!belongs(action.id) ||
+						action.label !== "Type" ||
+						action.undoOf ||
+						action.actor !== first.actor ||
+						action.document !== first.document ||
+						action.guards.length ||
+						action.accessGuards.length ||
+						action.changes.some(
+							change => change.kind !== "text" || change.target !== target,
+						)
+					)
+						break
+					result.push(action)
+				}
+				return result[0]?.id === first.id ? result : [first]
+			},
 			addDraft(action: DocumentAction) {
 				drafts.set(action.id, freezeAction(action))
 				draftVersion++

@@ -93,6 +93,19 @@ export function makeDocumentTransport(origin: string, subject: string) {
 						Effect.timeout("20 seconds"),
 						observability.observe("withdraw"),
 					),
+			commitBatch: (actions: readonly DocumentAction[]) => {
+				let first = actions[0]
+				if (!first)
+					return Effect.fail(
+						new DocumentConflict({ message: "Missing batch action" }),
+					)
+				return api.documents
+					.commitBatch({
+						params: { document: first.document },
+						payload: { actions: [...actions] },
+					})
+					.pipe(Effect.timeout("20 seconds"), observability.observe("commit"))
+			},
 			commit: (action: DocumentAction) =>
 				api.documents
 					.commit({
