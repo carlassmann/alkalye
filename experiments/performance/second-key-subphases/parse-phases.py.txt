@@ -1,0 +1,40 @@
+import pathlib,json,hashlib
+root=pathlib.Path('/tmp/alkalye-second-key-subphases')
+terminal=json.loads((root/'diagnostic-terminal.json').read_text())
+if terminal['exit']!=0:raise RuntimeError('Failed diagnostic: attribution not valid')
+resultfile=next(pathlib.Path(terminal['run']).glob('results/*/results.json'))
+result=json.loads(resultfile.read_text())[0]
+if result['status']!='measured-complete':raise RuntimeError('Incomplete public source/receipt proof')
+trace=pathlib.Path(result['trace']);payload=json.loads(trace.read_text());events=payload.get('traceEvents',[]) if isinstance(payload,dict) else payload
+start=next(e for e in events if e.get('name')=='interaction:start');owner=(start['pid'],start['tid'])
+end=next(e['ts'] for e in events if e.get('name')=='interaction:end' and (e.get('pid'),e.get('tid'))==owner and e['ts']>start['ts'])
+owned=sorted([e for e in events if (e.get('pid'),e.get('tid'))==owner],key=lambda e:e['ts'])
+phases=[];pending={}
+for e in owned:
+ name=e.get('name','')
+ if name.startswith('second-key:') and start['ts']<=e['ts']<end:
+  key,state=name.removeprefix('second-key:').rsplit('-',1)
+  if state=='start':
+   if key in pending:raise RuntimeError('Unpaired phase start')
+   pending[key]=e['ts']
+  elif state=='end':
+   if key not in pending:raise RuntimeError('Unpaired phase end')
+   a=pending.pop(key);phases.append({'phase':key,'start':a,'end':e['ts'],'durationMs':(e['ts']-a)/1000})
+if pending:raise RuntimeError('Incomplete input callback phase')
+keys=[]
+for phase in [p for p in phases if p['phase']=='text-input']:
+ group=[phase]
+ for name in ['change','update']:
+  p=next((p for p in phases if p['phase']==name and p['start']>=group[-1]['end']),None)
+  if p is None:raise RuntimeError('Missing successful callback phase')
+  group.append(p)
+ a=group[0]['start'];b=group[-1]['end']
+ task=next((e for e in owned if e.get('name')=='RunTask' and e.get('dur') and e['ts']<=a and e['ts']+e['dur']>=b),None)
+ if task is None:raise RuntimeError('Phase group crosses task')
+ metadata=[e for e in owned if e.get('name','').startswith('undo-residual:certified-token-metadata-') and a<=e['ts']<=phase['end']]
+ gc=[e for e in owned if e.get('name') in ['MinorGC','MajorGC'] and e.get('dur') and e['ts']<b and e['ts']+e['dur']>a]
+ keys.append({'keyOrdinal':len(keys)+1,'taskDurationMs':task['dur']/1000,'phases':[{**p,'startMs':(p['start']-start['ts'])/1000,'endMs':(p['end']-start['ts'])/1000} for p in group],'metadataMarksNestedNotAdditive':[{'name':e['name'],'ms':(e['ts']-start['ts'])/1000} for e in metadata],'nestedGCSpansNotAdditive':[{'name':e['name'],'durationMs':e['dur']/1000} for e in gc]})
+if len(keys)!=8:raise RuntimeError('Expected exact eight burst callbacks, prime excluded')
+out={'scope':'one marked production diagnostic; successful source/native/caret/independent receipts required; phases inclusive, metadata nested, no algorithm win','owner':owner,'tracePath':str(trace),'traceSHA256':hashlib.sha256(trace.read_bytes()).hexdigest(),'traceBytes':trace.stat().st_size,'keys':keys}
+(root/'phase-attribution.json').write_text(json.dumps(out,indent=2)+'\n')
+print(json.dumps([{'key':k['keyOrdinal'],'taskMs':k['taskDurationMs'],'phasesMs':{p['phase']:p['durationMs'] for p in k['phases']}} for k in keys]))

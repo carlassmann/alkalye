@@ -1,0 +1,22 @@
+{
+  "baseline": "b5577ba899b46ef5900b21328535409a6c5fe99c",
+  "deltaBase": "prior three-phase diagnostic marked source",
+  "execution": "UNRUN",
+  "modules": [
+    {
+      "module": "src/client/components/editor.ts",
+      "priorMarkedSHA256": "10d23185149169cb958c2023cfb1c5c6ed4024ee8b6b6e3d1e521d24741a57aa",
+      "nextMarkedSHA256": "9e9c50ae7ebc7fa4545171c0f37a18bed2d7f12785f160b13aeca3115309dc98"
+    },
+    {
+      "module": "src/client/document-app.ts",
+      "priorMarkedSHA256": "31a2fa7465d3fc2fcf6a64e5635c64c30d11128daa8918c8708d7d833c223a27",
+      "nextMarkedSHA256": "a7936842949259c8ebe40b080937edde1277789b976024bc359712b78c4d12b6"
+    },
+    {
+      "module": "src/shared/document-session.ts",
+      "priorMarkedSHA256": "c722424c43d79489756b7c4c8437e56154410101f87de9434e0dbe969ad9230d",
+      "nextMarkedSHA256": "4c62605b5588680891a6bfb0358e8c629e34ec3ca7287b6fcc6a2a9120e823c2"
+    }
+  ]
+}

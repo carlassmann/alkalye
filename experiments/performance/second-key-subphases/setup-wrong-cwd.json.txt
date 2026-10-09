@@ -1,0 +1,1 @@
+{"phase": "before-keys", "firstPreparationExit": 1, "reason": "tsc/build invoked root rather than app-runtime cwd", "correction": "same already assembled source; correct app-runtime cwd; no browser/server/native actions existed", "originalLogs": "not retained; overwritten by corrected redirections; do not claim byte-preserved"}

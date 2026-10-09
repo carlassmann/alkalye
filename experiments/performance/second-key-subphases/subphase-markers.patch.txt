@@ -1,0 +1,89 @@
+--- a/src/client/components/editor.ts
++++ b/src/client/components/editor.ts
+@@ -269,7 +269,10 @@
+ 		updateHighlight()
+ 		if (composing) return
+ 		performance.mark("second-key:change-start")
+-		let edit = options.change(source, atoms, text.takeReplacements())
++		performance.mark("second-key:take-replacements-start")
++		let replacements = text.takeReplacements()
++		performance.mark("second-key:take-replacements-end")
++		let edit = options.change(source, atoms, replacements)
+ 		performance.mark("second-key:change-end")
+ 		performance.mark("second-key:update-start")
+ 		if (edit) update(edit.content, edit.atoms, editable)
+--- a/src/client/document-app.ts
++++ b/src/client/document-app.ts
+@@ -1867,7 +1867,9 @@
+ 						let edit = replacements
+ 							? selected.opened.session.replace(replacements, base)
+ 							: selected.opened.session.edit(content, base)
++						performance.mark("second-key:launch-saved-start")
+ 						launch(edit.saved)
++						performance.mark("second-key:launch-saved-end")
+ 						requestRefresh(true)
+ 						return edit
+ 					},
+--- a/src/shared/document-session.ts
++++ b/src/shared/document-session.ts
+@@ -479,11 +479,13 @@
+ 			}
+ 		}
+ 		function submitEdit(operation: Operation | null, target: string) {
++			performance.mark("second-key:before-view-start")
+ 			let unchanged = {
+ 				operation: null,
+ 				content: view.text(target),
+ 				atoms: view.visible(target),
+ 			}
++			performance.mark("second-key:before-view-end")
+ 			if (!operation) return { ...unchanged, saved: Effect.void }
+ 			let decoded = Schema.decodeUnknownResult(DocumentActionSchema)({
+ 				id: operation.id,
+@@ -506,16 +508,27 @@
+ 					...unchanged,
+ 					saved: conflict("This document session is closed"),
+ 				}
++			performance.mark("second-key:apply-operation-start")
+ 			projection.replica.apply([operation])
++			performance.mark("second-key:apply-operation-end")
++			performance.mark("second-key:add-draft-start")
+ 			projection.addDraft(decoded.success)
++			performance.mark("second-key:add-draft-end")
++			performance.mark("second-key:update-drafts-start")
+ 			drafts.update()
++			performance.mark("second-key:update-drafts-end")
++			performance.mark("second-key:advance-view-start")
+ 			advanceView()
+-			return {
++			performance.mark("second-key:advance-view-end")
++			performance.mark("second-key:after-view-start")
++			let result = {
+ 				operation: freezeOperation(operation),
+ 				content: view.text(target),
+ 				atoms: view.visible(target),
+ 				saved: flush,
+ 			}
++			performance.mark("second-key:after-view-end")
++			return result
+ 		}
+ 
+ 		return {
+@@ -573,10 +586,13 @@
+ 				)
+ 					return oversizedEdit(target)
+ 				try {
+-					return submitEdit(
+-						projection.replica.prepareReplacements(target, replacements, base),
+-						target,
+-					)
++					performance.mark("second-key:prepare-replacements-start")
++					let operation = projection.replica.prepareReplacements(target, replacements, base)
++					performance.mark("second-key:prepare-replacements-end")
++					performance.mark("second-key:submit-edit-start")
++					let result = submitEdit(operation, target)
++					performance.mark("second-key:submit-edit-end")
++					return result
+ 				} catch (error) {
+ 					if (!(error instanceof RangeError)) throw error
+ 					return {

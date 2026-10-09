@@ -1,0 +1,340 @@
+{
+  "scope": "one marked production diagnostic; successful source/native/caret/independent receipts required; phases inclusive, metadata nested, no algorithm win",
+  "owner": [
+    32828,
+    22030039
+  ],
+  "tracePath": "/tmp/alkalye-second-key-subphases/marked-764d0139-c3a3-4c74-8680-8ea357ac4aa5/results/86f37b6f-6563-4189-8113-d698ea6e0e24/control-body-rich1m-0.trace.json",
+  "traceSHA256": "dd011e0b81fd5c8eb191b1eb3bb86a40641af4dd1784c46af7c7b3115dfdef57",
+  "traceBytes": 18666378,
+  "keys": [
+    {
+      "keyOrdinal": 1,
+      "taskDurationMs": 9.727,
+      "phases": [
+        {
+          "phase": "text-input",
+          "start": 429426721311,
+          "end": 429426727312,
+          "durationMs": 6.001,
+          "startMs": 0.584,
+          "endMs": 6.585
+        },
+        {
+          "phase": "change",
+          "start": 429426727323,
+          "end": 429426728172,
+          "durationMs": 0.849,
+          "startMs": 6.596,
+          "endMs": 7.445
+        },
+        {
+          "phase": "update",
+          "start": 429426728175,
+          "end": 429426728658,
+          "durationMs": 0.483,
+          "startMs": 7.448,
+          "endMs": 7.931
+        }
+      ],
+      "metadataMarksNestedNotAdditive": [
+        {
+          "name": "undo-residual:certified-token-metadata-start",
+          "ms": 1.13
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-end",
+          "ms": 4.284
+        }
+      ],
+      "nestedGCSpansNotAdditive": []
+    },
+    {
+      "keyOrdinal": 2,
+      "taskDurationMs": 23.448,
+      "phases": [
+        {
+          "phase": "text-input",
+          "start": 429426869414,
+          "end": 429426874114,
+          "durationMs": 4.7,
+          "startMs": 148.687,
+          "endMs": 153.387
+        },
+        {
+          "phase": "change",
+          "start": 429426874126,
+          "end": 429426889270,
+          "durationMs": 15.144,
+          "startMs": 153.399,
+          "endMs": 168.543
+        },
+        {
+          "phase": "update",
+          "start": 429426889273,
+          "end": 429426890199,
+          "durationMs": 0.926,
+          "startMs": 168.546,
+          "endMs": 169.472
+        }
+      ],
+      "metadataMarksNestedNotAdditive": [
+        {
+          "name": "undo-residual:certified-token-metadata-start",
+          "ms": 149.057
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-end",
+          "ms": 151.506
+        }
+      ],
+      "nestedGCSpansNotAdditive": []
+    },
+    {
+      "keyOrdinal": 3,
+      "taskDurationMs": 10.305,
+      "phases": [
+        {
+          "phase": "text-input",
+          "start": 429426920455,
+          "end": 429426926438,
+          "durationMs": 5.983,
+          "startMs": 199.728,
+          "endMs": 205.711
+        },
+        {
+          "phase": "change",
+          "start": 429426926459,
+          "end": 429426927313,
+          "durationMs": 0.854,
+          "startMs": 205.732,
+          "endMs": 206.586
+        },
+        {
+          "phase": "update",
+          "start": 429426927316,
+          "end": 429426928080,
+          "durationMs": 0.764,
+          "startMs": 206.589,
+          "endMs": 207.353
+        }
+      ],
+      "metadataMarksNestedNotAdditive": [
+        {
+          "name": "undo-residual:certified-token-metadata-start",
+          "ms": 200.352
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-end",
+          "ms": 203.429
+        }
+      ],
+      "nestedGCSpansNotAdditive": []
+    },
+    {
+      "keyOrdinal": 4,
+      "taskDurationMs": 9.46,
+      "phases": [
+        {
+          "phase": "text-input",
+          "start": 429427055672,
+          "end": 429427061261,
+          "durationMs": 5.589,
+          "startMs": 334.945,
+          "endMs": 340.534
+        },
+        {
+          "phase": "change",
+          "start": 429427061281,
+          "end": 429427062172,
+          "durationMs": 0.891,
+          "startMs": 340.554,
+          "endMs": 341.445
+        },
+        {
+          "phase": "update",
+          "start": 429427062175,
+          "end": 429427062962,
+          "durationMs": 0.787,
+          "startMs": 341.448,
+          "endMs": 342.235
+        }
+      ],
+      "metadataMarksNestedNotAdditive": [
+        {
+          "name": "undo-residual:certified-token-metadata-start",
+          "ms": 335.327
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-end",
+          "ms": 338.109
+        }
+      ],
+      "nestedGCSpansNotAdditive": []
+    },
+    {
+      "keyOrdinal": 5,
+      "taskDurationMs": 8.989,
+      "phases": [
+        {
+          "phase": "text-input",
+          "start": 429427178381,
+          "end": 429427183449,
+          "durationMs": 5.068,
+          "startMs": 457.654,
+          "endMs": 462.722
+        },
+        {
+          "phase": "change",
+          "start": 429427183468,
+          "end": 429427184396,
+          "durationMs": 0.928,
+          "startMs": 462.741,
+          "endMs": 463.669
+        },
+        {
+          "phase": "update",
+          "start": 429427184399,
+          "end": 429427185187,
+          "durationMs": 0.788,
+          "startMs": 463.672,
+          "endMs": 464.46
+        }
+      ],
+      "metadataMarksNestedNotAdditive": [
+        {
+          "name": "undo-residual:certified-token-metadata-start",
+          "ms": 458.061
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-end",
+          "ms": 460.802
+        }
+      ],
+      "nestedGCSpansNotAdditive": []
+    },
+    {
+      "keyOrdinal": 6,
+      "taskDurationMs": 9.065,
+      "phases": [
+        {
+          "phase": "text-input",
+          "start": 429427304639,
+          "end": 429427309628,
+          "durationMs": 4.989,
+          "startMs": 583.912,
+          "endMs": 588.901
+        },
+        {
+          "phase": "change",
+          "start": 429427309656,
+          "end": 429427310421,
+          "durationMs": 0.765,
+          "startMs": 588.929,
+          "endMs": 589.694
+        },
+        {
+          "phase": "update",
+          "start": 429427310424,
+          "end": 429427311370,
+          "durationMs": 0.946,
+          "startMs": 589.697,
+          "endMs": 590.643
+        }
+      ],
+      "metadataMarksNestedNotAdditive": [
+        {
+          "name": "undo-residual:certified-token-metadata-start",
+          "ms": 584.339
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-end",
+          "ms": 587.073
+        }
+      ],
+      "nestedGCSpansNotAdditive": []
+    },
+    {
+      "keyOrdinal": 7,
+      "taskDurationMs": 6.862,
+      "phases": [
+        {
+          "phase": "text-input",
+          "start": 429427329629,
+          "end": 429427332523,
+          "durationMs": 2.894,
+          "startMs": 608.902,
+          "endMs": 611.796
+        },
+        {
+          "phase": "change",
+          "start": 429427332536,
+          "end": 429427333293,
+          "durationMs": 0.757,
+          "startMs": 611.809,
+          "endMs": 612.566
+        },
+        {
+          "phase": "update",
+          "start": 429427333295,
+          "end": 429427333815,
+          "durationMs": 0.52,
+          "startMs": 612.568,
+          "endMs": 613.088
+        }
+      ],
+      "metadataMarksNestedNotAdditive": [
+        {
+          "name": "undo-residual:certified-token-metadata-start",
+          "ms": 609.205
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-end",
+          "ms": 610.041
+        }
+      ],
+      "nestedGCSpansNotAdditive": []
+    },
+    {
+      "keyOrdinal": 8,
+      "taskDurationMs": 6.445,
+      "phases": [
+        {
+          "phase": "text-input",
+          "start": 429427448582,
+          "end": 429427451512,
+          "durationMs": 2.93,
+          "startMs": 727.855,
+          "endMs": 730.785
+        },
+        {
+          "phase": "change",
+          "start": 429427451528,
+          "end": 429427452363,
+          "durationMs": 0.835,
+          "startMs": 730.801,
+          "endMs": 731.636
+        },
+        {
+          "phase": "update",
+          "start": 429427452366,
+          "end": 429427453003,
+          "durationMs": 0.637,
+          "startMs": 731.639,
+          "endMs": 732.276
+        }
+      ],
+      "metadataMarksNestedNotAdditive": [
+        {
+          "name": "undo-residual:certified-token-metadata-start",
+          "ms": 728.154
+        },
+        {
+          "name": "undo-residual:certified-token-metadata-end",
+          "ms": 728.979
+        }
+      ],
+      "nestedGCSpansNotAdditive": []
+    }
+  ]
+}

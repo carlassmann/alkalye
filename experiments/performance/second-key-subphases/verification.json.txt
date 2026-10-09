@@ -1,0 +1,144 @@
+{
+  "source": "/tmp/alkalye-second-key-subphases/proof-ready",
+  "files": [
+    {
+      "source": "/tmp/alkalye-second-key-subphases/proof-ready/README.md",
+      "archive": "README.md",
+      "sha256": "108c153bb3c1d409a2f5fe8baa74aee9626d1c1e877acab957476704bf8ba59d",
+      "bytes": 2086
+    },
+    {
+      "source": "/tmp/alkalye-second-key-subphases/proof-ready/assets.json.txt",
+      "archive": "assets.json.txt",
+      "sha256": "b867a56a8d0643f4c670f9a52a4faf7cc95c2eb976b0651a267848727e8c6b86",
+      "bytes": 4665
+    },
+    {
+      "source": "/tmp/alkalye-second-key-subphases/proof-ready/build.log.txt",
+      "archive": "build.log.txt",
+      "sha256": "a1e1ec9bdb36d7dd3f2aa0b8ef9ca9120691b4a84ccf5f8d8bac12f2ba04504c",
+      "bytes": 15
+    },
+    {
+      "source": "/tmp/alkalye-second-key-subphases/proof-ready/burst-probe.json.txt",
+      "archive": "burst-probe.json.txt",
+      "sha256": "68dd8bd5c9945ab9b59b16c8b4c5f93f0800967572c82fe10dbc22cbcc28d1c7",
+      "bytes": 1786
+    },
+    {
+      "source": "/tmp/alkalye-second-key-subphases/proof-ready/diagnostic-terminal.json.txt",
+      "archive": "diagnostic-terminal.json.txt",
+      "sha256": "9d3f9eebb8a2856c5d9dec154af12f8f0237d5ab19ec51f7972d2413e3591591",
+      "bytes": 96
+    },
+    {
+      "source": "/tmp/alkalye-second-key-subphases/proof-ready/diagnostic.log.txt",
+      "archive": "diagnostic.log.txt",
+      "sha256": "f463d5f1a6e309c80ca96e182ccb94aa419fffa4c47a4ef3301864504473dc27",
+      "bytes": 405
+    },
+    {
+      "source": "/tmp/alkalye-second-key-subphases/proof-ready/map-frame.py.txt",
+      "archive": "map-frame.py.txt",
+      "sha256": "e40e6af727a47866796e00099dc08c362105b4c3ec5972b619e4ab6f04150f35",
+      "bytes": 1475
+    },
+    {
+      "source": "/tmp/alkalye-second-key-subphases/proof-ready/oninput-source-map.json.txt",
+      "archive": "oninput-source-map.json.txt",
+      "sha256": "e1d04fd9af835380ec303f44b0a081c40bcf464cca05e4b3adab02404aaa4941",
+      "bytes": 662
+    },
+    {
+      "source": "/tmp/alkalye-second-key-subphases/proof-ready/owned-terminal.json.txt",
+      "archive": "owned-terminal.json.txt",
+      "sha256": "bec4ae8bee2b8d9b875fd290595bbd96d44cf687e602f7971d48ff190a61da70",
+      "bytes": 61
+    },
+    {
+      "source": "/tmp/alkalye-second-key-subphases/proof-ready/parse-phases.py.txt",
+      "archive": "parse-phases.py.txt",
+      "sha256": "0fc5a78a0d35eafc08e67f100f349e0e65c3ab344cb07852e0d447d1dd3230f9",
+      "bytes": 3258
+    },
+    {
+      "source": "/tmp/alkalye-second-key-subphases/proof-ready/parse-subphases.py.txt",
+      "archive": "parse-subphases.py.txt",
+      "sha256": "554fee6e8720d0ef444bfe16de6b2ed4f034c5974c114dd2ac7d0802f213612a",
+      "bytes": 1480
+    },
+    {
+      "source": "/tmp/alkalye-second-key-subphases/proof-ready/phase-attribution.json.txt",
+      "archive": "phase-attribution.json.txt",
+      "sha256": "fe2b9b0e2dccb64f1b4e7c1ed89fd412acded83ff0e81a6e32241d1e820c2396",
+      "bytes": 8568
+    },
+    {
+      "source": "/tmp/alkalye-second-key-subphases/proof-ready/phase-summary.log.txt",
+      "archive": "phase-summary.log.txt",
+      "sha256": "dbb180d261593ad875e1dc60c65567e6addb2236965441233e7962763e437d67",
+      "bytes": 783
+    },
+    {
+      "source": "/tmp/alkalye-second-key-subphases/proof-ready/preparation-ready.json.txt",
+      "archive": "preparation-ready.json.txt",
+      "sha256": "3eb29d2ef53a7c74a7c3ace99591b16d67fcfe4fce5bb0e4f39a87cc777cf22c",
+      "bytes": 384
+    },
+    {
+      "source": "/tmp/alkalye-second-key-subphases/proof-ready/production-body-gate.ts.txt",
+      "archive": "production-body-gate.ts.txt",
+      "sha256": "e8ad55245a1c30e05d29009f0b3c889e89aaa2fe246416223f7efcf5a793b274",
+      "bytes": 8623
+    },
+    {
+      "source": "/tmp/alkalye-second-key-subphases/proof-ready/raw-oninput-frame.json.txt",
+      "archive": "raw-oninput-frame.json.txt",
+      "sha256": "7c81564b50ded6aa9a82e030f77f3ca93a9cf3cad360612e3bbd9b08d75f04bf",
+      "bytes": 286
+    },
+    {
+      "source": "/tmp/alkalye-second-key-subphases/proof-ready/results.json.txt",
+      "archive": "results.json.txt",
+      "sha256": "6d368a0fe33c8b3c0c96b868948ddf0b9b9abd7d901b99c00ff2ccbc9e7fdce4",
+      "bytes": 32636
+    },
+    {
+      "source": "/tmp/alkalye-second-key-subphases/proof-ready/run-diagnostic.ts.txt",
+      "archive": "run-diagnostic.ts.txt",
+      "sha256": "c5f777edd74d5efcc82ed5528563b954adbcfd812d82b051b2949a8a01ea7641",
+      "bytes": 992
+    },
+    {
+      "source": "/tmp/alkalye-second-key-subphases/proof-ready/setup-wrong-cwd.json.txt",
+      "archive": "setup-wrong-cwd.json.txt",
+      "sha256": "c4796670bec413d5451a2fe3e035597afea3b402f08f277a487c1c23968a4497",
+      "bytes": 330
+    },
+    {
+      "source": "/tmp/alkalye-second-key-subphases/proof-ready/source-pins.json.txt",
+      "archive": "source-pins.json.txt",
+      "sha256": "2d28625497eeb54c828afd21cf8cff534e74a0095ca79ee384086cf3fefd42e8",
+      "bytes": 915
+    },
+    {
+      "source": "/tmp/alkalye-second-key-subphases/proof-ready/subphase-attribution.json.txt",
+      "archive": "subphase-attribution.json.txt",
+      "sha256": "cc9f624eecedf57edae3d1c4eb310cca8a8fa5d537b455935a21eb377ce46bf4",
+      "bytes": 15826
+    },
+    {
+      "source": "/tmp/alkalye-second-key-subphases/proof-ready/subphase-markers.patch.txt",
+      "archive": "subphase-markers.patch.txt",
+      "sha256": "5e65b3d4447917ee4c4056dd378b4c0e57c7b6a4123a49cd4f69f0cdec60f563",
+      "bytes": 3251
+    },
+    {
+      "source": "/tmp/alkalye-second-key-subphases/proof-ready/types.log.txt",
+      "archive": "types.log.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  ],
+  "verified": true
+}

@@ -1,0 +1,19 @@
+[
+  {
+    "arm": "control",
+    "raw": {
+      "url": "http://127.0.0.1:4498/chunks/document-app-wzhpfv3s.js",
+      "lineNumber": 91,
+      "columnNumber": 5061,
+      "coordinates": "Chrome one-based"
+    },
+    "generatedMappingColumnZeroBased": 5060,
+    "source": "../src/client/components/editor.ts",
+    "line": 264,
+    "column": 21,
+    "snippet": "\ttextarea.oninput = () => {",
+    "sourceContentSHA256": "9e9c50ae7ebc7fa4545171c0f37a18bed2d7f12785f160b13aeca3115309dc98",
+    "scriptSHA256": "a291e865666497989ef0ca34a87fa8a821532f7809215e9d4dcee5db6e7c9cf7",
+    "mapSHA256": "f4a6c3ec92b63becdcdbe1cad2425ce14cd8029181b37b17eadd09b014753fae"
+  }
+]

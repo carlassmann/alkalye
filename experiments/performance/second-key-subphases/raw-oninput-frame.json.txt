@@ -1,0 +1,10 @@
+{
+  "columnNumber": 5061,
+  "frame": "16DF11340D44DA45B50AB6FA2B0535B2",
+  "functionName": "Pi.s.oninput",
+  "isolate": "9508549423302626787",
+  "lineNumber": 91,
+  "sampleTraceId": 3547601780710080,
+  "scriptId": "7",
+  "url": "http://127.0.0.1:4498/chunks/document-app-wzhpfv3s.js"
+}

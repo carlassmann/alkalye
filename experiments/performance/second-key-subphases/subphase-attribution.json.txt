@@ -1,0 +1,685 @@
+{
+  "scope": "n1 diagnostic; spans inclusive and nested, not additive; all8 native/public accepted/reload gates passed",
+  "keys": [
+    {
+      "keyOrdinal": 1,
+      "taskMs": 9.727,
+      "subphases": [
+        {
+          "phase": "text-input",
+          "start": 429426721311,
+          "end": 429426727312,
+          "ms": 6.001
+        },
+        {
+          "phase": "take-replacements",
+          "start": 429426727326,
+          "end": 429426727339,
+          "ms": 0.013
+        },
+        {
+          "phase": "prepare-replacements",
+          "start": 429426727354,
+          "end": 429426727489,
+          "ms": 0.135
+        },
+        {
+          "phase": "before-view",
+          "start": 429426727497,
+          "end": 429426727503,
+          "ms": 0.006
+        },
+        {
+          "phase": "apply-operation",
+          "start": 429426727588,
+          "end": 429426727879,
+          "ms": 0.291
+        },
+        {
+          "phase": "add-draft",
+          "start": 429426727883,
+          "end": 429426727890,
+          "ms": 0.007
+        },
+        {
+          "phase": "update-drafts",
+          "start": 429426727893,
+          "end": 429426727910,
+          "ms": 0.017
+        },
+        {
+          "phase": "advance-view",
+          "start": 429426727913,
+          "end": 429426728001,
+          "ms": 0.088
+        },
+        {
+          "phase": "after-view",
+          "start": 429426728005,
+          "end": 429426728015,
+          "ms": 0.01
+        },
+        {
+          "phase": "submit-edit",
+          "start": 429426727494,
+          "end": 429426728017,
+          "ms": 0.523
+        },
+        {
+          "phase": "launch-saved",
+          "start": 429426728020,
+          "end": 429426728168,
+          "ms": 0.148
+        },
+        {
+          "phase": "change",
+          "start": 429426727323,
+          "end": 429426728172,
+          "ms": 0.849
+        },
+        {
+          "phase": "update",
+          "start": 429426728175,
+          "end": 429426728658,
+          "ms": 0.483
+        }
+      ],
+      "nestedGCNotAdditive": []
+    },
+    {
+      "keyOrdinal": 2,
+      "taskMs": 23.448,
+      "subphases": [
+        {
+          "phase": "text-input",
+          "start": 429426869414,
+          "end": 429426874114,
+          "ms": 4.7
+        },
+        {
+          "phase": "take-replacements",
+          "start": 429426874129,
+          "end": 429426874134,
+          "ms": 0.005
+        },
+        {
+          "phase": "prepare-replacements",
+          "start": 429426874148,
+          "end": 429426874262,
+          "ms": 0.114
+        },
+        {
+          "phase": "before-view",
+          "start": 429426874269,
+          "end": 429426874275,
+          "ms": 0.006
+        },
+        {
+          "phase": "apply-operation",
+          "start": 429426874366,
+          "end": 429426888915,
+          "ms": 14.549
+        },
+        {
+          "phase": "add-draft",
+          "start": 429426888945,
+          "end": 429426888969,
+          "ms": 0.024
+        },
+        {
+          "phase": "update-drafts",
+          "start": 429426888976,
+          "end": 429426888998,
+          "ms": 0.022
+        },
+        {
+          "phase": "advance-view",
+          "start": 429426889002,
+          "end": 429426889088,
+          "ms": 0.086
+        },
+        {
+          "phase": "after-view",
+          "start": 429426889093,
+          "end": 429426889105,
+          "ms": 0.012
+        },
+        {
+          "phase": "submit-edit",
+          "start": 429426874266,
+          "end": 429426889108,
+          "ms": 14.842
+        },
+        {
+          "phase": "launch-saved",
+          "start": 429426889111,
+          "end": 429426889265,
+          "ms": 0.154
+        },
+        {
+          "phase": "change",
+          "start": 429426874126,
+          "end": 429426889270,
+          "ms": 15.144
+        },
+        {
+          "phase": "update",
+          "start": 429426889273,
+          "end": 429426890199,
+          "ms": 0.926
+        }
+      ],
+      "nestedGCNotAdditive": []
+    },
+    {
+      "keyOrdinal": 3,
+      "taskMs": 10.305,
+      "subphases": [
+        {
+          "phase": "text-input",
+          "start": 429426920455,
+          "end": 429426926438,
+          "ms": 5.983
+        },
+        {
+          "phase": "take-replacements",
+          "start": 429426926463,
+          "end": 429426926469,
+          "ms": 0.006
+        },
+        {
+          "phase": "prepare-replacements",
+          "start": 429426926483,
+          "end": 429426926604,
+          "ms": 0.121
+        },
+        {
+          "phase": "before-view",
+          "start": 429426926613,
+          "end": 429426926620,
+          "ms": 0.007
+        },
+        {
+          "phase": "apply-operation",
+          "start": 429426926697,
+          "end": 429426926986,
+          "ms": 0.289
+        },
+        {
+          "phase": "add-draft",
+          "start": 429426926995,
+          "end": 429426927013,
+          "ms": 0.018
+        },
+        {
+          "phase": "update-drafts",
+          "start": 429426927020,
+          "end": 429426927043,
+          "ms": 0.023
+        },
+        {
+          "phase": "advance-view",
+          "start": 429426927046,
+          "end": 429426927113,
+          "ms": 0.067
+        },
+        {
+          "phase": "after-view",
+          "start": 429426927117,
+          "end": 429426927126,
+          "ms": 0.009
+        },
+        {
+          "phase": "submit-edit",
+          "start": 429426926610,
+          "end": 429426927130,
+          "ms": 0.52
+        },
+        {
+          "phase": "launch-saved",
+          "start": 429426927133,
+          "end": 429426927308,
+          "ms": 0.175
+        },
+        {
+          "phase": "change",
+          "start": 429426926459,
+          "end": 429426927313,
+          "ms": 0.854
+        },
+        {
+          "phase": "update",
+          "start": 429426927316,
+          "end": 429426928080,
+          "ms": 0.764
+        }
+      ],
+      "nestedGCNotAdditive": []
+    },
+    {
+      "keyOrdinal": 4,
+      "taskMs": 9.46,
+      "subphases": [
+        {
+          "phase": "text-input",
+          "start": 429427055672,
+          "end": 429427061261,
+          "ms": 5.589
+        },
+        {
+          "phase": "take-replacements",
+          "start": 429427061286,
+          "end": 429427061292,
+          "ms": 0.006
+        },
+        {
+          "phase": "prepare-replacements",
+          "start": 429427061304,
+          "end": 429427061571,
+          "ms": 0.267
+        },
+        {
+          "phase": "before-view",
+          "start": 429427061582,
+          "end": 429427061588,
+          "ms": 0.006
+        },
+        {
+          "phase": "apply-operation",
+          "start": 429427061657,
+          "end": 429427061913,
+          "ms": 0.256
+        },
+        {
+          "phase": "add-draft",
+          "start": 429427061918,
+          "end": 429427061925,
+          "ms": 0.007
+        },
+        {
+          "phase": "update-drafts",
+          "start": 429427061927,
+          "end": 429427061948,
+          "ms": 0.021
+        },
+        {
+          "phase": "advance-view",
+          "start": 429427061951,
+          "end": 429427062018,
+          "ms": 0.067
+        },
+        {
+          "phase": "after-view",
+          "start": 429427062020,
+          "end": 429427062030,
+          "ms": 0.01
+        },
+        {
+          "phase": "submit-edit",
+          "start": 429427061579,
+          "end": 429427062033,
+          "ms": 0.454
+        },
+        {
+          "phase": "launch-saved",
+          "start": 429427062036,
+          "end": 429427062168,
+          "ms": 0.132
+        },
+        {
+          "phase": "change",
+          "start": 429427061281,
+          "end": 429427062172,
+          "ms": 0.891
+        },
+        {
+          "phase": "update",
+          "start": 429427062175,
+          "end": 429427062962,
+          "ms": 0.787
+        }
+      ],
+      "nestedGCNotAdditive": []
+    },
+    {
+      "keyOrdinal": 5,
+      "taskMs": 8.989,
+      "subphases": [
+        {
+          "phase": "text-input",
+          "start": 429427178381,
+          "end": 429427183449,
+          "ms": 5.068
+        },
+        {
+          "phase": "take-replacements",
+          "start": 429427183472,
+          "end": 429427183477,
+          "ms": 0.005
+        },
+        {
+          "phase": "prepare-replacements",
+          "start": 429427183490,
+          "end": 429427183776,
+          "ms": 0.286
+        },
+        {
+          "phase": "before-view",
+          "start": 429427183785,
+          "end": 429427183792,
+          "ms": 0.007
+        },
+        {
+          "phase": "apply-operation",
+          "start": 429427183857,
+          "end": 429427184118,
+          "ms": 0.261
+        },
+        {
+          "phase": "add-draft",
+          "start": 429427184123,
+          "end": 429427184129,
+          "ms": 0.006
+        },
+        {
+          "phase": "update-drafts",
+          "start": 429427184131,
+          "end": 429427184147,
+          "ms": 0.016
+        },
+        {
+          "phase": "advance-view",
+          "start": 429427184150,
+          "end": 429427184218,
+          "ms": 0.068
+        },
+        {
+          "phase": "after-view",
+          "start": 429427184222,
+          "end": 429427184247,
+          "ms": 0.025
+        },
+        {
+          "phase": "submit-edit",
+          "start": 429427183782,
+          "end": 429427184250,
+          "ms": 0.468
+        },
+        {
+          "phase": "launch-saved",
+          "start": 429427184255,
+          "end": 429427184392,
+          "ms": 0.137
+        },
+        {
+          "phase": "change",
+          "start": 429427183468,
+          "end": 429427184396,
+          "ms": 0.928
+        },
+        {
+          "phase": "update",
+          "start": 429427184399,
+          "end": 429427185187,
+          "ms": 0.788
+        }
+      ],
+      "nestedGCNotAdditive": []
+    },
+    {
+      "keyOrdinal": 6,
+      "taskMs": 9.065,
+      "subphases": [
+        {
+          "phase": "text-input",
+          "start": 429427304639,
+          "end": 429427309628,
+          "ms": 4.989
+        },
+        {
+          "phase": "take-replacements",
+          "start": 429427309660,
+          "end": 429427309666,
+          "ms": 0.006
+        },
+        {
+          "phase": "prepare-replacements",
+          "start": 429427309681,
+          "end": 429427309915,
+          "ms": 0.234
+        },
+        {
+          "phase": "before-view",
+          "start": 429427309929,
+          "end": 429427309936,
+          "ms": 0.007
+        },
+        {
+          "phase": "apply-operation",
+          "start": 429427310014,
+          "end": 429427310267,
+          "ms": 0.253
+        },
+        {
+          "phase": "add-draft",
+          "start": 429427310275,
+          "end": 429427310283,
+          "ms": 0.008
+        },
+        {
+          "phase": "update-drafts",
+          "start": 429427310286,
+          "end": 429427310306,
+          "ms": 0.02
+        },
+        {
+          "phase": "advance-view",
+          "start": 429427310309,
+          "end": 429427310376,
+          "ms": 0.067
+        },
+        {
+          "phase": "after-view",
+          "start": 429427310380,
+          "end": 429427310395,
+          "ms": 0.015
+        },
+        {
+          "phase": "submit-edit",
+          "start": 429427309925,
+          "end": 429427310400,
+          "ms": 0.475
+        },
+        {
+          "phase": "launch-saved",
+          "start": 429427310403,
+          "end": 429427310418,
+          "ms": 0.015
+        },
+        {
+          "phase": "change",
+          "start": 429427309656,
+          "end": 429427310421,
+          "ms": 0.765
+        },
+        {
+          "phase": "update",
+          "start": 429427310424,
+          "end": 429427311370,
+          "ms": 0.946
+        }
+      ],
+      "nestedGCNotAdditive": []
+    },
+    {
+      "keyOrdinal": 7,
+      "taskMs": 6.862,
+      "subphases": [
+        {
+          "phase": "text-input",
+          "start": 429427329629,
+          "end": 429427332523,
+          "ms": 2.894
+        },
+        {
+          "phase": "take-replacements",
+          "start": 429427332538,
+          "end": 429427332543,
+          "ms": 0.005
+        },
+        {
+          "phase": "prepare-replacements",
+          "start": 429427332556,
+          "end": 429427332764,
+          "ms": 0.208
+        },
+        {
+          "phase": "before-view",
+          "start": 429427332773,
+          "end": 429427332779,
+          "ms": 0.006
+        },
+        {
+          "phase": "apply-operation",
+          "start": 429427332849,
+          "end": 429427333145,
+          "ms": 0.296
+        },
+        {
+          "phase": "add-draft",
+          "start": 429427333150,
+          "end": 429427333157,
+          "ms": 0.007
+        },
+        {
+          "phase": "update-drafts",
+          "start": 429427333159,
+          "end": 429427333164,
+          "ms": 0.005
+        },
+        {
+          "phase": "advance-view",
+          "start": 429427333166,
+          "end": 429427333249,
+          "ms": 0.083
+        },
+        {
+          "phase": "after-view",
+          "start": 429427333254,
+          "end": 429427333269,
+          "ms": 0.015
+        },
+        {
+          "phase": "submit-edit",
+          "start": 429427332770,
+          "end": 429427333272,
+          "ms": 0.502
+        },
+        {
+          "phase": "launch-saved",
+          "start": 429427333274,
+          "end": 429427333289,
+          "ms": 0.015
+        },
+        {
+          "phase": "change",
+          "start": 429427332536,
+          "end": 429427333293,
+          "ms": 0.757
+        },
+        {
+          "phase": "update",
+          "start": 429427333295,
+          "end": 429427333815,
+          "ms": 0.52
+        }
+      ],
+      "nestedGCNotAdditive": []
+    },
+    {
+      "keyOrdinal": 8,
+      "taskMs": 6.445,
+      "subphases": [
+        {
+          "phase": "text-input",
+          "start": 429427448582,
+          "end": 429427451512,
+          "ms": 2.93
+        },
+        {
+          "phase": "take-replacements",
+          "start": 429427451531,
+          "end": 429427451539,
+          "ms": 0.008
+        },
+        {
+          "phase": "prepare-replacements",
+          "start": 429427451564,
+          "end": 429427451764,
+          "ms": 0.2
+        },
+        {
+          "phase": "before-view",
+          "start": 429427451777,
+          "end": 429427451787,
+          "ms": 0.01
+        },
+        {
+          "phase": "apply-operation",
+          "start": 429427451850,
+          "end": 429427452096,
+          "ms": 0.246
+        },
+        {
+          "phase": "add-draft",
+          "start": 429427452101,
+          "end": 429427452107,
+          "ms": 0.006
+        },
+        {
+          "phase": "update-drafts",
+          "start": 429427452110,
+          "end": 429427452126,
+          "ms": 0.016
+        },
+        {
+          "phase": "advance-view",
+          "start": 429427452128,
+          "end": 429427452197,
+          "ms": 0.069
+        },
+        {
+          "phase": "after-view",
+          "start": 429427452199,
+          "end": 429427452207,
+          "ms": 0.008
+        },
+        {
+          "phase": "submit-edit",
+          "start": 429427451769,
+          "end": 429427452209,
+          "ms": 0.44
+        },
+        {
+          "phase": "launch-saved",
+          "start": 429427452212,
+          "end": 429427452359,
+          "ms": 0.147
+        },
+        {
+          "phase": "change",
+          "start": 429427451528,
+          "end": 429427452363,
+          "ms": 0.835
+        },
+        {
+          "phase": "update",
+          "start": 429427452366,
+          "end": 429427453003,
+          "ms": 0.637
+        }
+      ],
+      "nestedGCNotAdditive": []
+    }
+  ]
+}
