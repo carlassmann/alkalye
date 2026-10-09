@@ -1,0 +1,87 @@
+--- baseline/crdt.ts
++++ instrumented/crdt.ts
+@@ -115,6 +115,8 @@
+ 	rawSplices: PreparedSplice[]
+ }
+ 
++let ownedForkInvocation = 0
++
+ export class Replica {
+ 	operations = new Map<string, Operation>()
+ 	clock = 0
+@@ -163,36 +165,59 @@
+ 		})
+ 	}
+ 	private *forkSteps(cooperative: boolean, actor: string, author: string) {
++		let invocation = ++ownedForkInvocation
++		function mark(field: string, phase: string, size: number) {
++			performance.mark("owned-fork:" + invocation + ":" + field + ":" + phase, { detail: { size } })
++		}
+ 		let replica = new Replica(actor, author)
++		mark("freezeFacts", "start", this.operations.size)
+ 		for (let operation of this.operations.values())
+ 			yield* freezeFactSteps(operation, cooperative)
+ 		for (let fields of this.registers.values())
+ 			for (let operation of fields.values())
+ 				yield* freezeFactSteps(operation, cooperative)
++		mark("freezeFacts", "end", this.operations.size)
++		mark("operations", "start", this.operations.size)
+ 		replica.operations = yield* copyMapSteps(this.operations, cooperative)
++		mark("operations", "end", this.operations.size)
+ 		replica.clock = this.clock
+ 		replica.historyLoaded = this.historyLoaded
++		mark("legacyTargets", "start", this.legacyTextTargets.size)
+ 		replica.legacyTextTargets = yield* copySetSteps(
+ 			this.legacyTextTargets,
+ 			cooperative,
+ 		)
++		mark("legacyTargets", "end", this.legacyTextTargets.size)
++		mark("atomIndex", "start", this.atomIndex.size)
+ 		replica.atomIndex = yield* copyMapSteps(this.atomIndex, cooperative)
++		mark("atomIndex", "end", this.atomIndex.size)
++		mark("children", "start", this.children.size)
+ 		for (let [target, children] of this.children)
+ 			replica.children.set(target, yield* copyMapSteps(children, cooperative))
++		mark("children", "end", this.children.size)
++		mark("visibility", "start", this.visibility.size)
+ 		for (let [target, visibility] of this.visibility)
+ 			replica.visibility.set(target, yield* visibility.forkSteps(cooperative))
++		mark("visibility", "end", this.visibility.size)
++		mark("textOwners", "start", this.textOwners.size)
+ 		replica.textOwners = yield* copyMapSteps(this.textOwners, cooperative)
++		mark("textOwners", "end", this.textOwners.size)
++		mark("ownedAtomCounts", "start", this.ownedAtomCounts.size)
+ 		replica.ownedAtomCounts = yield* copyMapSteps(
+ 			this.ownedAtomCounts,
+ 			cooperative,
+ 		)
++		mark("ownedAtomCounts", "end", this.ownedAtomCounts.size)
+ 		replica.stateGeneration = this.stateGeneration
++		mark("registersTargets", "start", this.registers.size)
+ 		replica.registers = new Map(
+ 			[...this.registers].map(([target, fields]) => [target, new Map(fields)]),
+ 		)
+ 		replica.targets = new Map(
+ 			[...this.targets].map(([target, history]) => [target, [...history]]),
+ 		)
++		mark("registersTargets", "end", this.registers.size)
++		mark("textCaches", "start", this.strings.size)
+ 		replica.strings = yield* copyMapSteps(this.strings, cooperative)
+ 		replica.textCache = new Map(
+ 			[...this.textCache].map(([target, atoms]) => [
+@@ -201,12 +226,15 @@
+ 			]),
+ 		)
+ 		replica.sourceCache = yield* copyMapSteps(this.sourceCache, cooperative)
++		mark("textCaches", "end", this.strings.size)
++		mark("metadataReceipts", "start", this.updated.size)
+ 		replica.updated = yield* copyMapSteps(this.updated, cooperative)
+ 		replica.created = yield* copyMapSteps(this.created, cooperative)
+ 		replica.restored = yield* copyMapSteps(this.restored, cooperative)
+ 		replica.terminalRedo = this.terminalRedo
+ 		replica.insertionReceipt = this.insertionReceipt
+ 		replica.replacementReceipt = this.replacementReceipt
++		mark("metadataReceipts", "end", this.updated.size)
+ 		return replica
+ 	}
+ 	get generation() {

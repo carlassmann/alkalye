@@ -1,0 +1,214 @@
+[
+  {
+    "name": "longrtl",
+    "full": false,
+    "raw": 65536,
+    "clickExact": true,
+    "native": {
+      "x": 559,
+      "y": 277
+    },
+    "visible": {
+      "x": 558.640625,
+      "y": 277.125
+    },
+    "dx": -0.359375,
+    "dy": 0.125,
+    "state": {
+      "active": true,
+      "events": [
+        {
+          "hostScrollTop": 0,
+          "nativeEnd": 0,
+          "nativeLength": 3034,
+          "nativeScrollLeft": 0,
+          "nativeScrollTop": 0,
+          "nativeStart": 0,
+          "trusted": true,
+          "type": "select",
+          "window": {
+            "end": 3034,
+            "height": 1652.71875,
+            "start": 0,
+            "top": 48
+          }
+        },
+        {
+          "hostScrollTop": 35174,
+          "nativeEnd": 2181,
+          "nativeLength": 4073,
+          "nativeScrollLeft": 0,
+          "nativeScrollTop": 0,
+          "nativeStart": 2181,
+          "trusted": true,
+          "type": "select",
+          "window": {
+            "direction": "rtl",
+            "end": 67428,
+            "height": 2236.03125,
+            "start": 63356,
+            "top": 34269
+          }
+        },
+        {
+          "hostScrollTop": 35174,
+          "nativeEnd": 2181,
+          "nativeLength": 5086,
+          "nativeScrollLeft": 0,
+          "nativeScrollTop": 0,
+          "nativeStart": 2181,
+          "trusted": true,
+          "type": "select",
+          "window": {
+            "direction": "rtl",
+            "end": 68441,
+            "height": 2819.34375,
+            "start": 63356,
+            "top": 34269
+          }
+        },
+        {
+          "hostScrollTop": 34623,
+          "nativeEnd": 2181,
+          "nativeLength": 5086,
+          "nativeScrollLeft": 0,
+          "nativeScrollTop": 0,
+          "nativeStart": 2181,
+          "trusted": true,
+          "type": "pointerdown",
+          "window": {
+            "direction": "rtl",
+            "end": 68441,
+            "height": 2819.34375,
+            "start": 63356,
+            "top": 33718.09375
+          }
+        },
+        {
+          "hostScrollTop": 34623,
+          "nativeEnd": 2181,
+          "nativeLength": 5086,
+          "nativeScrollLeft": 0,
+          "nativeScrollTop": 0,
+          "nativeStart": 2181,
+          "trusted": true,
+          "type": "mousedown",
+          "window": {
+            "direction": "rtl",
+            "end": 68441,
+            "height": 2819.34375,
+            "start": 63356,
+            "top": 33718.09375
+          }
+        },
+        {
+          "hostScrollTop": 34623,
+          "nativeEnd": 2181,
+          "nativeLength": 5086,
+          "nativeScrollLeft": 0,
+          "nativeScrollTop": 0,
+          "nativeStart": 2181,
+          "trusted": true,
+          "type": "mousedown-microtask",
+          "window": {
+            "direction": "rtl",
+            "end": 68441,
+            "height": 2819.34375,
+            "start": 63356,
+            "top": 33718.09375
+          }
+        },
+        {
+          "hostScrollTop": 34623,
+          "nativeEnd": 0,
+          "nativeLength": 5086,
+          "nativeScrollLeft": 0,
+          "nativeScrollTop": 0,
+          "nativeStart": 0,
+          "trusted": true,
+          "type": "focus",
+          "window": {
+            "direction": "rtl",
+            "end": 68441,
+            "height": 2819.34375,
+            "start": 63356,
+            "top": 33718.09375
+          }
+        },
+        {
+          "hostScrollTop": 34623,
+          "nativeEnd": 2181,
+          "nativeLength": 5086,
+          "nativeScrollLeft": 0,
+          "nativeScrollTop": 0,
+          "nativeStart": 2181,
+          "trusted": true,
+          "type": "pointerup",
+          "window": {
+            "direction": "rtl",
+            "end": 68441,
+            "height": 2819.34375,
+            "start": 63356,
+            "top": 33718.09375
+          }
+        },
+        {
+          "hostScrollTop": 34623,
+          "nativeEnd": 2181,
+          "nativeLength": 5086,
+          "nativeScrollLeft": 0,
+          "nativeScrollTop": 0,
+          "nativeStart": 2181,
+          "trusted": true,
+          "type": "mouseup",
+          "window": {
+            "direction": "rtl",
+            "end": 68441,
+            "height": 2819.34375,
+            "start": 63356,
+            "top": 33718.09375
+          }
+        },
+        {
+          "hostScrollTop": 34623,
+          "nativeEnd": 2181,
+          "nativeLength": 5086,
+          "nativeScrollLeft": 0,
+          "nativeScrollTop": 0,
+          "nativeStart": 2181,
+          "trusted": true,
+          "type": "mousedown-frame",
+          "window": {
+            "direction": "rtl",
+            "end": 68441,
+            "height": 2819.34375,
+            "start": 63356,
+            "top": 33718.09375
+          }
+        }
+      ],
+      "nativeClientHeight": 2819,
+      "nativeClientWidth": 1280,
+      "nativeDirection": "none",
+      "nativeEnd": 2181,
+      "nativeLength": 5086,
+      "nativePrefix": "‏",
+      "nativeScrollHeight": 2819,
+      "nativeScrollLeft": 0,
+      "nativeScrollTop": 0,
+      "nativeStart": 2181,
+      "publicDirection": "none",
+      "publicEnd": 65536,
+      "publicStart": 65536,
+      "scrollTop": 34623,
+      "sourceExact": true,
+      "window": {
+        "direction": "rtl",
+        "end": 68441,
+        "height": 2819.34375,
+        "start": 63356,
+        "top": 33718.09375
+      }
+    }
+  }
+]

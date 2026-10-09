@@ -1,0 +1,335 @@
+@import "./editor-viewport.css";
+[data-editor].editor-wrap {
+	--editor-caret: oklch(59.6% 0.145 163.225);
+	--editor-selection: 10%;
+	display: block;
+	position: relative;
+	font: var(--editor-size)/var(--editor-line-height, 1.8) var(--mono);
+	--editor-padding: max(
+		24px,
+		calc((100% - var(--editor-width, 65ch)) / 2 + 24px)
+	);
+	width: 100%;
+	height: 100%;
+	margin: auto;
+}
+[data-editor] #editor {
+	font: var(--editor-size)/var(--editor-line-height, 1.8) var(--mono);
+	letter-spacing: var(--editor-letter-spacing, 0em);
+	tab-size: 2;
+	padding: 48px var(--editor-padding) 20vh;
+	margin: 0;
+	width: 100%;
+	height: 100%;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+	word-break: normal;
+	border: 0;
+	border-radius: 0;
+	resize: none;
+	background: transparent;
+	overflow: auto;
+}
+[data-editor] #highlight {
+	font: var(--editor-size)/var(--editor-line-height, 1.8) var(--mono);
+	letter-spacing: var(--editor-letter-spacing, 0em);
+	tab-size: 2;
+	padding: 48px var(--editor-padding) 20vh;
+	margin: 0;
+	width: 100%;
+	height: 100%;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+	word-break: normal;
+	border: 0;
+	border-radius: 0;
+	resize: none;
+	background: transparent;
+	overflow: auto;
+}
+[data-editor] #editor {
+	position: absolute;
+	inset: 0;
+	color: transparent;
+	caret-color: var(--editor-caret);
+	outline: 0;
+}
+[data-editor] #editor::selection {
+	background: color-mix(
+		in oklch,
+		var(--editor-caret) var(--editor-selection),
+		transparent
+	);
+	color: transparent;
+}
+[data-editor] #editor::placeholder {
+	color: var(--muted);
+}
+[data-editor] #highlight {
+	pointer-events: none;
+	color: var(--ink);
+	scrollbar-width: none;
+}
+[data-editor] #highlight::-webkit-scrollbar {
+	display: none;
+}
+[data-editor] .syntax-heading {
+	font-weight: 700;
+	color: var(--ink);
+}
+[data-editor] .syntax-heading .syntax-marker,
+[data-editor] .syntax-bold .syntax-marker {
+	font-weight: 400;
+}
+[data-editor] .syntax-marker {
+	color: var(--muted);
+}
+[data-editor] .syntax-bold {
+	font-weight: 700;
+}
+[data-editor] .syntax-code {
+	color: var(--ink);
+}
+[data-editor] .syntax-link {
+	color: var(--ink);
+}
+[data-editor] .syntax-link-label {
+	text-decoration: underline;
+	text-decoration-color: var(--muted);
+}
+[data-editor] .syntax-link-broken .syntax-link-label {
+	text-decoration: underline wavy;
+	text-decoration-color: var(--danger);
+}
+[data-editor] .syntax-quote {
+	color: var(--muted);
+}
+@media (max-width: 1100px) {
+	[data-editor].editor-wrap {
+		--editor-padding: max(24px, calc((100% - 750px) / 2 + 24px));
+	}
+}
+@media (max-width: 700px) {
+	[data-editor].editor-wrap {
+		--editor-padding: 16px;
+	}
+	[data-editor] #editor,
+	[data-editor] #highlight {
+		padding: 16px var(--editor-padding) 30vh;
+	}
+}
+@media print {
+	[data-editor] #editor {
+		display: none;
+	}
+}
+@media print {
+	[data-editor] #highlight {
+		display: none;
+	}
+}
+[data-editor] .completion-menu {
+	position: absolute;
+	left: calc(var(--editor-padding) + 22px);
+	right: calc(var(--editor-padding) + 22px);
+	bottom: 30px;
+	z-index: 4;
+	max-height: 260px;
+	overflow: auto;
+	background: var(--raised);
+	border: 1px solid var(--line);
+	border-radius: 0;
+	box-shadow: var(--shadow);
+}
+[data-editor] .completion-menu button {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	gap: 16px;
+	width: 100%;
+	font-size: 12px;
+	padding: 10px 15px;
+}
+[data-editor] .completion-menu small {
+	color: var(--muted);
+	font-size: 11px;
+	text-align: right;
+}
+[data-editor] .completion-menu button[aria-selected="true"] {
+	background: var(--brand-soft);
+}
+[data-editor] #highlight mark {
+	background: color-mix(
+		in oklch,
+		var(--editor-caret) var(--editor-selection),
+		transparent
+	);
+	color: inherit;
+}
+
+[data-editor] .collaborators {
+	position: absolute;
+	inset: 0;
+	overflow: hidden;
+	pointer-events: none;
+}
+[data-editor] .remote-caret {
+	position: absolute;
+	border-left: 2px solid var(--person);
+}
+[data-editor] .remote-caret small {
+	position: absolute;
+	bottom: 100%;
+	left: -2px;
+	white-space: nowrap;
+	font: 10px/1.6 var(--sans);
+	padding: 0 4px;
+	border-radius: 3px 3px 3px 0;
+	background: var(--person);
+	color: #10201c;
+}
+[data-editor] .remote-selection {
+	position: absolute;
+	background: var(--person);
+	opacity: 0.2;
+}
+[data-editor] .comment-highlight {
+	position: absolute;
+	border-bottom: 2px solid #dfba64;
+	background: #dfba641a;
+}
+
+[data-editor] .active-line {
+	position: absolute;
+	inset-inline: var(--editor-padding);
+	background: color-mix(in oklch, var(--ink) 3%, transparent);
+	pointer-events: none;
+}
+[data-editor][data-strikethrough="true"] .done-task {
+	text-decoration: line-through;
+}
+[data-editor][data-fade="true"] .done-task {
+	opacity: 0.5;
+}
+
+[data-editor] [data-editor-links] {
+	position: absolute;
+	inset: 0;
+	overflow: hidden;
+	pointer-events: none;
+}
+[data-editor] [data-editor-links] a {
+	position: absolute;
+	z-index: 2;
+	pointer-events: auto;
+	cursor: pointer;
+}
+[data-editor] [data-editor-links] a:focus-visible {
+	outline: 1px solid var(--brand);
+	outline-offset: 2px;
+}
+
+[data-editor] #highlight,
+[data-editor] [data-editor-links] {
+	animation: editor-text-in 120ms ease-out;
+}
+@keyframes editor-text-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+@media (prefers-reduced-motion: reduce) {
+	[data-editor] #highlight,
+	[data-editor] [data-editor-links] {
+		animation: none;
+	}
+}
+
+[data-editor] .syntax-link-icon {
+	position: relative;
+	color: transparent;
+	text-decoration: none;
+}
+[data-editor] .syntax-link-icon svg {
+	position: absolute;
+	left: 0;
+	top: 50%;
+	transform: translateY(-50%);
+	width: min(14px, 0.8em);
+	height: min(14px, 0.8em);
+	color: var(--ink);
+	opacity: 0.5;
+}
+[data-editor] .syntax-link.is-hovered .syntax-link-label {
+	text-decoration-color: var(--brand);
+}
+
+[data-app][aria-busy="true"]
+	[data-editor]
+	:is(#highlight, [data-editor-links]) {
+	animation: none;
+}
+
+:root[data-appearance="dark"] [data-editor] {
+	--editor-caret: oklch(65% 0.145 163.225);
+	--editor-selection: 15%;
+}
+@media (prefers-color-scheme: dark) {
+	:root:not([data-appearance="light"]) [data-editor] {
+		--editor-caret: oklch(65% 0.145 163.225);
+		--editor-selection: 15%;
+	}
+}
+
+[data-editor] .syntax-highlight {
+	background: #ffe066;
+	color: #24200e;
+	box-decoration-break: clone;
+}
+[data-editor]
+	.syntax-highlight
+	:is(.syntax-marker, .syntax-link, .syntax-code) {
+	color: inherit;
+}
+
+[data-editor] #highlight .local-caret {
+	border-inline-start: 2px solid var(--editor-caret);
+	margin-inline-start: -1px;
+	margin-inline-end: -1px;
+}
+
+[data-editor] [data-editor-line] {
+	display: block;
+	unicode-bidi: plaintext;
+	contain: layout style paint;
+}
+
+[data-editor-viewport] #highlight {
+	line-height: var(--editor-native-line-height);
+	position: absolute;
+	inset: 0 0 auto;
+	height: auto;
+	padding-block: 0;
+	overflow: visible;
+}
+[data-editor-viewport] #editor,
+[data-editor-viewport] #highlight {
+	unicode-bidi: plaintext;
+}
+
+[data-editor] .search-match {
+	position: absolute;
+	background: #eab30840;
+	border-radius: 2px;
+}
+[data-editor] #highlight::highlight(alkalye-search),
+[data-editor] #highlight *::highlight(alkalye-search) {
+	background-color: #eab30840;
+}
+[data-editor] .search-match[data-active] {
+	background: #eab30866;
+	outline: 1px solid var(--brand);
+}

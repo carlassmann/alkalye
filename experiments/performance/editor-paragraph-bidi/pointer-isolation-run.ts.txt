@@ -1,0 +1,30 @@
+import { browser,browserBatch,evaluate,serverAddress,wait } from "./tests/browser-driver"
+import * as Schema from "effect/Schema"
+let coordinate=Schema.Struct({x:Schema.Number,y:Schema.Number})
+let rows=[]
+let server=Bun.spawn(["bun","pointer-isolation-server.ts"],{stdout:"pipe",stderr:"inherit"})
+let session="pointer-visible-alignment-"+Date.now()
+try {
+ let origin=await serverAddress(server.stdout)
+ for(let name of ["longrtl"]) for(let full of [false]) {
+  browser(session,"set","viewport","1280","800")
+  browser(session,"open",origin+"?case="+name+(full?"&full":""))
+  wait(session,"document.body.dataset.ready==='true'")
+  for(let raw of [65536]) {
+   evaluate(session,`window.pointerFixture.select(${raw},${raw});true`)
+   evaluate(session,"window.pointerFixture.settle()")
+   wait(session,`window.pointerFixture.alignment(${raw}).aligned`)
+   let geometry=Schema.decodeUnknownSync(Schema.Struct({native:coordinate,visible:coordinate,stable:Schema.Boolean}))(evaluate(session,`window.pointerFixture.stableAlignment(${raw})`))
+   if(!geometry.stable)throw Error("Visible/native caret geometry not stable across frames")
+   let native=geometry.native,visible=geometry.visible
+   browserBatch(session,[["mouse","move",String(Math.round(visible.x)),String(Math.round(visible.y))],["mouse","down"],["mouse","up"]])
+   evaluate(session,"new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve(true))))")
+   let state=evaluate(session,"window.pointerFixture.state()")
+   let selected=Schema.decodeUnknownSync(Schema.Struct({publicStart:Schema.Number,publicEnd:Schema.Number,sourceExact:Schema.Boolean}))(state)
+   let clickExact=selected.publicStart===raw&&selected.publicEnd===raw&&selected.sourceExact
+   rows.push({name,full,raw,clickExact,native,visible,dx:visible.x-native.x,dy:visible.y-native.y,state})
+   await Bun.write("../pointer-isolation-results.json",JSON.stringify(rows,null,2))
+   console.log(JSON.stringify({name,full,raw,clickExact,dx:visible.x-native.x,dy:visible.y-native.y}))
+  }
+ }
+} finally {try{browser(session,"close")}finally{server.kill();await server.exited}}

@@ -1,0 +1,44 @@
+--- baseline/text-visibility.ts
++++ instrumented/text-visibility.ts
+@@ -65,6 +65,8 @@
+ 
+ export type TextVisibilitySnapshot = typeof VisibilitySnapshotSchema.Type
+ 
++let visibilityForkInvocation = 0
++
+ export class TextVisibility {
+ 	private removals = new Map<string, readonly string[]>()
+ 	private removers = new Map<string, ReadonlySet<string>>()
+@@ -83,16 +85,32 @@
+ 		return finishSteps(this.forkSteps(false))
+ 	}
+ 	*forkSteps(cooperative: boolean) {
++		let invocation = ++visibilityForkInvocation
++		function mark(field: string, phase: string, size: number) {
++			performance.mark("visibility-fork:" + invocation + ":" + field + ":" + phase, { detail: { size } })
++		}
+ 		let visibility = new TextVisibility()
++		mark("removals", "start", this.removals.size)
+ 		visibility.removals = yield* copyMapSteps(this.removals, cooperative)
++		mark("removals", "end", this.removals.size)
++		mark("removers", "start", this.removers.size)
+ 		visibility.removers = yield* copyMapSteps(this.removers, cooperative)
++		mark("removers", "end", this.removers.size)
++		mark("cancels", "start", this.cancels.size)
+ 		visibility.cancels = yield* copyMapSteps(this.cancels, cooperative)
++		mark("cancels", "end", this.cancels.size)
++		mark("cancellers", "start", this.cancellers.size)
+ 		visibility.cancellers = yield* copyMapSteps(this.cancellers, cooperative)
++		mark("cancellers", "end", this.cancellers.size)
++		mark("activeCache", "start", this.activeCache.size)
+ 		visibility.activeCache = yield* copyMapSteps(this.activeCache, cooperative)
++		mark("activeCache", "end", this.activeCache.size)
++		mark("legacyRemoved", "start", this.legacyRemoved.size)
+ 		visibility.legacyRemoved = yield* copySetSteps(
+ 			this.legacyRemoved,
+ 			cooperative,
+ 		)
++		mark("legacyRemoved", "end", this.legacyRemoved.size)
+ 		visibility.floor = this.floor
+ 		return visibility
+ 	}

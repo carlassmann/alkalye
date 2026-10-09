@@ -1,0 +1,23 @@
+I found no source blocker that should stop the CSS-only `unicode-bidi: plaintext` change. This was a read-only code review: I edited no files and ran nothing in a browser. I wrote the findings to `/Users/carlassmann/.claude/plans/read-only-focused-review-outside-idempotent-charm.md`.
+
+**Why the paragraph mapping holds:**
+- Each source line becomes one `[data-editor-line]`, which is also one bidi paragraph in the textarea.
+- On the first line of a window that starts mid-paragraph, the inline `isolate` + `dir` set in `editor-overlay.ts:126-133` overrides the CSS `plaintext`. Its direction comes from `directionMark`, the same mark the textarea gets as a prefix, so the two stay in sync.
+- Every later line starts right after a `\n`, so `plaintext` there gives the same direction the textarea's `plaintext` does.
+- Link icons don't change direction detection: their prefix characters (`\u2003\u2060`) are in both the textarea and the overlay and are neutral, and the svg is positioned outside the text flow.
+- No syntax CSS sets `direction` or `unicode-bidi`, and the measure element copies both properties plus the prefix mark.
+
+**Risks, each with a minimal native gate:**
+1. **`directionMark` doesn't follow the bidi algorithm** (`runtime/src/client/editor-viewport.ts:586`). It takes the first letter and checks it against a fixed list of RTL scripts.
+   - It ignores direction marks (RLM, LRM, ALM), doesn't skip text inside isolates, and misses some RTL scripts (Samaritan, Mandaic, Hanifi Rohingya).
+   - So a paragraph that starts with RLM shows RTL when shown whole, but flips to LTR once the window starts inside it.
+   - Gate: a long paragraph of `"\u200f"` followed by LTR text that straddles `window.start`. Compare caret x before and after the window moves.
+2. **Lines with no strong character** (empty, `---`, ```` ``` ````, `1.`): `plaintext` falls back to the inherited direction.
+   - Gate: run the same corpus under `<html dir=rtl>`.
+3. **Ambiguous caret offsets aren't covered.** Your three offsets don't hit run boundaries (LTR inside RTL, the edges of bold and code spans) or soft-wrap ends.
+   - Gate: native vs. overlay x at every run boundary and wrap offset, for both selection directions.
+4. **`.local-caret` draws its 2px bar on the wrong side in RTL lines.** It uses `border-inline-start`, which follows the inherited LTR direction rather than the line's resolved direction. The error is about 1–2px and only visual.
+   - Gate: a multi-cursor caret in an RTL line.
+5. **A paragraph whose first strong character falls past `window.end`.** The textarea and overlay agree with each other, but can differ from how the full paragraph renders. The gate in item 1 covers it.
+
+written with claude-opus-5-5 in Claude Code

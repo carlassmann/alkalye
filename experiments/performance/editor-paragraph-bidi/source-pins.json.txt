@@ -1,0 +1,19 @@
+{
+  "productionFiles": {
+    "src/client/components/editor.ts": "07b3ea10342439525f24816df0115126d4a03c14ed7f7e99cbd026f67aefd471",
+    "src/client/components/editor-overlay.ts": "6a457d3985f9a2562b21de4439490bbb9e6c83f711db73bea69490d2e711f4bf",
+    "src/client/editor-viewport.ts": "96d89cb7cae4d312edcb5ec3ca4aa4299c5976387ad042b6ea71a156a57e6ad6",
+    "src/client/source-textarea.ts": "462a7c6793951e3d2898258eb1bf6978915c9fd9d49d2ad852620afb569d171c",
+    "src/client/components/editor.css": "6045ebd25fc3980b933ecdb8664e8b96563c3a5fc0f577d9b47465e7039f28e8",
+    "src/client/components/editor-viewport.css": "91c9cfa195dd9b247ea06ef37b226da08f2139c08a6c25e6516d30a7f4cd73f6"
+  },
+  "runtimeFiles": {
+    "src/client/components/editor.ts": "07b3ea10342439525f24816df0115126d4a03c14ed7f7e99cbd026f67aefd471",
+    "src/client/components/editor-overlay.ts": "6a457d3985f9a2562b21de4439490bbb9e6c83f711db73bea69490d2e711f4bf",
+    "src/client/baseline-editor-viewport.ts": "96d89cb7cae4d312edcb5ec3ca4aa4299c5976387ad042b6ea71a156a57e6ad6",
+    "src/client/source-textarea.ts": "462a7c6793951e3d2898258eb1bf6978915c9fd9d49d2ad852620afb569d171c",
+    "src/client/components/editor.css": "c4257c88756596957cbff2e22c67761d25da1fd7718b9eab8d0586407dd50b41",
+    "src/client/components/editor-viewport.css": "91c9cfa195dd9b247ea06ef37b226da08f2139c08a6c25e6516d30a7f4cd73f6",
+    "src/shared/crdt.ts": "fa018ceddb23a671cc2364e324c11f06a184058e2c58a959c769b9bc39586833"
+  }
+}

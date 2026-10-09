@@ -1,0 +1,425 @@
+[
+  {
+    "name": "longrtl",
+    "full": true,
+    "raw": 65536,
+    "native": {
+      "x": 925,
+      "y": 278
+    },
+    "visible": {
+      "x": 924.96875,
+      "y": 277.59375
+    },
+    "dx": -0.03125,
+    "dy": -0.40625,
+    "state": {
+      "active": false,
+      "events": [],
+      "nativeDirection": "none",
+      "nativeEnd": 65536,
+      "nativeLength": 131072,
+      "nativePrefix": "0",
+      "nativeStart": 65536,
+      "publicDirection": "none",
+      "publicEnd": 65536,
+      "publicStart": 65536,
+      "scrollTop": 35530,
+      "sourceExact": true,
+      "window": {
+        "end": 131072,
+        "height": 71520.59375,
+        "start": 0,
+        "top": 48
+      }
+    }
+  },
+  {
+    "name": "longrtl",
+    "full": true,
+    "raw": 65000,
+    "native": {
+      "x": 947,
+      "y": 277
+    },
+    "visible": {
+      "x": 947.1875,
+      "y": 276.9375
+    },
+    "dx": 0.1875,
+    "dy": -0.0625,
+    "state": {
+      "active": false,
+      "events": [],
+      "nativeDirection": "none",
+      "nativeEnd": 65000,
+      "nativeLength": 131072,
+      "nativePrefix": "0",
+      "nativeStart": 65000,
+      "publicDirection": "none",
+      "publicEnd": 65000,
+      "publicStart": 65000,
+      "scrollTop": 35239,
+      "sourceExact": true,
+      "window": {
+        "end": 131072,
+        "height": 71520.59375,
+        "start": 0,
+        "top": 48
+      }
+    }
+  },
+  {
+    "name": "longrtl",
+    "full": true,
+    "raw": 66050,
+    "native": {
+      "x": 515,
+      "y": 277
+    },
+    "visible": {
+      "x": 515.40625,
+      "y": 276.84375
+    },
+    "dx": 0.40625,
+    "dy": -0.15625,
+    "state": {
+      "active": false,
+      "events": [],
+      "nativeDirection": "none",
+      "nativeEnd": 66050,
+      "nativeLength": 131072,
+      "nativePrefix": "0",
+      "nativeStart": 66050,
+      "publicDirection": "none",
+      "publicEnd": 66050,
+      "publicStart": 66050,
+      "scrollTop": 35790,
+      "sourceExact": true,
+      "window": {
+        "end": 131072,
+        "height": 71520.59375,
+        "start": 0,
+        "top": 48
+      }
+    }
+  },
+  {
+    "name": "longrtl",
+    "full": false,
+    "raw": 65536,
+    "native": {
+      "x": 559,
+      "y": 277
+    },
+    "visible": {
+      "x": 558.640625,
+      "y": 277.125
+    },
+    "dx": -0.359375,
+    "dy": 0.125,
+    "state": {
+      "active": false,
+      "events": [],
+      "nativeDirection": "none",
+      "nativeEnd": 2181,
+      "nativeLength": 5086,
+      "nativePrefix": "‏",
+      "nativeStart": 2181,
+      "publicDirection": "none",
+      "publicEnd": 65536,
+      "publicStart": 65536,
+      "scrollTop": 35174,
+      "sourceExact": true,
+      "window": {
+        "direction": "rtl",
+        "end": 68441,
+        "height": 2819.34375,
+        "start": 63356,
+        "top": 34269
+      }
+    }
+  },
+  {
+    "name": "longrtl",
+    "full": false,
+    "raw": 65000,
+    "native": {
+      "x": 581,
+      "y": 277
+    },
+    "visible": {
+      "x": 580.859375,
+      "y": 277.46875
+    },
+    "dx": -0.140625,
+    "dy": 0.46875,
+    "state": {
+      "active": false,
+      "events": [],
+      "nativeDirection": "none",
+      "nativeEnd": 1645,
+      "nativeLength": 3062,
+      "nativePrefix": "‏",
+      "nativeStart": 1645,
+      "publicDirection": "none",
+      "publicEnd": 65000,
+      "publicStart": 65000,
+      "scrollTop": 34882,
+      "sourceExact": true,
+      "window": {
+        "direction": "rtl",
+        "end": 66417,
+        "height": 1717.53125,
+        "start": 63356,
+        "top": 34269
+      }
+    }
+  },
+  {
+    "name": "longrtl",
+    "full": false,
+    "raw": 66050,
+    "native": {
+      "x": 807,
+      "y": 277
+    },
+    "visible": {
+      "x": 806.65625,
+      "y": 276.78125
+    },
+    "dx": -0.34375,
+    "dy": -0.21875,
+    "state": {
+      "active": false,
+      "events": [],
+      "nativeDirection": "none",
+      "nativeEnd": 1682,
+      "nativeLength": 4073,
+      "nativePrefix": "‏",
+      "nativeStart": 1682,
+      "publicDirection": "none",
+      "publicEnd": 66050,
+      "publicStart": 66050,
+      "scrollTop": 35466,
+      "sourceExact": true,
+      "window": {
+        "direction": "rtl",
+        "end": 68441,
+        "height": 2268.4375,
+        "start": 64369,
+        "top": 34819.90625
+      }
+    }
+  },
+  {
+    "name": "mixedrich",
+    "full": true,
+    "raw": 65536,
+    "native": {
+      "x": 842,
+      "y": 277
+    },
+    "visible": {
+      "x": 841.796875,
+      "y": 277.15625
+    },
+    "dx": -0.203125,
+    "dy": 0.15625,
+    "state": {
+      "active": false,
+      "events": [],
+      "nativeDirection": "none",
+      "nativeEnd": 65536,
+      "nativeLength": 131097,
+      "nativePrefix": "-",
+      "nativeStart": 65536,
+      "publicDirection": "none",
+      "publicEnd": 65536,
+      "publicStart": 65536,
+      "scrollTop": 36373,
+      "sourceExact": true,
+      "window": {
+        "end": 131097,
+        "height": 73173.3125,
+        "start": 0,
+        "top": 48
+      }
+    }
+  },
+  {
+    "name": "mixedrich",
+    "full": true,
+    "raw": 65000,
+    "native": {
+      "x": 755,
+      "y": 278
+    },
+    "visible": {
+      "x": 755.078125,
+      "y": 277.5
+    },
+    "dx": 0.078125,
+    "dy": -0.5,
+    "state": {
+      "active": false,
+      "events": [],
+      "nativeDirection": "none",
+      "nativeEnd": 65000,
+      "nativeLength": 131097,
+      "nativePrefix": "-",
+      "nativeStart": 65000,
+      "publicDirection": "none",
+      "publicEnd": 65000,
+      "publicStart": 65000,
+      "scrollTop": 36081,
+      "sourceExact": true,
+      "window": {
+        "end": 131097,
+        "height": 73173.3125,
+        "start": 0,
+        "top": 48
+      }
+    }
+  },
+  {
+    "name": "mixedrich",
+    "full": true,
+    "raw": 66050,
+    "native": {
+      "x": 691,
+      "y": 277
+    },
+    "visible": {
+      "x": 690.734375,
+      "y": 276.8125
+    },
+    "dx": -0.265625,
+    "dy": -0.1875,
+    "state": {
+      "active": false,
+      "events": [],
+      "nativeDirection": "none",
+      "nativeEnd": 66050,
+      "nativeLength": 131097,
+      "nativePrefix": "-",
+      "nativeStart": 66050,
+      "publicDirection": "none",
+      "publicEnd": 66050,
+      "publicStart": 66050,
+      "scrollTop": 36665,
+      "sourceExact": true,
+      "window": {
+        "end": 131097,
+        "height": 73173.3125,
+        "start": 0,
+        "top": 48
+      }
+    }
+  },
+  {
+    "name": "mixedrich",
+    "full": false,
+    "raw": 65536,
+    "native": {
+      "x": 842,
+      "y": 309
+    },
+    "visible": {
+      "x": 841.796875,
+      "y": 309.15625
+    },
+    "dx": -0.203125,
+    "dy": 0.15625,
+    "state": {
+      "active": false,
+      "events": [],
+      "nativeDirection": "none",
+      "nativeEnd": 2043,
+      "nativeLength": 3988,
+      "nativePrefix": "0",
+      "nativeStart": 2043,
+      "publicDirection": "none",
+      "publicEnd": 65536,
+      "publicStart": 65536,
+      "scrollTop": 35304,
+      "sourceExact": true,
+      "window": {
+        "end": 67481,
+        "height": 2203.625,
+        "start": 63493,
+        "top": 34495.84375
+      }
+    }
+  },
+  {
+    "name": "mixedrich",
+    "full": false,
+    "raw": 65000,
+    "native": {
+      "x": 755,
+      "y": 18
+    },
+    "visible": {
+      "x": 755.078125,
+      "y": 17.90625
+    },
+    "dx": 0.078125,
+    "dy": -0.09375,
+    "state": {
+      "active": false,
+      "events": [],
+      "nativeDirection": "none",
+      "nativeEnd": 1507,
+      "nativeLength": 3988,
+      "nativePrefix": "0",
+      "nativeStart": 1507,
+      "publicDirection": "none",
+      "publicEnd": 65000,
+      "publicStart": 65000,
+      "scrollTop": 35336,
+      "sourceExact": true,
+      "window": {
+        "end": 67481,
+        "height": 2203.625,
+        "start": 63493,
+        "top": 34528.25
+      }
+    }
+  },
+  {
+    "name": "mixedrich",
+    "full": false,
+    "raw": 66050,
+    "native": {
+      "x": 691,
+      "y": 601
+    },
+    "visible": {
+      "x": 690.734375,
+      "y": 601.21875
+    },
+    "dx": -0.265625,
+    "dy": 0.21875,
+    "state": {
+      "active": false,
+      "events": [],
+      "nativeDirection": "none",
+      "nativeEnd": 2557,
+      "nativeLength": 3988,
+      "nativePrefix": "0",
+      "nativeStart": 2557,
+      "publicDirection": "none",
+      "publicEnd": 66050,
+      "publicStart": 66050,
+      "scrollTop": 35368,
+      "sourceExact": true,
+      "window": {
+        "end": 67481,
+        "height": 2203.625,
+        "start": 63493,
+        "top": 34528.25
+      }
+    }
+  }
+]

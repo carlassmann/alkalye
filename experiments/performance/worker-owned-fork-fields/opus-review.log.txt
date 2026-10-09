@@ -1,0 +1,40 @@
+**Verdict: hold. There isn't enough data to propose this yet.** The diagnostic already emits `owned-fork:N:atomIndex:start/end` marks (`crdt.ts:191-193`), but nobody has read them. The 108ms is the whole fork. Even if the HashMap swap worked perfectly, fork would stay O(n), because `children`, `ownedAtomCounts`, `textOwners`, `operations` and each target's `visibility` (`crdt.ts:194-210`, `text-visibility.ts:93-112`) are still copied in full. The most it can save is the atomIndex interval. Gate: only propose if atomIndex is a clear majority of the interval at 1M atoms.
+
+**Why the slice is shaped right**
+- There is exactly one write: `indexAtom` → `atomIndex.set` (`crdt.ts:2310`). Nothing ever deletes or clears it. Append-only maps cleanly onto reassigning with `HashMap.set`.
+- Reads are `get(...)?.atom/target`, `has` (`364, 405, 584, 686, 823, 876, 1448, 1489, 1805, 2047, 2055, 2089, 2260, 2262`) and one iteration (`2182`, in `mergedAliasSteps`). That iteration only fills an id→target Map, so HashMap's different iteration order doesn't matter. `checkpointSteps` never reads atomIndex.
+- Atoms are frozen before insertion (`freezeTextAtom`, `2309`).
+
+**Risks found**
+1. **The entry object isn't frozen.** `{ target, atom }` at `2310` is mutable and would be shared across forks. Freeze it, or store a frozen entry.
+2. **Mutation mode.** In `internal/hashMap.js:726`, `beginMutation` sets edit to `_edit + 1`. That counter is per lineage, not globally unique. The node-edit invariant (reachable nodes have edit ≤ the map's edit) still makes the nodes safe. The danger is the editable `HashMapImpl` object itself: `setHash` mutates `_root` and `_size` in place (`:699`), and `endMutation` flips a flag in place.
+   - If an editable map is ever stored in `this.atomIndex`, a fork that shares the root by reference holds that same object, and the next restore write shows up in both.
+   - Cooperative restore yields inside the indexAtom loop (`2104-2105`). Its guard is only `stateGeneration === 0`. `forkEffect` checks only generation and clock, and clock is already set (`2099`) before that loop. So a fork that overlaps restore passes the checks.
+   - Rule: never use mutation mode on a field. If needed for load cost, mutate a local, call `endMutation`, then assign once. Best is to skip it until there's an ownership proof.
+3. **Restore ordering.** Validation reads `this.atomIndex` (`2047-2089`), then `apply(fields)`, then indexAtom writes incrementally while `children`, `ownedAtomCounts` and `legacyTextTargets` mutate alongside. A persistent map would let atomIndex be built locally and published at the end. That doesn't make restore atomic, because the sibling maps are still written incrementally. Don't claim it does.
+4. **`indexAtom` ordering.** `legacyTextTargets.add` runs before the `has` early-return (`2307-2308`). Keep that order exactly, and keep `has` before `set` so the duplicate path stays a no-op and doesn't allocate.
+5. **String hash overhead.** `Hash.string` recomputes djb2 over the whole key on every get/has/set, with no cache (`Hash.js:325`). V8 Map caches string hashes. Ids are a 16-digit clock + actor + a 9-character suffix, so roughly 40–60 characters. Hot paths: undo/redo receipts (`364`, `405`), `has` in insertion runs (`584`, `686`), and deletion validation (`2089`) on big removals.
+6. **Normal 1M load regression is the main risk.** Each persistent set copies about 4–5 HAMT levels, with up to 32 entries per node, plus the hash, so expect several-fold allocation over `Map.set`. Without mutation mode, a 1M hydrate is likely to regress. With local mutation mode plus a single publish, it may be acceptable, but that needs measuring.
+7. **Smaller points.**
+   - `size` is O(1) on `HashMapImpl`, so the mark sizes are fine.
+   - Use `getUnsafe` only where presence is proven.
+   - The `get` signature returns `Option`, so it doesn't drop in for `?.`. You'll need `getUnsafe` or a wrapper, which affects readability across about 14 call sites.
+
+**Measure before proposing**
+- Per-field fork marks at 1M: what share of 108ms is atomIndex?
+- At 1M, before and after: cold load/hydrate time and allocation, steady typing latency (insertion `has` path), and Undo/Redo receipt checks.
+
+**Public module cases needed before landing**
+- Convergence: fork, then concurrent writers on source and fork, then exchange ops. Both replicas give identical text and checkpoint.
+- Clone independence: after fork, an insert, restore or `restoreCheckpoint` on either side never changes the other's text, `targetOf` or checkpoint, in both directions and across repeated forks.
+- Restore overlapping fork: `forkEffect` concurrent with cooperative `restoreCheckpointEffect`. It must fail or stay independent, and never alias.
+- Cancel/terminal redo and receipts stay valid on the fork and are rejected after divergence (the identity checks at `364` and `405`).
+- Permissions: scoped capability writes through a forked replica stay rejected or accepted the same as on the source.
+- Interruption: interrupt `forkEffect` and the cooperative restore mid-yield. Source stays unchanged, no partial atomIndex is published, and scopes release.
+- Restore that fails validation partway leaves atomIndex unchanged.
+
+**Visibility and children:** untouched. Same reasoning applies once they're measured. `children` already copy-on-writes its sibling arrays (`2314`), so only the outer Map copy matters there.
+
+I haven't implemented anything or claimed any cause.
+
+Unrelated: several claude.ai connectors (GitHub, Slack, Notion, etc.) need authorizing in claude.ai connector settings. Not needed here.

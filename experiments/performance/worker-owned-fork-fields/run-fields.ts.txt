@@ -1,0 +1,36 @@
+import { cp, rename } from "node:fs/promises"
+import * as Schema from "effect/Schema"
+let root = "/tmp/alkalye-worker-owned-fork-diagnostic"
+let cwd = root + "/runtime"
+let state = root + "-work-state"
+let resultSchema = Schema.Struct({ stage: Schema.String, gates: Schema.Array(Schema.String), failure: Schema.optional(Schema.String) })
+let cells: { count: number; stage: string; driverPid?: number; code?: number; gates?: readonly string[] }[] = []
+async function publish() { await Bun.write(root + "/progress.json", JSON.stringify(cells, null, 2) + "\n") }
+async function work(action: string) {
+ let process = Bun.spawn(["work", action, "native"], { cwd, env: { ...Bun.env, WORK_STATE_ROOT: state }, stdout: "pipe", stderr: "pipe" })
+ let output = await new Response(process.stdout).text()
+ let error = await new Response(process.stderr).text()
+ if (await process.exited !== 0) throw Error(output + error)
+}
+for (let count of [1, 512]) {
+ let closed = root + "/native-" + count + "-state"
+ if (await Bun.file(closed + "/stable-copy-" + count + "-created.json").exists()) throw Error("Retained state exists; never repeat")
+ let cell: { count: number; stage: string; driverPid?: number; code?: number; gates?: readonly string[] } = { count, stage: "setup" }
+ cells.push(cell); await publish()
+ await cp("/tmp/alkalye-worker-anchor-mapping/native-seeded-snapshot", root + "/native-active", { recursive: true, errorOnExist: true, force: false })
+ await cp(cwd + "/dist", root + "/native-active/dist", { recursive: true })
+ try {
+  await work("run")
+  let driver = Bun.spawn(["bun", "native-merge-undo.ts"], { cwd, env: { ...Bun.env, NATIVE_COUNT: String(count), MAPPING_INCLUDE_BURST: "false" }, stdout: Bun.file(root + "/native-" + count + ".log"), stderr: Bun.file(root + "/native-" + count + "-stderr.log") })
+  cell.driverPid = driver.pid; cell.stage = "native"; await publish(); console.log(JSON.stringify(cell))
+  cell.code = await driver.exited
+  let result = Schema.decodeUnknownSync(resultSchema)(await Bun.file(cwd + "/stable-copy-native-results.json").json())
+  await Bun.write(root + "/native-" + count + "-results.json", await Bun.file(cwd + "/stable-copy-native-results.json").arrayBuffer())
+  cell.gates = result.gates; cell.stage = "terminal"; await publish()
+  if (cell.code !== 0 || result.failure || result.gates.length !== 1) throw Error("Native gate failed; preserve state")
+ } finally {
+  await work("stop")
+  await rename(root + "/native-active", closed)
+ }
+}
+console.log(JSON.stringify({ stage: "complete", cells: cells.length }))

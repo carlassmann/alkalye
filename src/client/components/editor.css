@@ -303,6 +303,7 @@
 
 [data-editor] [data-editor-line] {
 	display: block;
+	unicode-bidi: plaintext;
 	contain: layout style paint;
 }
 

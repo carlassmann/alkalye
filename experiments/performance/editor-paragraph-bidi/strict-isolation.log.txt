@@ -1,0 +1,7 @@
+pointer-isolation-fixture.ts(20,40): error TS18047: 'input' is possibly 'null'.
+pointer-isolation-fixture.ts(20,71): error TS18047: 'input' is possibly 'null'.
+pointer-isolation-fixture.ts(20,106): error TS18047: 'input' is possibly 'null'.
+pointer-isolation-fixture.ts(20,139): error TS18047: 'input' is possibly 'null'.
+pointer-isolation-fixture.ts(20,169): error TS18047: 'input' is possibly 'null'.
+pointer-isolation-fixture.ts(20,202): error TS18048: 'source' is possibly 'undefined'.
+pointer-isolation-fixture.ts(20,253): error TS18048: 'source' is possibly 'undefined'.

@@ -1,0 +1,1243 @@
+[
+	{
+		"count": 1,
+		"file": "Undo-1.trace.json",
+		"sha256": "d63c5448bfc06297f044df8673e66a4fd000e7901e81a1e982bcdb7fce42be34",
+		"bytes": 6473147,
+		"spans": [
+			{
+				"kind": "owned-fork",
+				"invocation": 6,
+				"field": "freezeFacts",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 28.978,
+				"durationMs": 0.019,
+				"taskUnionMs": 0.019
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 6,
+				"field": "operations",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 28.999,
+				"durationMs": 0.003,
+				"taskUnionMs": 0.003
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 6,
+				"field": "legacyTargets",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 29.004,
+				"durationMs": 0.003,
+				"taskUnionMs": 0.003
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 6,
+				"field": "atomIndex",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 29.008,
+				"durationMs": 56.218,
+				"taskUnionMs": 56.183
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 6,
+				"field": "children",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 85.241,
+				"durationMs": 51.604,
+				"taskUnionMs": 51.582
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 6,
+				"field": "removals",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 136.894,
+				"durationMs": 0.005,
+				"taskUnionMs": 0.005
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 6,
+				"field": "removers",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 136.9,
+				"durationMs": 0.003,
+				"taskUnionMs": 0.003
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 6,
+				"field": "cancels",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 136.905,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 6,
+				"field": "cancellers",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 136.909,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 6,
+				"field": "activeCache",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 136.913,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 6,
+				"field": "legacyRemoved",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 136.916,
+				"durationMs": 0.004,
+				"taskUnionMs": 0.004
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 6,
+				"field": "visibility",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 136.858,
+				"durationMs": 0.064,
+				"taskUnionMs": 0.064
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 6,
+				"field": "textOwners",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 136.923,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 6,
+				"field": "ownedAtomCounts",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 136.927,
+				"durationMs": 0.001,
+				"taskUnionMs": 0.001
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 6,
+				"field": "registersTargets",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 136.929,
+				"durationMs": 0.031,
+				"taskUnionMs": 0.031
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 6,
+				"field": "textCaches",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 136.966,
+				"durationMs": 0.016,
+				"taskUnionMs": 0.016
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 6,
+				"field": "metadataReceipts",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 136.99,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 7,
+				"field": "freezeFacts",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 155.096,
+				"durationMs": 0.007,
+				"taskUnionMs": 0.007
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 7,
+				"field": "operations",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 155.105,
+				"durationMs": 0.004,
+				"taskUnionMs": 0.004
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 7,
+				"field": "legacyTargets",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 155.11,
+				"durationMs": 0.003,
+				"taskUnionMs": 0.003
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 7,
+				"field": "atomIndex",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 155.114,
+				"durationMs": 56.323,
+				"taskUnionMs": 56.304
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 7,
+				"field": "children",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 211.451,
+				"durationMs": 53.029,
+				"taskUnionMs": 53.001
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 7,
+				"field": "removals",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 264.54,
+				"durationMs": 0.004,
+				"taskUnionMs": 0.004
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 7,
+				"field": "removers",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 264.545,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 7,
+				"field": "cancels",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 264.548,
+				"durationMs": 0.001,
+				"taskUnionMs": 0.001
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 7,
+				"field": "cancellers",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 264.55,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 7,
+				"field": "activeCache",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 264.553,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 7,
+				"field": "legacyRemoved",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 264.556,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 7,
+				"field": "visibility",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 264.499,
+				"durationMs": 0.061,
+				"taskUnionMs": 0.061
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 7,
+				"field": "textOwners",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 264.561,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 7,
+				"field": "ownedAtomCounts",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 264.565,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 7,
+				"field": "registersTargets",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 264.567,
+				"durationMs": 0.006,
+				"taskUnionMs": 0.006
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 7,
+				"field": "textCaches",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 264.574,
+				"durationMs": 0.003,
+				"taskUnionMs": 0.003
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 7,
+				"field": "metadataReceipts",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 264.578,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 8,
+				"field": "freezeFacts",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 265.598,
+				"durationMs": 0.006,
+				"taskUnionMs": 0.006
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 8,
+				"field": "operations",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 265.606,
+				"durationMs": 0.003,
+				"taskUnionMs": 0.003
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 8,
+				"field": "legacyTargets",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 265.61,
+				"durationMs": 0.001,
+				"taskUnionMs": 0.001
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 8,
+				"field": "atomIndex",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 265.613,
+				"durationMs": 53.573,
+				"taskUnionMs": 53.553
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 8,
+				"field": "children",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 319.223,
+				"durationMs": 51.045,
+				"taskUnionMs": 51.029
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 8,
+				"field": "removals",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 370.32,
+				"durationMs": 0.003,
+				"taskUnionMs": 0.003
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 8,
+				"field": "removers",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 370.331,
+				"durationMs": 0.009,
+				"taskUnionMs": 0.009
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 8,
+				"field": "cancels",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 370.341,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 8,
+				"field": "cancellers",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 370.344,
+				"durationMs": 0.001,
+				"taskUnionMs": 0.001
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 8,
+				"field": "activeCache",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 370.346,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 8,
+				"field": "legacyRemoved",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 370.349,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 8,
+				"field": "visibility",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 370.28,
+				"durationMs": 0.072,
+				"taskUnionMs": 0.072
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 8,
+				"field": "textOwners",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 370.354,
+				"durationMs": 0.001,
+				"taskUnionMs": 0.001
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 8,
+				"field": "ownedAtomCounts",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 370.356,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 8,
+				"field": "registersTargets",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 370.359,
+				"durationMs": 0.006,
+				"taskUnionMs": 0.006
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 8,
+				"field": "textCaches",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 370.366,
+				"durationMs": 0.003,
+				"taskUnionMs": 0.003
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 8,
+				"field": "metadataReceipts",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 370.37,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 9,
+				"field": "freezeFacts",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1058.168,
+				"durationMs": 0.008,
+				"taskUnionMs": 0.008
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 9,
+				"field": "operations",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1058.179,
+				"durationMs": 0.003,
+				"taskUnionMs": 0.003
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 9,
+				"field": "legacyTargets",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1058.183,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 9,
+				"field": "atomIndex",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1058.187,
+				"durationMs": 58.663,
+				"taskUnionMs": 58.626
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 9,
+				"field": "children",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1116.868,
+				"durationMs": 51.288,
+				"taskUnionMs": 51.263
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 9,
+				"field": "removals",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1168.198,
+				"durationMs": 0.004,
+				"taskUnionMs": 0.004
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 9,
+				"field": "removers",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1168.203,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 9,
+				"field": "cancels",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1168.206,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 9,
+				"field": "cancellers",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1168.209,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 9,
+				"field": "activeCache",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1168.212,
+				"durationMs": 0.001,
+				"taskUnionMs": 0.001
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 9,
+				"field": "legacyRemoved",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1168.214,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 9,
+				"field": "visibility",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1168.166,
+				"durationMs": 0.052,
+				"taskUnionMs": 0.052
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 9,
+				"field": "textOwners",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1168.219,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 9,
+				"field": "ownedAtomCounts",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1168.222,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 9,
+				"field": "registersTargets",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1168.225,
+				"durationMs": 0.012,
+				"taskUnionMs": 0.012
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 9,
+				"field": "textCaches",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1168.238,
+				"durationMs": 0.003,
+				"taskUnionMs": 0.003
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 9,
+				"field": "metadataReceipts",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1168.243,
+				"durationMs": 0.003,
+				"taskUnionMs": 0.003
+			}
+		],
+		"profileChunks": 0
+	},
+	{
+		"count": 1,
+		"file": "stable-copy-native-mc-1-selection.trace.json",
+		"sha256": "227df6ded5083f6ae1997b79f957325705f22341aedd1240ef19ba12366d274b",
+		"bytes": 3366182,
+		"spans": [],
+		"profileChunks": 0
+	},
+	{
+		"count": 1,
+		"file": "stable-copy-native-mc-1-single.trace.json",
+		"sha256": "4ca603cd63356d6f6d73f1d81f1e24cb85719c58b623bab35e2aca78240464dd",
+		"bytes": 6008156,
+		"spans": [
+			{
+				"kind": "owned-fork",
+				"invocation": 4,
+				"field": "freezeFacts",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 189.124,
+				"durationMs": 0.009,
+				"taskUnionMs": 0.009
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 4,
+				"field": "operations",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 189.135,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 4,
+				"field": "legacyTargets",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 189.139,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 4,
+				"field": "atomIndex",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 189.143,
+				"durationMs": 51.772,
+				"taskUnionMs": 51.738
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 4,
+				"field": "children",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 240.927,
+				"durationMs": 92.282,
+				"taskUnionMs": 92.239
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 4,
+				"field": "removals",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 333.264,
+				"durationMs": 0.005,
+				"taskUnionMs": 0.005
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 4,
+				"field": "removers",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 333.27,
+				"durationMs": 0.003,
+				"taskUnionMs": 0.003
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 4,
+				"field": "cancels",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 333.274,
+				"durationMs": 0.001,
+				"taskUnionMs": 0.001
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 4,
+				"field": "cancellers",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 333.276,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 4,
+				"field": "activeCache",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 333.279,
+				"durationMs": 0.001,
+				"taskUnionMs": 0.001
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 4,
+				"field": "legacyRemoved",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 333.281,
+				"durationMs": 0.007,
+				"taskUnionMs": 0.007
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 4,
+				"field": "visibility",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 333.221,
+				"durationMs": 0.069,
+				"taskUnionMs": 0.069
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 4,
+				"field": "textOwners",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 333.291,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 4,
+				"field": "ownedAtomCounts",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 333.294,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 4,
+				"field": "registersTargets",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 333.297,
+				"durationMs": 0.004,
+				"taskUnionMs": 0.004
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 4,
+				"field": "textCaches",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 333.302,
+				"durationMs": 0.004,
+				"taskUnionMs": 0.004
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 4,
+				"field": "metadataReceipts",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 333.306,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 5,
+				"field": "freezeFacts",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1200.706,
+				"durationMs": 0.009,
+				"taskUnionMs": 0.009
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 5,
+				"field": "operations",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1200.717,
+				"durationMs": 0.003,
+				"taskUnionMs": 0.003
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 5,
+				"field": "legacyTargets",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1200.722,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 5,
+				"field": "atomIndex",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1200.725,
+				"durationMs": 54.193,
+				"taskUnionMs": 54.163
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 5,
+				"field": "children",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1254.933,
+				"durationMs": 51.788,
+				"taskUnionMs": 51.765
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 5,
+				"field": "removals",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1306.789,
+				"durationMs": 0.008,
+				"taskUnionMs": 0.008
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 5,
+				"field": "removers",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1306.798,
+				"durationMs": 0.005,
+				"taskUnionMs": 0.005
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 5,
+				"field": "cancels",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1306.805,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 5,
+				"field": "cancellers",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1306.808,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 5,
+				"field": "activeCache",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1306.811,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 5,
+				"field": "legacyRemoved",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1306.815,
+				"durationMs": 0.003,
+				"taskUnionMs": 0.003
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 5,
+				"field": "visibility",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1306.736,
+				"durationMs": 0.084,
+				"taskUnionMs": 0.084
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 5,
+				"field": "textOwners",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1306.821,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 5,
+				"field": "ownedAtomCounts",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1306.824,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 5,
+				"field": "registersTargets",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1306.827,
+				"durationMs": 0.005,
+				"taskUnionMs": 0.005
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 5,
+				"field": "textCaches",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1306.833,
+				"durationMs": 0.003,
+				"taskUnionMs": 0.003
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 5,
+				"field": "metadataReceipts",
+				"thread": "(78213, 19615308)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 1306.837,
+				"durationMs": 0.003,
+				"taskUnionMs": 0.003
+			}
+		],
+		"profileChunks": 0
+	},
+	{
+		"count": 512,
+		"file": "stable-copy-native-mc-512-single.trace.json",
+		"sha256": "ae8114cf19949261214f4a8cbffe4027896d70c9c2c12a2bee7435e106212960",
+		"bytes": 8565407,
+		"spans": [],
+		"profileChunks": 0
+	},
+	{
+		"count": 512,
+		"file": "Undo-512.trace.json",
+		"sha256": "3964c439d07ebd7dee78f1aeabcc5e36b8400dfebdc02e2d6caef70945ad0ea8",
+		"bytes": 7299104,
+		"spans": [
+			{
+				"kind": "owned-fork",
+				"invocation": 4,
+				"field": "freezeFacts",
+				"thread": "(78442, 19617311)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 18.835,
+				"durationMs": 0.023,
+				"taskUnionMs": 0.023
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 4,
+				"field": "operations",
+				"thread": "(78442, 19617311)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 18.86,
+				"durationMs": 0.003,
+				"taskUnionMs": 0.003
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 4,
+				"field": "legacyTargets",
+				"thread": "(78442, 19617311)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 18.864,
+				"durationMs": 0.003,
+				"taskUnionMs": 0.003
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 4,
+				"field": "atomIndex",
+				"thread": "(78442, 19617311)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 18.869,
+				"durationMs": 59.814,
+				"taskUnionMs": 59.777
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 4,
+				"field": "children",
+				"thread": "(78442, 19617311)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 78.696,
+				"durationMs": 52.012,
+				"taskUnionMs": 51.988
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 4,
+				"field": "removals",
+				"thread": "(78442, 19617311)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 130.76,
+				"durationMs": 0.006,
+				"taskUnionMs": 0.006
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 4,
+				"field": "removers",
+				"thread": "(78442, 19617311)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 130.767,
+				"durationMs": 0.225,
+				"taskUnionMs": 0.224
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 4,
+				"field": "cancels",
+				"thread": "(78442, 19617311)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 130.995,
+				"durationMs": 0.003,
+				"taskUnionMs": 0.003
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 4,
+				"field": "cancellers",
+				"thread": "(78442, 19617311)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 130.999,
+				"durationMs": 0.003,
+				"taskUnionMs": 0.003
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 4,
+				"field": "activeCache",
+				"thread": "(78442, 19617311)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 131.003,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "visibility-fork",
+				"invocation": 4,
+				"field": "legacyRemoved",
+				"thread": "(78442, 19617311)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 131.007,
+				"durationMs": 0.008,
+				"taskUnionMs": 0.008
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 4,
+				"field": "visibility",
+				"thread": "(78442, 19617311)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 130.725,
+				"durationMs": 0.293,
+				"taskUnionMs": 0.292
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 4,
+				"field": "textOwners",
+				"thread": "(78442, 19617311)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 131.019,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 4,
+				"field": "ownedAtomCounts",
+				"thread": "(78442, 19617311)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 131.022,
+				"durationMs": 0.002,
+				"taskUnionMs": 0.002
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 4,
+				"field": "registersTargets",
+				"thread": "(78442, 19617311)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 131.025,
+				"durationMs": 0.006,
+				"taskUnionMs": 0.006
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 4,
+				"field": "textCaches",
+				"thread": "(78442, 19617311)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 131.032,
+				"durationMs": 0.003,
+				"taskUnionMs": 0.003
+			},
+			{
+				"kind": "owned-fork",
+				"invocation": 4,
+				"field": "metadataReceipts",
+				"thread": "(78442, 19617311)",
+				"threadName": "DedicatedWorker thread",
+				"startRelativeMs": 131.036,
+				"durationMs": 0.004,
+				"taskUnionMs": 0.004
+			}
+		],
+		"profileChunks": 0
+	},
+	{
+		"count": 512,
+		"file": "stable-copy-native-mc-512-selection.trace.json",
+		"sha256": "512e3a30aaee4c685266b09215c71ea2beacf37eaafb8a58898e03ccb1d2a9f4",
+		"bytes": 4794770,
+		"spans": [],
+		"profileChunks": 0
+	}
+]

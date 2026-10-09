@@ -1,0 +1,10 @@
+--- ../baseline-editor.css.txt	2026-10-09 02:06:06
++++ src/client/components/editor.css	2026-10-09 02:06:06
+@@ -303,6 +303,7 @@
+ 
+ [data-editor] [data-editor-line] {
+ 	display: block;
++	unicode-bidi: plaintext;
+ 	contain: layout style paint;
+ }
+ 

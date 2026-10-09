@@ -1,0 +1,18 @@
+[
+	{
+		"file": "src/shared/crdt.ts",
+		"sha256": "d66602662da7331f5cec4b9af8e34ac234d6a365f4718b0e0841272e1a2ac312"
+	},
+	{
+		"file": "src/shared/text-visibility.ts",
+		"sha256": "7cc025de560687f437460600a0975eb31d3393ea99d898de261cfdbdf2b353f8"
+	},
+	{
+		"file": "src/shared/document-actions.ts",
+		"sha256": "ce0306e866e2ee931a2d4472f3fc9298fed54c5443e24722eb7cd4b3f2f2eafe"
+	},
+	{
+		"file": "src/client/worker-document/worker-editor-basis.ts",
+		"sha256": "fa11ec4ff09406dec6300873a4883d04e21664dc5251a804f03106aaef3275ac"
+	}
+]

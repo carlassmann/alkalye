@@ -1489,6 +1489,30 @@
 			19.589ms to 20.336ms, so the frame budget remains unmet. Evidence:
 			<code>experiments/performance/open-entry-reuse</code>.
 		</p>
+		<h2>Replica copy attribution</h2>
+		<p>
+			Two marked native journeys isolate the remaining owned-copy cost on the
+			1MiB fixture. The atom index takes about 56–60ms and per-target child
+			indexes 51–53ms. Visibility takes under 0.3ms; other fields are tiny. Four
+			copies in the one-range journey are correlated observations, not four
+			independent repetitions. Exact source, ranges, caret and server acceptance
+			passed. This is attribution, not a speed comparison. Evidence:
+			<code>experiments/performance/worker-owned-fork-fields</code>.
+		</p>
+		<h2>RTL paragraph alignment</h2>
+		<p>
+			Editor overlay lines now use the same plaintext bidi paragraph resolution
+			as the native textarea. Six original RTL points had horizontal mismatches
+			of up to 43px; the same points after the CSS change align within 0.5px. A
+			separate twelve-point RTL/mixed Markdown corpus also aligns within 0.5px.
+		</p>
+		<p>
+			The exact production component passed eleven of twelve trusted clicks; one
+			landed a wrapped line late. Later probes refused clicks when idle
+			refinement changed geometry between frames. The CSS fixes paragraph
+			alignment; viewport timing and full pointer parity remain unresolved.
+			Evidence: <code>experiments/performance/editor-paragraph-bidi</code>.
+		</p>
 		<h2>Single cancellation proposals</h2>
 		<p>
 			Undo of one known text contribution now builds a validated cancellation
@@ -1513,8 +1537,8 @@
 			initially stale view, then replay recovers exactly one Undo. Before commit
 			it leaves no action. Callers need unknown-completion reconciliation;
 			worker behavior at this exact boundary remains unproved. Evidence:
-			<code>experiments/performance/worker-single-cancellation-proposal</code> and
-			<code>experiments/performance/document-persist-boundary</code>.
+			<code>experiments/performance/worker-single-cancellation-proposal</code>
+			and <code>experiments/performance/document-persist-boundary</code>.
 		</p>
 		<h2>Repeated worker selection mapping comparison</h2>
 		<p>

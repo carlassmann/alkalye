@@ -1,0 +1,11 @@
+let root=import.meta.dir
+let candidate=process.argv.includes("--candidate")
+let ordered=process.argv.includes("--ordered")
+let built=await Bun.build({entrypoints:[root+"/pointer-isolation-fixture.ts"],target:"browser",plugins:[{name:"viewport-arm",setup(build){build.onResolve({filter:/editor-viewport$/},()=>({path:root+"/src/client/"+(ordered?"retained-release-editor-viewport.ts":candidate?"editor-viewport.ts":"baseline-editor-viewport.ts")}))}}]})
+if(!built.success)throw new AggregateError(built.logs,"Fixture build failed")
+let script=built.outputs[0]
+if(!script)throw Error("Missing fixture build")
+let styles=await Promise.all(["editor.css","editor-viewport.css"].map(name=>Bun.file(root+"/src/client/components/"+name).text()))
+let server=Bun.serve({port:0,routes:{"/":new Response(`<!doctype html><title>Native pointer guard</title><style>:root{--font-size:18px;--line-height:1.8;--background:#fff;--foreground:#111;--font-mono:monospace;--editor-size:18px;--mono:monospace;--ink:#111;--muted:#777}*{box-sizing:border-box}body{margin:0}alkalye-editor{display:block;height:800px}${styles.join("\n")}</style><script type="module" src="/fixture.js"></script>`,{headers:{"Content-Type":"text/html"}}),"/fixture.js":new Response(script,{headers:{"Content-Type":"text/javascript"}})},fetch:()=>new Response("Missing",{status:404})})
+console.log(server.url.href)
+process.once("SIGTERM",()=>{server.stop(true);process.exit(0)})

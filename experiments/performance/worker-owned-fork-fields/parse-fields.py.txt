@@ -1,0 +1,34 @@
+import pathlib,json,re,hashlib
+root=pathlib.Path('/tmp/alkalye-worker-owned-fork-diagnostic');rows=[]
+def union(intervals):
+ total=0;stop=None
+ for start,end in sorted(intervals):
+  if stop is None or start>stop:total+=end-start;stop=end
+  elif end>stop:total+=end-stop;stop=end
+ return total/1000
+for count in [1,512]:
+ for path in (root/f'native-{count}-state').glob('*.trace.json'):
+  data=json.loads(path.read_text());events=data.get('traceEvents',[]) if isinstance(data,dict) else data
+  starts=[e['ts'] for e in events if e.get('name')=='worker-mc:start'];ends=[e['ts'] for e in events if e.get('name')=='worker-mc:end']
+  if not starts or not ends:continue
+  start=starts[0];end=next(v for v in ends if v>start)
+  names={(e.get('pid'),e.get('tid')):e.get('args',{}).get('name') for e in events if e.get('ph')=='M' and e.get('name')=='thread_name'}
+  open={};spans=[]
+  for event in sorted(events,key=lambda e:e.get('ts',0)):
+   match=re.fullmatch(r'(owned-fork|visibility-fork):(\d+):([^:]+):(start|end)',event.get('name',''))
+   if not match:continue
+   kind,invocation,field,phase=match.groups();key=(event.get('pid'),event.get('tid'),kind,invocation,field)
+   if phase=='start':open[key]=event
+   elif key in open:
+    first=open.pop(key);begin=first['ts'];finish=event['ts']
+    if begin>=end or finish<=start:continue
+    thread=key[:2];tasks=[(max(begin,e['ts']),min(finish,e['ts']+e['dur'])) for e in events if (e.get('pid'),e.get('tid'))==thread and e.get('name')=='RunTask' and e.get('dur') and e['ts']<finish and e['ts']+e['dur']>begin]
+    spans.append({'kind':kind,'invocation':int(invocation),'field':field,'thread':str(thread),'threadName':names.get(thread),'startRelativeMs':(begin-start)/1000,'durationMs':(finish-begin)/1000,'taskUnionMs':union(tasks)})
+  rows.append({'count':count,'file':path.name,'sha256':hashlib.sha256(path.read_bytes()).hexdigest(),'bytes':path.stat().st_size,'spans':spans,'profileChunks':sum(e.get('name')=='ProfileChunk' for e in events)})
+(root/'fields-analysis.json').write_text(json.dumps(rows,indent=2)+'\n')
+for row in rows:
+ if row['file'].startswith('Undo-'):
+  grouped={}
+  for span in row['spans']:
+   if span['kind']=='owned-fork':grouped.setdefault((span['thread'],span['invocation']),[]).append(span)
+  print(json.dumps({'count':row['count'],'file':row['file'],'forks':[{'invocation':k[1],'fields':[{n:s[n] for n in ['field','durationMs','taskUnionMs']} for s in v]} for k,v in grouped.items()]}))

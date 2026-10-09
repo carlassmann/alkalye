@@ -1,0 +1,12 @@
+{"name":"longrtl","full":true,"raw":65536,"clickExact":true,"dx":-0.03125,"dy":-0.40625}
+{"name":"longrtl","full":true,"raw":65000,"clickExact":true,"dx":0.1875,"dy":-0.0625}
+{"name":"longrtl","full":true,"raw":66050,"clickExact":true,"dx":0.40625,"dy":-0.15625}
+{"name":"longrtl","full":false,"raw":65536,"clickExact":true,"dx":-0.359375,"dy":-0.28125}
+{"name":"longrtl","full":false,"raw":65000,"clickExact":true,"dx":-0.140625,"dy":0.0625}
+{"name":"longrtl","full":false,"raw":66050,"clickExact":true,"dx":-0.34375,"dy":0.375}
+{"name":"mixedrich","full":true,"raw":65536,"clickExact":true,"dx":-0.203125,"dy":0.15625}
+{"name":"mixedrich","full":true,"raw":65000,"clickExact":true,"dx":0.078125,"dy":-0.5}
+{"name":"mixedrich","full":true,"raw":66050,"clickExact":true,"dx":-0.265625,"dy":-0.1875}
+{"name":"mixedrich","full":false,"raw":65536,"clickExact":true,"dx":-0.203125,"dy":0.15625}
+{"name":"mixedrich","full":false,"raw":65000,"clickExact":true,"dx":0.078125,"dy":31.90625}
+{"name":"mixedrich","full":false,"raw":66050,"clickExact":false,"dx":-0.265625,"dy":-31.78125}

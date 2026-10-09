@@ -1,0 +1,1 @@
+{"name":"longrtl","full":false,"raw":65536,"clickExact":true,"dx":-0.359375,"dy":0.125}

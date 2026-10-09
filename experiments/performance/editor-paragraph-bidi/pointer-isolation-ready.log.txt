@@ -1,0 +1,21 @@
+{"name":"longrtl","full":true,"raw":65536,"clickExact":true,"dx":-0.03125,"dy":-0.40625}
+{"name":"longrtl","full":true,"raw":65000,"clickExact":true,"dx":0.1875,"dy":-0.0625}
+{"name":"longrtl","full":true,"raw":66050,"clickExact":true,"dx":0.40625,"dy":-0.15625}
+{"name":"longrtl","full":false,"raw":65536,"clickExact":true,"dx":-0.359375,"dy":0.125}
+{"name":"longrtl","full":false,"raw":65000,"clickExact":true,"dx":-0.140625,"dy":-0.4375}
+{"name":"longrtl","full":false,"raw":66050,"clickExact":true,"dx":-0.34375,"dy":-0.03125}
+{"name":"mixedrich","full":true,"raw":65536,"clickExact":true,"dx":-0.203125,"dy":0.15625}
+{"name":"mixedrich","full":true,"raw":65000,"clickExact":true,"dx":0.078125,"dy":-0.5}
+{"name":"mixedrich","full":true,"raw":66050,"clickExact":true,"dx":-0.265625,"dy":-0.1875}
+{"name":"mixedrich","full":false,"raw":65536,"clickExact":true,"dx":-0.203125,"dy":0.15625}
+13 |   for(let raw of [65536,65000,66050]) {
+14 |    evaluate(session,`window.pointerFixture.select(${raw},${raw});true`)
+15 |    evaluate(session,"window.pointerFixture.settle()")
+16 |    wait(session,`window.pointerFixture.stableAlignment(${raw}).then(result=>result.stable)`)
+17 |    let geometry=Schema.decodeUnknownSync(Schema.Struct({native:coordinate,visible:coordinate,stable:Schema.Boolean}))(evaluate(session,`window.pointerFixture.stableAlignment(${raw})`))
+18 |    if(!geometry.stable)throw Error("Visible/native caret geometry not stable across frames")
+                                  ^
+error: Visible/native caret geometry not stable across frames
+      at /private/tmp/alkalye-pointer-lifecycle-successor/runtime/pointer-isolation-ready-run.ts:18:30
+
+Bun v1.4.0 (macOS arm64)

@@ -1,0 +1,139 @@
+import { EditorElement } from "./src/client/components/editor"
+import { editorPreferences } from "./src/shared/preferences"
+import { Replica } from "./src/shared/crdt"
+let name=new URL(location.href).searchParams.get("case")??"ascii"
+let line=name==="mixedrich"?("alpha **bold שלום** `code אבג` LTR مرحبا 😀 ".repeat(120)+"\n"):name==="longrtl"?("שלום עולם 😀 אבג ".repeat(300)+"\n"):name==="mixed"?"alpha 😀 beta\r\nnext lone\rrow 😀 end\n":name==="rtl"?"שלום עולם 😀 אבג\r\nمرحبا بالعالم\n":"alpha beta gamma 😀\n"
+let header=name==="mixedrich"?"---\ntitle: Mixed RTL\n---\n":""
+let content=header+Array.from({length:Math.ceil(131072/line.length)},(_,index)=>String(index).padStart(6,"0")+": "+line).join("").slice(0,131072)
+let replica=new Replica("pointer-fixture")
+replica.edit("doc",content)
+let editor=new EditorElement()
+editor.configure({content,atoms:replica.visible("doc"),editable:true,preferences:editorPreferences({autocomplete:false,accessibleInput:new URL(location.href).searchParams.has("full")}),documents:()=>[],isDrawing:()=>false,openDrawing(){},openDocument(){},comments:()=>[],createLinkedDocument:async()=>"unused",report(error){throw error},change(){return undefined},undo(){},select(){},requestAsset(){},attach(){},command(){},find(){}})
+editor.style.height="800px"
+document.body.append(editor)
+let input=editor.querySelector<HTMLTextAreaElement>("#editor")
+if(!input)throw Error("Missing native input")
+let source=editor.source
+if(!source)throw Error("Missing SourceTextarea")
+let events:{type:string,trusted:boolean,buttons:number,x:number,y:number}[]=[]
+for(let type of ["pointerdown","pointermove","pointerup"])input.addEventListener(type,event=>{
+ if(!(event instanceof PointerEvent))return
+ events.push({type:event.type,trusted:event.isTrusted,buttons:event.buttons,x:event.clientX,y:event.clientY})
+})
+function coordinate(raw: number) {
+ let highlight=editor.querySelector("#highlight")
+ if(!highlight || !source)throw Error("Missing public overlay/source")
+ let remaining=source.toView(raw)-source.viewport.viewport.start
+ if(remaining<0)throw Error("Expected coordinate outside painted window")
+ let walker=document.createTreeWalker(highlight,NodeFilter.SHOW_TEXT)
+ for(let node=walker.nextNode();node;node=walker.nextNode()){
+  let size=node.textContent?.length??0
+  if(remaining<size){
+   let range=document.createRange()
+   range.setStart(node,remaining);range.setEnd(node,remaining+1)
+   let bounds=range.getBoundingClientRect()
+   if(!bounds.width || !bounds.height)throw Error("Expected glyph not rendered")
+   let direction=node.parentElement?getComputedStyle(node.parentElement).direction:"ltr"
+   return {raw,x:direction==="rtl"?bounds.right-bounds.width*.2:bounds.left+bounds.width*.2,y:bounds.top+bounds.height*.5,bounds:bounds.toJSON(),direction}
+  }
+  remaining-=size
+ }
+ throw Error("No public rendered source point")
+}
+function overlayCaret(raw: number) {
+ let highlight=editor.querySelector("#highlight")
+ if(!highlight || !source)throw Error("Missing public overlay/source")
+ let remaining=source.toView(raw)-source.viewport.viewport.start
+ if(remaining<0)throw Error("Expected coordinate outside painted window")
+ let walker=document.createTreeWalker(highlight,NodeFilter.SHOW_TEXT)
+ for(let node=walker.nextNode();node;node=walker.nextNode()){
+  let size=node.textContent?.length??0
+  if(remaining<=size){
+   let range=document.createRange()
+   range.setStart(node,remaining);range.collapse(true)
+   let bounds=range.getBoundingClientRect()
+   if(!bounds.height)throw Error("Expected glyph not rendered")
+   let direction=node.parentElement?getComputedStyle(node.parentElement).direction:"ltr"
+   return {raw,x:bounds.left,y:bounds.top+bounds.height*.5,bounds:bounds.toJSON(),direction}
+  }
+  remaining-=size
+ }
+ throw Error("No public rendered source point")
+}
+let clipboard: {text: string, type: string, trusted: boolean} | undefined
+for (let type of ["copy", "cut"]) document.addEventListener(type, event => {
+ if (event instanceof ClipboardEvent) clipboard = {text:event.clipboardData?.getData("text/plain")??"",type:event.type,trusted:event.isTrusted}
+})
+let fixture={
+ clipboard(){return clipboard},
+ selected(){return source.value.slice(source.selectionStart, source.selectionEnd)},
+ cutExact(start:number,end:number){return source.value===content.slice(0,start)+content.slice(end)},
+ coordinate,
+ overlayCaret,
+ alignment(raw:number){let native=fixture.heldCoordinate(raw),visible=overlayCaret(raw);return {native,visible,aligned:Math.abs(native.x-visible.x)<=1&&Math.abs(native.y-visible.y)<=1}},
+ async stableAlignment(raw:number){let first=fixture.alignment(raw);await new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve())));let second=fixture.alignment(raw);return {...second,stable:first.aligned&&second.aligned&&Math.abs(first.visible.x-second.visible.x)<=1&&Math.abs(first.visible.y-second.visible.y)<=1}},
+ nativeCoordinate(raw: number,top:number){
+  if(!source)throw Error("Missing source")
+  source.setSelectionRange(raw,raw)
+  let expected=source.selectionStart
+  let offset=input.selectionStart
+  source.viewport.scrollTop=top
+  let template=editor.querySelector("[data-viewport-measure]")
+  if(!(template instanceof HTMLElement))throw Error("Missing native mirror styles")
+  let measure=template.cloneNode(false)
+  if(!(measure instanceof HTMLElement))throw Error("Invalid native mirror")
+  measure.textContent=input.value+"\u200b"
+  source.viewport.scrollElement.append(measure)
+  let node=measure.firstChild
+  if(!node)throw Error("Missing native mirror text")
+  let range=document.createRange();range.setStart(node,offset);range.collapse(true)
+  let rect=range.getBoundingClientRect()
+  if(!rect.height)throw Error("No native caret rectangle")
+  let native=input.getBoundingClientRect()
+  let mirror=measure.getBoundingClientRect()
+  let style=getComputedStyle(input)
+  let dx=native.left+parseFloat(style.paddingLeft)-mirror.left
+  let dy=native.top+parseFloat(style.paddingTop)-mirror.top
+  measure.remove()
+  return {raw:expected,x:Math.round(rect.left+dx),y:Math.round(rect.top+rect.height*.5+dy),height:rect.height,top}
+ },
+ heldCoordinate(raw: number){
+  if(!source)throw Error("Missing source")
+  let view=source.toView(raw)
+  let window=source.viewport.viewport
+  if(view<window.start||view>window.end)throw Error("Held target outside native window")
+  let expected=raw
+  let prefix=window.direction?1:0
+  let offset=prefix+source.viewport.value.slice(window.start,view).replace(/\r\n?/g,"\n").length
+  let top=source.viewport.scrollElement.scrollTop
+  let template=editor.querySelector("[data-viewport-measure]")
+  if(!(template instanceof HTMLElement))throw Error("Missing native mirror styles")
+  let measure=template.cloneNode(false)
+  if(!(measure instanceof HTMLElement))throw Error("Invalid native mirror")
+  measure.textContent=input.value+"\u200b"
+  source.viewport.scrollElement.append(measure)
+  let node=measure.firstChild
+  if(!node)throw Error("Missing native mirror text")
+  let range=document.createRange();range.setStart(node,offset);range.collapse(true)
+  let rect=range.getBoundingClientRect()
+  if(!rect.height)throw Error("No native caret rectangle")
+  let native=input.getBoundingClientRect()
+  let mirror=measure.getBoundingClientRect()
+  let style=getComputedStyle(input)
+  let dx=native.left+parseFloat(style.paddingLeft)-mirror.left
+  let dy=native.top+parseFloat(style.paddingTop)-mirror.top
+  measure.remove()
+  return {raw:expected,x:Math.round(rect.left+dx),y:Math.round(rect.top+rect.height*.5+dy),height:rect.height,top}
+ },
+ state(){return {active:document.activeElement===input,edge:document.body.dataset.pointerEdge,writes:document.body.dataset.pointerWrites,sourceExact:source.value===content,publicStart:source.selectionStart,publicEnd:source.selectionEnd,publicDirection:source.selectionDirection,nativeDirection:input.selectionDirection,nativePrefix:input.value.slice(0,1),nativeStart:input.selectionStart,nativeEnd:input.selectionEnd,nativeLength:input.value.length,window:source.viewport.viewport,scrollTop:source.viewport.scrollElement.scrollTop,events}},
+ reveal(){source.setSelectionRange(65536,65536);source.viewport.revealOffset(65536)},
+ clear(){events=[]},
+ select(start:number,end:number){source.setSelectionRange(start,end);return fixture.state()},
+ full(enabled:boolean){source.viewport.fullDocument(enabled);return fixture.state()},
+ coverage(){let view=source.viewport.viewport;let host=source.viewport.scrollElement;return {sourceExact:source.value===content,start:source.selectionStart,end:source.selectionEnd,viewportCovered:view.top<=host.scrollTop&&view.top+view.height>=Math.min(host.scrollTop+host.clientHeight,host.scrollHeight),selectionCovered:view.start<=source.selectionStart&&view.end>=source.selectionEnd,window:view,nativeLength:input.value.length}},
+ async settle(){await new Promise<void>(resolve=>requestIdleCallback(()=>requestAnimationFrame(()=>resolve())))},
+ composition(){input.dispatchEvent(new CompositionEvent("compositionstart",{bubbles:true}));input.dispatchEvent(new CompositionEvent("compositionend",{bubbles:true}));return {synthetic:true,sourceExact:source.value===content}}
+}
+declare global{interface Window{pointerFixture:typeof fixture}}
+window.pointerFixture=fixture
+document.body.dataset.ready="true"

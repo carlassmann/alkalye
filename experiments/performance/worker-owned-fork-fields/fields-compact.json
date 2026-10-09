@@ -1,0 +1,62 @@
+[
+	{
+		"count": 1,
+		"forks": 4,
+		"medianFields": {
+			"freezeFacts": 0.007,
+			"operations": 0.003,
+			"legacyTargets": 0.003,
+			"atomIndex": 56.27,
+			"children": 51.446,
+			"visibility": 0.062,
+			"textOwners": 0.002,
+			"ownedAtomCounts": 0.002,
+			"registersTargets": 0.009,
+			"textCaches": 0.003,
+			"metadataReceipts": 0.002
+		},
+		"maxFields": {
+			"freezeFacts": 0.019,
+			"operations": 0.004,
+			"legacyTargets": 0.003,
+			"atomIndex": 58.663,
+			"children": 53.029,
+			"visibility": 0.072,
+			"textOwners": 0.002,
+			"ownedAtomCounts": 0.002,
+			"registersTargets": 0.031,
+			"textCaches": 0.016,
+			"metadataReceipts": 0.003
+		}
+	},
+	{
+		"count": 512,
+		"forks": 1,
+		"medianFields": {
+			"freezeFacts": 0.023,
+			"operations": 0.003,
+			"legacyTargets": 0.003,
+			"atomIndex": 59.814,
+			"children": 52.012,
+			"visibility": 0.293,
+			"textOwners": 0.002,
+			"ownedAtomCounts": 0.002,
+			"registersTargets": 0.006,
+			"textCaches": 0.003,
+			"metadataReceipts": 0.004
+		},
+		"maxFields": {
+			"freezeFacts": 0.023,
+			"operations": 0.003,
+			"legacyTargets": 0.003,
+			"atomIndex": 59.814,
+			"children": 52.012,
+			"visibility": 0.293,
+			"textOwners": 0.002,
+			"ownedAtomCounts": 0.002,
+			"registersTargets": 0.006,
+			"textCaches": 0.003,
+			"metadataReceipts": 0.004
+		}
+	}
+]

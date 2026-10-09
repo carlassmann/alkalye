@@ -1,0 +1,24 @@
+import { browser,evaluate,serverAddress,wait } from "./tests/browser-driver"
+import * as Schema from "effect/Schema"
+let coordinate=Schema.Struct({x:Schema.Number,y:Schema.Number})
+let rows=[]
+let server=Bun.spawn(["bun","pointer-retained-release-server.ts"],{stdout:"pipe",stderr:"inherit"})
+let session="pointer-visible-alignment-"+Date.now()
+try {
+ let origin=await serverAddress(server.stdout)
+ for(let name of ["longrtl","mixedrich"]) for(let full of [true,false]) {
+  browser(session,"set","viewport","1280","800")
+  browser(session,"open",origin+"?case="+name+(full?"&full":""))
+  wait(session,"document.body.dataset.ready==='true'")
+  for(let raw of [65536,65000,66050]) {
+   evaluate(session,`window.pointerFixture.select(${raw},${raw});true`)
+   evaluate(session,"window.pointerFixture.settle()")
+   let native=Schema.decodeUnknownSync(coordinate)(evaluate(session,`window.pointerFixture.heldCoordinate(${raw})`))
+   let visible=Schema.decodeUnknownSync(coordinate)(evaluate(session,`window.pointerFixture.overlayCaret(${raw})`))
+   let state=evaluate(session,"window.pointerFixture.state()")
+   rows.push({name,full,raw,native,visible,dx:visible.x-native.x,dy:visible.y-native.y,state})
+   await Bun.write("../visible-css-root-corpus-results.json",JSON.stringify(rows,null,2))
+   console.log(JSON.stringify({name,full,raw,dx:visible.x-native.x,dy:visible.y-native.y}))
+  }
+ }
+} finally {try{browser(session,"close")}finally{server.kill();await server.exited}}

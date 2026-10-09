@@ -1,0 +1,3 @@
+{"count":1,"stage":"native","driverPid":78197}
+{"count":512,"stage":"native","driverPid":78428}
+{"stage":"complete","cells":2}

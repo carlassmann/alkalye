@@ -1,0 +1,20 @@
+[
+	{
+		"count": 1,
+		"stage": "terminal",
+		"driverPid": 78197,
+		"code": 0,
+		"gates": [
+			"native 1 exact source/all ranges/directions/primary/caret and independent edit+Undo acceptance"
+		]
+	},
+	{
+		"count": 512,
+		"stage": "terminal",
+		"driverPid": 78428,
+		"code": 0,
+		"gates": [
+			"native 512 exact source/all ranges/directions/primary/caret and independent edit+Undo acceptance"
+		]
+	}
+]
