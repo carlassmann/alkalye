@@ -27,6 +27,28 @@ export class SqliteProbe {
 						execute: () => sql`SELECT bytes FROM binary_probe WHERE id=1`,
 					})(undefined)
 					let boolean = yield* sql`SELECT ${true} AS value`
+					yield* sql`CREATE TABLE IF NOT EXISTS yield_probe (id INTEGER PRIMARY KEY)`
+					yield* sql`DELETE FROM yield_probe`
+					yield* sql.withTransaction(
+						Effect.gen(function* () {
+							for (let id = 0; id < 512; id++)
+								yield* sql`INSERT INTO yield_probe VALUES(${id})`
+						}),
+					)
+					let bulkFailure = yield* sql
+						.withTransaction(
+							Effect.gen(function* () {
+								for (let id = 512; id < 1024; id++)
+									yield* sql`INSERT INTO yield_probe VALUES(${id})`
+								return yield* Effect.fail("bulk rollback")
+							}),
+						)
+						.pipe(Effect.result)
+					let bulkRows = yield* SqlSchema.findOne({
+						Request: Schema.Void,
+						Result: Schema.Struct({ count: Schema.Natural }),
+						execute: () => sql`SELECT COUNT(*) AS count FROM yield_probe`,
+					})(undefined)
 					let failed = yield* sql
 						.withTransaction(
 							Effect.gen(function* () {
@@ -97,6 +119,8 @@ export class SqliteProbe {
 					return {
 						binary: [...binary.bytes],
 						boolean,
+						bulkFailure,
+						bulkRows: bulkRows.count,
 						failed,
 						nested,
 						interrupted,

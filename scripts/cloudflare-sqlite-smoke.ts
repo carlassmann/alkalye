@@ -44,6 +44,11 @@ let child = Bun.spawn(
 let resultSchema = Schema.Struct({
 	binary: Schema.Array(Schema.Number),
 	boolean: Schema.Array(Schema.Struct({ value: Schema.Number })),
+	bulkRows: Schema.Literal(512),
+	bulkFailure: Schema.Struct({
+		_tag: Schema.Literal("Failure"),
+		failure: Schema.Literal("bulk rollback"),
+	}),
 	failed: Schema.Struct({
 		_tag: Schema.Literal("Failure"),
 		failure: Schema.Literal("expected"),
@@ -83,7 +88,7 @@ try {
 		throw Error("SqlClient transaction state differs")
 	console.log(JSON.stringify(result))
 	console.log(
-		"PASS actual workerd SqlClient: failed/nested/interrupted rollback, concurrent reader isolation",
+		"PASS actual workerd SqlClient: automatic yields, bulk/failed/nested/interrupted rollback, concurrent reader isolation",
 	)
 	child.kill("SIGTERM")
 	await child.exited

@@ -6,6 +6,7 @@ import * as Layer from "effect/Layer"
 import * as Option from "effect/Option"
 import * as Reactivity from "effect/reactivity/Reactivity"
 import * as Schema from "effect/Schema"
+import * as Scheduler from "effect/Scheduler"
 import * as Semaphore from "effect/Semaphore"
 import * as SqlClient from "effect/sql/SqlClient"
 import type * as SqlConnection from "effect/sql/SqlConnection"
@@ -57,6 +58,7 @@ function makeClient(storage: DurableObjectStorage) {
 			SqlClient.TransactionConnection.Service
 		>(`alkalye/CloudflareSqlite/Transaction/${clientId++}`)
 		let semaphore = yield* Semaphore.make(1)
+		let transactionScheduler = new Scheduler.MixedScheduler("sync")
 		let connection: SqlConnection.Connection = {
 			execute,
 			executeUnprepared: execute,
@@ -85,6 +87,8 @@ function makeClient(storage: DurableObjectStorage) {
 				let depth = Option.isSome(current) ? current.value[1] + 1 : 0
 				let body = effect.pipe(
 					Effect.provideService(transaction, [connection, depth]),
+					// Native transaction gates block timer-based automatic yields until commit.
+					Effect.provideService(Scheduler.Scheduler, transactionScheduler),
 				)
 				let run = Effect.callback<
 					Effect.Success<typeof effect>,
