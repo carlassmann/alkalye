@@ -381,7 +381,6 @@ function makeSession(options: DocumentSessionOptions) {
 			function* () {
 				while (Queue.sizeUnsafe(unsaved)) {
 					let first = yield* Queue.peek(unsaved)
-					yield* recovery.attempt("projection", projection.replay)
 					if (!typingBatch) {
 						let originals = options.batchTyping
 							? projection.typingDrafts(
@@ -400,6 +399,7 @@ function makeSession(options: DocumentSessionOptions) {
 								: { action: first, originals: [first] }
 					}
 					let batch = typingBatch
+					yield* recovery.attempt("projection", projection.replay)
 					if (projection.proposed(batch.action.id))
 						yield* projection.validate({
 							kind: "proposed",

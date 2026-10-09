@@ -497,6 +497,25 @@ function makeLibrary() {
 										}),
 									)
 									.pipe(transport.observe("snapshot")),
+							commitBatch: actions =>
+								Effect.gen(function* () {
+									let first = actions[0]
+									if (!first)
+										return yield* Effect.fail(
+											new DocumentConflict({ message: "Missing batch action" }),
+										)
+									yield* Effect.forEach(
+										actions,
+										action => blobs.upload(action),
+										{ discard: true },
+									)
+									return yield* account.request(
+										account.api.documents.commitBatch({
+											params: { document: first.document },
+											payload: { actions: [...actions] },
+										}),
+									)
+								}).pipe(transport.observe("commit")),
 							commit: action =>
 								blobs.upload(action).pipe(
 									Effect.andThen(

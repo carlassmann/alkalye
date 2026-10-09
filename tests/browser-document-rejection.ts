@@ -473,13 +473,24 @@ export function verifyRejectedDocumentActions(subject: string, check: Check) {
 						"rollback keeps draft operation identities unique and never reuses a rejected id",
 					)
 					yield* session.flush
+					let pendingTyping = session.pending()
 					yield* session.sync
-					for (let operation of operations)
+					for (let operation of operations) {
+						let proposal = pendingTyping.find(action =>
+							action.changes.some(change => change.id === operation.id),
+						)
+						if (!proposal) throw new Error("Missing retained typing proposal")
+						let accepted = yield* remote.action(
+							typingOptions.document,
+							proposal.id,
+						)
 						check(
-							(yield* remote.action(typingOptions.document, operation.id))
-								.changes[0]?.id === operation.id,
+							accepted.changes.some(change => change.id === operation.id) &&
+								JSON.stringify(accepted.changes) ===
+									JSON.stringify(proposal.changes),
 							"typing retained through rollback reaches the server with its original operation identity",
 						)
+					}
 					view.update(
 						session.replica.text(typingOptions.document),
 						session.replica.visible(typingOptions.document),

@@ -60,6 +60,10 @@ export function verifyDocumentBlobs(
 						initialCreation: creation,
 						transport: {
 							...remote,
+							commitBatch: actions =>
+								Effect.forEach(actions, action => blobs.upload(action), {
+									discard: true,
+								}).pipe(Effect.andThen(remote.commitBatch(actions))),
 							commit: action =>
 								blobs
 									.upload(action)
