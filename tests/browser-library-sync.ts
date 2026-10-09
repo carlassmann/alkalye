@@ -8,7 +8,7 @@ import * as ManagedRuntime from "effect/ManagedRuntime"
 import { WorkspaceStore } from "../src/server/document-store"
 import { Identity } from "../src/shared/workspace"
 import { Replica } from "../src/shared/crdt"
-import { buildAction } from "../src/shared/document-actions"
+import { buildAction, restoreSnapshot } from "../src/shared/document-actions"
 import { newDocument } from "../src/shared/documents"
 import { assert, browser, evaluate, wait } from "./browser-driver"
 
@@ -51,6 +51,44 @@ if (process.argv.includes("--serve")) {
 				return new Response(script, {
 					headers: { "content-type": "text/javascript" },
 				})
+			if (url.pathname === "/test/accepted" || url.pathname === "/test/peer") {
+				let content =
+					url.pathname === "/test/peer" ? await request.text() : undefined
+				let accepted = await runtime.runPromise(
+					Effect.gen(function* () {
+						let store = yield* WorkspaceStore
+						let snapshot = yield* store.snapshot("sync-proof")
+						if (!snapshot) throw Error("Expected existing server document")
+						let replica = yield* restoreSnapshot(snapshot, "sync-owner")
+						if (content !== undefined) {
+							let action = yield* buildAction(
+								replica,
+								"sync-proof",
+								"Peer header",
+								staged => [staged.edit("sync-proof", content)],
+							)
+							yield* store.commit(action)
+							snapshot = yield* store.snapshot("sync-proof")
+							if (!snapshot)
+								throw Error(
+									"Expected existing server document after peer commit",
+								)
+							replica = yield* restoreSnapshot(snapshot, "sync-owner")
+						}
+						return {
+							content: replica.text("sync-proof"),
+							position: snapshot.position,
+							log: snapshot.log,
+						}
+					}).pipe(
+						Effect.provideService(Identity, {
+							subject: "sync-owner",
+							actors: ["sync-owner"],
+						}),
+					),
+				)
+				return Response.json(accepted)
+			}
 			if (url.pathname === "/test/library-failure") {
 				failLibrary = (await request.text()) === "true"
 				return new Response("ok")
@@ -191,6 +229,183 @@ if (process.argv.includes("--serve")) {
 			!evaluate(session, "window.librarySyncFailure ?? null"),
 			"library opens through real IndexedDB and authenticated HTTP",
 		)
+		evaluate(session, "window.librarySync.startInput()")
+		evaluate(session, "window.librarySync.reset()")
+		evaluate(
+			session,
+			"window.snapshotExpected=" +
+				JSON.stringify(
+					'---\ntitle: "Snapshot quiet"\n---\nBody [link](https://example.com/) 😀',
+				) +
+				";window.librarySync.edit(window.snapshotExpected).then(()=>window.librarySync.sync())",
+		)
+		wait(
+			session,
+			"window.librarySync.status()==='synced'&&window.librarySync.pending()===0&&window.librarySync.source()===window.snapshotExpected",
+		)
+		assert(
+			evaluate(session, "window.librarySync.counts.projectionWrites===0"),
+			"accepted sync with active owner does not force checkpoint projection",
+		)
+		evaluate(session, "window.librarySync.stopInput()")
+		wait(session, "window.librarySync.counts.projectionWrites>0")
+		assert(
+			evaluate(
+				session,
+				"window.librarySync.source()===window.snapshotExpected",
+			),
+			"quiet checkpoint retains source",
+		)
+		evaluate(
+			session,
+			"fetch('/test/accepted').then(response=>response.json()).then(value=>window.snapshotServer=value)",
+		)
+		assert(
+			evaluate(
+				session,
+				"window.snapshotServer.content===window.snapshotExpected",
+			),
+			"independent real SQLite source matches accepted edit",
+		)
+		evaluate(session, "window.librarySync.snapshotCacheFault(true)")
+		evaluate(
+			session,
+			"window.librarySync.edit(window.snapshotExpected+String.fromCharCode(10)+'Cache retry').then(()=>window.librarySync.sync())",
+		)
+		wait(session, "Boolean(window.librarySync.snapshotFailure())")
+		assert(
+			evaluate(
+				session,
+				"window.librarySync.source()===window.snapshotExpected+String.fromCharCode(10)+'Cache retry'&&window.librarySync.status()==='synced'",
+			),
+			"checkpoint failure does not undo durable synchronized edit",
+		)
+		evaluate(
+			session,
+			"window.snapshotExpected+=String.fromCharCode(10)+'Cache retry';window.librarySync.snapshotCacheFault(false)",
+		)
+		wait(session, "window.librarySync.snapshotFailure()===undefined")
+
+		evaluate(
+			session,
+			"window.librarySync.rows().then(rows=>window.snapshotRows=rows)",
+		)
+		assert(
+			evaluate(
+				session,
+				"window.snapshotRows.some(row=>row.summary.metadata.title==='Snapshot quiet'&&row.summary.excerpt.includes('Body'))",
+			),
+			"quiet real local catalogue updates frontmatter and excerpt",
+		)
+		evaluate(session, "window.librarySync.startInput()")
+		evaluate(session, "window.librarySync.reset()")
+		evaluate(
+			session,
+			"window.snapshotExpected=window.snapshotExpected.replace('Snapshot quiet','Manual metadata');window.librarySync.edit(window.snapshotExpected).then(()=>window.librarySync.retry())",
+		)
+		assert(
+			evaluate(session, "window.librarySync.counts.projectionWrites>0"),
+			"manual retry projects changed source under input",
+		)
+		evaluate(
+			session,
+			"window.librarySync.rows().then(rows=>window.manualRows=rows)",
+		)
+		assert(
+			evaluate(
+				session,
+				"window.manualRows.some(row=>row.summary.metadata.title==='Manual metadata')",
+			),
+			"manual retry publishes changed metadata before input stops",
+		)
+		assert(
+			evaluate(
+				session,
+				"window.librarySync.status()==='synced'&&window.librarySync.source()===window.snapshotExpected",
+			),
+			"manual retry remains forced and durable under input",
+		)
+		evaluate(session, "window.librarySync.stopInput()")
+		evaluate(
+			session,
+			"navigator.serviceWorker.register('/fixture-sw.js').then(()=>navigator.serviceWorker.ready)",
+		)
+		wait(session, "Boolean(navigator.serviceWorker.controller)")
+		let coldSource = evaluate(session, "window.snapshotExpected")
+		if (typeof coldSource !== "string") throw Error("Exact source prerequisite")
+		browser(session, "set", "offline", "true")
+		evaluate(session, "window.librarySync.close()")
+		browser(session, "reload")
+		wait(session, "Boolean(window.librarySync || window.librarySyncFailure)")
+		assert(
+			evaluate(
+				session,
+				"window.librarySync.source()===" + JSON.stringify(coldSource),
+			),
+			"new offline page restores exact IndexedDB journal source",
+		)
+		evaluate(session, "window.snapshotExpected=" + JSON.stringify(coldSource))
+		browser(session, "set", "offline", "false")
+		evaluate(session, "window.librarySync.sync()")
+		evaluate(
+			session,
+			"window.snapshotExpected=window.snapshotExpected.replace('Manual metadata','Peer metadata');fetch('/test/peer',{method:'POST',body:window.snapshotExpected}).then(response=>{if(!response.ok)throw Error('Peer commit failed')}).then(()=>window.librarySync.sync())",
+		)
+		wait(session, "window.librarySync.source()===window.snapshotExpected")
+		wait(
+			session,
+			"window.librarySync.rows().then(rows=>rows.some(row=>row.summary.metadata.title==='Peer metadata'))",
+		)
+		assert(
+			evaluate(
+				session,
+				"window.librarySync.source()===window.snapshotExpected",
+			),
+			"peer frontmatter and quiet catalogue remain exact",
+		)
+		evaluate(session, "window.librarySync.refresh()")
+		assert(
+			evaluate(
+				session,
+				"window.librarySync.catalogueTitle()==='Peer metadata'",
+			),
+			"public library catalogue publishes peer metadata",
+		)
+		browser(session, "set", "offline", "true")
+		evaluate(
+			session,
+			"window.librarySync.reset();window.snapshotExpected=window.snapshotExpected.replace('Peer metadata','No owner metadata')+String.fromCharCode(10)+'No owner durable';window.librarySync.edit(window.snapshotExpected).then(()=>window.librarySync.releaseDocument())",
+		)
+		browser(session, "set", "offline", "false")
+		wait(
+			session,
+			"fetch('/test/accepted').then(response=>response.json()).then(value=>{window.noOwnerAccepted=value;return value.content===window.snapshotExpected})",
+		)
+		wait(
+			session,
+			"window.librarySync.rows().then(rows=>rows.some(row=>row.summary.document==='sync-proof'&&!row.dirty&&row.summary.metadata.title==='No owner metadata'&&row.remotePosition===window.noOwnerAccepted.position))",
+		)
+		wait(session, "window.librarySync.counts.projectionWrites>0")
+		let noOwnerSource = evaluate(session, "window.snapshotExpected")
+		if (typeof noOwnerSource !== "string")
+			throw Error("Exact no-owner source prerequisite")
+		browser(session, "set", "offline", "true")
+		evaluate(session, "window.librarySync.close()")
+		browser(session, "reload")
+		wait(session, "Boolean(window.librarySync || window.librarySyncFailure)")
+		assert(
+			evaluate(
+				session,
+				"window.librarySync.source()===" + JSON.stringify(noOwnerSource),
+			),
+			"no-owner accepted projection then new offline page restores exact IndexedDB journal",
+		)
+		evaluate(
+			session,
+			"window.snapshotExpected=" + JSON.stringify(noOwnerSource),
+		)
+		browser(session, "set", "offline", "false")
+		evaluate(session, "window.librarySync.sync()")
 		evaluate(session, "window.librarySync.reset()")
 		evaluate(
 			session,

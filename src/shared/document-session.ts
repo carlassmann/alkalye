@@ -294,33 +294,52 @@ function makeSession(options: DocumentSessionOptions) {
 			Effect.sync(() => new BroadcastChannel(documentDatabaseName(options))),
 			channel => Effect.sync(() => channel.close()),
 		)
-		let saveSnapshot = gate
-			.withPermit(
-				Effect.all([
-					projection.captureSnapshot,
-					options.activity
-						? projection.captureState
-						: Effect.succeed(undefined),
-				]),
-			)
-			.pipe(
-				Effect.flatMap(([snapshot, state]) =>
+		let snapshotCapture = gate.withPermit(
+			Effect.all([
+				projection.captureSnapshot,
+				options.activity ? projection.captureState : Effect.succeed(undefined),
+			]),
+		)
+		let saveSnapshot = snapshotCapture.pipe(Effect.flatMap(persistSnapshot))
+		let snapshotInput = backgroundWork.snapshotInput
+		let backgroundSnapshot = snapshotInput
+			? Effect.scoped(
 					Effect.gen(function* () {
-						if (snapshot) yield* projection.saveSnapshot(snapshot)
-						if (options.activity && state?.localPosition)
-							return yield* options.activity
-								.projected(state)
-								.pipe(Effect.as(Option.some(state)))
-						return snapshot ? Option.some(snapshot) : Option.none()
+						let nextInput = yield* snapshotInput
+						return yield* Effect.raceFirst(
+							backgroundWork.beforeSnapshot.pipe(
+								Effect.andThen(snapshotCapture),
+								Effect.map(Option.some),
+							),
+							nextInput.pipe(Effect.as(Option.none())),
+						)
 					}),
-				),
-			)
+				).pipe(
+					Effect.flatMap(captured =>
+						Option.isNone(captured)
+							? Effect.succeed(Option.none())
+							: persistSnapshot(captured.value),
+					),
+				)
+			: saveSnapshot
+		function persistSnapshot([snapshot, state]: Effect.Success<
+			typeof snapshotCapture
+		>) {
+			return Effect.gen(function* () {
+				if (snapshot) yield* projection.saveSnapshot(snapshot)
+				if (options.activity && state?.localPosition)
+					return yield* options.activity
+						.projected(state)
+						.pipe(Effect.as(Option.some(state)))
+				return snapshot ? Option.some(snapshot) : Option.none()
+			})
+		}
 		let notify = Effect.sync(() => channel.postMessage(null))
 		let recovery = yield* makeDocumentRecovery(
 			{
 				save: Effect.suspend(() => rawFlushUnlocked),
 				projection: projection.replay,
-				snapshot: saveSnapshot,
+				snapshot: backgroundSnapshot,
 				notification: notify,
 			},
 			{ save: gate, projection: gate, snapshot: cacheWrites },

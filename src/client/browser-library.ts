@@ -302,15 +302,10 @@ function makeLibrary() {
 					yield* Effect.scoped(
 						Effect.gen(function* () {
 							let opened = yield* RcMap.get(documents, row.summary.document)
-							let alreadySaved = false
 							if (navigator.onLine) {
 								yield* opened.connection.synchronize
-								let synchronized =
-									opened.connection.current().status === "synced"
-								alreadySaved = synchronized && !opened.session.unsaved()
-								updated ||= synchronized
-							}
-							if (!alreadySaved) yield* opened.session.save
+								updated ||= opened.connection.current().status === "synced"
+							} else yield* opened.session.save
 						}),
 					).pipe(
 						Effect.catch(() =>
@@ -633,7 +628,7 @@ function makeLibrary() {
 						Object.freeze({ status: "syncing" }),
 					).pipe(
 						Effect.andThen(session.sync.pipe(transport.observe("sync"))),
-						Effect.andThen(session.save),
+						Effect.andThen(manual ? session.save : Effect.void),
 						Effect.andThen(
 							Effect.suspend(() =>
 								SubscriptionRef.set(

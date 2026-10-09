@@ -124,17 +124,42 @@
 			the caret after the match; Replace still changes that match. Closing Find
 			and typing inserts text instead of deleting the matched word. Native and
 			fallback highlight browser journeys passed, including distant matches,
-			replacement and subsequent typing. Full checks passed 752 tests and
-			41,767 assertions. The earlier comparison table predates this change;
-			its search-close timings are not a measurement of the corrected journey.
+			replacement and subsequent typing. Full checks passed 752 tests and 41,767
+			assertions. The earlier comparison table predates this change; its
+			search-close timings are not a measurement of the corrected journey.
 		</p>
-		<h2>Snapshot cancellation missed the browser path</h2>
+		<h2>Interrupt automatic snapshots when input arrives</h2>
+		<p>
+			Three alternating pairs on <code>6ec4596</code> removed redundant forced
+			snapshots from automatic online sync and interrupted optional capture when
+			trusted input arrived. All six cells passed exact source, caret,
+			independently accepted edit and Undo, and reload checks. Actual first-key
+			dispatch overlapped compaction in every cell; all three candidate captures
+			interrupted within 0.25ms. Journal writes remain outside cancellation.
+		</p>
+		<p>
+			Median first-key enclosing task fell from 12.673 to 6.855ms; its worst
+			trial fell from 17.697 to 8.959ms. Median main-thread work over three
+			seconds fell from 2,118.496 to 1,359.921ms (35.8%). Other input tasks
+			still reached 16.856ms. Undo work rose 2.8% at the median; its observed
+			exact source-and-caret frame opportunity was 36.7 versus 37.4ms. These
+			results support less interference during input, not sustained 120fps.
+			First-key visible feedback and physical presentation were not measured.
+		</p>
+		<p>
+			Manual saves, lifecycle saves and offline draining still force snapshots.
+			Quiet-time summaries may lag during continuous input; public browser
+			contracts cover recovery, peer metadata, manual save and a real offline
+			page reload. The earlier two-module trial below missed the forced online
+			path and was not adopted.
+		</p>
+		<h2>Earlier snapshot cancellation missed the browser path</h2>
 		<p>
 			One matched pair on <code>754c9d6</code> typed eight trusted keys during
 			actual compaction. Both builds passed exact source, native caret,
 			independent accepted edit and Undo, and reload checks. The cancellation
-			candidate emitted no interrupted-capture marker. Its largest task over
-			the three-second input window worsened from 13.526 to 16.857ms; total
+			candidate emitted no interrupted-capture marker. Its largest task over the
+			three-second input window worsened from 13.526 to 16.857ms; total
 			main-thread task time rose from 2,224 to 2,468ms. It remains outside
 			production. Source inspection found another path: automatic library sync
 			forces a snapshot, bypassing the cancellable background capture. This pair

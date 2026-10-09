@@ -1,6 +1,8 @@
 import * as Context from "effect/Context"
 import * as Effect from "effect/Effect"
 import * as Exit from "effect/Exit"
+import * as Fiber from "effect/Fiber"
+import { LocalDocuments } from "../src/client/local-documents"
 import * as Layer from "effect/Layer"
 import * as PubSub from "effect/PubSub"
 import * as Scope from "effect/Scope"
@@ -23,9 +25,17 @@ interface Counts {
 	projectionWrites: number
 }
 interface Probe {
+	startInput(): Promise<void>
+	stopInput(): Promise<void>
+	releaseDocument(): Promise<void>
+	reopenDocument(): Promise<void>
+	rows(): Promise<unknown>
 	refresh(): Promise<void>
 	cacheFault(value: boolean): void
+	snapshotCacheFault(value: boolean): void
+	snapshotFailure(): string | undefined
 	state(): { refresh: string; message?: string; cacheFailure?: string }
+	catalogueTitle(): string | undefined
 	workspaceName(): string | undefined
 	roles(): ReadonlyArray<string>
 
@@ -48,6 +58,7 @@ declare global {
 	}
 }
 let failCache = false
+let failDocumentSummary = false
 let counts: Counts = {
 	pulls: 0,
 	projections: 0,
@@ -95,6 +106,16 @@ Effect.runPromise(
 					}
 				if (property === "modify")
 					return function (key: string, update: (value: unknown) => unknown) {
+						if (failDocumentSummary && key.startsWith("document-summary:"))
+							return Effect.fail(
+								new StorageError({
+									operation: "controlled document summary",
+									cause: new DOMException(
+										"Retryable snapshot fault",
+										"UnknownError",
+									),
+								}),
+							)
 						return target.modify(key, update).pipe(
 							Effect.tap(changed =>
 								Effect.sync(() => {
@@ -164,15 +185,70 @@ Effect.runPromise(
 			Effect.forkIn(scope),
 		)
 
+		let documentScope = yield* Scope.make()
+		yield* Scope.addFinalizer(scope, Scope.close(documentScope, Exit.void))
 		let opened = yield* library
 			.open(document)
-			.pipe(Effect.provideService(Scope.Scope, scope))
+			.pipe(Effect.provideService(Scope.Scope, documentScope))
+		let local = Context.get(
+			yield* Layer.build(
+				LocalDocuments.layer(account.subject).pipe(
+					Layer.provide(Layer.succeed(BrowserStorage, counted)),
+				),
+			).pipe(Effect.provideService(Scope.Scope, scope)),
+			LocalDocuments,
+		)
+		let inputFiber: Fiber.Fiber<void, never> | undefined
 		yield* opened.connection.synchronize
 		function run<A, E>(effect: Effect.Effect<A, E>) {
 			return Effect.runPromise(effect)
 		}
 		window.librarySync = {
+			startInput() {
+				return run(
+					Effect.gen(function* () {
+						if (inputFiber) throw Error("Input activity already active")
+						inputFiber = yield* Effect.forever(
+							Effect.sync(() =>
+								globalThis.document.dispatchEvent(new Event("keydown")),
+							).pipe(Effect.andThen(Effect.sleep("50 millis"))),
+						).pipe(Effect.forkIn(scope))
+					}),
+				).then(() => {})
+			},
+			stopInput() {
+				let fiber = inputFiber
+				inputFiber = undefined
+				return fiber
+					? run(Fiber.interrupt(fiber)).then(() => {})
+					: Promise.resolve()
+			},
+			releaseDocument() {
+				return run(Scope.close(documentScope, Exit.void))
+			},
+			reopenDocument() {
+				return run(
+					Effect.gen(function* () {
+						documentScope = yield* Scope.make()
+						yield* Scope.addFinalizer(
+							scope,
+							Scope.close(documentScope, Exit.void),
+						)
+						opened = yield* library
+							.open(document)
+							.pipe(Effect.provideService(Scope.Scope, documentScope))
+					}),
+				).then(() => {})
+			},
+			rows() {
+				return run(local.rows)
+			},
 			refresh: () => run(library.refresh),
+			snapshotCacheFault(value) {
+				failDocumentSummary = value
+			},
+			snapshotFailure: () =>
+				opened.session.failures.current().snapshot?.message,
 			cacheFault(value) {
 				failCache = value
 			},
@@ -180,6 +256,11 @@ Effect.runPromise(
 				let { refresh, message, cacheFailure } = library.state.current()
 				return { refresh, message, cacheFailure }
 			},
+			catalogueTitle: () =>
+				library.state
+					.current()
+					.library.documents.find(row => row.document === document)?.metadata
+					.title,
 			workspaceName: () =>
 				library.state
 					.current()
