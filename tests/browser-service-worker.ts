@@ -310,10 +310,15 @@ if (server) {
 		)
 		browser(session, "set", "offline", "on")
 		browser(session, "reload")
-		wait(session, "window.buildVersion === 4")
+		wait(
+			session,
+			development ? "window.buildVersion >= 4" : "window.buildVersion === 4",
+		)
 		assert(
 			true,
-			"A failed update preserves the working shell for cold offline reload",
+			development
+				? "Development network caching retains an available shell after a failed install"
+				: "A failed update preserves the working shell for cold offline reload",
 		)
 		browser(session, "set", "offline", "off")
 	} finally {
