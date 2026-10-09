@@ -1,0 +1,68 @@
+import application, {
+	AlkalyeRelay,
+	AlkalyeWorkspace,
+} from "../src/cloudflare/index"
+import type { DeploymentEnvironment } from "../src/cloudflare/settings"
+
+export { AlkalyeRelay, AlkalyeWorkspace }
+
+let gateway = {
+	async fetch(request: Request, environment: DeploymentEnvironment) {
+		let url = new URL(request.url)
+		if (url.pathname === "/__test/workspace-rpc" && request.method === "POST") {
+			let workspace = crypto.randomUUID()
+			let stub = environment.WORKSPACES.get(
+				environment.WORKSPACES.idFromName(workspace),
+			)
+			let identity = { subject: "workspace-rpc-fixture", actors: [] }
+			let phases: {
+				phase: string
+				status?: number
+				error?: { name: string; message: string }
+			}[] = []
+			for (let [phase, operation] of [
+				["library-before", new Request(url.origin + "/api/library")],
+				[
+					"create",
+					new Request(url.origin + "/api/workspaces", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({
+							workspace,
+							name: "Private RPC diagnostic",
+							request: crypto.randomUUID(),
+						}),
+					}),
+				],
+				["library-after", new Request(url.origin + "/api/library")],
+			] satisfies [string, Request][]) {
+				try {
+					let response = await stub.handle(workspace, identity, operation)
+					phases.push({ phase, status: response.status })
+				} catch (error) {
+					phases.push({
+						phase,
+						error:
+							error instanceof Error
+								? { name: error.name, message: error.message.slice(0, 240) }
+								: { name: "Unknown", message: "Non-Error RPC failure" },
+					})
+				}
+			}
+			return Response.json({ phases })
+		}
+		if (url.pathname === "/__test/workspace-direct") {
+			let workspace = url.searchParams.get("workspace")
+			if (!workspace) return new Response("Workspace required", { status: 400 })
+			let stub = environment.WORKSPACES.get(
+				environment.WORKSPACES.idFromName(workspace),
+			)
+			return stub.fetch(
+				new Request(url.origin + "/api/workspaces/" + workspace),
+			)
+		}
+		return application.fetch(request, environment)
+	},
+} satisfies ExportedHandler<DeploymentEnvironment>
+
+export { gateway as default }
