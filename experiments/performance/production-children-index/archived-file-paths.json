@@ -1,0 +1,200 @@
+[
+	{
+		"source": "/tmp/alkalye-production-children-ordinal/archive-production-prepared/README.md",
+		"archive": "experiments/performance/production-children-index/README.md.txt",
+		"bytes": 4240,
+		"sha256": "478dda3b86309a946c45ede5202f13169cbbb41760974210d61bda1219cb76e3"
+	},
+	{
+		"source": "/tmp/alkalye-production-children-ordinal/archive-production-prepared/WITNESSES.json",
+		"archive": "experiments/performance/production-children-index/WITNESSES.json.txt",
+		"bytes": 4671,
+		"sha256": "38b549c467c74c8dd8db357fb95754147fbd3ec62f5702041b1a09feae29842e"
+	},
+	{
+		"source": "/tmp/alkalye-production-children-ordinal/archive-production-prepared/block-sockets.js.txt",
+		"archive": "experiments/performance/production-children-index/block-sockets.js.txt",
+		"bytes": 131,
+		"sha256": "b0b5373552c29a69d14151ec6a3d50ecb27b8dbf55e892a99e3089219f537469"
+	},
+	{
+		"source": "/tmp/alkalye-production-children-ordinal/archive-production-prepared/body-gate-session-length-failed.ts.txt",
+		"archive": "experiments/performance/production-children-index/body-gate-session-length-failed.ts.txt",
+		"bytes": 7722,
+		"sha256": "5b57ed7a4617c7298cfea554d6aa331ecb6afbff6f904dec80b63af905a09130"
+	},
+	{
+		"source": "/tmp/alkalye-production-children-ordinal/archive-production-prepared/browser-probes.ts.txt",
+		"archive": "experiments/performance/production-children-index/browser-probes.ts.txt",
+		"bytes": 7234,
+		"sha256": "016ee3be72a7ecbe05ea1d265d6eb3c9e0f9d183f521c4d5962108979cf5e976"
+	},
+	{
+		"source": "/tmp/alkalye-production-children-ordinal/archive-production-prepared/build-control.log",
+		"archive": "experiments/performance/production-children-index/build-control.log.txt",
+		"bytes": 0,
+		"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+	},
+	{
+		"source": "/tmp/alkalye-production-children-ordinal/archive-production-prepared/build-ordinal.log",
+		"archive": "experiments/performance/production-children-index/build-ordinal.log.txt",
+		"bytes": 0,
+		"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+	},
+	{
+		"source": "/tmp/alkalye-production-children-ordinal/archive-production-prepared/frozen-package-before-sessionfix.json",
+		"archive": "experiments/performance/production-children-index/frozen-package-before-sessionfix.json.txt",
+		"bytes": 121240,
+		"sha256": "371082eb29a9e95a75c97cd4a060558401d865c07243e389e3ec7543f7f3d613"
+	},
+	{
+		"source": "/tmp/alkalye-production-children-ordinal/archive-production-prepared/frozen-package-pins.json",
+		"archive": "experiments/performance/production-children-index/frozen-package-pins.json.txt",
+		"bytes": 121731,
+		"sha256": "55193c70c524c689879295513fc19c965b8d833eb3554537048cbc0dc39dc82a"
+	},
+	{
+		"source": "/tmp/alkalye-production-children-ordinal/archive-production-prepared/gate-control-rich1m.log",
+		"archive": "experiments/performance/production-children-index/gate-control-rich1m.log.txt",
+		"bytes": 310,
+		"sha256": "fd792acada419d717b68fdaec6ae8217df99087c79d112b07488095a6c0ec2ff"
+	},
+	{
+		"source": "/tmp/alkalye-production-children-ordinal/archive-production-prepared/gate-control-small2-retry.log",
+		"archive": "experiments/performance/production-children-index/gate-control-small2-retry.log.txt",
+		"bytes": 310,
+		"sha256": "c50fcb631b48098dd3f7a315be3a520a223bef84b8a9bc04f279cac55d58f21a"
+	},
+	{
+		"source": "/tmp/alkalye-production-children-ordinal/archive-production-prepared/gate-control-small2.log",
+		"archive": "experiments/performance/production-children-index/gate-control-small2.log.txt",
+		"bytes": 879,
+		"sha256": "90a38006156697991f886ff356ad39c691208862d9e101b259e5fa719d27dc2f"
+	},
+	{
+		"source": "/tmp/alkalye-production-children-ordinal/archive-production-prepared/gate-ordinal-rich1m.log",
+		"archive": "experiments/performance/production-children-index/gate-ordinal-rich1m.log.txt",
+		"bytes": 310,
+		"sha256": "6e17a63bf87c59a083dc755592ad626ce2ecd89c34e4ad147ac6b9551a4b8ecd"
+	},
+	{
+		"source": "/tmp/alkalye-production-children-ordinal/archive-production-prepared/gate-ordinal-small2.log",
+		"archive": "experiments/performance/production-children-index/gate-ordinal-small2.log.txt",
+		"bytes": 310,
+		"sha256": "af81f7ff80acc189c59e7444f5613e20f1258e7e134aa5e735e26c5642c9a928"
+	},
+	{
+		"source": "/tmp/alkalye-production-children-ordinal/archive-production-prepared/network.js.txt",
+		"archive": "experiments/performance/production-children-index/network.js.txt",
+		"bytes": 726,
+		"sha256": "7a94ec05710f749d5e1c689181b00078c62e0fbbcd1e596f2d3fa9fa4b0747c0"
+	},
+	{
+		"source": "/tmp/alkalye-production-children-ordinal/archive-production-prepared/parse-production.py.txt",
+		"archive": "experiments/performance/production-children-index/parse-production.py.txt",
+		"bytes": 3382,
+		"sha256": "84e9cd204e807425d629905c932861012837bdc2a7c1960398ba6eea985532bc"
+	},
+	{
+		"source": "/tmp/alkalye-production-children-ordinal/archive-production-prepared/production-analysis.json",
+		"archive": "experiments/performance/production-children-index/production-analysis.json.txt",
+		"bytes": 38604,
+		"sha256": "d4f7084ced6d485cb41ae4aaa44c0e7ef7493dfc7401019e37f98ac3e4975a44"
+	},
+	{
+		"source": "/tmp/alkalye-production-children-ordinal/archive-production-prepared/production-body-gate.ts.txt",
+		"archive": "experiments/performance/production-children-index/production-body-gate.ts.txt",
+		"bytes": 8027,
+		"sha256": "ca20a0db4bde6e50c553f62cfdf66c521a16553174d1915bc7d4edb7b59e716d"
+	},
+	{
+		"source": "/tmp/alkalye-production-children-ordinal/archive-production-prepared/production-body-series.ts.txt",
+		"archive": "experiments/performance/production-children-index/production-body-series.ts.txt",
+		"bytes": 1662,
+		"sha256": "6e0b728287ed2a1adc3b88ad4633b72a939090b32cbc9d7a20efa9734e02a2aa"
+	},
+	{
+		"source": "/tmp/alkalye-production-children-ordinal/archive-production-prepared/production-parser.log",
+		"archive": "experiments/performance/production-children-index/production-parser.log.txt",
+		"bytes": 2314,
+		"sha256": "3565fa4648d0d70236ecd27f59c95a5751b802429aaccc8239b61c7f42895fcc"
+	},
+	{
+		"source": "/tmp/alkalye-production-children-ordinal/archive-production-prepared/production-series.log",
+		"archive": "experiments/performance/production-children-index/production-series.log.txt",
+		"bytes": 5744,
+		"sha256": "fcc3f87510ac2b405277d9565acfed8d43a9295e7726f2f30bd1fac55af97114"
+	},
+	{
+		"source": "/tmp/alkalye-production-children-ordinal/archive-production-prepared/production-summary.json",
+		"archive": "experiments/performance/production-children-index/production-summary.json.txt",
+		"bytes": 8542,
+		"sha256": "13a41e93e8257165834dbe1f4ec86225962269924b163d7d9622db6ca11c43ff"
+	},
+	{
+		"source": "/tmp/alkalye-production-children-ordinal/archive-production-prepared/public-cell-witnesses.json",
+		"archive": "experiments/performance/production-children-index/public-cell-witnesses.json.txt",
+		"bytes": 209795,
+		"sha256": "1537a0b6e1f1c220d8222be4b9cc0245c77abfc094d10e5f823354fc9165f18b"
+	},
+	{
+		"source": "/tmp/alkalye-production-children-ordinal/archive-production-prepared/rewrite-oracle.ts.txt",
+		"archive": "experiments/performance/production-children-index/rewrite-oracle.ts.txt",
+		"bytes": 2048,
+		"sha256": "c8f15b4b5aedd3b23d00b28b86bce76194a205e061448bcf3c7cc894272cd8e2"
+	},
+	{
+		"source": "/tmp/alkalye-production-children-ordinal/archive-production-prepared/runner.ts.txt",
+		"archive": "experiments/performance/production-children-index/runner.ts.txt",
+		"bytes": 33822,
+		"sha256": "918190be858c8305567b030b9e501d58fdb7a7256770ae8a14f8493198c7f2c2"
+	},
+	{
+		"source": "/tmp/alkalye-production-children-ordinal/archive-production-prepared/server-journey.ts.txt",
+		"archive": "experiments/performance/production-children-index/server-journey.ts.txt",
+		"bytes": 601,
+		"sha256": "9ce984659a6acdb8de59f8b48a23f4eed23cbf3e3d0fda875640ae70ce29bb2a"
+	},
+	{
+		"source": "/tmp/alkalye-production-children-ordinal/archive-production-prepared/setup-failure.txt",
+		"archive": "experiments/performance/production-children-index/setup-failure.txt",
+		"bytes": 215,
+		"sha256": "787ae246cff3eed3b42817e92a2ffd0dd0d0d386599292f8f11de5a7f4cc3584"
+	},
+	{
+		"source": "/tmp/alkalye-production-children-ordinal/archive-production-prepared/source-pins.json",
+		"archive": "experiments/performance/production-children-index/source-pins.json.txt",
+		"bytes": 1092,
+		"sha256": "06fae4838b27c6cf2fe4cff6a1198992223de64dd97fa1aa94a4395b67169019"
+	},
+	{
+		"source": "/tmp/alkalye-production-children-ordinal/archive-production-prepared/types-control.log",
+		"archive": "experiments/performance/production-children-index/types-control.log.txt",
+		"bytes": 0,
+		"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+	},
+	{
+		"source": "/tmp/alkalye-production-children-ordinal/archive-production-prepared/types-gate.log",
+		"archive": "experiments/performance/production-children-index/types-gate.log.txt",
+		"bytes": 0,
+		"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+	},
+	{
+		"source": "/tmp/alkalye-production-children-ordinal/archive-production-prepared/types-ordinal.log",
+		"archive": "experiments/performance/production-children-index/types-ordinal.log.txt",
+		"bytes": 0,
+		"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+	},
+	{
+		"source": "/tmp/alkalye-production-children-ordinal/archive-production-prepared/types-series.log",
+		"archive": "experiments/performance/production-children-index/types-series.log.txt",
+		"bytes": 0,
+		"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+	},
+	{
+		"source": "/tmp/alkalye-production-children-ordinal/archive-production-prepared/types-wrongcwd-failed.log",
+		"archive": "experiments/performance/production-children-index/types-wrongcwd-failed.log.txt",
+		"bytes": 74,
+		"sha256": "332e28754c9809de3b087f5c9d89b896a13c425fa8cd495d5b0749576fea34c6"
+	}
+]

@@ -59,6 +59,52 @@
 			latency comparison, separate-account permission test or twenty-writer
 			capacity claim.
 		</p>
+		<h2>Production children-index comparison</h2>
+		<p>
+			Twelve actual production trials passed exact native text, caret,
+			independently accepted edit/Undo and reload checks. Three fresh trials per
+			arm and fixture compared the existing children Map with the ordinal index.
+			The index stays out of production: large-document typing did not improve,
+			and median Undo feedback became slower. The experimental worker editor's
+			Undo improvement did not transfer.
+		</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Median native frame opportunity, ms</th>
+					<th>Control</th>
+					<th>Ordinal index</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>2KiB typing</td>
+					<td>14.9</td>
+					<td>14.8</td>
+				</tr>
+				<tr>
+					<td>2KiB Undo</td>
+					<td>24.0</td>
+					<td>20.8</td>
+				</tr>
+				<tr>
+					<td>1MiB typing</td>
+					<td>10.7</td>
+					<td>10.7</td>
+				</tr>
+				<tr>
+					<td>1MiB Undo</td>
+					<td>22.6</td>
+					<td>29.1</td>
+				</tr>
+			</tbody>
+		</table>
+		<p>
+			These are first observer animation frames agreeing with exact native
+			state, not physical paint or display latency. Worst main tasks on the 1MiB
+			Undo journey were 11.952ms and 12.783ms; neither meets 8.33ms. GC overlaps
+			those tasks. The traces do not identify allocation ownership.
+		</p>
 		<h2>Bounded visibility memo pilot</h2>
 		<p>
 			One ordinary 1MiB trial per arm on the experimental worker editor reduced
@@ -69,7 +115,7 @@
 			comparison; this pilot does not establish a reliable latency gain or
 			physical 120Hz presentation.
 		</p>
-		<h2>Ordinal adjacency experiment</h2>
+		<h2>Experimental worker ordinal adjacency</h2>
 		<p>
 			Twelve isolated native browser cases passed exact source, selection, caret
 			and independent accepted edit/Undo checks. The private CRDT children index

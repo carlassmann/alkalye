@@ -1,0 +1,15 @@
+{
+  "rootCommit": "85a6e15f2665e6ee4092dc9d66f88c5e7aae56b8",
+  "controlCRDTSHA256": "4a0aa7553a0de7fbfc2d8eb9a6332313b04bcf0dc68e558de6add25ea6e71b7d",
+  "candidateCRDTSHA256": "6bcad274fcac66bf8ec36e0bd06aebd6de569b99879936427204f8d23df78605",
+  "scope": "actual production SourceTextarea/DOM/Effect/session/server85a6; only privatechildren6b differs; noexperimentalWorker",
+  "runnerDonor": "/tmp/alkalye-production-journeys/current-514e1bb/runtime",
+  "sourceWitnesses": {
+    "src/client/document-app.ts": "31a2fa7465d3fc2fcf6a64e5635c64c30d11128daa8918c8708d7d833c223a27",
+    "src/client/components/editor.ts": "07b3ea10342439525f24816df0115126d4a03c14ed7f7e99cbd026f67aefd471",
+    "src/shared/document-session.ts": "643001563d7f322103197af6e821541b9b0907c6a6d94a1b7dbf50143b40e9f4",
+    "tests/browser-driver.ts": "5e49dd57f64fa5c5d5c4b85add4ac396ac9e7397ee7a16596bf78ef7b4ea6b25",
+    "experiments/performance/interaction-matrix/runner.ts": "7d7b718baf6c839b8b280c90fdd975d22369df33a1d8522289343ff03b4c0159"
+  },
+  "status": "sourcecopy, strict/build/gates pending; timing UNRUN"
+}

@@ -1,0 +1,24 @@
+let root = "/tmp/alkalye-production-children-ordinal"
+if (await Bun.file(root + "/production-series-pending.json").exists()) throw Error("Retained series exists; no uncertain restart")
+await Bun.write(root + "/production-series-pending.json", JSON.stringify({ phase: "before-any-cell", sourceControl: "4a", sourceCandidate: "6b" }))
+let cells: { arm: string; fixture: string; trial: number; status: string; run: string; pid?: number }[] = []
+for (let fixture of ["small2", "rich1m"]) {
+ for (let trial = 0; trial < 3; trial++) {
+  for (let arm of trial % 2 ? ["ordinal", "control"] : ["control", "ordinal"]) {
+   let run = root + "/measured-" + arm + "-" + fixture + "-" + trial + "-" + crypto.randomUUID()
+   cells.push({ arm, fixture, trial, status: "running", run })
+   await Bun.write(root + "/production-series-progress.json", JSON.stringify(cells, null, 2))
+   console.log(JSON.stringify({ arm, fixture, trial, stage: "start" }))
+   let child = Bun.spawn(["bun", "production-body-gate.ts", arm, fixture, "--measure"], { cwd: import.meta.dir, env: { ...process.env, PRODUCTION_BODY_RUN: run }, stdout: "inherit", stderr: "inherit" })
+   let exit = await child.exited
+   let cell = cells.at(-1)
+   if (!cell) throw Error("Missing current cell")
+   cell.pid = child.pid
+   cell.status = exit === 0 ? "complete" : "failed"
+   await Bun.write(root + "/production-series-progress.json", JSON.stringify(cells, null, 2))
+   console.log(JSON.stringify({ arm, fixture, trial, stage: cell.status, exit }))
+   if (exit !== 0) throw Error("Stopped series after failed or uncertain cell")
+  }
+ }
+}
+console.log(JSON.stringify({ stage: "complete", cells: cells.length }))

@@ -1,0 +1,1178 @@
+[
+  {
+    "arm": "control",
+    "fixture": "small2",
+    "trial": 0,
+    "phase": "input",
+    "sha256": "4133a8679ea30fed7df785a413e7a5681d9cbe979a8a47df3b43a80618d1c3c8",
+    "bytes": 3752619,
+    "windowMs": 3001.122,
+    "mainThread": [
+      40949,
+      20130570
+    ],
+    "mainMaxTaskMs": 3.368,
+    "mainBusyMs": 67.899,
+    "largestMainGCSpanMs": 0.367,
+    "readyFromStartMs": 3.1999999880788437,
+    "readyFromNativeEventMs": 2.7999999523158294,
+    "nativeEvent": "beforeinput",
+    "nativeEventInputDelayMs": 0.0,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+        "characters": 2048,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 12
+      },
+      {
+        "sha256": "cbe04a807281e15d52fe1fafd4d99c78f0f26b88d8211c214e88d02a22577356",
+        "characters": 2049,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 36
+      },
+      {
+        "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+        "characters": 2048,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 37
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 2048,
+      "bytes": 2048,
+      "realNewlines": 121,
+      "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995"
+    },
+    "traceFile": "control-body-small2-0.trace.json"
+  },
+  {
+    "arm": "control",
+    "fixture": "small2",
+    "trial": 0,
+    "phase": "undo",
+    "sha256": "2faab4403e45c2d555095691e7f9867a2cac31e343d01650a7967d32a76f94c6",
+    "bytes": 3274642,
+    "windowMs": 3002.203,
+    "mainThread": [
+      40949,
+      20130570
+    ],
+    "mainMaxTaskMs": 2.473,
+    "mainBusyMs": 65.275,
+    "largestMainGCSpanMs": 0.365,
+    "readyFromStartMs": 24.19999998807907,
+    "readyFromNativeEventMs": 24.19999998807907,
+    "nativeEvent": "keydown",
+    "nativeEventInputDelayMs": 0.19999998807907104,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+        "characters": 2048,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 12
+      },
+      {
+        "sha256": "cbe04a807281e15d52fe1fafd4d99c78f0f26b88d8211c214e88d02a22577356",
+        "characters": 2049,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 36
+      },
+      {
+        "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+        "characters": 2048,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 37
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 2048,
+      "bytes": 2048,
+      "realNewlines": 121,
+      "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995"
+    },
+    "traceFile": "control-body-small2-0-undo.trace.json"
+  },
+  {
+    "arm": "ordinal",
+    "fixture": "small2",
+    "trial": 0,
+    "phase": "input",
+    "sha256": "18d7eef8c7f84bfe8454d17167903d8db3dd6f6f4fd97a8e2fe0559ac0485504",
+    "bytes": 3757173,
+    "windowMs": 3000.792,
+    "mainThread": [
+      41317,
+      20135020
+    ],
+    "mainMaxTaskMs": 3.253,
+    "mainBusyMs": 65.715,
+    "largestMainGCSpanMs": 0.44,
+    "readyFromStartMs": 15.90000003576256,
+    "readyFromNativeEventMs": 15.40000003576256,
+    "nativeEvent": "beforeinput",
+    "nativeEventInputDelayMs": 0.0,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+        "characters": 2048,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 12
+      },
+      {
+        "sha256": "cbe04a807281e15d52fe1fafd4d99c78f0f26b88d8211c214e88d02a22577356",
+        "characters": 2049,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 36
+      },
+      {
+        "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+        "characters": 2048,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 37
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 2048,
+      "bytes": 2048,
+      "realNewlines": 121,
+      "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995"
+    },
+    "traceFile": "ordinal-body-small2-0.trace.json"
+  },
+  {
+    "arm": "ordinal",
+    "fixture": "small2",
+    "trial": 0,
+    "phase": "undo",
+    "sha256": "1f1b1bb521190d8fd457466241883b382be01e03b83aaf4bf9dab754c55b3c8d",
+    "bytes": 3319298,
+    "windowMs": 3001.657,
+    "mainThread": [
+      41317,
+      20135020
+    ],
+    "mainMaxTaskMs": 2.442,
+    "mainBusyMs": 75.249,
+    "largestMainGCSpanMs": 0.362,
+    "readyFromStartMs": 17.30000001192093,
+    "readyFromNativeEventMs": 17.399999976158142,
+    "nativeEvent": "keydown",
+    "nativeEventInputDelayMs": 0.19999998807907104,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+        "characters": 2048,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 12
+      },
+      {
+        "sha256": "cbe04a807281e15d52fe1fafd4d99c78f0f26b88d8211c214e88d02a22577356",
+        "characters": 2049,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 36
+      },
+      {
+        "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+        "characters": 2048,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 37
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 2048,
+      "bytes": 2048,
+      "realNewlines": 121,
+      "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995"
+    },
+    "traceFile": "ordinal-body-small2-0-undo.trace.json"
+  },
+  {
+    "arm": "ordinal",
+    "fixture": "small2",
+    "trial": 1,
+    "phase": "input",
+    "sha256": "512dfff042218c2558657af0990eb59d53b0e2c3c52202625818ddeb9f6572e5",
+    "bytes": 3775121,
+    "windowMs": 3001.149,
+    "mainThread": [
+      41694,
+      20139489
+    ],
+    "mainMaxTaskMs": 3.341,
+    "mainBusyMs": 71.336,
+    "largestMainGCSpanMs": 0.504,
+    "readyFromStartMs": 15.300000011920702,
+    "readyFromNativeEventMs": 14.800000011920702,
+    "nativeEvent": "beforeinput",
+    "nativeEventInputDelayMs": 0.0,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+        "characters": 2048,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 12
+      },
+      {
+        "sha256": "cbe04a807281e15d52fe1fafd4d99c78f0f26b88d8211c214e88d02a22577356",
+        "characters": 2049,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 36
+      },
+      {
+        "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+        "characters": 2048,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 37
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 2048,
+      "bytes": 2048,
+      "realNewlines": 121,
+      "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995"
+    },
+    "traceFile": "ordinal-body-small2-0.trace.json"
+  },
+  {
+    "arm": "ordinal",
+    "fixture": "small2",
+    "trial": 1,
+    "phase": "undo",
+    "sha256": "f09764d61c0f552f427d34e8f41bf25cffd73e076d56f9524aae4e112a4af1fb",
+    "bytes": 3298192,
+    "windowMs": 3001.017,
+    "mainThread": [
+      41694,
+      20139489
+    ],
+    "mainMaxTaskMs": 2.413,
+    "mainBusyMs": 67.234,
+    "largestMainGCSpanMs": 0.329,
+    "readyFromStartMs": 29.80000001192093,
+    "readyFromNativeEventMs": 29.80000001192093,
+    "nativeEvent": "keydown",
+    "nativeEventInputDelayMs": 0.09999996423721313,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+        "characters": 2048,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 12
+      },
+      {
+        "sha256": "cbe04a807281e15d52fe1fafd4d99c78f0f26b88d8211c214e88d02a22577356",
+        "characters": 2049,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 36
+      },
+      {
+        "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+        "characters": 2048,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 37
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 2048,
+      "bytes": 2048,
+      "realNewlines": 121,
+      "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995"
+    },
+    "traceFile": "ordinal-body-small2-0-undo.trace.json"
+  },
+  {
+    "arm": "control",
+    "fixture": "small2",
+    "trial": 1,
+    "phase": "input",
+    "sha256": "30ff9ff6a33c01393c22cbbd80c2c66dbd045c523bfeb888862c7713d1e782d2",
+    "bytes": 3753816,
+    "windowMs": 3001.2,
+    "mainThread": [
+      42123,
+      20144119
+    ],
+    "mainMaxTaskMs": 3.192,
+    "mainBusyMs": 70.221,
+    "largestMainGCSpanMs": 0.465,
+    "readyFromStartMs": 15.600000023841858,
+    "readyFromNativeEventMs": 15.100000023841858,
+    "nativeEvent": "beforeinput",
+    "nativeEventInputDelayMs": 0.0,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+        "characters": 2048,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 12
+      },
+      {
+        "sha256": "cbe04a807281e15d52fe1fafd4d99c78f0f26b88d8211c214e88d02a22577356",
+        "characters": 2049,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 36
+      },
+      {
+        "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+        "characters": 2048,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 37
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 2048,
+      "bytes": 2048,
+      "realNewlines": 121,
+      "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995"
+    },
+    "traceFile": "control-body-small2-0.trace.json"
+  },
+  {
+    "arm": "control",
+    "fixture": "small2",
+    "trial": 1,
+    "phase": "undo",
+    "sha256": "53c2fd8708b07fabb5eb2d9926507648f353908cfd73664f096a4caea087f63d",
+    "bytes": 3282569,
+    "windowMs": 3000.65,
+    "mainThread": [
+      42123,
+      20144119
+    ],
+    "mainMaxTaskMs": 2.283,
+    "mainBusyMs": 70.895,
+    "largestMainGCSpanMs": 0.362,
+    "readyFromStartMs": 20.100000023841858,
+    "readyFromNativeEventMs": 20.100000023841858,
+    "nativeEvent": "keydown",
+    "nativeEventInputDelayMs": 0.30000001192092896,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+        "characters": 2048,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 12
+      },
+      {
+        "sha256": "cbe04a807281e15d52fe1fafd4d99c78f0f26b88d8211c214e88d02a22577356",
+        "characters": 2049,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 36
+      },
+      {
+        "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+        "characters": 2048,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 37
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 2048,
+      "bytes": 2048,
+      "realNewlines": 121,
+      "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995"
+    },
+    "traceFile": "control-body-small2-0-undo.trace.json"
+  },
+  {
+    "arm": "control",
+    "fixture": "small2",
+    "trial": 2,
+    "phase": "input",
+    "sha256": "11efba0d766c674840c5f451415fd1f345228b9ec282f60d358f9bbf69c637e0",
+    "bytes": 3763150,
+    "windowMs": 3000.874,
+    "mainThread": [
+      42491,
+      20148557
+    ],
+    "mainMaxTaskMs": 3.246,
+    "mainBusyMs": 70.628,
+    "largestMainGCSpanMs": 0.449,
+    "readyFromStartMs": 15.300000011921156,
+    "readyFromNativeEventMs": 14.900000035763014,
+    "nativeEvent": "beforeinput",
+    "nativeEventInputDelayMs": 0.0,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+        "characters": 2048,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 12
+      },
+      {
+        "sha256": "cbe04a807281e15d52fe1fafd4d99c78f0f26b88d8211c214e88d02a22577356",
+        "characters": 2049,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 36
+      },
+      {
+        "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+        "characters": 2048,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 37
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 2048,
+      "bytes": 2048,
+      "realNewlines": 121,
+      "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995"
+    },
+    "traceFile": "control-body-small2-0.trace.json"
+  },
+  {
+    "arm": "control",
+    "fixture": "small2",
+    "trial": 2,
+    "phase": "undo",
+    "sha256": "32343e94e4c1cf8b13e795b9890823d06ae058375efc63f3bab24249fbfd1c64",
+    "bytes": 3275783,
+    "windowMs": 3002.502,
+    "mainThread": [
+      42491,
+      20148557
+    ],
+    "mainMaxTaskMs": 2.311,
+    "mainBusyMs": 71.294,
+    "largestMainGCSpanMs": 0.354,
+    "readyFromStartMs": 24.0,
+    "readyFromNativeEventMs": 24.0,
+    "nativeEvent": "keydown",
+    "nativeEventInputDelayMs": 0.19999998807907104,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+        "characters": 2048,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 12
+      },
+      {
+        "sha256": "cbe04a807281e15d52fe1fafd4d99c78f0f26b88d8211c214e88d02a22577356",
+        "characters": 2049,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 36
+      },
+      {
+        "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+        "characters": 2048,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 37
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 2048,
+      "bytes": 2048,
+      "realNewlines": 121,
+      "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995"
+    },
+    "traceFile": "control-body-small2-0-undo.trace.json"
+  },
+  {
+    "arm": "ordinal",
+    "fixture": "small2",
+    "trial": 2,
+    "phase": "input",
+    "sha256": "d274eaa3fc2f7fdd5009ddbfd4f529e15a932305a6df92fb49fcb35d19ce75bf",
+    "bytes": 3759150,
+    "windowMs": 3001.854,
+    "mainThread": [
+      42853,
+      20152985
+    ],
+    "mainMaxTaskMs": 3.225,
+    "mainBusyMs": 72.07,
+    "largestMainGCSpanMs": 0.397,
+    "readyFromStartMs": 15.100000023841858,
+    "readyFromNativeEventMs": 14.699999988078844,
+    "nativeEvent": "beforeinput",
+    "nativeEventInputDelayMs": 0.0,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+        "characters": 2048,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 12
+      },
+      {
+        "sha256": "cbe04a807281e15d52fe1fafd4d99c78f0f26b88d8211c214e88d02a22577356",
+        "characters": 2049,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 36
+      },
+      {
+        "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+        "characters": 2048,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 37
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 2048,
+      "bytes": 2048,
+      "realNewlines": 121,
+      "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995"
+    },
+    "traceFile": "ordinal-body-small2-0.trace.json"
+  },
+  {
+    "arm": "ordinal",
+    "fixture": "small2",
+    "trial": 2,
+    "phase": "undo",
+    "sha256": "205bfb7ddddb867988c2d5abd498158b00908970cea4fbc4e398c602cc0c62ea",
+    "bytes": 3284731,
+    "windowMs": 3002.276,
+    "mainThread": [
+      42853,
+      20152985
+    ],
+    "mainMaxTaskMs": 2.293,
+    "mainBusyMs": 71.143,
+    "largestMainGCSpanMs": 0.367,
+    "readyFromStartMs": 20.799999952316284,
+    "readyFromNativeEventMs": 20.799999952316284,
+    "nativeEvent": "keydown",
+    "nativeEventInputDelayMs": 0.20000004768371582,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+        "characters": 2048,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 12
+      },
+      {
+        "sha256": "cbe04a807281e15d52fe1fafd4d99c78f0f26b88d8211c214e88d02a22577356",
+        "characters": 2049,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 36
+      },
+      {
+        "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995",
+        "characters": 2048,
+        "epochSHA256": "f58b43a76ca6ed7a530b64c93823b6f306078effd3f9120013ae856aebf65166",
+        "position": 37
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 2048,
+      "bytes": 2048,
+      "realNewlines": 121,
+      "sha256": "67d8d2729652850c75b382019b36a8694b723e9ede736649636d89daede2d995"
+    },
+    "traceFile": "ordinal-body-small2-0-undo.trace.json"
+  },
+  {
+    "arm": "control",
+    "fixture": "rich1m",
+    "trial": 0,
+    "phase": "input",
+    "sha256": "3e3d9f8685ec5a7b8caa077d34ecbb78ad1f4bbc3feabd1985fc611ddd9aac55",
+    "bytes": 8440633,
+    "windowMs": 3002.71,
+    "mainThread": [
+      43242,
+      20157607
+    ],
+    "mainMaxTaskMs": 11.065,
+    "mainBusyMs": 852.982,
+    "largestMainGCSpanMs": 10.013,
+    "readyFromStartMs": 11.300000011920929,
+    "readyFromNativeEventMs": 10.800000011920929,
+    "nativeEvent": "beforeinput",
+    "nativeEventInputDelayMs": 0.0,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 28
+      },
+      {
+        "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+        "characters": 1048577,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 36
+      },
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 37
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    },
+    "traceFile": "control-body-rich1m-0.trace.json"
+  },
+  {
+    "arm": "control",
+    "fixture": "rich1m",
+    "trial": 0,
+    "phase": "undo",
+    "sha256": "dae3f00e622135bae79d4e011d6be1d6fe87c4953e36fe530431ba2825e6a85f",
+    "bytes": 9931477,
+    "windowMs": 3001.248,
+    "mainThread": [
+      43242,
+      20157607
+    ],
+    "mainMaxTaskMs": 10.986,
+    "mainBusyMs": 794.102,
+    "largestMainGCSpanMs": 10.373,
+    "readyFromStartMs": 20.099999964235394,
+    "readyFromNativeEventMs": 20.099999964235394,
+    "nativeEvent": "keydown",
+    "nativeEventInputDelayMs": 0.30000001191910997,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 28
+      },
+      {
+        "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+        "characters": 1048577,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 36
+      },
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 37
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    },
+    "traceFile": "control-body-rich1m-0-undo.trace.json"
+  },
+  {
+    "arm": "ordinal",
+    "fixture": "rich1m",
+    "trial": 0,
+    "phase": "input",
+    "sha256": "d773cef20c4003a1de2f2b5b599d5ba7f7bf8f18eb5bedf4a574e67475a10eef",
+    "bytes": 8570715,
+    "windowMs": 3004.326,
+    "mainThread": [
+      43669,
+      20162474
+    ],
+    "mainMaxTaskMs": 11.138,
+    "mainBusyMs": 843.903,
+    "largestMainGCSpanMs": 10.125,
+    "readyFromStartMs": 11.099999964237213,
+    "readyFromNativeEventMs": 10.699999988079071,
+    "nativeEvent": "beforeinput",
+    "nativeEventInputDelayMs": 0,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 28
+      },
+      {
+        "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+        "characters": 1048577,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 36
+      },
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 37
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    },
+    "traceFile": "ordinal-body-rich1m-0.trace.json"
+  },
+  {
+    "arm": "ordinal",
+    "fixture": "rich1m",
+    "trial": 0,
+    "phase": "undo",
+    "sha256": "9d8882de1caccd9ddaa1c13f375173edc594ef1683b63c283acb5720ccf8747a",
+    "bytes": 9757377,
+    "windowMs": 3001.779,
+    "mainThread": [
+      43669,
+      20162474
+    ],
+    "mainMaxTaskMs": 11.052,
+    "mainBusyMs": 797.253,
+    "largestMainGCSpanMs": 10.518,
+    "readyFromStartMs": 29.099999964239032,
+    "readyFromNativeEventMs": 29.099999964239032,
+    "nativeEvent": "keydown",
+    "nativeEventInputDelayMs": 0.30000001191910997,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 28
+      },
+      {
+        "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+        "characters": 1048577,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 36
+      },
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 37
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    },
+    "traceFile": "ordinal-body-rich1m-0-undo.trace.json"
+  },
+  {
+    "arm": "ordinal",
+    "fixture": "rich1m",
+    "trial": 1,
+    "phase": "input",
+    "sha256": "e9444cdf7f02fe69005beb75666c49062127d4fd9b32b6a1495d5aee7bc411ff",
+    "bytes": 8466187,
+    "windowMs": 3002.783,
+    "mainThread": [
+      44084,
+      20167281
+    ],
+    "mainMaxTaskMs": 11.22,
+    "mainBusyMs": 820.427,
+    "largestMainGCSpanMs": 10.144,
+    "readyFromStartMs": 11.099999964237213,
+    "readyFromNativeEventMs": 10.699999988079071,
+    "nativeEvent": "beforeinput",
+    "nativeEventInputDelayMs": 0.0,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 28
+      },
+      {
+        "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+        "characters": 1048577,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 36
+      },
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 37
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    },
+    "traceFile": "ordinal-body-rich1m-0.trace.json"
+  },
+  {
+    "arm": "ordinal",
+    "fixture": "rich1m",
+    "trial": 1,
+    "phase": "undo",
+    "sha256": "9eadaebca52b5a295bd8c5e6fa523e457997a5cc42208924b8564d40cf162aeb",
+    "bytes": 9767169,
+    "windowMs": 3002.276,
+    "mainThread": [
+      44084,
+      20167281
+    ],
+    "mainMaxTaskMs": 11.02,
+    "mainBusyMs": 749.391,
+    "largestMainGCSpanMs": 10.538,
+    "readyFromStartMs": 30.099999964235394,
+    "readyFromNativeEventMs": 30.099999964235394,
+    "nativeEvent": "keydown",
+    "nativeEventInputDelayMs": 0.30000001192274794,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 28
+      },
+      {
+        "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+        "characters": 1048577,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 36
+      },
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 37
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    },
+    "traceFile": "ordinal-body-rich1m-0-undo.trace.json"
+  },
+  {
+    "arm": "control",
+    "fixture": "rich1m",
+    "trial": 1,
+    "phase": "input",
+    "sha256": "893ee35cdc1f2c707d67a63715046449c582c43d986a0b5dd8e0dd1ce4d4d402",
+    "bytes": 8462312,
+    "windowMs": 3000.974,
+    "mainThread": [
+      44506,
+      20172105
+    ],
+    "mainMaxTaskMs": 11.161,
+    "mainBusyMs": 843.007,
+    "largestMainGCSpanMs": 10.382,
+    "readyFromStartMs": 11.099999964237213,
+    "readyFromNativeEventMs": 10.699999988079071,
+    "nativeEvent": "beforeinput",
+    "nativeEventInputDelayMs": 0.0,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 28
+      },
+      {
+        "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+        "characters": 1048577,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 36
+      },
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 37
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    },
+    "traceFile": "control-body-rich1m-0.trace.json"
+  },
+  {
+    "arm": "control",
+    "fixture": "rich1m",
+    "trial": 1,
+    "phase": "undo",
+    "sha256": "18a39ce9cb1bb9b365b1de4a475dbd6a62c140d89e3180d53ab87f7830cc18aa",
+    "bytes": 9982253,
+    "windowMs": 3002.47,
+    "mainThread": [
+      44506,
+      20172105
+    ],
+    "mainMaxTaskMs": 11.952,
+    "mainBusyMs": 778.045,
+    "largestMainGCSpanMs": 11.669,
+    "readyFromStartMs": 22.599999964239032,
+    "readyFromNativeEventMs": 22.599999964239032,
+    "nativeEvent": "keydown",
+    "nativeEventInputDelayMs": 0.30000001192274794,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 28
+      },
+      {
+        "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+        "characters": 1048577,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 36
+      },
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 37
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    },
+    "traceFile": "control-body-rich1m-0-undo.trace.json"
+  },
+  {
+    "arm": "control",
+    "fixture": "rich1m",
+    "trial": 2,
+    "phase": "input",
+    "sha256": "628fe2fc6bc3fc02ef72ad1b5f3574b5814bda00f5c4e2d67fd6c123fe407c6b",
+    "bytes": 8439885,
+    "windowMs": 3000.958,
+    "mainThread": [
+      44927,
+      20176922
+    ],
+    "mainMaxTaskMs": 10.826,
+    "mainBusyMs": 842.049,
+    "largestMainGCSpanMs": 10.144,
+    "readyFromStartMs": 11.100000023841858,
+    "readyFromNativeEventMs": 10.600000023841858,
+    "nativeEvent": "beforeinput",
+    "nativeEventInputDelayMs": 0.0,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 28
+      },
+      {
+        "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+        "characters": 1048577,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 36
+      },
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 37
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    },
+    "traceFile": "control-body-rich1m-0.trace.json"
+  },
+  {
+    "arm": "control",
+    "fixture": "rich1m",
+    "trial": 2,
+    "phase": "undo",
+    "sha256": "7ab4115b3d94d542dcd30e8830c4672b79576f520f69bc134801f873964b2e64",
+    "bytes": 9913513,
+    "windowMs": 3001.716,
+    "mainThread": [
+      44927,
+      20176922
+    ],
+    "mainMaxTaskMs": 10.054,
+    "mainBusyMs": 753.807,
+    "largestMainGCSpanMs": 9.438,
+    "readyFromStartMs": 28.400000035764606,
+    "readyFromNativeEventMs": 28.400000035764606,
+    "nativeEvent": "keydown",
+    "nativeEventInputDelayMs": 0.30000001191910997,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 28
+      },
+      {
+        "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+        "characters": 1048577,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 36
+      },
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 37
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    },
+    "traceFile": "control-body-rich1m-0-undo.trace.json"
+  },
+  {
+    "arm": "ordinal",
+    "fixture": "rich1m",
+    "trial": 2,
+    "phase": "input",
+    "sha256": "4f1a0bb61ee2fd2488882469cc4577675b84ed01eccfef03135864fa8db9e2dc",
+    "bytes": 8496065,
+    "windowMs": 3002.015,
+    "mainThread": [
+      45351,
+      20181767
+    ],
+    "mainMaxTaskMs": 11.032,
+    "mainBusyMs": 833.532,
+    "largestMainGCSpanMs": 10.472,
+    "readyFromStartMs": 11.0,
+    "readyFromNativeEventMs": 10.700000047683716,
+    "nativeEvent": "beforeinput",
+    "nativeEventInputDelayMs": 0.0,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 28
+      },
+      {
+        "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+        "characters": 1048577,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 36
+      },
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 37
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    },
+    "traceFile": "ordinal-body-rich1m-0.trace.json"
+  },
+  {
+    "arm": "ordinal",
+    "fixture": "rich1m",
+    "trial": 2,
+    "phase": "undo",
+    "sha256": "e0566e7a5fdee557aec7c2617caecbffab2107f4cfbcb37cb55786797492ac23",
+    "bytes": 9882469,
+    "windowMs": 3002.009,
+    "mainThread": [
+      45351,
+      20181767
+    ],
+    "mainMaxTaskMs": 12.783,
+    "mainBusyMs": 763.691,
+    "largestMainGCSpanMs": 12.203,
+    "readyFromStartMs": 20.19999998808089,
+    "readyFromNativeEventMs": 20.19999998808089,
+    "nativeEvent": "keydown",
+    "nativeEventInputDelayMs": 0.30000001191910997,
+    "cpuProfileChunks": 0,
+    "status": "measured-complete",
+    "receipts": [
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 28
+      },
+      {
+        "sha256": "7be7ff8f2d74dbaa5e1642cb1197b5d62ded5450b3dc09654285a6dd696ebe4d",
+        "characters": 1048577,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 36
+      },
+      {
+        "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b",
+        "characters": 1048576,
+        "epochSHA256": "f43669b7e0e431d30e6b6b2696ec06c5b9614c19720904601da948fe1ce82871",
+        "position": 37
+      }
+    ],
+    "fixtureEvidence": {
+      "characters": 1048576,
+      "bytes": 1048576,
+      "realNewlines": 20767,
+      "sha256": "0ba3f77995fce57ab0142bbb058e5413468afd515c1b2592079091656a89091b"
+    },
+    "traceFile": "ordinal-body-rich1m-0-undo.trace.json"
+  }
+]

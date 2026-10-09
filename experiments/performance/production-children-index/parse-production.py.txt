@@ -1,0 +1,35 @@
+import json,pathlib,hashlib,statistics,os
+root=pathlib.Path('/tmp/alkalye-production-children-ordinal')
+print('parser PID',os.getpid(),flush=True)
+def union(intervals):
+ total=0;end=None
+ for start,stop in sorted(intervals):
+  if end is None or start>end:total+=stop-start;end=stop
+  elif stop>end:total+=stop-end;end=stop
+ return total/1000
+rows=[]
+for cell in json.loads((root/'production-series-progress.json').read_text()):
+ resultfile=next(pathlib.Path(cell['run']).glob('results/*/results.json'))
+ result=json.loads(resultfile.read_text())[0]
+ receipts=[result[k] for k in ['seedReceipt','editedReceipt','undoReceipt']]
+ for phase,tracekey,obskey in [('input','trace','observation'),('undo','undoTrace','undoObservation')]:
+  path=pathlib.Path(result[tracekey]);data=json.loads(path.read_text());events=data.get('traceEvents',[]) if isinstance(data,dict) else data
+  mark=next(e for e in events if e.get('name')=='interaction:start');start=mark['ts'];owner=(mark['pid'],mark['tid'])
+  end=next(e['ts'] for e in events if e.get('name')=='interaction:end' and e['ts']>start and (e['pid'],e['tid'])==owner)
+  selected=[e for e in events if e.get('ts',0)<end and e.get('ts',0)+e.get('dur',0)>start]
+  tasks=[e for e in selected if (e.get('pid'),e.get('tid'))==owner and e.get('name')=='RunTask' and e.get('dur')]
+  gc=[e for e in selected if (e.get('pid'),e.get('tid'))==owner and e.get('dur') and ('GC' in e.get('name','') or 'CollectGarbage' in e.get('name',''))]
+  probe=result[obskey]['probe'];key=next(e for e in probe['events'] if e.get('editor') and ((phase=='input' and e['type']=='beforeinput' and e.get('data')=='x') or (phase=='undo' and e['type']=='keydown' and e.get('key','').lower()=='z')))
+  row={'arm':cell['arm'],'fixture':cell['fixture'],'trial':cell['trial'],'phase':phase,'trace':str(path),'sha256':hashlib.sha256(path.read_bytes()).hexdigest(),'bytes':path.stat().st_size,'windowMs':(end-start)/1000,'mainThread':list(owner),'mainMaxTaskMs':max([e['dur']/1000 for e in tasks],default=0),'mainBusyMs':union([(max(start,e['ts']),min(end,e['ts']+e['dur'])) for e in tasks]),'largestMainGCSpanMs':max([e['dur']/1000 for e in gc],default=0),'readyFromStartMs':probe['ready']-probe['start'],'readyFromNativeEventMs':probe['ready']-key['time'],'nativeEvent':key['type'],'nativeEventInputDelayMs':key['time']-key['eventTimestamp'],'cpuProfileChunks':sum(e.get('name')=='ProfileChunk' for e in events),'status':result['status'],'receipts':receipts,'fixtureEvidence':result['fixture']}
+  rows.append(row)
+(root/'production-analysis.json').write_text(json.dumps(rows,indent=2)+'\n')
+summary=[]
+for fixture in ['small2','rich1m']:
+ for phase in ['input','undo']:
+  for arm in ['control','ordinal']:
+   group=[r for r in rows if r['fixture']==fixture and r['phase']==phase and r['arm']==arm]
+   stats={k:{'median':statistics.median(r[k] for r in group),'max':max(r[k] for r in group),'samples':[r[k] for r in group]} for k in ['readyFromNativeEventMs','readyFromStartMs','mainMaxTaskMs','mainBusyMs','largestMainGCSpanMs']}
+   summary.append({'fixture':fixture,'phase':phase,'arm':arm,'n':len(group),'metrics':stats})
+(root/'production-summary.json').write_text(json.dumps(summary,indent=2)+'\n')
+for g in summary:
+ print(g['fixture'],g['phase'],g['arm'],json.dumps({k:{'median':round(v['median'],3),'max':round(v['max'],3)} for k,v in g['metrics'].items()}),flush=True)

@@ -1,0 +1,61 @@
+{"arm":"control","fixture":"small2","trial":0,"stage":"start"}
+started web pid=40797
+{"stage":"complete","arm":"control","fixture":"small2","resultDirectory":"/tmp/alkalye-production-children-ordinal/measured-control-small2-0-4b075d2f-3573-4649-8803-66ed07f9582f/results","timing":"separate-input-and-undo-3s-windows"}
+stopped alkalye-production-children-ordinal/codex-production-children-ordinal/web
+{"arm":"control","fixture":"small2","trial":0,"stage":"complete","exit":0}
+{"arm":"ordinal","fixture":"small2","trial":0,"stage":"start"}
+started web pid=41202
+{"stage":"complete","arm":"ordinal","fixture":"small2","resultDirectory":"/tmp/alkalye-production-children-ordinal/measured-ordinal-small2-0-4828f6bb-ac83-48e1-8b09-cbbe35153ede/results","timing":"separate-input-and-undo-3s-windows"}
+stopped alkalye-production-children-ordinal/codex-production-children-ordinal/web
+{"arm":"ordinal","fixture":"small2","trial":0,"stage":"complete","exit":0}
+{"arm":"ordinal","fixture":"small2","trial":1,"stage":"start"}
+started web pid=41585
+{"stage":"complete","arm":"ordinal","fixture":"small2","resultDirectory":"/tmp/alkalye-production-children-ordinal/measured-ordinal-small2-1-86573ce4-f484-4b24-985e-d6095817f622/results","timing":"separate-input-and-undo-3s-windows"}
+stopped alkalye-production-children-ordinal/codex-production-children-ordinal/web
+{"arm":"ordinal","fixture":"small2","trial":1,"stage":"complete","exit":0}
+{"arm":"control","fixture":"small2","trial":1,"stage":"start"}
+started web pid=42005
+{"stage":"complete","arm":"control","fixture":"small2","resultDirectory":"/tmp/alkalye-production-children-ordinal/measured-control-small2-1-818ea0b6-fa2f-41e6-b259-d7bf795390f8/results","timing":"separate-input-and-undo-3s-windows"}
+stopped alkalye-production-children-ordinal/codex-production-children-ordinal/web
+{"arm":"control","fixture":"small2","trial":1,"stage":"complete","exit":0}
+{"arm":"control","fixture":"small2","trial":2,"stage":"start"}
+started web pid=42376
+{"stage":"complete","arm":"control","fixture":"small2","resultDirectory":"/tmp/alkalye-production-children-ordinal/measured-control-small2-2-ef0ceb6a-ef7f-4b66-8587-65f252eaec26/results","timing":"separate-input-and-undo-3s-windows"}
+stopped alkalye-production-children-ordinal/codex-production-children-ordinal/web
+{"arm":"control","fixture":"small2","trial":2,"stage":"complete","exit":0}
+{"arm":"ordinal","fixture":"small2","trial":2,"stage":"start"}
+started web pid=42742
+{"stage":"complete","arm":"ordinal","fixture":"small2","resultDirectory":"/tmp/alkalye-production-children-ordinal/measured-ordinal-small2-2-eccebd30-c360-41b0-af7e-3dcc27e08ddc/results","timing":"separate-input-and-undo-3s-windows"}
+stopped alkalye-production-children-ordinal/codex-production-children-ordinal/web
+{"arm":"ordinal","fixture":"small2","trial":2,"stage":"complete","exit":0}
+{"arm":"control","fixture":"rich1m","trial":0,"stage":"start"}
+started web pid=43107
+{"stage":"complete","arm":"control","fixture":"rich1m","resultDirectory":"/tmp/alkalye-production-children-ordinal/measured-control-rich1m-0-2cd861c6-29b6-4a93-ab20-f105cf4f993b/results","timing":"separate-input-and-undo-3s-windows"}
+stopped alkalye-production-children-ordinal/codex-production-children-ordinal/web
+{"arm":"control","fixture":"rich1m","trial":0,"stage":"complete","exit":0}
+{"arm":"ordinal","fixture":"rich1m","trial":0,"stage":"start"}
+started web pid=43530
+{"stage":"complete","arm":"ordinal","fixture":"rich1m","resultDirectory":"/tmp/alkalye-production-children-ordinal/measured-ordinal-rich1m-0-b85bac17-00ab-428e-ae7d-a3aee3fb4b76/results","timing":"separate-input-and-undo-3s-windows"}
+stopped alkalye-production-children-ordinal/codex-production-children-ordinal/web
+{"arm":"ordinal","fixture":"rich1m","trial":0,"stage":"complete","exit":0}
+{"arm":"ordinal","fixture":"rich1m","trial":1,"stage":"start"}
+started web pid=43957
+{"stage":"complete","arm":"ordinal","fixture":"rich1m","resultDirectory":"/tmp/alkalye-production-children-ordinal/measured-ordinal-rich1m-1-3b95d9be-6647-4803-87e3-1ea5d4d82a26/results","timing":"separate-input-and-undo-3s-windows"}
+stopped alkalye-production-children-ordinal/codex-production-children-ordinal/web
+{"arm":"ordinal","fixture":"rich1m","trial":1,"stage":"complete","exit":0}
+{"arm":"control","fixture":"rich1m","trial":1,"stage":"start"}
+started web pid=44377
+{"stage":"complete","arm":"control","fixture":"rich1m","resultDirectory":"/tmp/alkalye-production-children-ordinal/measured-control-rich1m-1-62b98603-7e19-40a5-ba46-35d880980ac2/results","timing":"separate-input-and-undo-3s-windows"}
+stopped alkalye-production-children-ordinal/codex-production-children-ordinal/web
+{"arm":"control","fixture":"rich1m","trial":1,"stage":"complete","exit":0}
+{"arm":"control","fixture":"rich1m","trial":2,"stage":"start"}
+started web pid=44802
+{"stage":"complete","arm":"control","fixture":"rich1m","resultDirectory":"/tmp/alkalye-production-children-ordinal/measured-control-rich1m-2-4c05f78d-2f10-425e-9b24-a62d67cc808d/results","timing":"separate-input-and-undo-3s-windows"}
+stopped alkalye-production-children-ordinal/codex-production-children-ordinal/web
+{"arm":"control","fixture":"rich1m","trial":2,"stage":"complete","exit":0}
+{"arm":"ordinal","fixture":"rich1m","trial":2,"stage":"start"}
+started web pid=45224
+{"stage":"complete","arm":"ordinal","fixture":"rich1m","resultDirectory":"/tmp/alkalye-production-children-ordinal/measured-ordinal-rich1m-2-5c21bed8-0221-42a8-9cf9-7f6f4058089a/results","timing":"separate-input-and-undo-3s-windows"}
+stopped alkalye-production-children-ordinal/codex-production-children-ordinal/web
+{"arm":"ordinal","fixture":"rich1m","trial":2,"stage":"complete","exit":0}
+{"stage":"complete","cells":12}

@@ -1,0 +1,15 @@
+started web pid=35982
+stopped alkalye-production-children-ordinal/codex-production-children-ordinal/web
+43 | 			},
+44 | 		},
+45 | 	)
+46 | 	if (result.status !== 0) {
+47 | 		let failure = result.error?.message || result.stderr || result.stdout
+48 | 		throw new Error(`${session} ${args[0]}: ${failure}`)
+                 ^
+error: production-children-preflight-59690500-4905-48a0-b9bc-0b783f9bf7c7 --profile: {"error":"Session name 'production-children-preflight-59690500-4905-48a0-b9bc-0b783f9bf7c7' is too long. Socket path would be 105 bytes (max 103).\nUse a shorter session name or set AGENT_BROWSER_SOCKET_DIR to a shorter path.","success":false}
+
+      at browser (/private/tmp/alkalye-production-children-ordinal/runtime/tests/browser-driver.ts:48:13)
+      at /private/tmp/alkalye-production-children-ordinal/runtime/production-body-gate.ts:73:2
+
+Bun v1.4.0 (macOS arm64)

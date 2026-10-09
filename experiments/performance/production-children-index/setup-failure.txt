@@ -1,0 +1,1 @@
+Source witness mistakenly named src/client/editor.ts instead of src/client/components/editor.ts. Copy complete; no server/keys issued. Following tsc wrongcwd rejected missing project. Corrected before strict/build.
