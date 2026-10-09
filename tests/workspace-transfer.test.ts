@@ -577,3 +577,73 @@ test("document moves stage current permissions and preserve retry identities und
 		await cold.dispose()
 	}
 })
+
+test("frozen export cache preserves legacy bytes across restart and refuses corrupt chunks", async () => {
+	let source = runtime("chunk-cache")
+	try {
+		let payload = await source.runPromise(
+			owner(
+				Effect.gen(function* () {
+					let store = yield* WorkspaceStore
+					let transfers = yield* WorkspaceTransfers
+					let sql = yield* SqlClient.SqlClient
+					yield* store.create("chunk-space", "Chunk migration", "create")
+					let action = yield* buildAction(
+						new Replica("owner"),
+						"chunk-doc",
+						"Create",
+						r => newDocument(r, "chunk-doc", "Untitled", "Persisted Ω😀"),
+					)
+					yield* store.createDocument("chunk-space", action)
+					yield* transfers.freezeWorkspace("chunk-space", 1)
+					let bytes = yield* transfers.exportWorkspacePayload("chunk-space", 1)
+					yield* sql`DELETE FROM workspace_transfer_export_chunks WHERE workspace=${"chunk-space"}`
+					yield* sql`DELETE FROM workspace_transfer_export_manifests WHERE workspace=${"chunk-space"}`
+					yield* sql`INSERT INTO workspace_transfer_exports VALUES(${"chunk-space"},${1},${bytes})`
+					let legacy = yield* transfers.exportWorkspacePayload("chunk-space", 1)
+					expect(legacy).toEqual(bytes)
+					return bytes
+				}),
+			),
+		)
+		await source.dispose()
+		source = runtime("chunk-cache")
+		await source.runPromise(
+			owner(
+				Effect.gen(function* () {
+					let transfers = yield* WorkspaceTransfers
+					let store = yield* WorkspaceStore
+					let sql = yield* SqlClient.SqlClient
+					expect(
+						yield* transfers.exportWorkspacePayload("chunk-space", 1),
+					).toEqual(payload)
+					expect(
+						(yield* transfers.exportWorkspace(
+							"chunk-space",
+							1,
+						)).workspace_documents.map(row => row.document),
+					).toEqual(["chunk-doc"])
+					yield* sql`UPDATE workspace_transfer_export_chunks SET payload=${new Uint8Array([0, 1])} WHERE workspace=${"chunk-space"}`
+					expect(
+						(yield* transfers
+							.exportWorkspace("chunk-space", 1)
+							.pipe(Effect.exit))._tag,
+					).toBe("Failure")
+					expect(
+						(yield* store
+							.rename("chunk-space", "Still frozen", "rename")
+							.pipe(Effect.exit))._tag,
+					).toBe("Failure")
+					let snapshot = yield* store.snapshot("chunk-doc")
+					if (!snapshot)
+						return yield* Effect.fail(new Error("Frozen source missing"))
+					expect(
+						(yield* restoreSnapshot(snapshot, "reader")).text("chunk-doc"),
+					).toBe("Persisted Ω😀")
+				}),
+			),
+		)
+	} finally {
+		await source.dispose()
+	}
+})

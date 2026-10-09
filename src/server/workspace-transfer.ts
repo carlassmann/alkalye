@@ -216,7 +216,10 @@ export let WorkspaceTransferSchema = Schema.Struct({
 	effect_event_remotes: Schema.Array(effect_event_remotesRow),
 })
 export type WorkspaceTransfer = typeof WorkspaceTransferSchema.Type
-let transferBinary = SchemaBinary.toCodec(WorkspaceTransferSchema)
+export let WorkspaceTransferCodec = SchemaBinary.toCodec(
+	WorkspaceTransferSchema,
+)
+let workspaceExportChunkBytes = 256 * 1024
 export let DocumentMoveSchema = Schema.Struct({
 	document: Schema.String,
 	from: Schema.String,
@@ -266,6 +269,8 @@ export function initializeTransferFences(sql: SqlClient.SqlClient) {
 		yield* sql`CREATE TABLE IF NOT EXISTS document_move_aborts (document TEXT NOT NULL,request TEXT NOT NULL,PRIMARY KEY(document,request))`
 		yield* sql`CREATE TABLE IF NOT EXISTS workspace_transfer_fences (workspace TEXT PRIMARY KEY, generation INTEGER NOT NULL)`
 		yield* sql`CREATE TABLE IF NOT EXISTS workspace_transfer_exports (workspace TEXT NOT NULL,generation INTEGER NOT NULL,payload BLOB NOT NULL,PRIMARY KEY(workspace,generation))`
+		yield* sql`CREATE TABLE IF NOT EXISTS workspace_transfer_export_manifests (workspace TEXT NOT NULL,generation INTEGER NOT NULL,bytes INTEGER NOT NULL,chunks INTEGER NOT NULL,fingerprint TEXT NOT NULL,PRIMARY KEY(workspace,generation))`
+		yield* sql`CREATE TABLE IF NOT EXISTS workspace_transfer_export_chunks (workspace TEXT NOT NULL,generation INTEGER NOT NULL,part INTEGER NOT NULL,payload BLOB NOT NULL,PRIMARY KEY(workspace,generation,part))`
 		yield* sql`CREATE TABLE IF NOT EXISTS workspace_transfer_receipts (workspace TEXT NOT NULL,generation INTEGER NOT NULL,fingerprint TEXT NOT NULL,PRIMARY KEY(workspace,generation))`
 	})
 }
@@ -503,17 +508,80 @@ function makeTransfers() {
 				}),
 			)
 		}
-		function exportWorkspace(workspace: string, generation: number) {
+		function cacheWorkspaceExport(
+			workspace: string,
+			generation: number,
+			payload: Uint8Array,
+		) {
+			return Effect.gen(function* () {
+				let chunks = Math.ceil(payload.length / workspaceExportChunkBytes)
+				for (let part = 0; part < chunks; part++) {
+					let chunk = payload.subarray(
+						part * workspaceExportChunkBytes,
+						(part + 1) * workspaceExportChunkBytes,
+					)
+					yield* sql`INSERT INTO workspace_transfer_export_chunks VALUES(${workspace},${generation},${part},${chunk})`
+				}
+				let fingerprint = encode(yield* crypto.digest("SHA-256", payload))
+				yield* sql`INSERT INTO workspace_transfer_export_manifests VALUES(${workspace},${generation},${payload.length},${chunks},${fingerprint})`
+			})
+		}
+		function exportWorkspacePayload(workspace: string, generation: number) {
 			return sql.withTransaction(
 				Effect.gen(function* () {
 					yield* frozen(workspace, generation)
+					let manifests = yield* sql<{
+						bytes: number
+						chunks: number
+						fingerprint: string
+					}>`SELECT bytes,chunks,fingerprint FROM workspace_transfer_export_manifests WHERE workspace=${workspace} AND generation=${generation}`
+					let manifest = manifests[0]
+					if (manifest) {
+						if (
+							!Number.isSafeInteger(manifest.bytes) ||
+							manifest.bytes <= 0 ||
+							!Number.isSafeInteger(manifest.chunks) ||
+							manifest.chunks !==
+								Math.ceil(manifest.bytes / workspaceExportChunkBytes)
+						)
+							return yield* failure("Workspace export manifest is invalid")
+						let chunks = yield* sql<{
+							part: number
+							payload: Uint8Array
+						}>`SELECT part,payload FROM workspace_transfer_export_chunks WHERE workspace=${workspace} AND generation=${generation} ORDER BY part`
+						if (chunks.length !== manifest.chunks)
+							return yield* failure("Workspace export chunks are incomplete")
+						let payload = new Uint8Array(manifest.bytes)
+						for (let [part, chunk] of chunks.entries()) {
+							let size = Math.min(
+								workspaceExportChunkBytes,
+								manifest.bytes - part * workspaceExportChunkBytes,
+							)
+							if (chunk.part !== part || chunk.payload.length !== size)
+								return yield* failure("Workspace export chunk is invalid")
+							payload.set(chunk.payload, part * workspaceExportChunkBytes)
+						}
+						if (
+							encode(yield* crypto.digest("SHA-256", payload)) !==
+							manifest.fingerprint
+						)
+							return yield* failure("Workspace export fingerprint differs")
+						return payload
+					}
 					let previous = yield* sql<{
 						payload: Uint8Array
 					}>`SELECT payload FROM workspace_transfer_exports WHERE workspace=${workspace} AND generation=${generation}`
-					if (previous[0])
-						return yield* Schema.decodeUnknownEffect(transferBinary)(
+					if (previous[0]) {
+						yield* Schema.decodeUnknownEffect(WorkspaceTransferCodec)(
 							previous[0].payload,
 						)
+						yield* cacheWorkspaceExport(
+							workspace,
+							generation,
+							previous[0].payload,
+						)
+						return previous[0].payload
+					}
 					let bundle = {
 						workspace,
 						generation,
@@ -552,10 +620,19 @@ function makeTransfers() {
 						effect_event_journal: yield* read_effect_event_journal(workspace),
 						effect_event_remotes: yield* read_effect_event_remotes(workspace),
 					}
-					let payload = yield* Schema.encodeEffect(transferBinary)(bundle)
-					yield* sql`INSERT INTO workspace_transfer_exports VALUES (${workspace},${generation},${payload})`
-					return bundle
+					let payload = yield* Schema.encodeEffect(WorkspaceTransferCodec)(
+						bundle,
+					)
+					yield* cacheWorkspaceExport(workspace, generation, payload)
+					return payload
 				}),
+			)
+		}
+		function exportWorkspace(workspace: string, generation: number) {
+			return exportWorkspacePayload(workspace, generation).pipe(
+				Effect.flatMap(payload =>
+					Schema.decodeUnknownEffect(WorkspaceTransferCodec)(payload),
+				),
 			)
 		}
 		function importWorkspace(input: WorkspaceTransfer) {
@@ -706,12 +783,14 @@ function makeTransfers() {
 					)
 				)
 					return yield* failure("Transfer contains a foreign remote receipt")
+
 				let json = Schema.encodeSync(
 					Schema.fromJsonString(WorkspaceTransferSchema),
 				)(bundle)
 				let fingerprint = encode(
 					yield* crypto.digest("SHA-256", new TextEncoder().encode(json)),
 				)
+
 				return yield* sql.withTransaction(
 					Effect.gen(function* () {
 						let receipt = yield* sql<{
@@ -728,60 +807,87 @@ function makeTransfers() {
 						if (existing.length)
 							return yield* failure("Transfer target workspace is already used")
 						yield* sql`INSERT INTO workspace_transfer_fences VALUES(${bundle.workspace},${bundle.generation})`
-						if (bundle.workspaces.length)
-							yield* sql`INSERT INTO workspaces ${sql.insert(bundle.workspaces)}`
-						if (bundle.workspace_members.length)
-							yield* sql`INSERT INTO workspace_members ${sql.insert(bundle.workspace_members)}`
-						if (bundle.workspace_documents.length)
-							yield* sql`INSERT INTO workspace_documents ${sql.insert(bundle.workspace_documents)}`
-						if (bundle.workspace_preferences.length)
-							yield* sql`INSERT INTO workspace_preferences ${sql.insert(bundle.workspace_preferences)}`
-						if (bundle.workspace_avatars.length)
-							yield* sql`INSERT INTO workspace_avatars ${sql.insert(bundle.workspace_avatars)}`
-						if (bundle.workspace_actions.length)
-							yield* sql`INSERT INTO workspace_actions ${sql.insert(bundle.workspace_actions)}`
-						if (bundle.document_access.length)
-							yield* sql`INSERT INTO document_access ${sql.insert(bundle.document_access)}`
-						if (bundle.document_summaries.length)
-							yield* sql`INSERT INTO document_summaries ${sql.insert(bundle.document_summaries)}`
-						if (bundle.invitations.length)
-							yield* sql`INSERT INTO invitations ${sql.insert(bundle.invitations)}`
-						if (bundle.invitation_members.length)
-							yield* sql`INSERT INTO invitation_members ${sql.insert(bundle.invitation_members)}`
-						if (bundle.document_heads.length)
-							yield* sql`INSERT INTO document_heads ${sql.insert(bundle.document_heads)}`
-						if (bundle.document_tips.length)
-							yield* sql`INSERT INTO document_tips ${sql.insert(bundle.document_tips)}`
-						if (bundle.document_actions.length)
-							yield* sql`INSERT INTO document_actions ${sql.insert(bundle.document_actions)}`
-						if (bundle.document_targets.length)
-							yield* sql`INSERT INTO document_targets ${sql.insert(bundle.document_targets)}`
-						if (bundle.document_operation_ids.length)
-							yield* sql`INSERT INTO document_operation_ids ${sql.insert(bundle.document_operation_ids)}`
-						if (bundle.document_actor_subjects.length)
-							yield* sql`INSERT INTO document_actor_subjects ${sql.insert(bundle.document_actor_subjects)}`
-						if (bundle.document_withdrawals.length)
-							yield* sql`INSERT INTO document_withdrawals ${sql.insert(bundle.document_withdrawals)}`
-						if (bundle.document_clock_reservations.length)
-							yield* sql`INSERT INTO document_clock_reservations ${sql.insert(bundle.document_clock_reservations)}`
-						if (bundle.document_compensations.length)
-							yield* sql`INSERT INTO document_compensations ${sql.insert(bundle.document_compensations)}`
-						if (bundle.document_undo_boundaries.length)
-							yield* sql`INSERT INTO document_undo_boundaries ${sql.insert(bundle.document_undo_boundaries)}`
-						if (bundle.document_blobs.length)
-							yield* sql`INSERT INTO document_blobs ${sql.insert(bundle.document_blobs)}`
-						if (bundle.effect_event_journal.length)
-							yield* sql`INSERT INTO effect_event_journal ${sql.insert(bundle.effect_event_journal)}`
-						if (bundle.effect_event_remotes.length)
-							yield* sql`INSERT INTO effect_event_remotes ${sql.insert(bundle.effect_event_remotes)}`
-						if (bundle.document_transfer_fences.length)
-							yield* sql`INSERT INTO document_transfer_fences ${sql.insert(bundle.document_transfer_fences)}`
-						if (bundle.document_move_exports.length)
-							yield* sql`INSERT INTO document_move_exports ${sql.insert(bundle.document_move_exports)}`
-						if (bundle.document_move_receipts.length)
-							yield* sql`INSERT INTO document_move_receipts ${sql.insert(bundle.document_move_receipts)}`
-						if (bundle.document_move_aborts.length)
-							yield* sql`INSERT INTO document_move_aborts ${sql.insert(bundle.document_move_aborts)}`
+						for (let row of bundle.workspaces)
+							yield* sql`INSERT INTO workspaces ${sql.insert(row)}`
+
+						for (let row of bundle.workspace_members)
+							yield* sql`INSERT INTO workspace_members ${sql.insert(row)}`
+
+						for (let row of bundle.workspace_documents)
+							yield* sql`INSERT INTO workspace_documents ${sql.insert(row)}`
+
+						for (let row of bundle.workspace_preferences)
+							yield* sql`INSERT INTO workspace_preferences ${sql.insert(row)}`
+
+						for (let row of bundle.workspace_avatars)
+							yield* sql`INSERT INTO workspace_avatars ${sql.insert(row)}`
+
+						for (let row of bundle.workspace_actions)
+							yield* sql`INSERT INTO workspace_actions ${sql.insert(row)}`
+
+						for (let row of bundle.document_access)
+							yield* sql`INSERT INTO document_access ${sql.insert(row)}`
+
+						for (let row of bundle.document_summaries)
+							yield* sql`INSERT INTO document_summaries ${sql.insert(row)}`
+
+						for (let row of bundle.invitations)
+							yield* sql`INSERT INTO invitations ${sql.insert(row)}`
+
+						for (let row of bundle.invitation_members)
+							yield* sql`INSERT INTO invitation_members ${sql.insert(row)}`
+
+						for (let row of bundle.document_heads)
+							yield* sql`INSERT INTO document_heads ${sql.insert(row)}`
+
+						for (let row of bundle.document_tips)
+							yield* sql`INSERT INTO document_tips ${sql.insert(row)}`
+
+						for (let row of bundle.document_actions)
+							yield* sql`INSERT INTO document_actions ${sql.insert(row)}`
+
+						for (let row of bundle.document_targets)
+							yield* sql`INSERT INTO document_targets ${sql.insert(row)}`
+
+						for (let row of bundle.document_operation_ids)
+							yield* sql`INSERT INTO document_operation_ids ${sql.insert(row)}`
+
+						for (let row of bundle.document_actor_subjects)
+							yield* sql`INSERT INTO document_actor_subjects ${sql.insert(row)}`
+
+						for (let row of bundle.document_withdrawals)
+							yield* sql`INSERT INTO document_withdrawals ${sql.insert(row)}`
+
+						for (let row of bundle.document_clock_reservations)
+							yield* sql`INSERT INTO document_clock_reservations ${sql.insert(row)}`
+
+						for (let row of bundle.document_compensations)
+							yield* sql`INSERT INTO document_compensations ${sql.insert(row)}`
+
+						for (let row of bundle.document_undo_boundaries)
+							yield* sql`INSERT INTO document_undo_boundaries ${sql.insert(row)}`
+
+						for (let row of bundle.document_blobs)
+							yield* sql`INSERT INTO document_blobs ${sql.insert(row)}`
+
+						for (let row of bundle.effect_event_journal)
+							yield* sql`INSERT INTO effect_event_journal ${sql.insert(row)}`
+
+						for (let row of bundle.effect_event_remotes)
+							yield* sql`INSERT INTO effect_event_remotes ${sql.insert(row)}`
+
+						for (let row of bundle.document_transfer_fences)
+							yield* sql`INSERT INTO document_transfer_fences ${sql.insert(row)}`
+
+						for (let row of bundle.document_move_exports)
+							yield* sql`INSERT INTO document_move_exports ${sql.insert(row)}`
+
+						for (let row of bundle.document_move_receipts)
+							yield* sql`INSERT INTO document_move_receipts ${sql.insert(row)}`
+
+						for (let row of bundle.document_move_aborts)
+							yield* sql`INSERT INTO document_move_aborts ${sql.insert(row)}`
+
 						yield* sql`INSERT INTO workspace_transfer_receipts VALUES(${bundle.workspace},${bundle.generation},${fingerprint})`
 					}),
 				)
@@ -1209,7 +1315,8 @@ function makeTransfers() {
 						}
 						let log = yield* crypto.randomUUIDv4
 						yield* sql`INSERT INTO document_transfer_fences VALUES(${bundle.document},${bundle.request},${bundle.destination},${bundle.subject},'imported')`
-						yield* sql`INSERT INTO workspace_documents ${sql.insert(bundle.workspace_documents.map(row => ({ ...row, workspace: bundle.destination })))}`
+						for (let row of bundle.workspace_documents)
+							yield* sql`INSERT INTO workspace_documents ${sql.insert({ ...row, workspace: bundle.destination })}`
 						let positions = new Map<number, number>()
 						for (let row of [...bundle.document_actions].sort(
 							(a, b) => a.position - b.position,
@@ -1242,26 +1349,26 @@ function makeTransfers() {
 							let position = yield* mapped(row.position)
 							yield* sql`INSERT INTO document_summaries ${sql.insert({ ...row, log, position })}`
 						}
-						if (bundle.document_access.length)
-							yield* sql`INSERT INTO document_access ${sql.insert(bundle.document_access)}`
-						if (bundle.invitations.length)
-							yield* sql`INSERT INTO invitations ${sql.insert(bundle.invitations.map(row => ({ ...row, workspace: bundle.destination })))}`
-						if (bundle.invitation_members.length)
-							yield* sql`INSERT INTO invitation_members ${sql.insert(bundle.invitation_members)}`
-						if (bundle.document_targets.length)
-							yield* sql`INSERT INTO document_targets ${sql.insert(bundle.document_targets)}`
-						if (bundle.document_operation_ids.length)
-							yield* sql`INSERT INTO document_operation_ids ${sql.insert(bundle.document_operation_ids)}`
-						if (bundle.document_actor_subjects.length)
-							yield* sql`INSERT INTO document_actor_subjects ${sql.insert(bundle.document_actor_subjects)}`
-						if (bundle.document_withdrawals.length)
-							yield* sql`INSERT INTO document_withdrawals ${sql.insert(bundle.document_withdrawals)}`
-						if (bundle.document_clock_reservations.length)
-							yield* sql`INSERT INTO document_clock_reservations ${sql.insert(bundle.document_clock_reservations)}`
-						if (bundle.document_compensations.length)
-							yield* sql`INSERT INTO document_compensations ${sql.insert(bundle.document_compensations)}`
-						if (bundle.document_blobs.length)
-							yield* sql`INSERT INTO document_blobs ${sql.insert(bundle.document_blobs)}`
+						for (let row of bundle.document_access)
+							yield* sql`INSERT INTO document_access ${sql.insert(row)}`
+						for (let row of bundle.invitations)
+							yield* sql`INSERT INTO invitations ${sql.insert({ ...row, workspace: bundle.destination })}`
+						for (let row of bundle.invitation_members)
+							yield* sql`INSERT INTO invitation_members ${sql.insert(row)}`
+						for (let row of bundle.document_targets)
+							yield* sql`INSERT INTO document_targets ${sql.insert(row)}`
+						for (let row of bundle.document_operation_ids)
+							yield* sql`INSERT INTO document_operation_ids ${sql.insert(row)}`
+						for (let row of bundle.document_actor_subjects)
+							yield* sql`INSERT INTO document_actor_subjects ${sql.insert(row)}`
+						for (let row of bundle.document_withdrawals)
+							yield* sql`INSERT INTO document_withdrawals ${sql.insert(row)}`
+						for (let row of bundle.document_clock_reservations)
+							yield* sql`INSERT INTO document_clock_reservations ${sql.insert(row)}`
+						for (let row of bundle.document_compensations)
+							yield* sql`INSERT INTO document_compensations ${sql.insert(row)}`
+						for (let row of bundle.document_blobs)
+							yield* sql`INSERT INTO document_blobs ${sql.insert(row)}`
 						for (let row of bundle.effect_event_journal) {
 							let previous = yield* SqlSchema.findOneOption({
 								Request: Schema.Uint8Array,
@@ -1406,6 +1513,7 @@ function makeTransfers() {
 			abortDocumentMove,
 			freezeWorkspace,
 			exportWorkspace,
+			exportWorkspacePayload,
 			importWorkspace,
 			activateImportedWorkspace,
 		}
