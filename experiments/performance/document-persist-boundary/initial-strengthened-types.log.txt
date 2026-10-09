@@ -1,0 +1,1 @@
+tests/persist-boundary.test.ts(258,34): error TS2722: Cannot invoke an object which is possibly 'undefined'.

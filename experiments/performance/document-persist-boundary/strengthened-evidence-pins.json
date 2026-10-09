@@ -1,0 +1,18 @@
+{
+	"persist-boundary-strengthened.test.ts.txt": {
+		"bytes": 9883,
+		"sha256": "0c09c36a477d1e0b292de20a1f58ccf283d794baa2bbc7e3aefd4b21bdc74fae"
+	},
+	"commit-boundary-strengthened-final.log.txt": {
+		"bytes": 619,
+		"sha256": "ea3180a39008345b00c811d58c037dc033e17faec486c9d4af62cf9458486a42"
+	},
+	"initial-strengthened-types.log.txt": {
+		"bytes": 109,
+		"sha256": "881f79e229dc25d85b2090221d8f3de32a1b6247fc9442e138778015996ab765"
+	},
+	"types-strengthened-final.log.txt": {
+		"bytes": 0,
+		"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+	}
+}

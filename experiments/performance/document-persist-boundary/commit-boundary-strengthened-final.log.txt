@@ -1,0 +1,12 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/persist-boundary.test.ts:
+{"phase":"before","immediateWasEdit":true,"finalWasEdit":true,"finalWasUndo":false,"pending":0}
+(pass) interruption at the journal commit boundary retains exactly the durable contribution ({"count":1,"peer":"none","phase":"before"}) [75.11ms]
+{"phase":"after","immediateWasEdit":true,"finalWasEdit":false,"finalWasUndo":true,"pending":0}
+(pass) interruption at the journal commit boundary retains exactly the durable contribution ({"count":1,"peer":"none","phase":"after"}) [30.70ms]
+
+ 2 pass
+ 0 fail
+ 36 expect() calls
+Ran 2 tests across 1 file. [153.00ms]
