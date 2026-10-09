@@ -1,0 +1,105 @@
+import * as Effect from "effect/Effect"
+import { Replica as Baseline } from "./src/shared/crdt-baseline"
+import { Replica as Candidate } from "./src/shared/crdt"
+import type { ReplicaCheckpoint } from "./src/shared/checkpoint"
+import type { Atom } from "./src/shared/model"
+interface ReadReplica {
+	restore(snapshot: ReplicaCheckpoint): void
+	text(target: string): string
+	visible(target: string): Atom[]
+	atomTarget(id: string): string | undefined
+}
+let source = "---\ntitle: Index cost\n---\n" + "Body TOKEN 😀\n".repeat(90000)
+source = source.slice(0, 1_048_576)
+let { snapshot, initial } = seed()
+function seed() {
+	let replica = new Baseline("fixture-" + "x".repeat(48))
+	let initial = replica.edit("document", source)
+	if (!initial) throw Error("Missing seed")
+	return { snapshot: replica.checkpoint(), initial }
+}
+function hash(value: string) {
+	return new Bun.CryptoHasher("sha256").update(value).digest("hex")
+}
+let rows: {
+	arm: string
+	mode: string
+	trial: number
+	restoreMs: number
+	textMs: number
+	lookupMs: number
+	heapBefore: number
+	heapAfter: number
+	rssBefore: number
+	rssAfter: number
+	atomCount: number
+	sourceSHA: string
+}[] = []
+async function sample(
+	arm: string,
+	mode: string,
+	trial: number,
+	create: () => Promise<ReadReplica>,
+) {
+	Bun.gc(true)
+	let before = process.memoryUsage()
+	let start = performance.now()
+	let replica = await create()
+	let restored = performance.now()
+	let content = replica.text("document")
+	let textDone = performance.now()
+	if (content !== source) throw Error("Exact source mismatch")
+	let atoms = replica.visible("document")
+	let ids: string[] = []
+	for (let index = 0; index < 512; index++) {
+		let atom = atoms[Math.floor((index * atoms.length) / 512)]
+		if (!atom) throw Error("Missing sampled atom")
+		ids.push(atom.id)
+	}
+	let lookupStart = performance.now()
+	for (let repeat = 0; repeat < 20; repeat++)
+		for (let id of ids)
+			if (replica.atomTarget(id) !== "document")
+				throw Error("Atom identity mismatch")
+	let lookupDone = performance.now()
+	let after = process.memoryUsage()
+	rows.push({
+		arm,
+		mode,
+		trial,
+		restoreMs: restored - start,
+		textMs: textDone - restored,
+		lookupMs: lookupDone - lookupStart,
+		heapBefore: before.heapUsed,
+		heapAfter: after.heapUsed,
+		rssBefore: before.rss,
+		rssAfter: after.rss,
+		atomCount: atoms.length,
+		sourceSHA: hash(content),
+	})
+	await Bun.write("../cost-results.json", JSON.stringify(rows, null, 2) + "\n")
+}
+for (let trial = 0; trial < 3; trial++) {
+	for (let arm of trial % 2
+		? ["candidate", "baseline"]
+		: ["baseline", "candidate"]) {
+		await sample(arm, "apply", trial, async () => {
+			let replica =
+				arm === "baseline" ? new Baseline("applied") : new Candidate("applied")
+			replica.apply([initial])
+			return replica
+		})
+		await sample(arm, "sync", trial, async () => {
+			let replica: ReadReplica =
+				arm === "baseline" ? new Baseline("cold") : new Candidate("cold")
+			replica.restore(snapshot)
+			return replica
+		})
+		await sample(arm, "cooperative", trial, () =>
+			arm === "baseline"
+				? Effect.runPromise(Baseline.fromCheckpointEffect(snapshot, "cold"))
+				: Effect.runPromise(Candidate.fromCheckpointEffect(snapshot, "cold")),
+		)
+	}
+}
+console.log(JSON.stringify({ stage: "complete", samples: rows.length }))

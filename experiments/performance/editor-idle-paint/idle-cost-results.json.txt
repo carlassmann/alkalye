@@ -1,0 +1,218 @@
+[
+  {
+    "kind": "baseline",
+    "size": 2048,
+    "phase": "idle",
+    "state": {
+      "done": true,
+      "activity": {
+        "idle": 0,
+        "paint": 0,
+        "notifications": 0
+      },
+      "typedExact": true,
+      "originalExact": true,
+      "caret": 0,
+      "end": 0,
+      "length": 2048
+    }
+  },
+  {
+    "kind": "baseline",
+    "size": 2048,
+    "phase": "typing",
+    "state": {
+      "done": true,
+      "activity": {
+        "idle": 0,
+        "paint": 2,
+        "notifications": 2
+      },
+      "typedExact": true,
+      "originalExact": false,
+      "caret": 11,
+      "end": 11,
+      "length": 2049
+    }
+  },
+  {
+    "kind": "baseline",
+    "size": 2048,
+    "phase": "scroll",
+    "state": {
+      "done": true,
+      "activity": {
+        "idle": 0,
+        "paint": 0,
+        "notifications": 0
+      },
+      "typedExact": true,
+      "originalExact": false,
+      "caret": 11,
+      "end": 11,
+      "length": 2049
+    }
+  },
+  {
+    "kind": "candidate",
+    "size": 2048,
+    "phase": "idle",
+    "state": {
+      "done": true,
+      "activity": {
+        "idle": 0,
+        "paint": 0,
+        "notifications": 0
+      },
+      "typedExact": true,
+      "originalExact": true,
+      "caret": 0,
+      "end": 0,
+      "length": 2048
+    }
+  },
+  {
+    "kind": "candidate",
+    "size": 2048,
+    "phase": "typing",
+    "state": {
+      "done": true,
+      "activity": {
+        "idle": 0,
+        "paint": 2,
+        "notifications": 2
+      },
+      "typedExact": true,
+      "originalExact": false,
+      "caret": 11,
+      "end": 11,
+      "length": 2049
+    }
+  },
+  {
+    "kind": "candidate",
+    "size": 2048,
+    "phase": "scroll",
+    "state": {
+      "done": true,
+      "activity": {
+        "idle": 0,
+        "paint": 0,
+        "notifications": 0
+      },
+      "typedExact": true,
+      "originalExact": false,
+      "caret": 11,
+      "end": 11,
+      "length": 2049
+    }
+  },
+  {
+    "kind": "baseline",
+    "size": 1048576,
+    "phase": "idle",
+    "state": {
+      "done": true,
+      "activity": {
+        "idle": 191,
+        "paint": 0,
+        "notifications": 0
+      },
+      "typedExact": true,
+      "originalExact": true,
+      "caret": 0,
+      "end": 0,
+      "length": 1048576
+    }
+  },
+  {
+    "kind": "baseline",
+    "size": 1048576,
+    "phase": "typing",
+    "state": {
+      "done": true,
+      "activity": {
+        "idle": 192,
+        "paint": 2,
+        "notifications": 2
+      },
+      "typedExact": true,
+      "originalExact": false,
+      "caret": 11,
+      "end": 11,
+      "length": 1048577
+    }
+  },
+  {
+    "kind": "baseline",
+    "size": 1048576,
+    "phase": "scroll",
+    "state": {
+      "done": true,
+      "activity": {
+        "idle": 192,
+        "paint": 0,
+        "notifications": 0
+      },
+      "typedExact": true,
+      "originalExact": false,
+      "caret": 11,
+      "end": 11,
+      "length": 1048577
+    }
+  },
+  {
+    "kind": "candidate",
+    "size": 1048576,
+    "phase": "idle",
+    "state": {
+      "done": true,
+      "activity": {
+        "idle": 190,
+        "paint": 190,
+        "notifications": 190
+      },
+      "typedExact": true,
+      "originalExact": true,
+      "caret": 0,
+      "end": 0,
+      "length": 1048576
+    }
+  },
+  {
+    "kind": "candidate",
+    "size": 1048576,
+    "phase": "typing",
+    "state": {
+      "done": true,
+      "activity": {
+        "idle": 193,
+        "paint": 186,
+        "notifications": 186
+      },
+      "typedExact": true,
+      "originalExact": false,
+      "caret": 11,
+      "end": 11,
+      "length": 1048577
+    }
+  },
+  {
+    "kind": "candidate",
+    "size": 1048576,
+    "phase": "scroll",
+    "state": {
+      "done": true,
+      "activity": {
+        "idle": 191,
+        "paint": 191,
+        "notifications": 191
+      },
+      "typedExact": true,
+      "originalExact": false,
+      "caret": 11,
+      "end": 11,
+      "length": 1048577
+    }
+  }
+]

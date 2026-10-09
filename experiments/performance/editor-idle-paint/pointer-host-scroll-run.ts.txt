@@ -1,0 +1,30 @@
+import { browser, evaluate, serverAddress, wait } from "./tests/browser-driver"
+import * as Schema from "effect/Schema"
+let root=import.meta.dir+"/.."
+let rows=[]
+for(let size of [2048,1048576]) for(let kind of ["baseline","candidate"]) {
+ let server=Bun.spawn(["bun","pointer-budget-server.ts",...(kind==="candidate"?["--candidate"]:[])],{stdout:"pipe",stderr:"inherit"})
+ let session="idle-cost-"+kind+"-"+size+"-"+Date.now()
+ try {
+  let origin=await serverAddress(server.stdout)
+  browser(session,"set","viewport","1280","800")
+  browser(session,"open",origin+"?case=ascii&size="+size)
+  wait(session,"document.body.dataset.ready==='true'")
+  for(let phase of ["scroll"]) {
+   let label=kind+"-"+size+"-host-scroll"
+   evaluate(session,"window.pointerFixture.prepare(10)");browser(session,"press","x");wait(session,"window.pointerFixture.budget().typedExact")
+   browser(session,"profiler","start","--categories","devtools.timeline,disabled-by-default-devtools.timeline,toplevel,blink.user_timing,v8,disabled-by-default-v8.gc")
+   try {
+    evaluate(session,`window.pointerFixture.begin(${JSON.stringify(label)})`)
+    if(phase==="typing") browser(session,"press","x")
+    browser(session,"scroll","down","600","--selector","[data-editor-viewport]");wait(session,"window.pointerFixture.budget().scrollTop>100");let down=evaluate(session,"window.pointerFixture.budget().scrollTop");console.log(JSON.stringify({kind,size,observedDown:down}));browser(session,"scroll","up","600","--selector","[data-editor-viewport]");wait(session,"window.pointerFixture.budget().scrollTop<10")
+    wait(session,"window.pointerFixture.budget().done")
+   } finally {browser(session,"profiler","stop",root+"/idle-cost-"+label+".trace.json")}
+   let state=Schema.decodeUnknownSync(Schema.Struct({done:Schema.Boolean,activity:Schema.Struct({idle:Schema.Number,paint:Schema.Number,notifications:Schema.Number}),typedExact:Schema.Boolean,originalExact:Schema.Boolean,caret:Schema.Number,end:Schema.Number,length:Schema.Number}))(evaluate(session,"window.pointerFixture.budget()"))
+   if(!state.done || (phase==="idle"?!state.originalExact:!state.typedExact) || (phase!=="idle"&&(state.caret!==11||state.end!==11)))throw Error("Exact native source/caret oracle failed: "+JSON.stringify({kind,size,phase,state}))
+   rows.push({kind,size,phase,state})
+   await Bun.write(root+"/idle-host-scroll-results.json",JSON.stringify(rows,null,2))
+   console.log(JSON.stringify({kind,size,phase,activity:state.activity,exact:true}))
+  }
+ } finally {try{browser(session,"close")}finally{server.kill();await server.exited}}
+}

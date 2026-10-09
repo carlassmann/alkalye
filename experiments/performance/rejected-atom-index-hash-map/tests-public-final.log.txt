@@ -1,0 +1,12 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/replica-fact-index.test.ts:
+(pass) forked fact indices stay independent through both-way insertion and checkpoint restore [332.90ms]
+{"forkRestore":"pending-rejected"}
+(pass) large-document source restore preserves completed clone or rejects pending stale fork [182.85ms]
+(pass) invalid restored identities leave source and earlier forks unchanged [99.47ms]
+
+ 3 pass
+ 0 fail
+ 17 expect() calls
+Ran 3 tests across 1 file. [644.00ms]

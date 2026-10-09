@@ -1,0 +1,102 @@
+[
+  {
+    "kind": "baseline",
+    "size": 2048,
+    "phase": "scroll",
+    "state": {
+      "done": true,
+      "activity": {
+        "idle": 0,
+        "paint": 2,
+        "notifications": 2
+      },
+      "typedExact": true,
+      "originalExact": false,
+      "caret": 11,
+      "end": 11,
+      "length": 2049
+    },
+    "mainTaskCount": 118,
+    "mainTaskP95Ms": 0.317,
+    "mainTaskMaxMs": 1.398,
+    "mainTaskTotalMs": 11.879,
+    "mainGCMaxMs": 0,
+    "windowMs": 3002.731,
+    "scope": "post-ready3s module; explicit host scroll observed600\u21920, exact native source/caret"
+  },
+  {
+    "kind": "candidate",
+    "size": 2048,
+    "phase": "scroll",
+    "state": {
+      "done": true,
+      "activity": {
+        "idle": 0,
+        "paint": 2,
+        "notifications": 2
+      },
+      "typedExact": true,
+      "originalExact": false,
+      "caret": 11,
+      "end": 11,
+      "length": 2049
+    },
+    "mainTaskCount": 121,
+    "mainTaskP95Ms": 0.31,
+    "mainTaskMaxMs": 1.286,
+    "mainTaskTotalMs": 12.094,
+    "mainGCMaxMs": 0,
+    "windowMs": 3002.556,
+    "scope": "post-ready3s module; explicit host scroll observed600\u21920, exact native source/caret"
+  },
+  {
+    "kind": "baseline",
+    "size": 1048576,
+    "phase": "scroll",
+    "state": {
+      "done": true,
+      "activity": {
+        "idle": 193,
+        "paint": 2,
+        "notifications": 2
+      },
+      "typedExact": true,
+      "originalExact": false,
+      "caret": 11,
+      "end": 11,
+      "length": 1048577
+    },
+    "mainTaskCount": 451,
+    "mainTaskP95Ms": 0.996,
+    "mainTaskMaxMs": 2.336,
+    "mainTaskTotalMs": 130.103,
+    "mainGCMaxMs": 0,
+    "windowMs": 3002.929,
+    "scope": "post-ready3s module; explicit host scroll observed600\u21920, exact native source/caret"
+  },
+  {
+    "kind": "candidate",
+    "size": 1048576,
+    "phase": "scroll",
+    "state": {
+      "done": true,
+      "activity": {
+        "idle": 193,
+        "paint": 180,
+        "notifications": 180
+      },
+      "typedExact": true,
+      "originalExact": false,
+      "caret": 11,
+      "end": 11,
+      "length": 1048577
+    },
+    "mainTaskCount": 447,
+    "mainTaskP95Ms": 1.045,
+    "mainTaskMaxMs": 2.28,
+    "mainTaskTotalMs": 119.66,
+    "mainGCMaxMs": 0,
+    "windowMs": 3001.342,
+    "scope": "post-ready3s module; explicit host scroll observed600\u21920, exact native source/caret"
+  }
+]

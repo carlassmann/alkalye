@@ -1,0 +1,74 @@
+[
+  {
+    "kind": "baseline",
+    "size": 2048,
+    "phase": "scroll",
+    "state": {
+      "done": true,
+      "activity": {
+        "idle": 0,
+        "paint": 2,
+        "notifications": 2
+      },
+      "typedExact": true,
+      "originalExact": false,
+      "caret": 11,
+      "end": 11,
+      "length": 2049
+    }
+  },
+  {
+    "kind": "candidate",
+    "size": 2048,
+    "phase": "scroll",
+    "state": {
+      "done": true,
+      "activity": {
+        "idle": 0,
+        "paint": 2,
+        "notifications": 2
+      },
+      "typedExact": true,
+      "originalExact": false,
+      "caret": 11,
+      "end": 11,
+      "length": 2049
+    }
+  },
+  {
+    "kind": "baseline",
+    "size": 1048576,
+    "phase": "scroll",
+    "state": {
+      "done": true,
+      "activity": {
+        "idle": 193,
+        "paint": 2,
+        "notifications": 2
+      },
+      "typedExact": true,
+      "originalExact": false,
+      "caret": 11,
+      "end": 11,
+      "length": 1048577
+    }
+  },
+  {
+    "kind": "candidate",
+    "size": 1048576,
+    "phase": "scroll",
+    "state": {
+      "done": true,
+      "activity": {
+        "idle": 193,
+        "paint": 180,
+        "notifications": 180
+      },
+      "typedExact": true,
+      "originalExact": false,
+      "caret": 11,
+      "end": 11,
+      "length": 1048577
+    }
+  }
+]

@@ -1,0 +1,1 @@
+export let viewportActivity = { idle: 0, paint: 0, notifications: 0 }

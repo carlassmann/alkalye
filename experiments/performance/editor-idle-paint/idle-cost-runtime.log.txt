@@ -1,0 +1,12 @@
+{"kind":"baseline","size":2048,"phase":"idle","activity":{"idle":0,"paint":0,"notifications":0},"exact":true}
+{"kind":"baseline","size":2048,"phase":"typing","activity":{"idle":0,"paint":2,"notifications":2},"exact":true}
+{"kind":"baseline","size":2048,"phase":"scroll","activity":{"idle":0,"paint":0,"notifications":0},"exact":true}
+{"kind":"candidate","size":2048,"phase":"idle","activity":{"idle":0,"paint":0,"notifications":0},"exact":true}
+{"kind":"candidate","size":2048,"phase":"typing","activity":{"idle":0,"paint":2,"notifications":2},"exact":true}
+{"kind":"candidate","size":2048,"phase":"scroll","activity":{"idle":0,"paint":0,"notifications":0},"exact":true}
+{"kind":"baseline","size":1048576,"phase":"idle","activity":{"idle":191,"paint":0,"notifications":0},"exact":true}
+{"kind":"baseline","size":1048576,"phase":"typing","activity":{"idle":192,"paint":2,"notifications":2},"exact":true}
+{"kind":"baseline","size":1048576,"phase":"scroll","activity":{"idle":192,"paint":0,"notifications":0},"exact":true}
+{"kind":"candidate","size":1048576,"phase":"idle","activity":{"idle":190,"paint":190,"notifications":190},"exact":true}
+{"kind":"candidate","size":1048576,"phase":"typing","activity":{"idle":193,"paint":186,"notifications":186},"exact":true}
+{"kind":"candidate","size":1048576,"phase":"scroll","activity":{"idle":191,"paint":191,"notifications":191},"exact":true}

@@ -1,0 +1,77 @@
+{
+	"sha256.json": {
+		"archived": "sha256.json.txt",
+		"sha256": "2e4545a8fff19ab1f1e8045a8cba3118c6c61e95f13789159c3f4e4cae8b0c20",
+		"bytes": 1357
+	},
+	"editor.ts.txt": {
+		"archived": "editor.ts.txt",
+		"sha256": "07b3ea10342439525f24816df0115126d4a03c14ed7f7e99cbd026f67aefd471",
+		"bytes": 78022
+	},
+	"editor.css.txt": {
+		"archived": "editor.css.txt",
+		"sha256": "c4257c88756596957cbff2e22c67761d25da1fd7718b9eab8d0586407dd50b41",
+		"bytes": 7176
+	},
+	"candidate-native.log.txt": {
+		"archived": "candidate-native.log.txt",
+		"sha256": "7937559795527471b804806f3b15869fd0d5285ffe2cf52103feec2144128d56",
+		"bytes": 1078
+	},
+	"candidate-editor-viewport.ts.txt": {
+		"archived": "candidate-editor-viewport.ts.txt",
+		"sha256": "d17f6806cc038d839d3dd2dcd1b1b0f43e28f2b897f13fdb819c6a9f1e928b13",
+		"bytes": 37324
+	},
+	"candidate-results.json": {
+		"archived": "candidate-results.json.txt",
+		"sha256": "8f384817007730f81cc3fca0c1f26cc3c4b951e6f4fb724ce8391829fd8d6387",
+		"bytes": 93583
+	},
+	"README.md": {
+		"archived": "README.original.md.txt",
+		"sha256": "2968217f825151d9f724bce1d725b2a05a07b70b43b4e38b7ba38c433af08649",
+		"bytes": 665
+	},
+	"baseline-native.log.txt": {
+		"archived": "baseline-native.log.txt",
+		"sha256": "f20f8b88cf9225dd67571841b6276b6a192aa35bbdb8870d54cee93e7d1f1fd7",
+		"bytes": 1652
+	},
+	"pointer-isolation-fixture.ts.txt": {
+		"archived": "pointer-isolation-fixture.ts.txt",
+		"sha256": "dbe3b172425163af5495fe42bab36ea26457b23a399ba7ace6050b6fcdcd541f",
+		"bytes": 10226
+	},
+	"baseline-results.json": {
+		"archived": "baseline-results.json.txt",
+		"sha256": "80e06e00b405ae8a96b52752d2cdb34469fb3aa03067ac00aeaa8023ee5ee762",
+		"bytes": 75517
+	},
+	"strict.log.txt": {
+		"archived": "strict.log.txt",
+		"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+		"bytes": 0
+	},
+	"pointer-idle-server.ts.txt": {
+		"archived": "pointer-idle-server.ts.txt",
+		"sha256": "5ad5592951783b93789938c13d9d0a16fccc74e9664c71847c18e120ea4ea74b",
+		"bytes": 1533
+	},
+	"initial-review-cli-failure.log.txt": {
+		"archived": "initial-review-cli-failure.log.txt",
+		"sha256": "2122456c9827a04aff9792c1149505097ac016d61c330a0df0dd73976358987c",
+		"bytes": 94
+	},
+	"baseline-editor-viewport.ts.txt": {
+		"archived": "baseline-editor-viewport.ts.txt",
+		"sha256": "96d89cb7cae4d312edcb5ec3ca4aa4299c5976387ad042b6ea71a156a57e6ad6",
+		"bytes": 37282
+	},
+	"pointer-idle-run.ts.txt": {
+		"archived": "pointer-idle-run.ts.txt",
+		"sha256": "66196ed6cdff1685a9746b7f118244b174baeff6103a341a4bf207fb6d24d2b5",
+		"bytes": 2229
+	}
+}

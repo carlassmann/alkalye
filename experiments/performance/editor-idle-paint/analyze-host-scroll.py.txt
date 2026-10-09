@@ -1,0 +1,14 @@
+import json,math
+from pathlib import Path
+r=Path('/tmp/alkalye-pointer-lifecycle-successor')
+rows=[]
+for cell in json.loads((r/'idle-host-scroll-results.json').read_text()):
+ label=f"{cell['kind']}-{cell['size']}-host-scroll"
+ es=json.loads((r/f'idle-cost-{label}.trace.json').read_text())['traceEvents']
+ start=next(e for e in es if e['name']==label+':start'); end=next(e for e in es if e['name']==label+':end')
+ a,b=start['ts'],end['ts']; pid,tid=start['pid'],start['tid']
+ tasks=[e['dur']/1000 for e in es if e['name']=='RunTask' and e.get('ph')=='X' and e['pid']==pid and e['tid']==tid and e['ts']<b and e['ts']+e.get('dur',0)>a]
+ tasks.sort(); gc=[e.get('dur',0)/1000 for e in es if 'GC' in e['name'] and e.get('ph')=='X' and e['pid']==pid and e['tid']==tid and a<=e['ts']<b]
+ rows.append({**cell,'mainTaskCount':len(tasks),'mainTaskP95Ms':tasks[max(0,math.ceil(len(tasks)*.95)-1)] if tasks else None,'mainTaskMaxMs':max(tasks,default=0),'mainTaskTotalMs':sum(tasks),'mainGCMaxMs':max(gc,default=0),'windowMs':(b-a)/1000,'scope':'post-ready3s module; explicit host scroll observed600→0, exact native source/caret'})
+(r/'idle-host-scroll-summary.json').write_text(json.dumps(rows,indent=2)+'\n')
+for x in rows: print(x['kind'],x['size'],x['phase'],x['mainTaskP95Ms'],x['mainTaskMaxMs'],x['mainTaskTotalMs'],x['state']['activity'])

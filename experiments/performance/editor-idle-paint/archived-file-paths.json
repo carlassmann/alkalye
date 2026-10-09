@@ -1,0 +1,147 @@
+{
+	"idle-paint.patch": {
+		"archived": "idle-paint.patch",
+		"sha256": "444516ceda7ad9fe62b9d8d07c2192588acced7756fb7bdb6ad4bc88fc0d9f76",
+		"bytes": 659
+	},
+	"src_client_idle-painted-editor-viewport.ts.txt": {
+		"archived": "src_client_idle-painted-editor-viewport.ts.txt",
+		"sha256": "d17f6806cc038d839d3dd2dcd1b1b0f43e28f2b897f13fdb819c6a9f1e928b13",
+		"bytes": 37324
+	},
+	"src_client_baseline-editor-viewport.ts.txt": {
+		"archived": "src_client_baseline-editor-viewport.ts.txt",
+		"sha256": "96d89cb7cae4d312edcb5ec3ca4aa4299c5976387ad042b6ea71a156a57e6ad6",
+		"bytes": 37282
+	},
+	"tsconfig.budget.json.txt": {
+		"archived": "tsconfig.budget.json.txt",
+		"sha256": "4152ccc886606b8688291a6e18c2ea76797c22c1520454be59111a5b8e6ba230",
+		"bytes": 164
+	},
+	"analyze-host-scroll.py.txt": {
+		"archived": "analyze-host-scroll.py.txt",
+		"sha256": "9ce50129daff84b89a0b1ab67efddbf701601eb09f6083c3b0aec2d640d8ebde",
+		"bytes": 1337
+	},
+	"strict-idle-budget-run-final.log.txt": {
+		"archived": "strict-idle-budget-run-final.log.txt",
+		"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+		"bytes": 0
+	},
+	"idle-host-scroll-runtime.log.txt": {
+		"archived": "idle-host-scroll-runtime.log.txt",
+		"sha256": "87c93f2e519fd6b1def88cc57ecc23199b2bfe130beb6608fc860c09ba485c79",
+		"bytes": 676
+	},
+	"sha256.json": {
+		"archived": "sha256.json.txt",
+		"sha256": "74368bb00bf0b00579af533066c8a7c627a0f8c9f5c75694a4b744ac8c97d8d1",
+		"bytes": 2912
+	},
+	"pointer-host-scroll-run.ts.txt": {
+		"archived": "pointer-host-scroll-run.ts.txt",
+		"sha256": "03d9b9959dd046319f251a5ad0d16d8ddaf2fb2930a99aa5ba1949a178f25fef",
+		"bytes": 2589
+	},
+	"trace-hashes.json": {
+		"archived": "trace-hashes.json.txt",
+		"sha256": "aa408d56e8dfb06f1424a313da345f15770d52d4ca87fa82c21716f5bf60fa7c",
+		"bytes": 2555
+	},
+	"idle-paint-opus-corrected.log.txt": {
+		"archived": "idle-paint-opus-corrected.log.txt",
+		"sha256": "bae577fb54224674ea919d433a4551bca31c1a99ebe6d0c1596b9b60c34de4e4",
+		"bytes": 3832
+	},
+	"README.md": {
+		"archived": "README.original.md.txt",
+		"sha256": "c489d61fd9a87bf4d27cd650ec93ebeb9ccd01407edb12387a61e603f3e1e2c7",
+		"bytes": 1358
+	},
+	"idle-host-scroll-results.json": {
+		"archived": "idle-host-scroll-results.json.txt",
+		"sha256": "2511c714604208a0b617f8044b59db53349227f35c67f2f109d0137996ef8566",
+		"bytes": 1316
+	},
+	"analyze-idle.py.txt": {
+		"archived": "analyze-idle.py.txt",
+		"sha256": "78b5d318759d13b039d1a35cc9bbecc0f2ecfcbd72a6069835334eeee247cec2",
+		"bytes": 1309
+	},
+	"src_client_budget-baseline-editor-viewport.ts.txt": {
+		"archived": "src_client_budget-baseline-editor-viewport.ts.txt",
+		"sha256": "57bbf1ffaed121ef45d34ccc6012a06ff1da87e7abf1d90c75038bb0f00585a4",
+		"bytes": 37436
+	},
+	"strict-idle-host-scroll.log.txt": {
+		"archived": "strict-idle-host-scroll.log.txt",
+		"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+		"bytes": 0
+	},
+	"strict-idle-budget-corrected.log.txt": {
+		"archived": "strict-idle-budget-corrected.log.txt",
+		"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+		"bytes": 0
+	},
+	"pointer-budget-server.ts.txt": {
+		"archived": "pointer-budget-server.ts.txt",
+		"sha256": "6db81778b3d82731e51f1ce1e6d46f5ea2b69cddce92b3dad29d73a17966664f",
+		"bytes": 1359
+	},
+	"idle-cost-runtime.log.txt": {
+		"archived": "idle-cost-runtime.log.txt",
+		"sha256": "5b4414cff41701693cc65a52a0b77a0e3f6e573e099d9f331531770c2e1bf35c",
+		"bytes": 1384
+	},
+	"pointer-budget-fixture.ts.txt": {
+		"archived": "pointer-budget-fixture.ts.txt",
+		"sha256": "abc74ca3085c1dfec1b3bc46c6380607256da30020fa5936c9dc212d28897a55",
+		"bytes": 11086
+	},
+	"src_client_budget-candidate-editor-viewport.ts.txt": {
+		"archived": "src_client_budget-candidate-editor-viewport.ts.txt",
+		"sha256": "3180ecaac02c155137a734cf97e94b0cee5778afeb4a782603afc4f648f323dd",
+		"bytes": 37478
+	},
+	"idle-cost-results.json": {
+		"archived": "idle-cost-results.json.txt",
+		"sha256": "9a8af21893cbe463b6b3b09cc8d208c2bf7a6bbb79c6674e09f67342ce6ad3da",
+		"bytes": 3924
+	},
+	"pointer-budget-run.ts.txt": {
+		"archived": "pointer-budget-run.ts.txt",
+		"sha256": "25dfd71520ecca5f08996b5f4bf277511745a09e1f4dfeebe5ab1075b71424ec",
+		"bytes": 2230
+	},
+	"src_client_components_editor.css.txt": {
+		"archived": "src_client_components_editor.css.txt",
+		"sha256": "c4257c88756596957cbff2e22c67761d25da1fd7718b9eab8d0586407dd50b41",
+		"bytes": 7176
+	},
+	"idle-host-scroll-summary.json": {
+		"archived": "idle-host-scroll-summary.json.txt",
+		"sha256": "9aaa315d69d5c17ffa78c360b74a23bb32e0e1dbcd265c8c9801f806145a2856",
+		"bytes": 2376
+	},
+	"strict-idle-budget.log.txt": {
+		"archived": "strict-idle-budget.log.txt",
+		"sha256": "65614c9e88fee06f17cb09cc78835af27d6023a9dfe37ebd5800e38b9c8fbdcd",
+		"bytes": 226
+	},
+	"src_client_viewport-activity.ts.txt": {
+		"archived": "src_client_viewport-activity.ts.txt",
+		"sha256": "d056df0df1816aff659d3d59371f5dee6ebca05037652e913364d6dff9d617d9",
+		"bytes": 70
+	},
+	"idle-cost-summary.json": {
+		"archived": "idle-cost-summary.json.txt",
+		"sha256": "92e5dd9fc04a1fddc762d44c578c1f145d8b215700b835ce6c34ab45a592ce04",
+		"bytes": 6859
+	},
+	"src_client_components_editor.ts.txt": {
+		"archived": "src_client_components_editor.ts.txt",
+		"sha256": "07b3ea10342439525f24816df0115126d4a03c14ed7f7e99cbd026f67aefd471",
+		"bytes": 78022
+	}
+}

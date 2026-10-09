@@ -1,0 +1,161 @@
+--- baseline/src/shared/crdt.ts
++++ candidate/src/shared/crdt.ts
+@@ -5,6 +5,8 @@
+ 	compactCheckpointEffect,
+ } from "./checkpoint"
+ import * as Effect from "effect/Effect"
++import * as HashMap from "effect/HashMap"
++import * as Option from "effect/Option"
+ import { attempt, cooperative } from "../platform/effects"
+ import { TextVisibility } from "./text-visibility"
+ import type { VisibilityFact } from "./text-visibility"
+@@ -119,7 +121,7 @@
+ 	operations = new Map<string, Operation>()
+ 	clock = 0
+ 	historyLoaded = true
+-	private atomIndex = new Map<string, { target: string; atom: Atom }>()
++	private atomIndex = HashMap.empty<string, Readonly<{ target: string; atom: Atom }>>()
+ 	private children = new Map<string, Map<string, Atom[]>>()
+ 	private visibility = new Map<string, TextVisibility>()
+ 	private textOwners = new Map<string, string>()
+@@ -176,7 +178,7 @@
+ 			this.legacyTextTargets,
+ 			cooperative,
+ 		)
+-		replica.atomIndex = yield* copyMapSteps(this.atomIndex, cooperative)
++		replica.atomIndex = this.atomIndex
+ 		for (let [target, children] of this.children)
+ 			replica.children.set(target, yield* copyMapSteps(children, cooperative))
+ 		for (let [target, visibility] of this.visibility)
+@@ -333,7 +335,7 @@
+ 			this.legacyTextTargets.has(receipt.target) ||
+ 			!this.canCancel(receipt.target, receipt.lastOperation) ||
+ 			!this.matchesInsertionReceipt(receipt) ||
+-			this.atomIndex.get(receipt.atom.id)?.atom !== receipt.atom
++			Option.getOrUndefined(HashMap.get(this.atomIndex, receipt.atom.id))?.atom !== receipt.atom
+ 		)
+ 			return undefined
+ 		let current = receipt.inserted ? receipt.after : receipt.before
+@@ -374,7 +376,7 @@
+ 			this.sourceCache.get(redo.target) !== redo.atoms ||
+ 			this.textCache.get(redo.target) !== redo.raw ||
+ 			this.strings.get(redo.target) !== redo.content ||
+-			this.atomIndex.get(redo.atom.id)?.atom !== redo.atom
++			Option.getOrUndefined(HashMap.get(this.atomIndex, redo.atom.id))?.atom !== redo.atom
+ 		)
+ 			return undefined
+ 		let content = redo.content + redo.atom.value
+@@ -553,7 +555,7 @@
+ 				typeof inserted.id !== "string" ||
+ 				typeof inserted.value !== "string" ||
+ 				inserted.after !== last.id ||
+-				this.atomIndex.has(inserted.id) ||
++				HashMap.has(this.atomIndex, inserted.id) ||
+ 				this.children.get(target)?.has(inserted.id) ||
+ 				this.visibility.get(target)?.hidden(inserted.id) ||
+ 				inserted.order !== undefined ||
+@@ -655,7 +657,7 @@
+ 				typeof atom.id !== "string" ||
+ 				typeof atom.value !== "string" ||
+ 				atom.after !== anchor ||
+-				this.atomIndex.has(atom.id) ||
++				HashMap.has(this.atomIndex, atom.id) ||
+ 				this.children.get(target)?.has(atom.id) ||
+ 				this.visibility.get(target)?.hidden(atom.id) ||
+ 				atom.order !== undefined ||
+@@ -792,7 +794,7 @@
+ 				start: splice.start,
+ 				remove: splice.remove,
+ 				inserted: splice.inserted.flatMap(id => {
+-					let atom = replica.atomIndex.get(id)?.atom
++					let atom = Option.getOrUndefined(HashMap.get(replica.atomIndex, id))?.atom
+ 					return atom ? [atom] : []
+ 				}),
+ 			}))
+@@ -845,7 +847,7 @@
+ 		let splice = edit.splices[0]
+ 		let rawSplice = edit.rawSplices[0]
+ 		let inserted = operation.insert[0]
+-		let insertedAtom = inserted && this.atomIndex.get(inserted.id)?.atom
++		let insertedAtom = inserted && Option.getOrUndefined(HashMap.get(this.atomIndex, inserted.id))?.atom
+ 		let before = sourceStrings.get(edit.atoms)
+ 		if (
+ 			operation.kind === "text" &&
+@@ -1417,7 +1419,7 @@
+ 		let removed = previous.remove
+ 			.filter(id => !ignored.has(id))
+ 			.flatMap(id => {
+-				let atom = this.atomIndex.get(id)?.atom
++				let atom = Option.getOrUndefined(HashMap.get(this.atomIndex, id))?.atom
+ 				return atom ? [atom] : []
+ 			})
+ 		let fragment = removed.map(atom => atom.value).join("")
+@@ -1458,7 +1460,7 @@
+ 
+ 		for (let id of previous.remove) {
+ 			if (ignored.has(id)) continue
+-			let atom = this.atomIndex.get(id)?.atom
++			let atom = Option.getOrUndefined(HashMap.get(this.atomIndex, id))?.atom
+ 			if (!atom) continue
+ 			let newId = `${operation.id}:${String(operation.insert.length).padStart(8, "0")}`
+ 			operation.insert.push({
+@@ -1774,7 +1776,7 @@
+ 		return this.atomTarget(id) === target
+ 	}
+ 	atomTarget(id: string) {
+-		return this.atomIndex.get(id)?.target
++		return Option.getOrUndefined(HashMap.get(this.atomIndex, id))?.target
+ 	}
+ 	targetIds() {
+ 		return this.targets.keys()
+@@ -2016,7 +2018,7 @@
+ 				if (cooperative && ++work % 512 === 0) yield
+ 				if (Number(atom.id.slice(0, 16)) > snapshot.clock)
+ 					throw new Error("Checkpoint clock precedes an insertion")
+-				let known = atoms.get(atom.id) ?? this.atomIndex.get(atom.id)
++				let known = atoms.get(atom.id) ?? Option.getOrUndefined(HashMap.get(this.atomIndex, atom.id))
+ 				if (
+ 					known &&
+ 					(known.target !== target.id ||
+@@ -2024,7 +2026,7 @@
+ 				)
+ 					throw new Error("Checkpoint atom identity is immutable")
+ 				let owner = atom.id.slice(0, -9)
+-				if (this.textOwners.has(owner) && !this.atomIndex.has(atom.id))
++				if (this.textOwners.has(owner) && !HashMap.has(this.atomIndex, atom.id))
+ 					throw new Error("Checkpoint insertion identity is immutable")
+ 				let previous = owners.get(owner)
+ 				if (previous && previous !== target.id)
+@@ -2058,7 +2060,7 @@
+ 			])
+ 				for (let id of deletionIds(runs)) {
+ 					if (cooperative && ++work % 512 === 0) yield
+-					let atom = atoms.get(id) ?? this.atomIndex.get(id)
++					let atom = atoms.get(id) ?? Option.getOrUndefined(HashMap.get(this.atomIndex, id))
+ 					if (atom?.target !== target.id)
+ 						throw new Error("Unknown checkpoint deletion")
+ 				}
+@@ -2229,9 +2231,9 @@
+ 					throw new Error("Removal identity is immutable")
+ 			}
+ 			for (let atom of operation.insert) {
+-				if (owner && !this.atomIndex.has(atom.id))
++				if (owner && !HashMap.has(this.atomIndex, atom.id))
+ 					throw new Error("Insertion identity is immutable")
+-				let previous = atoms.get(atom.id) ?? this.atomIndex.get(atom.id)
++				let previous = atoms.get(atom.id) ?? Option.getOrUndefined(HashMap.get(this.atomIndex, atom.id))
+ 				if (
+ 					previous &&
+ 					(previous.target !== operation.target ||
+@@ -2277,9 +2279,9 @@
+ 			)
+ 		)
+ 			this.legacyTextTargets.add(target)
+-		if (this.atomIndex.has(atom.id)) return
++		if (HashMap.has(this.atomIndex, atom.id)) return
+ 		freezeTextAtom(atom)
+-		this.atomIndex.set(atom.id, { target, atom })
++		this.atomIndex = HashMap.set(this.atomIndex, atom.id, Object.freeze({ target, atom }))
+ 		let owner = atom.id.slice(0, -9)
+ 		this.ownedAtomCounts.set(owner, (this.ownedAtomCounts.get(owner) ?? 0) + 1)
+ 		let children = this.children.get(target) ?? new Map<string, Atom[]>()

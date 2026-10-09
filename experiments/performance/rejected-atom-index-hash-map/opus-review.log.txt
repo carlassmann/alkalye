@@ -1,0 +1,46 @@
+I didn't find a correctness bug in this change, but it shouldn't go to native comparison yet: the load and lookup costs haven't been measured. Review only; I made no edits and ran nothing.
+
+**Diff scope** (`src/shared/crdt.ts`)
+- Only the `atomIndex` code changed: its declaration, the get/has calls, `indexAtom`'s set, and the fork assignment at :194. No other replica field, no checkpoint code and no text-wire code changed.
+- `beginMutation` appears nowhere. `HashMap.set` at :2312 always runs with `_editable=false`, so it builds a new root. Entry wrappers are frozen with `Object.freeze`, and `freezeTextAtom` runs before the entry is inserted.
+- In `indexAtom`, legacy text detection still runs before the duplicate check (:2296–2310), same order as the baseline.
+- Every lookup is `Option.getOrUndefined(HashMap.get(...))?.x`, which behaves like the old `Map.get(...)?.x`.
+- The only loop over the index is :2184 (`mergedAliasSteps`). It fills a lookup map, so the different iteration order doesn't matter.
+- The per-field timing marks keep the same names and use `HashMap.size`, so both arms report the same fields.
+
+**Safety checks**
+- **Aliasing / fork independence:** none found. Source and fork share a root, and any write gives the writer a new root, so changes don't cross in either direction. No other code reads `atomIndex`, and checkpoints don't serialize it.
+- **Generation bypass:** none found. The index is captured once in the middle of `forkSteps`. Every path that changes it also bumps the generation: `apply` at :1053 and restore at :2122. `forkEffect` rejects the copy if the generation or clock moved (:162).
+- **Restore validation:** it reads the index in place (:2049, :2057, :2091, :2262) and only writes after all validation passes, same as the baseline. A failed restore leaves the root untouched.
+- **Cancellation:** an interrupted or rejected fork leaves the source untouched; the discarded replica only held a shared root.
+- **Receipts:** the identity checks at :366/:407 compare the atom by reference, which still works because the wrapper holds the original atom.
+- **Unicode and headers:** legacy detection is unchanged, and the header-undo lookup at :1450 just uses the new call.
+
+**Performance**
+- The `atomIndex` fork step drops from 56–60 ms to near 0. `children` (51–52 ms), `visibility`, `textOwners`, `operations` and the cache copies are still O(n), so the whole fork is still not O(1).
+
+**Blocker: load cost is unmeasured**
+- Every `indexAtom` during `apply` (:1038) and restore (:2106) now copies a path of tree nodes and allocates a new map object. That replaces an amortized O(1) `Map.set`. Cold restore and big inserts take this hit once per atom, and `has` followed by `set` hashes the id twice.
+- With `beginMutation` ruled out, the only ways to fix this would be bulk construction (e.g. `HashMap.fromIterable`) or accepting the regression.
+
+**Gates to pass before native comparison**
+1. **Load:** cold `restore` and `restoreEffect` of the large seed doc, baseline `Map` vs `HashMap`, measuring wall time and allocated bytes. Also run `apply` of one large text insert.
+2. **Hashing:** Effect doesn't cache string hashes, so every lookup re-hashes the ~25-character id and goes through `Hash.hash` and `Equal.equals`. Each hit also allocates a `Some`. Hot loops: the restore validation per atom and per deletion id (:2049, :2091), undo inverse (:1450, :1491), and `targetOf`. Time lookups per op on large docs.
+3. **Iteration:** time `mergedAliasSteps` (:2184) walking the tree vs walking a `Map`.
+4. **Memory:** retained heap of source plus N forks, and peak heap during load, vs the baseline. Tree nodes and frozen wrappers add per-entry overhead.
+5. **Equivalence:** the fork-step totals should drop by about 56–60 ms with all other fields unchanged. Any regression in load or lookups has to be weighed against that saving.
+
+**Tests**
+- `replica-fact-index.test.ts` covers both-way independence, a restore while a fork is pending, and invalid restores.
+- It doesn't cover:
+  - a cooperative fork interleaved with `apply` (not just restore);
+  - frozen wrappers / no live source mutation;
+  - a duplicate atom id carrying a legacy value (legacy flag still set);
+  - restore validation run against a forked root.
+- Existing suites to run:
+  - `replica-loading`
+  - `replacement-reconstruction`, `document-replacements`, `replacement-cache-diagnostic`
+  - `frontmatter`
+  - `checkpoint*`, `durable-checkpoint*`
+
+These connectors need authorizing in claude.ai connector settings before their tools work: Axiom, Canva, GitHub, Gmail, Google Drive, HubSpot, Lusha, Miro, Notion, Ocean.io, Ramp Data, Slack, the SynTwin connectors (Staging SynTwin, SynTwin Admin, SynTwin Kunde, syntwin admin, syntwin main) and lemlist.

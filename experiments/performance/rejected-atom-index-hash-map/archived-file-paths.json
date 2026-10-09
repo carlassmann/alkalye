@@ -1,0 +1,127 @@
+{
+	"baseline-crdt.ts.txt": {
+		"archived": "baseline-crdt.ts.txt",
+		"sha256": "e61d7819830f0a6ab9adb4ed15b58870c50e912bc4f9564d56ab3379bdb6bc2b",
+		"bytes": 74714
+	},
+	"fact-index-cost.ts.txt": {
+		"archived": "fact-index-cost.ts.txt",
+		"sha256": "c9d632bebddef744cb5cd1c6cf050ee3b97ac1d64661d8caf36821c61ae394d0",
+		"bytes": 3261
+	},
+	"fixture-metadata.json": {
+		"archived": "fixture-metadata.json.txt",
+		"sha256": "a0eeeec7de95808d47a5ab97bf406f42cd209b3ae801a5eaca6f5ebffd12e1d4",
+		"bytes": 212
+	},
+	"measured-candidate-crdt.ts.txt": {
+		"archived": "measured-candidate-crdt.ts.txt",
+		"sha256": "cc3eec83565dc5731394c7c737cc93fbe14d4e852ea7b581c78b310b4bacea4e",
+		"bytes": 76688
+	},
+	"types-public-final.log": {
+		"archived": "types-public-final.log.txt",
+		"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+		"bytes": 0
+	},
+	"tests-public-corrected.log": {
+		"archived": "tests-public-corrected.log.txt",
+		"sha256": "e16d2199fd558f00119f1b232535001f21311ef49c35f19482068fb165ff781e",
+		"bytes": 5751
+	},
+	"tests-public.log": {
+		"archived": "tests-public.log.txt",
+		"sha256": "2ee5aa3c4d4c22165bf54e2ab3644392989158f662839e1cc7535c64d42e3178",
+		"bytes": 3077127
+	},
+	"measured-baseline-crdt.ts.txt": {
+		"archived": "measured-baseline-crdt.ts.txt",
+		"sha256": "d66602662da7331f5cec4b9af8e34ac234d6a365f4718b0e0841272e1a2ac312",
+		"bytes": 76110
+	},
+	"cost.log": {
+		"archived": "cost.log.txt",
+		"sha256": "9e14acd3412360e067c32fc8c783c2e137fed78a8dee4d9ffb958d90a3e9b48f",
+		"bytes": 34
+	},
+	"types-cost.log": {
+		"archived": "types-cost.log.txt",
+		"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+		"bytes": 0
+	},
+	"tests-first.log": {
+		"archived": "tests-first.log.txt",
+		"sha256": "bc303079c580789d6febaa1f788938e4f3e08e15defc5eb4829788cadcc544f1",
+		"bytes": 5620
+	},
+	"types-public.log": {
+		"archived": "types-public.log.txt",
+		"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+		"bytes": 0
+	},
+	"candidate-crdt.ts.txt": {
+		"archived": "candidate-crdt.ts.txt",
+		"sha256": "f7b6ef2d8fc3fe5f1de820816654a9f06c88540d34982179fde1c6382c169af4",
+		"bytes": 75184
+	},
+	"README.md": {
+		"archived": "README.original.md.txt",
+		"sha256": "de577bf347de598d949b2929a29e1c968e12d46ebb65b2d2e33120989d8e79aa",
+		"bytes": 2351
+	},
+	"cost-results.json": {
+		"archived": "cost-results.json.txt",
+		"sha256": "42f5610ea93e459e0f7a583ffe8c7ab8cb489c24750f67dc77ac4146b82bc0ee",
+		"bytes": 7181
+	},
+	"opus-review.log": {
+		"archived": "opus-review.log.txt",
+		"sha256": "4ba13af73dc7a76a5240cb90cf2d99928737ecea18894f2bbf7769f0fa5eaa11",
+		"bytes": 4776
+	},
+	"pure-source-pins.json": {
+		"archived": "pure-source-pins.json.txt",
+		"sha256": "8c16b27908fc1fb48779a9e146e945bc88c6f8fa26c5078e443b0473d8a3c707",
+		"bytes": 174
+	},
+	"replica-fact-index.test.ts.txt": {
+		"archived": "replica-fact-index.test.ts.txt",
+		"sha256": "13238c737f4e17a9bdf94c73494e9af33cfd345bdcd9ce52414ceb4a21ee1d75",
+		"bytes": 3526
+	},
+	"types-first.log": {
+		"archived": "types-first.log.txt",
+		"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+		"bytes": 0
+	},
+	"inventory.json": {
+		"archived": "inventory.json.txt",
+		"sha256": "20940d267ce7818c743e2e9c572cad73b983c9918225fe1554798a0ebe649766",
+		"bytes": 3178
+	},
+	"cost-summary.json": {
+		"archived": "cost-summary.json.txt",
+		"sha256": "e0fb687d96d8d28b6a69b53e48530690cce7fdcb15b2c57a27722b9d8bd20a20",
+		"bytes": 1331
+	},
+	"production-atom-index.patch": {
+		"archived": "production-atom-index.patch",
+		"sha256": "6e4afdd99effa040dca1ad32eeed3562f0219407a143f8dd93fb97c11a2d215d",
+		"bytes": 6651
+	},
+	"tests-public-final.log": {
+		"archived": "tests-public-final.log.txt",
+		"sha256": "2d7bf5836ccfb988e68f3d6a449089a7c9c41a6936970cec322876d963fdba5f",
+		"bytes": 467
+	},
+	"types-cost-final.log": {
+		"archived": "types-cost-final.log.txt",
+		"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+		"bytes": 0
+	},
+	"types-public-corrected.log": {
+		"archived": "types-public-corrected.log.txt",
+		"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+		"bytes": 0
+	}
+}

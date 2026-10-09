@@ -1,0 +1,302 @@
+[
+  {
+    "kind": "baseline",
+    "size": 2048,
+    "phase": "idle",
+    "state": {
+      "done": true,
+      "activity": {
+        "idle": 0,
+        "paint": 0,
+        "notifications": 0
+      },
+      "typedExact": true,
+      "originalExact": true,
+      "caret": 0,
+      "end": 0,
+      "length": 2048
+    },
+    "mainTaskCount": 62,
+    "mainTaskP95Ms": 0.313,
+    "mainTaskMaxMs": 1.773,
+    "mainTaskTotalMs": 9.971,
+    "mainGCMaxMs": 0,
+    "windowMs": 3001.11,
+    "scope": "post-ready3s module; initial scroll phase host movement unverified"
+  },
+  {
+    "kind": "baseline",
+    "size": 2048,
+    "phase": "typing",
+    "state": {
+      "done": true,
+      "activity": {
+        "idle": 0,
+        "paint": 2,
+        "notifications": 2
+      },
+      "typedExact": true,
+      "originalExact": false,
+      "caret": 11,
+      "end": 11,
+      "length": 2049
+    },
+    "mainTaskCount": 100,
+    "mainTaskP95Ms": 0.335,
+    "mainTaskMaxMs": 1.87,
+    "mainTaskTotalMs": 12.024000000000001,
+    "mainGCMaxMs": 0,
+    "windowMs": 3001.606,
+    "scope": "post-ready3s module; initial scroll phase host movement unverified"
+  },
+  {
+    "kind": "baseline",
+    "size": 2048,
+    "phase": "scroll",
+    "state": {
+      "done": true,
+      "activity": {
+        "idle": 0,
+        "paint": 0,
+        "notifications": 0
+      },
+      "typedExact": true,
+      "originalExact": false,
+      "caret": 11,
+      "end": 11,
+      "length": 2049
+    },
+    "mainTaskCount": 76,
+    "mainTaskP95Ms": 0.369,
+    "mainTaskMaxMs": 0.428,
+    "mainTaskTotalMs": 9.618,
+    "mainGCMaxMs": 0,
+    "windowMs": 3002.595,
+    "scope": "post-ready3s module; initial scroll phase host movement unverified"
+  },
+  {
+    "kind": "candidate",
+    "size": 2048,
+    "phase": "idle",
+    "state": {
+      "done": true,
+      "activity": {
+        "idle": 0,
+        "paint": 0,
+        "notifications": 0
+      },
+      "typedExact": true,
+      "originalExact": true,
+      "caret": 0,
+      "end": 0,
+      "length": 2048
+    },
+    "mainTaskCount": 62,
+    "mainTaskP95Ms": 0.376,
+    "mainTaskMaxMs": 1.138,
+    "mainTaskTotalMs": 9.269,
+    "mainGCMaxMs": 0,
+    "windowMs": 3002.888,
+    "scope": "post-ready3s module; initial scroll phase host movement unverified"
+  },
+  {
+    "kind": "candidate",
+    "size": 2048,
+    "phase": "typing",
+    "state": {
+      "done": true,
+      "activity": {
+        "idle": 0,
+        "paint": 2,
+        "notifications": 2
+      },
+      "typedExact": true,
+      "originalExact": false,
+      "caret": 11,
+      "end": 11,
+      "length": 2049
+    },
+    "mainTaskCount": 100,
+    "mainTaskP95Ms": 0.322,
+    "mainTaskMaxMs": 1.891,
+    "mainTaskTotalMs": 12.372,
+    "mainGCMaxMs": 0,
+    "windowMs": 3002.742,
+    "scope": "post-ready3s module; initial scroll phase host movement unverified"
+  },
+  {
+    "kind": "candidate",
+    "size": 2048,
+    "phase": "scroll",
+    "state": {
+      "done": true,
+      "activity": {
+        "idle": 0,
+        "paint": 0,
+        "notifications": 0
+      },
+      "typedExact": true,
+      "originalExact": false,
+      "caret": 11,
+      "end": 11,
+      "length": 2049
+    },
+    "mainTaskCount": 76,
+    "mainTaskP95Ms": 0.358,
+    "mainTaskMaxMs": 0.377,
+    "mainTaskTotalMs": 9.715,
+    "mainGCMaxMs": 0,
+    "windowMs": 3002.222,
+    "scope": "post-ready3s module; initial scroll phase host movement unverified"
+  },
+  {
+    "kind": "baseline",
+    "size": 1048576,
+    "phase": "idle",
+    "state": {
+      "done": true,
+      "activity": {
+        "idle": 191,
+        "paint": 0,
+        "notifications": 0
+      },
+      "typedExact": true,
+      "originalExact": true,
+      "caret": 0,
+      "end": 0,
+      "length": 1048576
+    },
+    "mainTaskCount": 414,
+    "mainTaskP95Ms": 0.944,
+    "mainTaskMaxMs": 1.181,
+    "mainTaskTotalMs": 119.668,
+    "mainGCMaxMs": 0,
+    "windowMs": 3001.182,
+    "scope": "post-ready3s module; initial scroll phase host movement unverified"
+  },
+  {
+    "kind": "baseline",
+    "size": 1048576,
+    "phase": "typing",
+    "state": {
+      "done": true,
+      "activity": {
+        "idle": 192,
+        "paint": 2,
+        "notifications": 2
+      },
+      "typedExact": true,
+      "originalExact": false,
+      "caret": 11,
+      "end": 11,
+      "length": 1048577
+    },
+    "mainTaskCount": 445,
+    "mainTaskP95Ms": 1.015,
+    "mainTaskMaxMs": 2.303,
+    "mainTaskTotalMs": 148.573,
+    "mainGCMaxMs": 0,
+    "windowMs": 3001.814,
+    "scope": "post-ready3s module; initial scroll phase host movement unverified"
+  },
+  {
+    "kind": "baseline",
+    "size": 1048576,
+    "phase": "scroll",
+    "state": {
+      "done": true,
+      "activity": {
+        "idle": 192,
+        "paint": 0,
+        "notifications": 0
+      },
+      "typedExact": true,
+      "originalExact": false,
+      "caret": 11,
+      "end": 11,
+      "length": 1048577
+    },
+    "mainTaskCount": 427,
+    "mainTaskP95Ms": 1.021,
+    "mainTaskMaxMs": 1.326,
+    "mainTaskTotalMs": 133.79,
+    "mainGCMaxMs": 0,
+    "windowMs": 3000.865,
+    "scope": "post-ready3s module; initial scroll phase host movement unverified"
+  },
+  {
+    "kind": "candidate",
+    "size": 1048576,
+    "phase": "idle",
+    "state": {
+      "done": true,
+      "activity": {
+        "idle": 190,
+        "paint": 190,
+        "notifications": 190
+      },
+      "typedExact": true,
+      "originalExact": true,
+      "caret": 0,
+      "end": 0,
+      "length": 1048576
+    },
+    "mainTaskCount": 413,
+    "mainTaskP95Ms": 1.039,
+    "mainTaskMaxMs": 1.523,
+    "mainTaskTotalMs": 118.623,
+    "mainGCMaxMs": 0,
+    "windowMs": 3000.684,
+    "scope": "post-ready3s module; initial scroll phase host movement unverified"
+  },
+  {
+    "kind": "candidate",
+    "size": 1048576,
+    "phase": "typing",
+    "state": {
+      "done": true,
+      "activity": {
+        "idle": 193,
+        "paint": 186,
+        "notifications": 186
+      },
+      "typedExact": true,
+      "originalExact": false,
+      "caret": 11,
+      "end": 11,
+      "length": 1048577
+    },
+    "mainTaskCount": 447,
+    "mainTaskP95Ms": 1.137,
+    "mainTaskMaxMs": 2.323,
+    "mainTaskTotalMs": 162.788,
+    "mainGCMaxMs": 0,
+    "windowMs": 3000.268,
+    "scope": "post-ready3s module; initial scroll phase host movement unverified"
+  },
+  {
+    "kind": "candidate",
+    "size": 1048576,
+    "phase": "scroll",
+    "state": {
+      "done": true,
+      "activity": {
+        "idle": 191,
+        "paint": 191,
+        "notifications": 191
+      },
+      "typedExact": true,
+      "originalExact": false,
+      "caret": 11,
+      "end": 11,
+      "length": 1048577
+    },
+    "mainTaskCount": 426,
+    "mainTaskP95Ms": 0.99,
+    "mainTaskMaxMs": 1.354,
+    "mainTaskTotalMs": 119.374,
+    "mainGCMaxMs": 0,
+    "windowMs": 3000.812,
+    "scope": "post-ready3s module; initial scroll phase host movement unverified"
+  }
+]

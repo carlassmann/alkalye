@@ -1,0 +1,50 @@
+{
+  "apply": {
+    "baseline": {
+      "restoreMs": 936.0863329999993,
+      "textMs": 146.6233339999999,
+      "lookupMs": 0.4174159999997755,
+      "heapDeltaMedianBytes": 311249712,
+      "rssDeltaMedianBytes": 196608
+    },
+    "candidate": {
+      "restoreMs": 1929.2238340000004,
+      "textMs": 174.5222079999985,
+      "lookupMs": 2.6220829999947455,
+      "heapDeltaMedianBytes": 471276113,
+      "rssDeltaMedianBytes": 14139392
+    }
+  },
+  "sync": {
+    "baseline": {
+      "restoreMs": 736.834625,
+      "textMs": 210.648416,
+      "lookupMs": 0.3107089999998607,
+      "heapDeltaMedianBytes": 257615047,
+      "rssDeltaMedianBytes": 278528
+    },
+    "candidate": {
+      "restoreMs": 1722.6557919999977,
+      "textMs": 237.23962500000198,
+      "lookupMs": 2.5557499999995343,
+      "heapDeltaMedianBytes": 359172663,
+      "rssDeltaMedianBytes": 1425408
+    }
+  },
+  "cooperative": {
+    "baseline": {
+      "restoreMs": 2191.272417,
+      "textMs": 280.5829999999987,
+      "lookupMs": 0.3013750000000073,
+      "heapDeltaMedianBytes": 190619046,
+      "rssDeltaMedianBytes": 1654784
+    },
+    "candidate": {
+      "restoreMs": 3194.6841249999998,
+      "textMs": 270.74070799999936,
+      "lookupMs": 2.4549169999991136,
+      "heapDeltaMedianBytes": 210568379,
+      "rssDeltaMedianBytes": 12517376
+    }
+  }
+}

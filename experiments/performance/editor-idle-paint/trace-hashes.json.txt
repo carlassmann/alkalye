@@ -1,0 +1,66 @@
+{
+  "idle-cost-baseline-2048-host-scroll.trace.json": {
+    "sha256": "6a5ca49f4fdd734fc2b50cfce3f523c8fec610cd276ddb4441eb4dab8b277a1e",
+    "bytes": 1325511
+  },
+  "idle-cost-candidate-1048576-typing.trace.json": {
+    "sha256": "5abe264198f0764121e39aefe4321a344425d637e8c6f572cb4c81a1fcfa4766",
+    "bytes": 2638192
+  },
+  "idle-cost-candidate-1048576-scroll.trace.json": {
+    "sha256": "cdfd9b759fcba9d03ed49d21615dc40e36f38f544847bc1cb02391129ee3f981",
+    "bytes": 2583091
+  },
+  "idle-cost-candidate-1048576-idle.trace.json": {
+    "sha256": "ed96f5849c76f970ad1c11fe3fc64ca33dd4e4794cac54d1da8555c5a10c12ff",
+    "bytes": 3191595
+  },
+  "idle-cost-baseline-2048-idle.trace.json": {
+    "sha256": "7948d09c8f13475c857e3f81b8cdeac24b0c19e9f6e1d853fd6adfb5403b49ae",
+    "bytes": 1413318
+  },
+  "idle-cost-candidate-2048-host-scroll.trace.json": {
+    "sha256": "1b88bb2d0eff1c7b719bb95064ce7908f84c13467cfa919ed142d0c86ceb7d11",
+    "bytes": 1552989
+  },
+  "idle-cost-candidate-2048-scroll.trace.json": {
+    "sha256": "25c9e4bcfb60bd16b794663aa712e32d891ad5e35a3bb5e39f6bd852fd2866fe",
+    "bytes": 436189
+  },
+  "idle-cost-baseline-2048-typing.trace.json": {
+    "sha256": "b001f03a3b7f5033a342b2f11b1e2dad72ab23bff519d3a95f7dae96ae2c9682",
+    "bytes": 661653
+  },
+  "idle-cost-baseline-1048576-idle.trace.json": {
+    "sha256": "13f484ab9d77d68cdd41d534e3f132d04bd900bc2e7e994c44926036b13d18e7",
+    "bytes": 2914282
+  },
+  "idle-cost-baseline-2048-scroll.trace.json": {
+    "sha256": "1bf15647bb4cf134975e724f11861a3337b77769c5dfa2b48cd6ea3f114c3d66",
+    "bytes": 440496
+  },
+  "idle-cost-candidate-2048-typing.trace.json": {
+    "sha256": "edc8a22a142a71544378dad197f2417f44cf4330286cc62c196de23290aa4791",
+    "bytes": 659454
+  },
+  "idle-cost-baseline-1048576-host-scroll.trace.json": {
+    "sha256": "3c730aea8c15e8ecf84718528c1bc7a6f4c7d14ef67efb96f6f4b19bd9f35e6c",
+    "bytes": 3026779
+  },
+  "idle-cost-candidate-1048576-host-scroll.trace.json": {
+    "sha256": "e3fc13d2499d8f71e408e87cf07d20147297226664568815b42ad2671f3b4818",
+    "bytes": 3248942
+  },
+  "idle-cost-candidate-2048-idle.trace.json": {
+    "sha256": "fc2993c9b0e548dd6c5ff9dcc51a7f6adb759d22eebc9919f73f9b61336e403b",
+    "bytes": 1426524
+  },
+  "idle-cost-baseline-1048576-typing.trace.json": {
+    "sha256": "eebd6c65e8ff6883d6f272f205d0360c2a2c7944558ce13a590556f5e20d2493",
+    "bytes": 2392689
+  },
+  "idle-cost-baseline-1048576-scroll.trace.json": {
+    "sha256": "d2e48c259b0b04ead04bdacfce33250751fce121bfe0d695d7b033118bc88a8f",
+    "bytes": 2327914
+  }
+}

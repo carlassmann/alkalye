@@ -1,0 +1,2 @@
+pointer-budget-fixture.ts(1,10): error TS2305: Module '"./src/client/editor-viewport"' has no exported member 'viewportActivity'.
+pointer-budget-server.ts(3,5): error TS6133: 'ordered' is declared but its value is never read.

@@ -1,0 +1,24 @@
+**Verdict:** I found no false positive. The probe now closes the root-level gaps from the earlier reviews. I reviewed it read-only: no edits and no runs.
+
+**Setup checked**
+- The fixture's `document-session.ts`, `cli/document-platform.ts` and `platform/document-journal.ts` are identical to the production worktree (`diff` printed nothing).
+- **Boundary:** with no `activity` or `historyOrigin` set, the first `withLock` after arming is the Undo write in `propose → persistUnlocked`. The other callers (`document-session.ts:595` and `:672`) can't fire in this setup.
+  - `before` pauses after `prepare`, inside the gate, before the write.
+  - `after` pauses after the outer transaction commits.
+  - In the `after` case, `undoOf===editId` in the cold read proves the paused write was the Undo.
+- **Reopen independence:** `cliDocumentSessionLayer` builds a fresh `sqliteLayer`, so the cold read uses its own SQLite connection plus its own readonly reader. That means it sees only committed data, and no transaction is open at that point. Opening a session only replays the journal and never calls the transport, and the unchanged server position confirms the cold session pushed nothing.
+- **Identity:** the server lookup of `durableUndo.id` returns the same id and `undoOf`. Position goes up by exactly 1, and the repeated sync keeps it the same, so there are no duplicates. In `before`, the unchanged position proves nothing was accepted.
+- **Interrupt:** the `hasInterruptsOnly` check rules out a storage failure passing as an interruption.
+
+**Remaining caveats (none are false positives)**
+1. **Possible flaky failure in the `immediately` check, `after` phase only.** `lifecycle.changes` is `Stream.tick("1 second")`, which triggers a projection replay. That replay waits on `gate`. If a tick lands while the write is paused, the replay can run as soon as the interrupt releases the gate, before line 208 reads the text. The check would then fail. It can't pass wrongly.
+2. **Local journal duplicates aren't counted directly.** `pending()` is the projection's deduplicated view, so a duplicate local entry wouldn't show there. The server's +1 position and the repeated-sync check do cover duplicates on the server.
+3. **Retry after an `after` interruption isn't tested.** Calling `undo()` again (undo further back vs "nothing to undo") is the real cost of an unknown outcome.
+4. **`count` and `peer` are fixed.** Multi-token and concurrent-peer cases are still uncovered.
+
+**What the result does not show**
+- Bun SQLite in the CLI only, not the IndexedDB/browser journal.
+- An in-process interrupt and a second connection while the first is still open. That is not a process crash, a restart, or power loss; fsync/WAL durability isn't exercised.
+- Nothing about worker RPC, `UndoQueued` receipts, request→action resolution, or epoch replay. Those gaps from the earlier review are still open.
+
+Several claude.ai connectors (GitHub, Slack, etc.) need authorizing in your claude.ai connector settings; this review didn't need them.

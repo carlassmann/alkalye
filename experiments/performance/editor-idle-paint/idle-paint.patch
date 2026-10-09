@@ -1,0 +1,14 @@
+diff --git a/tmp/alkalye-pointer-lifecycle-successor/runtime/src/client/baseline-editor-viewport.ts b/tmp/alkalye-pointer-lifecycle-successor/runtime/src/client/idle-painted-editor-viewport.ts
+index fa97029..5aa1d2c 100644
+--- a/tmp/alkalye-pointer-lifecycle-successor/runtime/src/client/baseline-editor-viewport.ts
++++ b/tmp/alkalye-pointer-lifecycle-successor/runtime/src/client/idle-painted-editor-viewport.ts
+@@ -750,7 +750,9 @@ export class EditorViewport {
+ 			) {
+ 				let index = this.blocks.findIndex(block => !block.measured)
+ 				if (index < 0) return
++				this.readSelection()
+ 				this.refine(index)
++				this.paint()
+ 			}
+ 			this.idle()
+ 		})

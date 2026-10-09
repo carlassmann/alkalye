@@ -1,0 +1,8 @@
+{"kind":"baseline","size":2048,"observedDown":600}
+{"kind":"baseline","size":2048,"phase":"scroll","activity":{"idle":0,"paint":2,"notifications":2},"exact":true}
+{"kind":"candidate","size":2048,"observedDown":600}
+{"kind":"candidate","size":2048,"phase":"scroll","activity":{"idle":0,"paint":2,"notifications":2},"exact":true}
+{"kind":"baseline","size":1048576,"observedDown":600}
+{"kind":"baseline","size":1048576,"phase":"scroll","activity":{"idle":193,"paint":2,"notifications":2},"exact":true}
+{"kind":"candidate","size":1048576,"observedDown":600}
+{"kind":"candidate","size":1048576,"phase":"scroll","activity":{"idle":193,"paint":180,"notifications":180},"exact":true}

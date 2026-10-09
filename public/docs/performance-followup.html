@@ -1489,6 +1489,32 @@
 			19.589ms to 20.336ms, so the frame budget remains unmet. Evidence:
 			<code>experiments/performance/open-entry-reuse</code>.
 		</p>
+		<h2>Viewport refinement and cursor placement</h2>
+		<p>
+			Idle geometry refinement now reads the native selection and repaints the
+			editor window in the same animation frame. The control reproduced wrong
+			cursor offsets; the candidate passed all twelve trusted-click cases. Opus
+			found no semantic blocker.
+		</p>
+		<p>
+			Separate n1 module gates covered small and large documents, exact typing
+			and observed host scrolling. Main-thread tasks stayed below 2.4ms in these
+			measured windows. Large-document idle repaint notifications increased from
+			zero to 190; there is no reliable speed-win or whole-app 120fps claim.
+			Evidence: <code>experiments/performance/editor-idle-paint</code>.
+		</p>
+		<h2>Rejected atom-index persistent map</h2>
+		<p>
+			An Effect HashMap prototype passed public correctness checks but made cold
+			loading worse. On 1,048,576 UTF-16 units (1,198,368 UTF-8 bytes), median
+			synchronous restore rose from 737ms to 1,723ms and cooperative restore
+			from 2,191ms to 3,195ms. Eighteen alternating samples cover three trials
+			per arm and mode. Exact source and atom lookups passed. This version is
+			rejected; memory brackets describe the whole process, not allocation
+			ownership. Evidence:
+			<code>experiments/performance/rejected-atom-index-hash-map</code>.
+		</p>
+
 		<h2>Replica copy attribution</h2>
 		<p>
 			Two marked native journeys isolate the remaining owned-copy cost on the

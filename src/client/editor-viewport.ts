@@ -750,7 +750,9 @@ export class EditorViewport {
 			) {
 				let index = this.blocks.findIndex(block => !block.measured)
 				if (index < 0) return
+				this.readSelection()
 				this.refine(index)
+				this.paint()
 			}
 			this.idle()
 		})

@@ -1,0 +1,4 @@
+{
+  "baselineSHA": "e61d7819830f0a6ab9adb4ed15b58870c50e912bc4f9564d56ab3379bdb6bc2b",
+  "candidateSHA": "f7b6ef2d8fc3fe5f1de820816654a9f06c88540d34982179fde1c6382c169af4"
+}

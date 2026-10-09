@@ -1,0 +1,1 @@
+{"extends":"./tsconfig.json","include":["src/**/*.ts","pointer-budget-fixture.ts","pointer-budget-server.ts","pointer-budget-run.ts","pointer-host-scroll-run.ts"]}

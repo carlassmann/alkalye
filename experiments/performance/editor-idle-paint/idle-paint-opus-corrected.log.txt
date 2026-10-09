@@ -1,0 +1,29 @@
+**No blockers.** I diffed the two files: they differ by exactly 2 lines, `idle-painted-editor-viewport.ts:753` (`readSelection()`) and `:755` (`paint()`). I made no edits.
+
+**Is `readSelection` before `refine` correct?** Yes.
+- `readSelection` maps native offsets using `this.window.start` and `this.prefix`. `refine` doesn't change either of them; it only changes `blocks`, the spacer, `scrollTop` and the hidden measure element. Only `paint` updates `window`.
+- So putting it before or after `refine` gives the same result. What matters is that it runs before `paint`, which rewrites `element.value` and the selection. It does.
+- It's the same pair as `schedule()` (L866–867), so the idle path now matches an existing pattern rather than adding a new one.
+
+**Does `paint` preserve native authority?** Yes.
+- Without `readSelection`, `paint` would overwrite caret moves that fire no `select` or `keyup` event: assistive-tech caret moves, or the gap after the first keydown of a held key, before autorepeat starts, once 150ms have passed. The read prevents that.
+- The non-force branch of `readSelection` (L1029–1040) still keeps the stored endpoints when the selection runs past the visible window.
+- If `refine` re-estimates block `first-1` and shifts `window.start`, `paint` rewrites `value` and remaps the selection from absolute offsets. Baseline does the same on the paint triggered by the scroll event. In the idle callback the rewrite now happens in the same frame instead of on the next scroll-triggered paint.
+
+**Guards:**
+- Composition, dragging and the 150ms guard are unchanged.
+- `paint` also checks `composing` and `dragging` itself.
+- Composition start reads the selection before setting `composing = true`.
+- Native typing isn't at risk: `beforeinput` and `keydown` update `lastInteraction`, and the model is updated synchronously.
+
+**Reentrancy and RAF chain:** fine. `idleFrame` is reset to 0 before `paint`, and `paint` ends by calling `idle()`, so it schedules the next frame and the outer `this.idle()` returns early. There is still only one chain. If `painted` calls `render`, that ends in `idle()` too, which stays idempotent.
+
+**Scroll:** `paint` reads `scrollTop` after `refine` has adjusted it, so the textarea's `top` is consistent within the frame. The scroll event that adjustment fires later hits `schedule()`, which finds nothing to change.
+
+**Non-blocking regressions:**
+1. **More work per idle frame (resource).** `painted` now fires on every idle frame until every block is measured. In the editor (`components/editor.ts:258`) that calls `updateHighlight`, which runs `overlay.update` in a microtask and then a separate frame that runs `paintActiveLine` and `paintDecorations`. Those take caret range rects and redo decoration work. Example: a document with N unmeasured blocks above the viewport now gets about N extra overlay/decoration passes, even when the window didn't change. Baseline only did this when `refine` actually moved the scroll position. Possible fix: call `paint` only if `refine` moved the scroll position or changed the window, or skip `painted` when `window` is unchanged.
+2. **Unanchored jump on the dense-document path (layout, edge case).** If `measuredBlock` sets `denseDocument = true` (L659, very dense graphemes), the idle `paint` switches straight to full mode. The full-mode path has no scroll anchor (L972–974), so content can jump while the user is idle. Baseline delayed that until the next paint, which could also be unanchored. This already existed; the delta just exposes it in more frames.
+
+No new selection, composition or cleanup regressions. The CSS is identical in both versions, so there's no layout difference there.
+
+The review notes are also saved in `/Users/carlassmann/.claude/plans/read-tmp-alkalye-pointer-lifecycle-succe-gleaming-blum.md`.

@@ -1,0 +1,16 @@
+{
+  "editor.ts.txt": "07b3ea10342439525f24816df0115126d4a03c14ed7f7e99cbd026f67aefd471",
+  "editor.css.txt": "c4257c88756596957cbff2e22c67761d25da1fd7718b9eab8d0586407dd50b41",
+  "candidate-native.log.txt": "7937559795527471b804806f3b15869fd0d5285ffe2cf52103feec2144128d56",
+  "candidate-editor-viewport.ts.txt": "d17f6806cc038d839d3dd2dcd1b1b0f43e28f2b897f13fdb819c6a9f1e928b13",
+  "candidate-results.json": "8f384817007730f81cc3fca0c1f26cc3c4b951e6f4fb724ce8391829fd8d6387",
+  "README.md": "2968217f825151d9f724bce1d725b2a05a07b70b43b4e38b7ba38c433af08649",
+  "baseline-native.log.txt": "f20f8b88cf9225dd67571841b6276b6a192aa35bbdb8870d54cee93e7d1f1fd7",
+  "pointer-isolation-fixture.ts.txt": "dbe3b172425163af5495fe42bab36ea26457b23a399ba7ace6050b6fcdcd541f",
+  "baseline-results.json": "80e06e00b405ae8a96b52752d2cdb34469fb3aa03067ac00aeaa8023ee5ee762",
+  "strict.log.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "pointer-idle-server.ts.txt": "5ad5592951783b93789938c13d9d0a16fccc74e9664c71847c18e120ea4ea74b",
+  "initial-review-cli-failure.log.txt": "2122456c9827a04aff9792c1149505097ac016d61c330a0df0dd73976358987c",
+  "baseline-editor-viewport.ts.txt": "96d89cb7cae4d312edcb5ec3ca4aa4299c5976387ad042b6ea71a156a57e6ad6",
+  "pointer-idle-run.ts.txt": "66196ed6cdff1685a9746b7f118244b174baeff6103a341a4bf207fb6d24d2b5"
+}
