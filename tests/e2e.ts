@@ -49,6 +49,7 @@ let fullSuite = [
 	"tests/browser-workspace-avatars.ts",
 	"tests/browser-whiteboard.ts",
 	"tests/browser-live-polling.ts",
+	"tests/browser-live-presence.ts",
 	"tests/browser-live-network-fallback.ts",
 ]
 let moduleSuite = [
@@ -58,6 +59,7 @@ let moduleSuite = [
 	"tests/browser-editor-overlay.ts",
 	"tests/browser-storage.ts",
 	"tests/browser-library-sync.ts",
+	"tests/browser-live-presence.ts",
 ]
 let mode = Bun.argv.includes("--modules")
 	? "modules"

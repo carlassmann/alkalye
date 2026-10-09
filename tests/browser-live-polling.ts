@@ -154,6 +154,29 @@ try {
 		) === recoveredPolls,
 		"WebSocket recovery stops polling while edits and presence keep working",
 	)
+	let sharedUrl = string(evaluate(guest, "location.href"))
+	browser(guest, "open", new URL("/privacy", origin).href)
+	wait(
+		owner,
+		'!document.querySelector("#presence")?.textContent.includes("Renamed guest")',
+	)
+	assert(true, "leaving the shared document removes its peer cursor")
+	browser(guest, "open", sharedUrl)
+	wait(
+		guest,
+		'document.querySelector("#editor")?.value.includes("Still collaborating.")',
+	)
+	wait(
+		owner,
+		'document.querySelector("#presence")?.textContent.includes("Renamed guest")',
+	)
+	assert(true, "reopening renews presence after document scope release")
+	browser(guest, "close")
+	wait(
+		owner,
+		'!document.querySelector("#presence")?.textContent.includes("Renamed guest")',
+	)
+	assert(true, "disconnect removes renewed presence without leaving a cursor")
 } finally {
 	for (let session of [owner, guest]) {
 		try {

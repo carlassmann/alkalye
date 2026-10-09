@@ -5,6 +5,7 @@ import * as Effect from "effect/Effect"
 import * as Exit from "effect/Exit"
 import * as Layer from "effect/Layer"
 import * as PubSub from "effect/PubSub"
+import * as Option from "effect/Option"
 import * as Queue from "effect/Queue"
 import * as Clock from "effect/Clock"
 import * as RcMap from "effect/RcMap"
@@ -85,13 +86,7 @@ function makeLive() {
 							watched.delete(document)
 							unavailable.delete(document)
 							yield* send({ type: "unwatch", document }).pipe(Effect.ignore)
-							yield* SubscriptionRef.update(
-								presence,
-								peers =>
-									new Map(
-										[...peers].filter(([, peer]) => peer.document !== document),
-									),
-							)
+							yield* removePresence(peer => peer.document === document)
 						}),
 					)
 					yield* send({ type: "watch", document }).pipe(Effect.ignore)
@@ -107,13 +102,10 @@ function makeLive() {
 		yield* maintain().pipe(Effect.forkScoped({ startImmediately: true }))
 		yield* Stream.fromSchedule(Schedule.spaced("3 seconds")).pipe(
 			Stream.runForEach(() =>
-				SubscriptionRef.update(
-					presence,
-					peers =>
-						new Map(
-							[...peers].filter(([, peer]) => Date.now() - peer.time < 10_000),
-						),
-				),
+				Effect.gen(function* () {
+					let now = yield* Clock.currentTimeMillis
+					yield* removePresence(peer => !(now - peer.time < 10_000))
+				}),
 			),
 			Effect.forkScoped({ startImmediately: true }),
 		)
@@ -134,6 +126,17 @@ function makeLive() {
 			announce: (value: LivePresence) =>
 				send({ type: "presence", presence: value }),
 		})
+		function removePresence(remove: (peer: LivePresence) => boolean) {
+			return SubscriptionRef.updateSome(presence, peers => {
+				let next: Map<string, LivePresence> | undefined
+				for (let [actor, peer] of peers) {
+					if (!remove(peer)) continue
+					next ??= new Map(peers)
+					next.delete(actor)
+				}
+				return next ? Option.some(next) : Option.none()
+			})
+		}
 		function send(message: LiveClientMessage) {
 			return Effect.suspend(() => {
 				let current = Ref.getUnsafe(writer)
@@ -219,7 +222,9 @@ function makeLive() {
 						Effect.gen(function* () {
 							yield* Ref.set(writer, undefined)
 							yield* SubscriptionRef.set(connected, false)
-							yield* SubscriptionRef.set(presence, new Map())
+							yield* SubscriptionRef.updateSome(presence, peers =>
+								peers.size ? Option.some(new Map()) : Option.none(),
+							)
 						}),
 					)
 					yield* account.connect
@@ -383,23 +388,16 @@ function makeLive() {
 						}),
 					)
 				} else if (message.type === "gone") {
-					yield* SubscriptionRef.update(presence, peers => {
+					yield* SubscriptionRef.updateSome(presence, peers => {
+						if (peers.get(message.actor)?.document !== message.document)
+							return Option.none()
 						let next = new Map(peers)
-						if (next.get(message.actor)?.document === message.document)
-							next.delete(message.actor)
-						return next
+						next.delete(message.actor)
+						return Option.some(next)
 					})
 				} else if (message.type === "unavailable") {
 					unavailable.add(message.document)
-					yield* SubscriptionRef.update(
-						presence,
-						peers =>
-							new Map(
-								[...peers].filter(
-									([, peer]) => peer.document !== message.document,
-								),
-							),
-					)
+					yield* removePresence(peer => peer.document === message.document)
 				} else if (message.type === "advanced") {
 					for (let document of unavailable) {
 						yield* send({ type: "watch", document })
