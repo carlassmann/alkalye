@@ -1908,6 +1908,10 @@ function mountApplication() {
 							.current()
 							.filter(comment => comment.fields.resolved !== "true")
 							.flatMap(comment => (comment.range ? [comment.range] : [])),
+					typingBoundary: () => {
+						selected.opened.session.closeTypingGroup()
+						launch(selected.opened.session.flush)
+					},
 					select: () => launch(announce()),
 					undo: redo => {
 						if (

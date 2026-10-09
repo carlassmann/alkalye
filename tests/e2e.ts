@@ -22,6 +22,7 @@ let fullSuite = [
 	"tests/browser-service-worker.ts",
 	"tests/browser-updates.ts",
 	"tests/browser-installation.ts",
+	"tests/browser-typing-batches.ts",
 	"tests/browser-motion.ts",
 	"tests/browser-floating-actions.ts",
 	"tests/browser-editor-context-menu.ts",

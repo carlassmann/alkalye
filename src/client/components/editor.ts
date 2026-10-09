@@ -62,6 +62,7 @@ export interface EditorOptions {
 		base?: Atom[],
 		replacements?: SourceReplacement[],
 	): { atoms: Atom[]; content: string; operation: Operation | null } | undefined
+	typingBoundary?(): void
 	undo(redo: boolean): void
 	select(): void
 	requestAsset(): void
@@ -260,6 +261,42 @@ function createEditorView(
 		painted: updateHighlight,
 		fullDocument: options.preferences.accessibleInput,
 	})
+	let typingSelection = { start: text.selectionStart, end: text.selectionEnd }
+	function rememberTypingSelection() {
+		typingSelection = { start: text.selectionStart, end: text.selectionEnd }
+	}
+	function closeTypingGroup() {
+		options.typingBoundary?.()
+		rememberTypingSelection()
+	}
+	textarea.addEventListener(
+		"keydown",
+		event => {
+			if (
+				event.metaKey ||
+				event.ctrlKey ||
+				event.altKey ||
+				[
+					"ArrowLeft",
+					"ArrowRight",
+					"ArrowUp",
+					"ArrowDown",
+					"Home",
+					"End",
+					"PageUp",
+					"PageDown",
+					"Tab",
+					"Escape",
+					"Enter",
+				].includes(event.key)
+			)
+				closeTypingGroup()
+		},
+		{ capture: true, signal: listeners.signal },
+	)
+	textarea.addEventListener("blur", closeTypingGroup, {
+		signal: listeners.signal,
+	})
 	textarea.readOnly = !editable
 	textarea.oninput = () => {
 		releaseTab = false
@@ -269,11 +306,13 @@ function createEditorView(
 		let edit = options.change(source, atoms, text.takeReplacements())
 		if (edit) update(edit.content, edit.atoms, editable)
 		else text.sync()
+		rememberTypingSelection()
 		if (options.preferences.autocomplete) showCompletions()
 	}
 	textarea.addEventListener(
 		"compositionstart",
 		() => {
+			closeTypingGroup()
 			composing = true
 			menu.hidden = true
 			textarea.removeAttribute("aria-activedescendant")
@@ -302,6 +341,7 @@ function createEditorView(
 					update(deferred.content, deferred.atoms, deferred.editable)
 				else text.sync()
 			}
+			closeTypingGroup()
 			deferredUpdate = undefined
 		},
 		{ signal: listeners.signal },
@@ -310,6 +350,7 @@ function createEditorView(
 	textarea.addEventListener(
 		"pointerdown",
 		() => {
+			closeTypingGroup()
 			dragging = true
 			secondarySelections = []
 			primaryGoalX = undefined
@@ -337,6 +378,11 @@ function createEditorView(
 	textarea.addEventListener("copy", copySource, { signal: listeners.signal })
 	textarea.addEventListener("cut", copySource, { signal: listeners.signal })
 	textarea.onselect = () => {
+		if (
+			text.selectionStart !== typingSelection.start ||
+			text.selectionEnd !== typingSelection.end
+		)
+			closeTypingGroup()
 		paintActiveLine()
 		options.select()
 	}
@@ -2322,6 +2368,13 @@ function createEditorView(
 	}
 
 	function multiInput(event: InputEvent) {
+		if (
+			!composing &&
+			!["insertText", "deleteContentBackward", "deleteContentForward"].includes(
+				event.inputType,
+			)
+		)
+			closeTypingGroup()
 		if (composing) return
 		primaryGoalX = undefined
 		if (

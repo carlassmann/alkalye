@@ -112,6 +112,20 @@ if (process.argv.includes("--serve")) {
 			if (shell) {
 				let markup = await response.text()
 				let instrumentation =
+					(url.searchParams.has("typing-batches")
+						? `<script>(()=>{
+					window.typingReceipts=[];
+					let original=window.fetch;
+					window.fetch=async function(input,init){
+						let request=new Request(input,init), path=new URL(request.url).pathname;
+						let capture=request.method==='POST'&&(path.endsWith('/actions')||path.endsWith('/actions/batch'));
+						let payload=capture?await request.text():undefined;
+						let response=await original(input,init);
+						if(capture&&response.ok){let body=JSON.parse(payload),positions=await response.clone().json();for(let [index,action] of (body.actions??[body]).entries())window.typingReceipts.push({label:action.label,operations:action.changes?.length,position:Array.isArray(positions)?positions[index]:positions})}
+						return response;
+					}
+					})()</script>`
+						: "") +
 					(Bun.env.TEST_SEARCH_HIGHLIGHTS === "fallback"
 						? '<script>Object.defineProperty(window, "Highlight", {value:undefined, configurable:true})</script>'
 						: "") +
