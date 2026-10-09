@@ -1,3 +1,4 @@
+import { emailAuthenticationLayer } from "../src/server/bun-databases"
 import type * as Context from "effect/Context"
 import { Database } from "bun:sqlite"
 import { afterAll, expect, test } from "bun:test"
@@ -53,7 +54,7 @@ function fixture<A, E>(
 	return Effect.runPromise(
 		work.pipe(
 			Effect.provide(
-				EmailAuthentication.layer(join(directory, name + ".sqlite")).pipe(
+				emailAuthenticationLayer(join(directory, name + ".sqlite")).pipe(
 					Layer.provide(
 						Layer.mergeAll(
 							Cipher.live,

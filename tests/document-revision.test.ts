@@ -1,3 +1,4 @@
+import { workspaceStoreLayer } from "../src/server/bun-databases"
 import { afterAll, expect, test } from "bun:test"
 import { mkdtemp, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
@@ -90,7 +91,7 @@ test("exact revisions serialize competing writers and include child changes", as
 				actors: ["owner", "owner-first", "owner-second", "owner-stale"],
 			}),
 			Effect.provide(
-				Layer.merge(WorkspaceStore.layer(filename), webCryptoLayer),
+				Layer.merge(workspaceStoreLayer(filename), webCryptoLayer),
 			),
 		),
 	)

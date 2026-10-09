@@ -1,3 +1,4 @@
+import { sessionsLayer } from "../src/server/bun-databases"
 import { Database } from "bun:sqlite"
 import { afterAll, expect, test } from "bun:test"
 import { mkdtemp, rm } from "node:fs/promises"
@@ -24,7 +25,7 @@ function fixture<A, E>(
 ) {
 	return Effect.runPromise(
 		task.pipe(
-			Effect.provide(Sessions.layer(join(directory, name + ".sqlite"))),
+			Effect.provide(sessionsLayer(join(directory, name + ".sqlite"))),
 			Effect.provide(TestClock.layer()),
 		),
 	)
@@ -121,7 +122,7 @@ test("use extends idle expiry but never the absolute lifetime", () =>
 test("tokens survive a server restart, remain redacted and are stored only as hashes", async () => {
 	let filename = join(directory, "restart.sqlite")
 	let session = await Effect.runPromise(
-		login().pipe(Effect.provide(Sessions.layer(filename))),
+		login().pipe(Effect.provide(sessionsLayer(filename))),
 	)
 	expect(JSON.stringify(session)).not.toContain(Redacted.value(session.token))
 	let stored = new Database(filename, { readonly: true })
@@ -138,18 +139,18 @@ test("tokens survive a server restart, remain redacted and are stored only as ha
 	let restored = await Effect.runPromise(
 		Sessions.use(sessions =>
 			sessions.authenticate(session.token, "bearer"),
-		).pipe(Effect.provide(Sessions.layer(filename))),
+		).pipe(Effect.provide(sessionsLayer(filename))),
 	)
 	expect(restored.subject).toBe(identity.subject)
 	await Effect.runPromise(
 		Sessions.use(sessions => sessions.logout(session.token)).pipe(
-			Effect.provide(Sessions.layer(filename)),
+			Effect.provide(sessionsLayer(filename)),
 		),
 	)
 	let result = await Effect.runPromise(
 		Sessions.use(sessions =>
 			sessions.authenticate(session.token, "bearer"),
-		).pipe(Effect.result, Effect.provide(Sessions.layer(filename))),
+		).pipe(Effect.result, Effect.provide(sessionsLayer(filename))),
 	)
 	expect(result._tag).toBe("Failure")
 })
@@ -269,7 +270,7 @@ test("native SQL migrations upgrade pre-purpose databases and invalidate unbound
 	)
 	old.close()
 	let session = await Effect.runPromise(
-		login().pipe(Effect.provide(Sessions.layer(filename))),
+		login().pipe(Effect.provide(sessionsLayer(filename))),
 	)
 	let stored = new Database(filename, { readonly: true })
 	try {
@@ -292,7 +293,7 @@ test("native SQL migrations upgrade pre-purpose databases and invalidate unbound
 	let restored = await Effect.runPromise(
 		Sessions.use(sessions =>
 			sessions.authenticate(session.token, "bearer"),
-		).pipe(Effect.provide(Sessions.layer(filename))),
+		).pipe(Effect.provide(sessionsLayer(filename))),
 	)
 	expect(restored.subject).toBe(identity.subject)
 })

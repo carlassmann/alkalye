@@ -1,3 +1,4 @@
+import { workspaceStoreLayer } from "../src/server/bun-databases"
 import { afterAll, expect, test } from "bun:test"
 import { mkdtemp, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
@@ -25,7 +26,7 @@ function infrastructure(
 ) {
 	let filename = join(directory, name + ".sqlite")
 	return Layer.mergeAll(
-		WorkspaceStore.layer(filename),
+		workspaceStoreLayer(filename),
 		sqliteLayer(filename),
 		webCryptoLayer,
 	).pipe(

@@ -9,7 +9,6 @@ import * as Schema from "effect/Schema"
 import * as SqlClient from "effect/sql/SqlClient"
 import * as Migrator from "effect/sql/Migrator"
 import * as SqlSchema from "effect/sql/SqlSchema"
-import { sqliteLayer } from "../platform/sqlite"
 import { Signatures } from "../platform/signatures"
 import { webCryptoLayer } from "../platform/web-crypto"
 import { encode } from "../shared/base64"
@@ -30,24 +29,26 @@ export class Sessions extends Context.Service<
 	Sessions,
 	Effect.Success<ReturnType<typeof makeSessions>>
 >()("Sessions") {
-	static layer(filename: string) {
-		return Layer.effect(Sessions, makeSessions()).pipe(
-			Layer.provide(
-				Layer.mergeAll(sqliteLayer(filename), Signatures.layer, webCryptoLayer),
-			),
-		)
+	static get live() {
+		return sessionsSqlLayer("session_sql_migrations")
 	}
+}
+export function sessionsSqlLayer(table: string = "effect_sql_migrations") {
+	return Layer.effect(Sessions, makeSessions(table)).pipe(
+		Layer.provide(Layer.merge(Signatures.layer, webCryptoLayer)),
+	)
 }
 let challengeLifetime = 60_000
 let idleLifetime = 7 * 24 * 60 * 60_000
 let sessionLifetime = 30 * 24 * 60 * 60_000
 let challengeLimit = 2048
-function makeSessions() {
+function makeSessions(table: string) {
 	return Effect.gen(function* () {
 		let sql = yield* SqlClient.SqlClient
 		let random = yield* Crypto.Crypto
 		let signatures = yield* Signatures
 		yield* Migrator.make({})({
+			table,
 			loader: Migrator.fromRecord({
 				"001_account_sessions": initialSchema,
 				"002_session_context": sessionContext,

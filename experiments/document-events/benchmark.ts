@@ -1,3 +1,4 @@
+import { documentStoreLayer } from "../../src/server/bun-databases"
 import { mkdtemp, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
@@ -6,7 +7,7 @@ import * as Schema from "effect/Schema"
 import { Replica } from "../../src/shared/crdt"
 import { newDocument } from "../../src/shared/documents"
 import { DocumentActionSchema } from "./document"
-import { commit, DocumentStore, Principal, readSnapshot } from "./journal"
+import { commit, Principal, readSnapshot } from "./journal"
 
 let directory = await mkdtemp(join(tmpdir(), "alkalye-document-benchmark-"))
 let actions = Number(process.env.BENCHMARK_ACTIONS ?? 5000)
@@ -95,7 +96,7 @@ try {
 				}),
 			)
 		}).pipe(
-			Effect.provide(DocumentStore.layer(filename)),
+			Effect.provide(documentStoreLayer(filename)),
 			Effect.provideService(Principal, {
 				subject: "writer",
 				actors: ["writer"],

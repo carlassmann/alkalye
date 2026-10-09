@@ -1,3 +1,4 @@
+import { workspaceStoreLayer } from "../src/server/bun-databases"
 import { afterAll, expect, test } from "bun:test"
 import { Database } from "bun:sqlite"
 import { mkdtemp, rm } from "node:fs/promises"
@@ -29,7 +30,7 @@ function run<A, E>(
 		work.pipe(
 			Effect.provideService(Identity, { subject: "owner", actors: ["owner"] }),
 			Effect.provide(
-				Layer.merge(WorkspaceStore.layer(filename), webCryptoLayer),
+				Layer.merge(workspaceStoreLayer(filename), webCryptoLayer),
 			),
 		),
 	)

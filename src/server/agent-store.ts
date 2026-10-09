@@ -5,18 +5,18 @@ import * as Schema from "effect/Schema"
 import * as Migrator from "effect/sql/Migrator"
 import * as SqlClient from "effect/sql/SqlClient"
 import * as SqlSchema from "effect/sql/SqlSchema"
-import { sqliteLayer } from "../platform/sqlite"
 import { makeAgentDatabase } from "./agent-database"
 import { makeOAuthDatabase } from "./oauth-database"
 export class AgentStore extends Context.Service<
 	AgentStore,
 	Effect.Success<ReturnType<typeof makeStore>>
 >()("alkalye/AgentStore") {
-	static layer(filename: string) {
-		return Layer.effect(AgentStore, makeStore()).pipe(
-			Layer.provide(sqliteLayer(filename)),
-		)
+	static get live() {
+		return agentStoreSqlLayer()
 	}
+}
+export function agentStoreSqlLayer() {
+	return Layer.effect(AgentStore, makeStore())
 }
 function makeStore() {
 	return Effect.gen(function* () {

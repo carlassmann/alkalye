@@ -1,6 +1,7 @@
+import { documentStoreLayer } from "../../src/server/bun-databases"
 import * as Effect from "effect/Effect"
 import { buildAction, restoreSnapshot } from "./document"
-import { commit, DocumentStore, Principal, readSnapshot } from "./journal"
+import { commit, Principal, readSnapshot } from "./journal"
 
 let [filename, document, suffix] = Bun.argv.slice(2)
 if (!filename || !document || suffix === undefined)
@@ -20,7 +21,7 @@ await Effect.runPromise(
 		console.log(JSON.stringify({ position }))
 		if (Bun.env.HOLD_AFTER_COMMIT === "1") yield* Effect.sleep("1 minute")
 	}).pipe(
-		Effect.provide(DocumentStore.layer(filename)),
+		Effect.provide(documentStoreLayer(filename)),
 		Effect.provideService(Principal, {
 			subject: "peer",
 			actors: ["other-process"],

@@ -1,3 +1,4 @@
+import { workspaceStoreLayer } from "../src/server/bun-databases"
 import { afterAll, expect, test } from "bun:test"
 import { mkdtemp, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
@@ -105,7 +106,7 @@ test("role lookups preserve current self authority, cross-subject privacy and sc
 			Effect.provideService(Identity, { subject: "owner", actors: ["owner"] }),
 			Effect.provide(
 				Layer.merge(
-					WorkspaceStore.layer(join(directory, "roles.sqlite")),
+					workspaceStoreLayer(join(directory, "roles.sqlite")),
 					webCryptoLayer,
 				),
 			),

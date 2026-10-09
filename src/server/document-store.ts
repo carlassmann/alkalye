@@ -19,7 +19,6 @@ import * as SqlEventJournal from "effect/eventlog/SqlEventJournal"
 import * as SqlClient from "effect/sql/SqlClient"
 import * as SqlError from "effect/sql/SqlError"
 import * as SqlSchema from "effect/sql/SqlSchema"
-import { sqliteLayer } from "../platform/sqlite"
 import { webCryptoLayer } from "../platform/web-crypto"
 import { IdentifierSchema } from "../shared/model"
 import { decode, encode } from "../shared/base64"
@@ -133,51 +132,46 @@ export class DocumentStore extends Context.Service<
 	DocumentStore,
 	Effect.Success<ReturnType<typeof makeDocumentStore>>["documentFixture"]
 >()("DocumentStore/Store") {
-	static layer(filename: string) {
+	static get live() {
 		return Layer.effect(
 			DocumentStore,
 			StoreEngine.pipe(Effect.map(store => store.documentFixture)),
-		).pipe(Layer.provide(storeLayer(filename)))
+		).pipe(Layer.provide(documentDatabaseLayer))
 	}
 }
 export class WorkspaceStore extends Context.Service<
 	WorkspaceStore,
 	Effect.Success<ReturnType<typeof makeDocumentStore>>["workspace"]
 >()("WorkspaceStore/Store") {
-	static layer(filename: string) {
+	static get live() {
 		return Layer.effect(
 			WorkspaceStore,
 			StoreEngine.pipe(Effect.map(store => store.workspace)),
-		).pipe(Layer.provide(storeLayer(filename)))
+		).pipe(Layer.provide(documentDatabaseLayer))
 	}
 }
 class StoreEngine extends Context.Service<
 	StoreEngine,
 	Effect.Success<ReturnType<typeof makeDocumentStore>>
 >()("WorkspaceStore/StoreEngine") {}
-function storeLayer(filename: string) {
-	let database = sqliteLayer(filename)
-	let identity = Layer.effect(EventLog.Identity, journalIdentity()).pipe(
-		Layer.provide(Layer.merge(database, EventLogEncryption.layerSubtle)),
-	)
-	let infrastructure = EventLog.layer(events, handlers).pipe(
-		Layer.provideMerge(SqlEventJournal.layer()),
-		Layer.provideMerge(database),
-		Layer.provideMerge(webCryptoLayer),
-		Layer.provide(identity),
-	)
-	let reader = Layer.unwrap(
-		SqlClient.SqlClient.pipe(
-			Effect.map(() => sqliteLayer(filename, { readonly: true })),
+export let documentDatabaseLayer = Layer.suspend(() =>
+	Layer.effect(StoreEngine, makeDocumentStore()).pipe(
+		Layer.provide(
+			Layer.merge(
+				EventLog.layer(events, handlers).pipe(
+					Layer.provideMerge(SqlEventJournal.layer()),
+					Layer.provideMerge(webCryptoLayer),
+					Layer.provide(
+						Layer.effect(EventLog.Identity, journalIdentity()).pipe(
+							Layer.provide(EventLogEncryption.layerSubtle),
+						),
+					),
+				),
+				Layer.effect(ReadDatabase, SqlClient.SqlClient),
+			),
 		),
-	).pipe(Layer.provide(database))
-	let reads = Layer.effect(ReadDatabase, SqlClient.SqlClient).pipe(
-		Layer.provide(reader),
-	)
-	return Layer.effect(StoreEngine, makeDocumentStore()).pipe(
-		Layer.provide(Layer.merge(infrastructure, reads)),
-	)
-}
+	),
+)
 
 function journalIdentity() {
 	return Effect.gen(function* () {

@@ -11,7 +11,6 @@ import * as Migrator from "effect/sql/Migrator"
 import * as SqlSchema from "effect/sql/SqlSchema"
 import { Cipher } from "../platform/cipher"
 import { Signatures } from "../platform/signatures"
-import { sqliteLayer } from "../platform/sqlite"
 import { webCryptoLayer } from "../platform/web-crypto"
 import { PacketSchema } from "../shared/model"
 import {
@@ -39,15 +38,18 @@ export class EmailAuthentication extends Context.Service<
 	EmailAuthentication,
 	Effect.Success<ReturnType<typeof makeEmailAuthentication>>
 >()("alkalye/EmailAuthentication") {
-	static layer(filename: string) {
-		return Layer.effect(EmailAuthentication, makeEmailAuthentication()).pipe(
-			Layer.provide(
-				Layer.mergeAll(sqliteLayer(filename), Signatures.layer, webCryptoLayer),
-			),
-		)
+	static get live() {
+		return emailAuthenticationSqlLayer("email_sql_migrations")
 	}
 }
-function makeEmailAuthentication() {
+export function emailAuthenticationSqlLayer(
+	table: string = "effect_sql_migrations",
+) {
+	return Layer.effect(EmailAuthentication, makeEmailAuthentication(table)).pipe(
+		Layer.provide(Layer.merge(Signatures.layer, webCryptoLayer)),
+	)
+}
+function makeEmailAuthentication(table: string) {
 	return Effect.gen(function* () {
 		let sql = yield* SqlClient.SqlClient
 		let cipher = yield* Cipher
@@ -56,6 +58,7 @@ function makeEmailAuthentication() {
 		let randomness = yield* Crypto.Crypto
 		let delivery = yield* EmailDelivery
 		yield* Migrator.make({})({
+			table,
 			loader: Migrator.fromRecord({ "001_email_accounts": initialSchema }),
 		})
 		let byEmail = SqlSchema.findOneOption({

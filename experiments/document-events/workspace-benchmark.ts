@@ -1,3 +1,4 @@
+import { workspaceStoreLayer } from "../../src/server/bun-databases"
 import { mkdtemp, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
@@ -110,7 +111,7 @@ try {
 				}),
 			)
 		}).pipe(
-			Effect.provide(WorkspaceStore.layer(filename)),
+			Effect.provide(workspaceStoreLayer(filename)),
 			Effect.provideService(Identity, {
 				subject: "writer",
 				actors: ["writer"],

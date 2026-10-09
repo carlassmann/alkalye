@@ -1,3 +1,4 @@
+import { workspaceStoreLayer } from "../src/server/bun-databases"
 import { expect, test } from "bun:test"
 import { mkdtemp, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
@@ -44,7 +45,7 @@ test.each([
 				Effect.scoped(
 					Effect.gen(function* () {
 						let services = yield* Layer.build(
-							WorkspaceStore.layer(join(directory, "server.sqlite")),
+							workspaceStoreLayer(join(directory, "server.sqlite")),
 						)
 						let store = Context.get(services, WorkspaceStore)
 						let passiveState = yield* makePassiveDocumentCache()
