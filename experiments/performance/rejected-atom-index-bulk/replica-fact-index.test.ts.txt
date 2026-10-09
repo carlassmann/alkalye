@@ -1,0 +1,115 @@
+import { expect, test } from "bun:test"
+import * as Effect from "effect/Effect"
+import * as Fiber from "effect/Fiber"
+import * as Exit from "effect/Exit"
+import * as Cause from "effect/Cause"
+import { Replica } from "../src/shared/crdt"
+
+function seed() {
+	let owner = new Replica("owner")
+	let source = "---\ntitle: Shared\n---\n" + "Body 😀\n".repeat(8192)
+	if (!owner.edit("document", source)) throw Error("Missing seed")
+	return { owner, source }
+}
+
+test("forked fact indices stay independent through both-way insertion and checkpoint restore", async () => {
+	let { owner, source } = seed()
+	let peer = await Effect.runPromise(owner.forkEffect("peer"))
+	let ownerEdit = owner.edit("document", source + "Owner 🦋")
+	let peerEdit = peer.edit("document", "Peer 🌻\n" + source)
+	if (!ownerEdit || !peerEdit) throw Error("Missing edit")
+	expect(owner.atomTarget(peerEdit.insert[0]?.id ?? "")).toBeUndefined()
+	expect(peer.atomTarget(ownerEdit.insert[0]?.id ?? "")).toBeUndefined()
+	owner.apply([peerEdit])
+	peer.apply([ownerEdit])
+	expect(peer.text("document")).toBe(owner.text("document"))
+	let retained = peer.checkpoint()
+	let cold = new Replica("cold")
+	cold.restore(owner.checkpoint())
+	let inserted = cold.edit("document", cold.text("document") + "Cold 😀")
+	if (!inserted) throw Error("Missing cold edit")
+	expect(owner.atomTarget(inserted.insert[0]?.id ?? "")).toBeUndefined()
+	owner.restore(cold.checkpoint())
+	expect(owner.text("document")).toBe(cold.text("document"))
+	expect(peer.checkpoint()).toEqual(retained)
+	expect(peer.atomTarget(inserted.insert[0]?.id ?? "")).toBeUndefined()
+	let ownerLater = owner.edit("document", owner.text("document") + "Later")
+	if (!ownerLater) throw Error("Missing later edit")
+	expect(cold.atomTarget(ownerLater.insert[0]?.id ?? "")).toBeUndefined()
+	expect(cold.text("document")).not.toContain("Later")
+})
+
+test("large-document source restore preserves completed clone or rejects pending stale fork", async () => {
+	let { owner, source } = seed()
+	let remote = owner.fork("remote")
+	if (!remote.edit("document", source + "Remote"))
+		throw Error("Missing remote edit")
+	await Effect.runPromise(
+		Effect.gen(function* () {
+			let pending = yield* owner
+				.forkEffect("pending")
+				.pipe(Effect.forkChild({ startImmediately: true }))
+			let completion = pending.pollUnsafe()
+			owner.restore(remote.checkpoint())
+			if (completion && Exit.isSuccess(completion)) {
+				expect(completion.value.text("document")).toBe(source)
+				expect(completion.value.checkpoint()).not.toEqual(owner.checkpoint())
+				console.log(JSON.stringify({ forkRestore: "completed-independent" }))
+			} else {
+				expect(completion).toBeUndefined()
+				expect(Exit.isFailure(yield* Fiber.await(pending))).toBe(true)
+				console.log(JSON.stringify({ forkRestore: "pending-rejected" }))
+			}
+		}),
+	)
+	expect(owner.text("document")).toBe(remote.text("document"))
+	let retry = await Effect.runPromise(owner.forkEffect("retry"))
+	expect(retry.checkpoint()).toEqual(owner.checkpoint())
+	let ownerEdit = owner.edit("document", owner.text("document") + "Independent")
+	if (!ownerEdit) throw Error("Missing owner edit")
+	expect(retry.atomTarget(ownerEdit.insert[0]?.id ?? "")).toBeUndefined()
+})
+
+test("invalid restored identities leave source and earlier forks unchanged", () => {
+	let { owner } = seed()
+	let peer = owner.fork("peer")
+	let checkpoint = owner.checkpoint()
+	expect(() => owner.restoreCheckpoint({ format: "invalid" })).toThrow()
+	expect(owner.checkpoint()).toEqual(checkpoint)
+	expect(peer.checkpoint()).toEqual(checkpoint)
+})
+
+
+test("interrupted private cooperative hydration leaves existing forks usable and retry independent", async () => {
+	let { owner, source } = seed()
+	let snapshot = owner.checkpoint()
+	let before = owner.fork("before")
+	await Effect.runPromise(
+		Effect.gen(function* () {
+			let hydration = yield* Replica.fromCheckpointEffect(snapshot, "hydrated").pipe(
+				Effect.forkChild({ startImmediately: true }),
+			)
+			let completed = hydration.pollUnsafe()
+			if (completed) {
+				expect(Exit.isSuccess(completed)).toBe(true)
+				if (Exit.isSuccess(completed)) expect(completed.value.text("document")).toBe(source)
+				console.log(JSON.stringify({ hydration: "completed-independent" }))
+			} else {
+				yield* Fiber.interrupt(hydration)
+				let result = yield* Fiber.await(hydration)
+				expect(Exit.isFailure(result)).toBe(true)
+				if (Exit.isFailure(result)) expect(Cause.hasInterruptsOnly(result.cause)).toBe(true)
+				console.log(JSON.stringify({ hydration: "interrupted-private" }))
+			}
+		}),
+	)
+	expect(owner.checkpoint()).toEqual(snapshot)
+	expect(before.checkpoint()).toEqual(snapshot)
+	let retry = await Effect.runPromise(Replica.fromCheckpointEffect(snapshot, "retry"))
+	expect(retry.text("document")).toBe(source)
+	let inserted = retry.edit("document", source + "Retry 🦋")
+	if (!inserted) throw Error("Missing retry edit")
+	expect(owner.atomTarget(inserted.insert[0]?.id ?? "")).toBeUndefined()
+	expect(before.atomTarget(inserted.insert[0]?.id ?? "")).toBeUndefined()
+	expect(owner.text("document")).toBe(source)
+})

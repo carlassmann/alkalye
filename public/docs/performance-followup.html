@@ -1515,6 +1515,19 @@
 			<code>experiments/performance/rejected-atom-index-hash-map</code>.
 		</p>
 
+		<h2>Rejected bulk persistent-map variant</h2>
+		<p>
+			Sealing local Effect HashMap mutation batches before publication or
+			yielding preserves fork independence. The candidate passed 104 public
+			tests and eighteen alternating cost samples, including both-way edits
+			after each fork. On the same large fixture, median synchronous restore
+			still rose from 732ms to 1,438ms, and cooperative restore from 2,113ms to
+			2,947ms. Fork time improved from 194ms to 112ms after synchronous restore,
+			but cold-load and lookup regressions reject broad adoption. No native
+			comparison was run. Evidence:
+			<code>experiments/performance/rejected-atom-index-bulk</code>.
+		</p>
+
 		<h2>Replica copy attribution</h2>
 		<p>
 			Two marked native journeys isolate the remaining owned-copy cost on the

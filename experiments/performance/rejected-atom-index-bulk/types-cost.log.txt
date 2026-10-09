@@ -1,0 +1,18 @@
+fact-index-cost.ts(113,37): error TS2345: Argument of type '() => Promise<Candidate | Baseline>' is not assignable to parameter of type '() => Promise<ReadReplica>'.
+  Type 'Promise<Replica | Replica>' is not assignable to type 'Promise<ReadReplica>'.
+    Type 'Replica | Replica' is not assignable to type 'ReadReplica'.
+      Type 'Replica' is not assignable to type 'ReadReplica'.
+        The types returned by 'edit(...)' are incompatible between these types.
+          Type 'Operation | null' is not assignable to type 'Operation | undefined'.
+            Type 'null' is not assignable to type 'Operation | undefined'.
+fact-index-cost.ts(120,8): error TS2322: Type 'Replica | Replica' is not assignable to type 'ReadReplica'.
+  Type 'Replica' is not assignable to type 'ReadReplica'.
+    The types returned by 'edit(...)' are incompatible between these types.
+      Type 'Operation | null' is not assignable to type 'Operation | undefined'.
+        Type 'null' is not assignable to type 'Operation | undefined'.
+fact-index-cost.ts(126,4): error TS2322: Type 'Promise<Replica> | Promise<Replica>' is not assignable to type 'Promise<ReadReplica>'.
+  Type 'Promise<Replica>' is not assignable to type 'Promise<ReadReplica>'.
+    Type 'Replica' is not assignable to type 'ReadReplica'.
+      The types returned by 'edit(...)' are incompatible between these types.
+        Type 'Operation | null' is not assignable to type 'Operation | undefined'.
+          Type 'null' is not assignable to type 'Operation | undefined'.

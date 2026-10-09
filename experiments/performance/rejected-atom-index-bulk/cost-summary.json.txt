@@ -1,0 +1,68 @@
+{
+  "apply": {
+    "baseline": {
+      "restoreMs": 912.3842919999997,
+      "textMs": 143.28029099999912,
+      "lookupMs": 0.48916700000017954,
+      "forkMs": 452.46116600000096,
+      "heapDeltaMedianBytes": 358362657,
+      "rssDeltaMedianBytes": 32243712,
+      "forkHeapDeltaMedianBytes": -78904737,
+      "forkRSSDeltaMedianBytes": 65699840
+    },
+    "candidate": {
+      "restoreMs": 1402.712208,
+      "textMs": 150.8501670000005,
+      "lookupMs": 2.760874999999942,
+      "forkMs": 382.7300830000022,
+      "heapDeltaMedianBytes": 219871596,
+      "rssDeltaMedianBytes": 9945088,
+      "forkHeapDeltaMedianBytes": -52680503,
+      "forkRSSDeltaMedianBytes": 7471104
+    }
+  },
+  "sync": {
+    "baseline": {
+      "restoreMs": 732.4442079999972,
+      "textMs": 214.62820799999827,
+      "lookupMs": 0.3221669999984442,
+      "forkMs": 194.22575000000143,
+      "heapDeltaMedianBytes": 257598712,
+      "rssDeltaMedianBytes": 98304,
+      "forkHeapDeltaMedianBytes": 15865759,
+      "forkRSSDeltaMedianBytes": 16384
+    },
+    "candidate": {
+      "restoreMs": 1437.7053749999995,
+      "textMs": 219.54062500000146,
+      "lookupMs": 2.467832999998791,
+      "forkMs": 112.23887500000274,
+      "heapDeltaMedianBytes": 215604782,
+      "rssDeltaMedianBytes": 1343488,
+      "forkHeapDeltaMedianBytes": 227645806,
+      "forkRSSDeltaMedianBytes": 16384
+    }
+  },
+  "cooperative": {
+    "baseline": {
+      "restoreMs": 2112.9966249999998,
+      "textMs": 241.494917,
+      "lookupMs": 0.31925000000046566,
+      "forkMs": 178.856832999998,
+      "heapDeltaMedianBytes": 159670073,
+      "rssDeltaMedianBytes": 196608,
+      "forkHeapDeltaMedianBytes": 0,
+      "forkRSSDeltaMedianBytes": 0
+    },
+    "candidate": {
+      "restoreMs": 2947.09325,
+      "textMs": 264.0353749999995,
+      "lookupMs": 2.418874999995751,
+      "forkMs": 92.75387500000033,
+      "heapDeltaMedianBytes": 216752596,
+      "rssDeltaMedianBytes": 34586624,
+      "forkHeapDeltaMedianBytes": 35219901,
+      "forkRSSDeltaMedianBytes": 0
+    }
+  }
+}

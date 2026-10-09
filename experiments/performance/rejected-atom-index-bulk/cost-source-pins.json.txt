@@ -1,0 +1,14 @@
+{
+  "src/shared/crdt.ts": {
+    "sha256": "d07092736346df66cbe4da1180395347fb416e3d50c66d3d84d1703acb8b9719",
+    "bytes": 75698
+  },
+  "src/shared/crdt-baseline.ts": {
+    "sha256": "e61d7819830f0a6ab9adb4ed15b58870c50e912bc4f9564d56ab3379bdb6bc2b",
+    "bytes": 74714
+  },
+  "fact-index-cost.ts": {
+    "sha256": "cd70729b5532b41c72c1900683ab3b5ce22b43ac1ecdfc5dc2985a83ed3a6de5",
+    "bytes": 4861
+  }
+}

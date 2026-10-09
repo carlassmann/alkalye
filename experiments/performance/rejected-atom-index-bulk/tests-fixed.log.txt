@@ -1,0 +1,134 @@
+bun test v1.4.0 (34cbb9a40)
+
+tests/replacement-reconstruction.test.ts:
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\ntitle: &n T\nalias: *n\n---\nBody TOKEN 😀\n","text":""}) [13.91ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\ntitle: &n T\nalias: *n\n---\nBody TOKEN 😀\n","text":"🦊é中"}) [2.75ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\nx: 1\nalias: *n\n---\nBody TOKEN 😀\n","text":""}) [2.08ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\nx: 1\nalias: *n\n---\nBody TOKEN 😀\n","text":"🦊é中"}) [1.72ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"﻿---\r\ntitle: &n T\r\nalias: *n\r\n---\r\nBody TOKEN 😀\r\n","text":""}) [3.75ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"﻿---\r\ntitle: &n T\r\nalias: *n\r\n---\r\nBody TOKEN 😀\r\n","text":"🦊é中"}) [1.51ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\ntitle: \"Broken\n---\nBody TOKEN 😀\n","text":""}) [1.08ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\ntitle: \"Broken\n---\nBody TOKEN 😀\n","text":"🦊é中"}) [1.27ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\nunclosed: *n\nBody TOKEN 😀\n","text":""}) [1.00ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"---\nunclosed: *n\nBody TOKEN 😀\n","text":"🦊é中"}) [1.05ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"Body TOKEN 😀\n","text":""}) [0.76ms]
+(pass) validated deletion/Unicode replacement Undo chains equal independent checkpoint reconstruction ({"source":"Body TOKEN 😀\n","text":"🦊é中"}) [0.76ms]
+(pass) root header replacement cancellation always preserves cold alias normalization (---
+anchor: &n T
+alias: *n
+---
+Body
+) [0.94ms]
+(pass) root header replacement cancellation always preserves cold alias normalization (﻿---
+anchor: &n T
+alias: *n
+---
+Body
+) [2.05ms]
+(pass) body replacement inverse preserves concurrent lost-alias normalization [3.54ms]
+
+tests/replica-fact-index.test.ts:
+(pass) forked fact indices stay independent through both-way insertion and checkpoint restore [278.30ms]
+{"forkRestore":"pending-rejected"}
+(pass) large-document source restore preserves completed clone or rejects pending stale fork [153.35ms]
+(pass) invalid restored identities leave source and earlier forks unchanged [84.42ms]
+{"hydration":"interrupted-private"}
+(pass) interrupted private cooperative hydration leaves existing forks usable and retry independent [188.00ms]
+
+tests/frontmatter.test.ts:
+(pass) Effect YAML retains typed frontmatter, nested data and body offsets [1.02ms]
+(pass) empty headers and EOF fences retain the actual body [0.11ms]
+(pass) metadata patches preserve inline comments and anchor references [0.86ms]
+(pass) flow-map frontmatter patches retain unknown nested values [0.20ms]
+(pass) frontmatter patches preserve unrelated YAML, comments and CRLF [0.16ms]
+(pass) source fields override legacy registers, including empty and false values [0.14ms]
+(pass) malformed field types fail independently through Schema [0.19ms]
+(pass) first metadata edit materializes legacy fields, later deletion cannot resurrect them [1.09ms]
+(pass) frontmatter converges through wire and snapshot: identical booleans [2.36ms]
+(pass) frontmatter converges through wire and snapshot: different titles [1.78ms]
+(pass) frontmatter converges through wire and snapshot: independent keys [1.73ms]
+(pass) frontmatter converges through wire and snapshot: concurrent first headers [0.95ms]
+(pass) metadata edits preserve concurrent body insertions and comment atom identities [0.68ms]
+(pass) removing and recreating a header keeps a single valid source [0.19ms]
+(pass) header deletion concurrent with a metadata edit retains a complete header [0.46ms]
+(pass) slide separators and local duplicate keys remain literal source [0.20ms]
+(pass) undo after resolving metadata conflicts restores the previous winner [0.98ms]
+(pass) undo header deletion preserves a concurrent metadata change [0.54ms]
+(pass) concurrent body prepends cannot displace frontmatter [0.65ms]
+(pass) typing a duplicate key leaves it visible for correction [0.20ms]
+(pass) header typing preserves source order, scalar continuations and broken fences [2.12ms]
+(pass) headers over list and separator prefixes remain complete during concurrent creation [0.97ms]
+(pass) body typing does not rewrite a header containing literal duplicate keys [0.35ms]
+(pass) selective undo and redo preserve a subsequent rename by the same actor [0.50ms]
+(pass) undoing a slide deletion never turns body text into frontmatter [0.23ms]
+(pass) composition over a header comment preserves unseen remote metadata [0.79ms]
+(pass) header comments retain unchanged quotes after atomic entry edits [0.46ms]
+(pass) copying legacy metadata into an existing canonical document materializes its source [0.43ms]
+(pass) concurrent legacy migration cannot overwrite another writer's explicit metadata edit [0.64ms]
+(pass) three writers converge through delayed delivery, duplicate replay and cached reopen [505.06ms]
+(pass) header deletion preserves body identities and concurrent prepends [0.28ms]
+(pass) stale header deletion removes every frame observed by the editor [0.34ms]
+(pass) stale composition does not resurrect an unchanged key deleted by a peer [0.37ms]
+(pass) undo restores header comments and its original EOF closing fence [0.35ms]
+(pass) plain ampersands and asterisks do not turn independent keys into one conflict [1.04ms]
+(pass) migration at a higher unrelated room clock cannot replace explicit metadata [1.07ms]
+(pass) body edits cannot erase a deletion that outranks a delayed legacy migration [0.42ms]
+(pass) native YAML keys with spaces, Unicode and periods remain independent entries [0.78ms]
+(pass) first full-source write migrates legacy metadata before marking its source authoritative [0.30ms]
+(pass) header comments must preserve concurrent untouched keys [0.79ms]
+(pass) EOF formatting must preserve concurrent untouched keys [0.73ms]
+(pass) concurrent body separators cannot swallow a new header [0.36ms]
+(pass) concurrent source edits cannot leave dangling YAML aliases [2.84ms]
+(pass) invalid source YAML retains independent concurrent fields and literal asterisks [1.19ms]
+(pass) concurrent deletion of an anchor cannot break an unseen alias [1.06ms]
+(pass) concurrent replacement of an existing value by an alias survives anchor deletion as valid source [1.00ms]
+(pass) removing an anchor after reading its alias preserves deliberately invalid source [0.29ms]
+(pass) an undone anchor cannot justify hiding newly typed invalid aliases [2.64ms]
+(pass) typing after an EOF header preserves its newline and body across checkpoints [0.35ms]
+(pass) closing an offline root header cannot leave the incremental view different from its checkpoint [0.22ms]
+(pass) editing a promoted offline header body preserves raw anchors for following metadata edits [1.78ms]
+(pass) body edits promote a header revealed by another writer deleting its prefix [1.13ms]
+(pass) bulk reads preserve immutable replica views through incremental edits and concurrent metadata [24.26ms]
+
+tests/checkpoint-hydration.test.ts:
+(pass) cooperative checkpoint hydration matches synchronous state and yields during schema, tombstone and atom loading [189.80ms]
+(pass) interruption never publishes a partially hydrated document [111.61ms]
+(pass) cooperative checkpoint decoding owns atom metadata before releasing a batch [74.56ms]
+(pass) cooperative snapshots retain deletion provenance when runs are unsorted and duplicate identities normalize [120.53ms]
+(pass) legacy checkpoints hydrate cooperatively with permanent tombstones and enforce their migration floor [37.73ms]
+(pass) small unsorted duplicate deletion runs hydrate to the same canonical facts [137.09ms]
+
+tests/replacement-cache-diagnostic.test.ts:
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"none"}) [753.58ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"insert"}) [806.86ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"delete"}) [789.28ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"retype"}) [758.02ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"frontmatter"}) [791.89ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"comment"}) [780.82ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":1,"peer":"scope"}) [860.02ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"none"}) [829.91ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"insert"}) [970.07ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"delete"}) [968.25ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"retype"}) [941.72ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"frontmatter"}) [950.59ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"comment"}) [928.62ms]
+(pass) accepted replacement / Undo / Redo preserves authoritative peer changes ({"count":512,"peer":"scope"}) [1076.31ms]
+
+tests/replica-loading.test.ts:
+(pass) cooperative replica copies preserve snapshots and independently merge Unicode edits [202.08ms]
+(pass) interrupted replica copies leave the source usable and can be retried [148.82ms]
+(pass) a concurrent source edit rejects a partially copied replica [116.27ms]
+(pass) cooperative materialization yields while preserving frontmatter and Unicode offsets [208.49ms]
+(pass) concurrent materialization never publishes a stale source cache [192.48ms]
+(pass) interrupted materialization can be read and retried without partial caches [191.47ms]
+(pass) synchronous reads during cooperative materialization share the same source [212.81ms]
+(pass) forked deletion histories independently remove and undo the same atom (cooperative=false) [0.63ms]
+(pass) forked deletion histories independently remove and undo the same atom (cooperative=true) [0.25ms]
+(pass) forked cancellation chains keep repeated undo isolated (cooperative=false) [0.24ms]
+(pass) forked cancellation chains keep repeated undo isolated (cooperative=true) [0.14ms]
+(pass) a concurrent deletion undo rejects a partially copied replica [217.91ms]
+
+ 104 pass
+ 0 fail
+ 1403 expect() calls
+Ran 104 tests across 6 files. [15.75s]

@@ -1,0 +1,33 @@
+I've checked the hashes and both patches; writing up now.
+
+**Verdict: no blocker.** I only read files; nothing was edited and no tests were run.
+
+**Source and patch checks**
+- The current `src/shared/crdt.ts` hashes to `d0709273…`, which is `candidateSHA` in pins.json. The baseline hashes to `e61d7819…`, which is `baselineSHA`.
+- `atom-index-bulk.patch` applied to the baseline gives exactly `d0709273…`.
+- `bulk-over-persistent.patch` does not apply to the baseline (1 of 5 hunks fails). That's expected, because it's a diff against the persistent-HashMap version. All of its `+` lines are present in the current source:
+  - apply: `src/shared/crdt.ts:1009`
+  - restore batching: `:2076-2086`
+  - `indexAtoms` / `indexAtom`: `:2273-2310`
+
+**Your claims, checked**
+- **`indexAtoms(Atom[], copyAtoms)` with early return on empty:** confirmed (`:2273-2274`).
+- **Restore gathers references only, copies inside the loop:** confirmed. `copyAtom` runs inside the per-atom loop, right before legacy/has/freeze/set/owner/children, so the order matches the baseline.
+- **Batches cap at 512 and get sealed before each yield:** confirmed. The flush happens before `yield`, and the paused atom is indexed before the yield, as before. An editable map never stays open across a yield or into a generator `return()`.
+- **Public `restore()` (`:1898`, `shareAtoms=false` → copy) runs on an existing Replica:** confirmed. It's non-cooperative, so it never yields. The cooperative path still throws unless the replica is fresh (`:1942`).
+- **Partial-on-throw:** OK. In effect 3.22.2, `setTree` on an editable map changes it in place and returns `self`. So the outer `index` already holds any atom whose `set` finished before a later throw, and `finally` publishes it, which matches the old immediate assignment.
+  - Weak spot: this relies on the editable map's identity being stable. If Effect ever returned a new instance there, the atom being processed when the throw happens would be missing from the index while still counted in `children` and `ownedAtomCounts`.
+  - Note: I checked effect 3.22.2 from a bunx jazz-run cache. The project has no node_modules, so this isn't confirmed against its pinned version.
+- **Sharing with forks (`:181` `replica.atomIndex = this.atomIndex`):** safe. `beginMutation` uses `_edit+1`, and the nodes of a map that's already shared have an edit ≤ k (or NaN), so they're copied rather than changed. Nothing can fork or read `this.atomIndex` while the synchronous `indexAtoms` loop runs.
+- **Apply passes the actual `operation.insert` array:** confirmed. It isn't kept or copied, and it's frozen as before.
+
+**Suggested gates (public API only)**
+1. **Error, apply:** a text operation whose atom fails partway (e.g. bad value). Compare `atomIndex` size, `children` and `ownedAtomCounts` against the baseline.
+2. **Error, public `restore()` on a populated Replica:** a snapshot with more than 512 atoms that fails partway. Assert the same partial state as the baseline.
+3. **Interruption:** start `fromCheckpointEffect` (cooperative) and interrupt the fiber at a yield after more than 512 atoms. The replica it leaves behind must not be editable: a later `set` mustn't change an earlier snapshot.
+4. **Fork:** fork A→B, then index into A (by apply, and by public restore of a large snapshot). Assert B's text and lookups are unchanged, and the reverse (index into B, A unchanged).
+5. **Double fork:** fork A→B and A→C, then mutate B and C. They must not see each other's changes (covers the shared `_edit+1`).
+6. **Batch edges:** 0, 1, 511, 512, 513 and 1025 atoms, plus several targets so the `work` counter crosses a target boundary. Text output should match the baseline.
+7. **`shareAtoms`:** `restoreCheckpoint` keeps atom identity; `restore` copies (changing the input snapshot afterwards has no effect).
+
+Performance is still unmeasured, and the existing hot-lookup regression is untouched.

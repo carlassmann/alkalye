@@ -1,0 +1,72 @@
+--- a/src/shared/crdt.ts
++++ b/src/shared/crdt.ts
+@@ -1006,8 +1006,7 @@
+ 				)
+ 				if (operation.kind !== "set") {
+ 					if (operation.kind === "text") {
+-						for (let atom of operation.insert)
+-							this.indexAtom(operation.target, atom)
++						this.indexAtoms(operation.target, operation.insert)
+ 						if (operation.insert.length || operation.remove.length)
+ 							this.textOwners.set(operation.id, operation.target)
+ 					} else this.textOwners.set(operation.id, operation.target)
+@@ -2074,10 +2073,17 @@
+ 		for (let { target, visibility } of incoming) {
+ 			if (!this.targets.has(target.id)) this.targets.set(target.id, [])
+ 			this.visibility.set(target.id, visibility)
++			let batch: Atom[] = []
+ 			for (let atom of target.atoms) {
+-				this.indexAtom(target.id, shareAtoms ? atom : copyAtom(atom))
+-				if (cooperative && ++work % 512 === 0) yield
+-			}
++				batch.push(atom)
++				let pause = cooperative && ++work % 512 === 0
++				if (batch.length === 512 || pause) {
++					this.indexAtoms(target.id, batch, !shareAtoms)
++					batch = []
++					if (pause) yield
++				}
++			}
++			this.indexAtoms(target.id, batch, !shareAtoms)
+ 			this.created.set(
+ 				target.id,
+ 				Math.min(target.created, this.created.get(target.id) ?? Infinity),
+@@ -2264,7 +2270,17 @@
+ 			value: "",
+ 		}
+ 	}
+-	private indexAtom(target: string, atom: Atom) {
++	private indexAtoms(target: string, atoms: Atom[], copyAtoms = false) {
++		if (!atoms.length) return
++		let index = HashMap.beginMutation(this.atomIndex)
++		try {
++			for (let atom of atoms)
++				index = this.indexAtom(target, copyAtoms ? copyAtom(atom) : atom, index)
++		} finally {
++			this.atomIndex = HashMap.endMutation(index)
++		}
++	}
++	private indexAtom(target: string, atom: Atom, atomIndex = this.atomIndex) {
+ 		if (
+ 			!(
+ 				atom.value.length === 1 &&
+@@ -2279,9 +2295,9 @@
+ 			)
+ 		)
+ 			this.legacyTextTargets.add(target)
+-		if (HashMap.has(this.atomIndex, atom.id)) return
++		if (HashMap.has(atomIndex, atom.id)) return atomIndex
+ 		freezeTextAtom(atom)
+-		this.atomIndex = HashMap.set(this.atomIndex, atom.id, Object.freeze({ target, atom }))
++		atomIndex = HashMap.set(atomIndex, atom.id, Object.freeze({ target, atom }))
+ 		let owner = atom.id.slice(0, -9)
+ 		this.ownedAtomCounts.set(owner, (this.ownedAtomCounts.get(owner) ?? 0) + 1)
+ 		let children = this.children.get(target) ?? new Map<string, Atom[]>()
+@@ -2290,6 +2306,7 @@
+ 		siblings.splice(index < 0 ? siblings.length : index, 0, atom)
+ 		children.set(atom.after, siblings)
+ 		this.children.set(target, children)
++		return atomIndex
+ 	}
+ 	private requireHistory() {
+ 		if (!this.historyLoaded)

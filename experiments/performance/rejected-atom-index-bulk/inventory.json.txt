@@ -1,0 +1,90 @@
+{
+  "baseline-crdt.ts.txt": {
+    "bytes": 74714,
+    "sha256": "e61d7819830f0a6ab9adb4ed15b58870c50e912bc4f9564d56ab3379bdb6bc2b"
+  },
+  "fact-index-cost.ts.txt": {
+    "bytes": 4861,
+    "sha256": "cd70729b5532b41c72c1900683ab3b5ce22b43ac1ecdfc5dc2985a83ed3a6de5"
+  },
+  "fixture-metadata.json": {
+    "bytes": 212,
+    "sha256": "a0eeeec7de95808d47a5ab97bf406f42cd209b3ae801a5eaca6f5ebffd12e1d4"
+  },
+  "opus-final-review.log": {
+    "bytes": 3930,
+    "sha256": "bee314eb7b7d39fb82242a9a16948bf9caa4359130f004853f49e8626ed345a9"
+  },
+  "atom-index-bulk.patch": {
+    "bytes": 8641,
+    "sha256": "e88f14f6f5cb7310b1ca95923f34ab32765cb6e48d265fa4e5158b505d061d37"
+  },
+  "types-cost-fixed.log": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "REVIEW-STATUS.md": {
+    "bytes": 1740,
+    "sha256": "b521df06de1d7cd3cb728d6e55226f2e20bf270556a871f63195590b43103209"
+  },
+  "cost.log": {
+    "bytes": 63,
+    "sha256": "274ca693fc9c017d299275a173e19f19e6680d9cd43ada94fa0c595fc7ce73b4"
+  },
+  "types-final.log": {
+    "bytes": 117,
+    "sha256": "3ba87b926f3b848998cb045f4351b6787dff36ad084c9f19d3a4d7833871d004"
+  },
+  "types-cost.log": {
+    "bytes": 1521,
+    "sha256": "0fd011f81b4e7f00eeb0e3090de01839f0a9b03cfa47dc86dd394da24a00caf1"
+  },
+  "bulk-over-persistent.patch": {
+    "bytes": 2623,
+    "sha256": "f2a61ed7548462c001be03018a6231087919369edb8292e77eb000fe79513701"
+  },
+  "tests-fixed.log": {
+    "bytes": 11452,
+    "sha256": "fd0168f02cac364b94236c7252637a5d81a3ac7243d8e32540be5c04038586d5"
+  },
+  "candidate-crdt.ts.txt": {
+    "bytes": 75698,
+    "sha256": "d07092736346df66cbe4da1180395347fb416e3d50c66d3d84d1703acb8b9719"
+  },
+  "README.md": {
+    "bytes": 2616,
+    "sha256": "297c8ac17970ba70136a9ba9e932bd6af74e62d293c818fb0974403771409a38"
+  },
+  "cost-results.json": {
+    "bytes": 10116,
+    "sha256": "474dd391520df568e257a735dbfb2aa49ac083c2dc2769b0b476cd1c29262b54"
+  },
+  "opus-review.log": {
+    "bytes": 4555,
+    "sha256": "08479aab643b962e302d0ca26d4576f286e2f7e2574f37d0314d3c43d6539414"
+  },
+  "replica-fact-index.test.ts.txt": {
+    "bytes": 5092,
+    "sha256": "5b11caf5224a220aa2c66384c0a8a61085ab06bb4557f83ea86bc46d88cee772"
+  },
+  "types-fixed.log": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "source-corrections.txt": {
+    "bytes": 453,
+    "sha256": "3cf886e43d4377487ec3f47b8d168d8f4f91e5ae5c5b62b8b4981e202250463a"
+  },
+  "cost-summary.json": {
+    "bytes": 2038,
+    "sha256": "2adfa19edc5bad9b19980554b8e874dc9d05fa9643dc9d5bca36fc6e446bf061"
+  },
+  "pins.json": {
+    "bytes": 174,
+    "sha256": "1e98ba099083e5da19f0ee623a4b2b6e40afd69707d6da2f7676bb51328c7add"
+  },
+  "cost-source-pins.json": {
+    "bytes": 407,
+    "sha256": "1b81ac34ca52520a89ba582a7295c27cf817aa29ea7cfdb8dcdabfaabf7d153f"
+  }
+}

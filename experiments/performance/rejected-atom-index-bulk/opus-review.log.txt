@@ -1,0 +1,34 @@
+**Verdict:** the source (`src/shared/crdt.ts`) looks correct, but `bulk-over-persistent.patch` is stale and doesn't match it. Source is ready for untimed strict/module checks. Don't apply or review the patch file. Nothing was run; this is source reading only.
+
+**Blocker: the patch is not the source**
+- Patch `indexAtom` still does `this.atomIndex = HashMap.set(this.atomIndex, …)`, so the batch's local index is never updated. A duplicate inside one batch would get past `has(index)` and be counted twice in children/ownedAtomCounts.
+- The patch also declares `let index = siblings.findIndex…` in a function that already has an `index` parameter. That's a SyntaxError ("already declared"). It then does `return index`, which returns the number, not the map.
+- The source fixes both: the parameter is named `atomIndex`, it does `atomIndex = HashMap.set(atomIndex, …)`, and it returns `atomIndex` (`crdt.ts:2281-2307`).
+- Fix: regenerate the patch from the source before any timed run, and check the timed tree's hash.
+
+**Audit of the source**
+- **Reentrant callbacks:** none during a batch. The loop only touches Map/Set, `freezeTextAtom`, and HashMap has/set (string hash and Equal on strings). The `atoms` are an `operation.insert` array or a local batch array.
+- **Exceptions:** `finally` seals the batch and publishes whatever was inserted so far. Partial state matches the baseline order: atomIndex is set before ownedAtomCounts and children.
+- **One restore difference:** `copyAtom` now runs for up to 511 atoms before any of them are indexed. If something throws, the baseline would already have indexed them. This doesn't matter in practice because restore always runs on a fresh `Replica` that is thrown away on failure (`crdt.ts:1914-1922`).
+- **Interruption and yields:** restore always calls `indexAtoms` before it yields, so no editable map is open at a yield. `return()` at a yield is safe.
+- **Fork, checkpoint and editable-map escape:** apply and `indexAtoms` are synchronous. Fork (`crdt.ts:181`) can only see a sealed map. The editable map is never kept in `this.atomIndex` while a batch is open.
+- **Node owner tokens:** `beginMutation` uses `_edit+1` of the current map, so it isn't globally unique. It's still safe here:
+  - Ordinary `set` outside a batch creates nodes with `edit=NaN`, which can never be edited in place.
+  - Nodes created in a batch are reachable only from that batch's result.
+  - Any later fork already has `_edit ≥ X`, so its next batch uses a higher number and can't edit those nodes.
+  - Two sibling forks can both use `X+1`, but each edits only nodes it created itself.
+  - So forks stay independent, as long as `atomIndex` is only ever assigned at lines 124, 181 and 2278, which is true today.
+- **Duplicates and conflicts:** the order is unchanged: legacy check, then duplicate check, then freeze, then set, then owner count, then children. A duplicate inside one batch is now seen through the in-place-edited local map.
+- **Legacy, alias, wire, permissions:** unchanged.
+
+**Nit:** an empty batch (the final flush, or an operation that only removes) still allocates a new map wrapper and bumps `_edit`. It's harmless, but `if (!batch.length) return` at the call sites is free.
+
+**Can batching fix the slow cold paths? (structure only, no attribution)**
+- **Restore:** this is where it can help most. Each batch of up to 512 copies the root and the upper array nodes (fan-out 32, SHIFT 5) about once instead of once per insert. The deep nodes along random hash paths still get copied about once per insert, and every insert still pays for string hashing, a LeafNode, and a frozen wrapper. Expect it to land somewhere between naive and baseline. Only matched timing can say where.
+- **Apply:** batches are per operation. If the large apply is many operations with small inserts, a batch of about 1 gets nothing, plus the wrapper allocation. Batching across the whole apply loop with a local map would be the next step, but only if measurements show apply is still slow.
+- **Cooperative:** the 512 cap and the yield boundary limit how much gets amortized, same as restore.
+- **Hot lookup (.31 → 2.56ms):** batching doesn't touch the read path. Every get/has still recomputes `Hash.string(id)` (strings aren't cached, `Hash.ts:110`) and allocates an `Option`. That read cost stays.
+
+**Next step:** regenerate the patch, then run the untimed strict/module checks on the source tree. I'm not making an adoption recommendation until matched cost runs exist.
+
+written with claude-opus-5-5 in Claude Code
