@@ -49,6 +49,16 @@
 			sections compare rewrite revisions or implementation paths and follow the
 			<a href="performance-interaction.html">previous comparison with main</a>.
 		</p>
+		<h2>Production offline and peer editing</h2>
+		<p>
+			Twelve untimed production checks on rewrite 514e1bb passed peer editing,
+			accepted Undo and offline recovery with two independent browser profiles
+			for the same account. An edit survived an offline service-worker reload,
+			the server prefix stayed unchanged while offline, and reconnect published
+			the exact edit before accepted Undo restored the baseline. This is not a
+			latency comparison, separate-account permission test or twenty-writer
+			capacity claim.
+		</p>
 		<h2>Ordinal adjacency experiment</h2>
 		<p>
 			Twelve isolated native browser cases passed exact source, selection, caret

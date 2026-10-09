@@ -1,0 +1,15 @@
+import * as Effect from 'effect/Effect'
+import * as Schedule from 'effect/Schedule'
+import { cp } from 'node:fs/promises'
+let root='/tmp/alkalye-production-journeys/current-514e1bb',failed=false
+async function command(args:string[],extra:Record<string,string>={}){let child=Bun.spawn(args,{cwd:import.meta.dir,env:{...process.env,...extra},stdout:'inherit',stderr:'inherit'});if(await child.exited!==0)throw Error('Two-client stage failed: '+args[1])}
+try{
+ await command(['work','run','web'])
+ await Effect.runPromise(Effect.tryPromise({try:async()=>{let response=await fetch('http://127.0.0.1:4498/changelog');if(!response.ok)throw Error('Owned server not ready')},catch:error=>new Error(String(error))}).pipe(Effect.retry({times:600,schedule:Schedule.spaced('100 millis')}),Effect.timeout('60 seconds')))
+ await command(['bun','experiments/performance/interaction-matrix/seed-rewrite.ts',root+'/manifest.private.json',root+'/oracle.private.json',root+'/fixtures'],{JOURNEY_FIXTURES:'peer2'})
+ await command(['bun','two-client.ts'])
+}catch(error){failed=true;throw error}
+finally{
+ await command(['work','down'])
+ if(failed){let destination=root+'/failed-two-client-'+Date.now();for(let name of ['data','profile-peer-0','profile-peer-1'])try{await cp(root+'/'+name,destination+'/'+name,{recursive:true})}catch(error){await Bun.write(root+'/two-client-snapshot-secondary.log',String(error))}}
+}

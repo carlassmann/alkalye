@@ -1,0 +1,1 @@
+{"extends": "./tsconfig.json", "include": ["src/**/*.ts", "setup-journey.ts", "server-journey.ts", "readiness-journey.ts", "experiments/performance/interaction-matrix/*.ts", "dry-probe.ts", "broad-smoke.ts", "two-client.ts", "two-client-smoke.ts"]}

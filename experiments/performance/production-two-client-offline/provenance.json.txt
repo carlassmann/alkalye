@@ -1,0 +1,43 @@
+{
+  "productionPin": "514e1bbff531f1bca8a1d1dead11bacfe2ba1372",
+  "runtimeHandle": 87158,
+  "strictHandle": 93713,
+  "files": {
+    "two-client.ts.txt": {
+      "sha256": "7977df2b7e75bf4ff1e96c2526c5a31949fc0195fdccb5aca2fa2407dd0bcd88",
+      "bytes": 7474
+    },
+    "two-client-smoke.ts.txt": {
+      "sha256": "0565c0382a6a02ee173763aa417310b17a127df7b03016e27a2c3920bc4cb572",
+      "bytes": 1396
+    },
+    "browser-probes.ts.txt": {
+      "sha256": "016ee3be72a7ecbe05ea1d265d6eb3c9e0f9d183f521c4d5962108979cf5e976",
+      "bytes": 7234
+    },
+    "seed-rewrite.ts.txt": {
+      "sha256": "f365f6287fc30408ce5718699f8dc04528c43b79f190e2a07f885e91d8786d42",
+      "bytes": 6557
+    },
+    "rewrite-oracle.ts.txt": {
+      "sha256": "c8f15b4b5aedd3b23d00b28b86bce76194a205e061448bcf3c7cc894272cd8e2",
+      "bytes": 2048
+    },
+    "tsconfig.journey.json": {
+      "sha256": "2f153e9dc55241effd3ed0c2ccca91844d0ff5c5dcaf8f78811161affa72cd23",
+      "bytes": 248
+    },
+    "strict-two-client.log.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "two-client-runtime.log.txt": {
+      "sha256": "d0c11f983ec3066876c342b3d38d60d94e824f45e67fcd686b9739d487b8bf33",
+      "bytes": 209
+    },
+    "result.json": {
+      "sha256": "a033e32c077980d0fc07b47b37b9ade05cfa8344a208aaff25dd96a21f2c7a53",
+      "bytes": 2339
+    }
+  }
+}

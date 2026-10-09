@@ -1,0 +1,82 @@
+import * as Effect from 'effect/Effect'
+import * as Schema from 'effect/Schema'
+import * as Redacted from 'effect/Redacted'
+import * as FetchHttpClient from 'effect/http/FetchHttpClient'
+import { cp, rm } from 'node:fs/promises'
+import { browser,evaluate,wait } from './tests/browser-driver'
+import {apiDocuments} from './src/cli/api-documents'
+import {nativeCaretProbe,savedVersionProbe,savedStateProbe,installTrustedProbe,trustedMutationProbe,removeTrustedProbe,sourceHashProbe,localSavedProbe} from './experiments/performance/interaction-matrix/browser-probes'
+let root='/tmp/alkalye-production-journeys/current-514e1bb'
+let configuration=Schema.decodeUnknownSync(Schema.Struct({origin:Schema.String,keyFile:Schema.String,scope:Schema.String,documents:Schema.Array(Schema.Struct({fixture:Schema.String,documentId:Schema.String}))}))(await Bun.file(root+'/oracle.private.json').json())
+let manifest=Schema.decodeUnknownSync(Schema.Struct({versions:Schema.Array(Schema.Struct({seedProfile:Schema.String,fixtures:Schema.Array(Schema.Struct({name:Schema.String,path:Schema.String,sourceFile:Schema.String}))}))}))(await Bun.file(root+'/manifest.private.json').json())
+let version=manifest.versions[0],fixture=version?.fixtures.find(value=>value.name==='peer2'),identity=configuration.documents.find(value=>value.fixture==='peer2')
+if(!version||!fixture||!identity)throw Error('Private peer fixture missing')
+let documentId=identity.documentId
+let key=Redacted.make((await Bun.file(configuration.keyFile).text()).trim()),api=apiDocuments(configuration.origin,key,configuration.scope)
+let baseline=await Bun.file(fixture.sourceFile).text(),source=baseline,stage='setup',unknown=false,previousRevision:string|undefined
+let receipts:{phase:string;sha256:string;characters:number;serverPosition:number}[]=[],gates:string[]=[]
+let sessions=['current-peer-a','current-peer-b']
+function hash(value:string){return new Bun.CryptoHasher('sha256').update(value).digest('hex')}
+async function accepted(expected:string,phase:string,advance=true){
+ let value=await Effect.runPromise(Effect.gen(function*(){while(true){let value=yield* api.read(documentId);if(hash(value.content)===hash(expected))return value;yield* Effect.sleep('100 millis')}}).pipe(Effect.timeout('20 seconds'),Effect.provide(FetchHttpClient.layer)))
+ let split=value.revision.lastIndexOf(':'),position=Number(value.revision.slice(split+1))
+ if(previousRevision&&advance){let prior=previousRevision.lastIndexOf(':');if(previousRevision.slice(0,prior)!==value.revision.slice(0,split)||position<=Number(previousRevision.slice(prior+1)))throw Error('Independent accepted revision did not advance')}
+ if(!advance&&previousRevision&&value.revision!==previousRevision)throw Error('Offline accepted prefix unexpectedly changed')
+ previousRevision=value.revision;receipts.push({phase,sha256:hash(value.content),characters:value.content.length,serverPosition:position});return value
+}
+function exact(session:string,expected:string){wait(session,`(${sourceHashProbe.toString()})(${JSON.stringify(hash(expected))},${expected.length})`)}
+function liveReadback(session:string,expected:string){exact(session,expected);wait(session,`(${savedStateProbe.toString()})(null,true)`)}
+function savedBefore(session:string){let expression=`(${savedVersionProbe.toString()})()`;wait(session,`${expression}!==null`);return Schema.decodeUnknownSync(Schema.String)(evaluate(session,expression))}
+async function append(session:string,letter:string,offline=false){
+ let before=savedBefore(session),offset=source.length
+ evaluate(session,`(()=>{let editor=document.querySelector('alkalye-editor');editor.selectRange(${offset},${offset});editor.source.focus();return true})()`)
+ wait(session,`(${nativeCaretProbe.toString()})(${offset},true)`)
+ evaluate(session,`(${installTrustedProbe.toString()})()`)
+ unknown=true
+ browser(session,'press',letter)
+ let expected=source+letter
+ exact(session,expected)
+ if(evaluate(session,`(${trustedMutationProbe.toString()})(${JSON.stringify(letter)})`)!==true)throw Error('Exact trusted beforeinput absent')
+ wait(session,`(${nativeCaretProbe.toString()})(${expected.length},true)`)
+ wait(session,offline?`(${localSavedProbe.toString()})(${JSON.stringify(before)},false)`:`(${savedStateProbe.toString()})(${JSON.stringify(before)},false)`)
+ evaluate(session,`(${removeTrustedProbe.toString()})()`)
+ source=expected
+ if(!offline){await accepted(source,stage);unknown=false}
+ gates.push(stage)
+}
+async function undo(session:string,expected:string){
+ let before=savedBefore(session);unknown=true
+ browser(session,'press',process.platform==='darwin'?'Meta+z':'Control+z')
+ exact(session,expected);wait(session,`(${savedStateProbe.toString()})(${JSON.stringify(before)},false)`)
+ await accepted(expected,stage);source=expected;unknown=false;gates.push(stage)
+}
+try{
+ for(let index=0;index<sessions.length;index++){
+  let session=sessions[index];if(!session)throw Error('Session absent')
+  let profile=root+'/profile-peer-'+index
+  await rm(profile,{recursive:true,force:true});await cp(version.seedProfile,profile,{recursive:true})
+  for(let name of ['SingletonLock','SingletonSocket','SingletonCookie'])await rm(profile+'/'+name,{force:true})
+  browser(session,'--profile',profile,'open',configuration.origin+fixture.path)
+  browser(session,'set','viewport','1280','800')
+  wait(session,"document.querySelector('#editor')?.readOnly===false")
+  liveReadback(session,baseline)
+ }
+ let a=sessions[0],b=sessions[1];if(!a||!b)throw Error('Two clients absent')
+ await accepted(baseline,'seed');gates.push('two-independent-profile-readbacks')
+ stage='client-a-write';await append(a,'x');liveReadback(b,source);gates.push('b-live-observed-a')
+ stage='client-b-write';await append(b,'y');liveReadback(a,source);gates.push('a-live-observed-b')
+ stage='client-b-undo';await undo(b,baseline+'x');liveReadback(a,source)
+ stage='client-a-undo';await undo(a,baseline);liveReadback(b,source)
+ browser(b,'close')
+ stage='offline-readiness';wait(a,'navigator.serviceWorker.controller!==null')
+ browser(a,'set','offline','on');wait(a,'navigator.onLine===false');gates.push(stage)
+ stage='offline-native-write';await append(a,'o',true)
+ await accepted(baseline,'offline-independent-prefix',false)
+ stage='offline-reload';browser(a,'reload');wait(a,'navigator.onLine===false');wait(a,"document.querySelector('#editor')?.readOnly===false")
+ exact(a,source);wait(a,`(${localSavedProbe.toString()})(null,true)`);await accepted(baseline,'offline-reopened-prefix',false);gates.push(stage)
+ stage='online-reconnect';browser(a,'set','offline','off');wait(a,'navigator.onLine===true');await accepted(source,stage);liveReadback(a,source);unknown=false;gates.push(stage)
+ stage='offline-write-undo';await undo(a,baseline)
+ await Bun.write(root+'/two-client-result.json',JSON.stringify({status:'correctness-complete',productionPin:'514e1bbff531f1bca8a1d1dead11bacfe2ba1372',gates,receipts,scope:'Same account, independent browser profiles and per-session actors; actual two-client native edits/live convergence/Undo/offline local reload/reconnect. No separate-account permissions, performance or physical device claim.'},null,2))
+ console.log(JSON.stringify({status:'correctness-complete',gates:gates.length}))
+}catch(error){await Bun.write(root+'/two-client-result.json',JSON.stringify({status:'failed',stage,error:String(error),unknown,gates,receipts},null,2));throw error}
+finally{for(let session of sessions)try{browser(session,'close')}catch{}}

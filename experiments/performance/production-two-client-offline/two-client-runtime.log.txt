@@ -1,0 +1,4 @@
+started web pid=32338
+{"fixture":"peer2","characters":2048,"exactServerRead":true}
+{"status":"correctness-complete","gates":12}
+stopped alkalye-production-journeys-current/codex-production-journey-fixture/web

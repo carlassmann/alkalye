@@ -1,0 +1,68 @@
+[
+	{
+		"source": "/tmp/alkalye-production-journeys/current-514e1bb/proof-ready-two-client-offline/two-client.ts.txt",
+		"archive": "experiments/performance/production-two-client-offline/two-client.ts.txt",
+		"bytes": 7474,
+		"sha256": "7977df2b7e75bf4ff1e96c2526c5a31949fc0195fdccb5aca2fa2407dd0bcd88"
+	},
+	{
+		"source": "/tmp/alkalye-production-journeys/current-514e1bb/proof-ready-two-client-offline/two-client-smoke.ts.txt",
+		"archive": "experiments/performance/production-two-client-offline/two-client-smoke.ts.txt",
+		"bytes": 1396,
+		"sha256": "0565c0382a6a02ee173763aa417310b17a127df7b03016e27a2c3920bc4cb572"
+	},
+	{
+		"source": "/tmp/alkalye-production-journeys/current-514e1bb/proof-ready-two-client-offline/browser-probes.ts.txt",
+		"archive": "experiments/performance/production-two-client-offline/browser-probes.ts.txt",
+		"bytes": 7234,
+		"sha256": "016ee3be72a7ecbe05ea1d265d6eb3c9e0f9d183f521c4d5962108979cf5e976"
+	},
+	{
+		"source": "/tmp/alkalye-production-journeys/current-514e1bb/proof-ready-two-client-offline/seed-rewrite.ts.txt",
+		"archive": "experiments/performance/production-two-client-offline/seed-rewrite.ts.txt",
+		"bytes": 6557,
+		"sha256": "f365f6287fc30408ce5718699f8dc04528c43b79f190e2a07f885e91d8786d42"
+	},
+	{
+		"source": "/tmp/alkalye-production-journeys/current-514e1bb/proof-ready-two-client-offline/rewrite-oracle.ts.txt",
+		"archive": "experiments/performance/production-two-client-offline/rewrite-oracle.ts.txt",
+		"bytes": 2048,
+		"sha256": "c8f15b4b5aedd3b23d00b28b86bce76194a205e061448bcf3c7cc894272cd8e2"
+	},
+	{
+		"source": "/tmp/alkalye-production-journeys/current-514e1bb/proof-ready-two-client-offline/tsconfig.journey.json",
+		"archive": "experiments/performance/production-two-client-offline/tsconfig.journey.json.txt",
+		"bytes": 248,
+		"sha256": "2f153e9dc55241effd3ed0c2ccca91844d0ff5c5dcaf8f78811161affa72cd23"
+	},
+	{
+		"source": "/tmp/alkalye-production-journeys/current-514e1bb/proof-ready-two-client-offline/strict-two-client.log.txt",
+		"archive": "experiments/performance/production-two-client-offline/strict-two-client.log.txt",
+		"bytes": 0,
+		"sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+	},
+	{
+		"source": "/tmp/alkalye-production-journeys/current-514e1bb/proof-ready-two-client-offline/two-client-runtime.log.txt",
+		"archive": "experiments/performance/production-two-client-offline/two-client-runtime.log.txt",
+		"bytes": 209,
+		"sha256": "d0c11f983ec3066876c342b3d38d60d94e824f45e67fcd686b9739d487b8bf33"
+	},
+	{
+		"source": "/tmp/alkalye-production-journeys/current-514e1bb/proof-ready-two-client-offline/result.json",
+		"archive": "experiments/performance/production-two-client-offline/result.json.txt",
+		"bytes": 2339,
+		"sha256": "a033e32c077980d0fc07b47b37b9ade05cfa8344a208aaff25dd96a21f2c7a53"
+	},
+	{
+		"source": "/tmp/alkalye-production-journeys/current-514e1bb/proof-ready-two-client-offline/README.md",
+		"archive": "experiments/performance/production-two-client-offline/README.md.txt",
+		"bytes": 1181,
+		"sha256": "b0e516b111ddef5f64f5ba9eb28435f96ec2daaa2f08b46153927e4e652245c2"
+	},
+	{
+		"source": "/tmp/alkalye-production-journeys/current-514e1bb/proof-ready-two-client-offline/provenance.json",
+		"archive": "experiments/performance/production-two-client-offline/provenance.json.txt",
+		"bytes": 1402,
+		"sha256": "9777d1ab622c2d7d4b6c63c44ffe37c5088e8bd35fde5fb267d4b675947c5129"
+	}
+]

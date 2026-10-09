@@ -1,0 +1,75 @@
+{
+  "status": "correctness-complete",
+  "productionPin": "514e1bbff531f1bca8a1d1dead11bacfe2ba1372",
+  "gates": [
+    "two-independent-profile-readbacks",
+    "client-a-write",
+    "b-live-observed-a",
+    "client-b-write",
+    "a-live-observed-b",
+    "client-b-undo",
+    "client-a-undo",
+    "offline-readiness",
+    "offline-native-write",
+    "offline-reload",
+    "online-reconnect",
+    "offline-write-undo"
+  ],
+  "receipts": [
+    {
+      "phase": "seed",
+      "sha256": "c77ab7f9594b4b02c8fc500c47fa4a8a4873e58d9b7f0fba338750aea23bcb2e",
+      "characters": 2048,
+      "serverPosition": 29
+    },
+    {
+      "phase": "client-a-write",
+      "sha256": "329ba7e1724f0ef41f88ebb2b55cb9010d0818a42c8f36e1f4249c9f2e556a6d",
+      "characters": 2049,
+      "serverPosition": 30
+    },
+    {
+      "phase": "client-b-write",
+      "sha256": "6e258e93edf3228eb3d760a3dbe85610d03f3e15892aec52fbbfc974b58ac42d",
+      "characters": 2050,
+      "serverPosition": 31
+    },
+    {
+      "phase": "client-b-undo",
+      "sha256": "329ba7e1724f0ef41f88ebb2b55cb9010d0818a42c8f36e1f4249c9f2e556a6d",
+      "characters": 2049,
+      "serverPosition": 32
+    },
+    {
+      "phase": "client-a-undo",
+      "sha256": "c77ab7f9594b4b02c8fc500c47fa4a8a4873e58d9b7f0fba338750aea23bcb2e",
+      "characters": 2048,
+      "serverPosition": 33
+    },
+    {
+      "phase": "offline-independent-prefix",
+      "sha256": "c77ab7f9594b4b02c8fc500c47fa4a8a4873e58d9b7f0fba338750aea23bcb2e",
+      "characters": 2048,
+      "serverPosition": 33
+    },
+    {
+      "phase": "offline-reopened-prefix",
+      "sha256": "c77ab7f9594b4b02c8fc500c47fa4a8a4873e58d9b7f0fba338750aea23bcb2e",
+      "characters": 2048,
+      "serverPosition": 33
+    },
+    {
+      "phase": "online-reconnect",
+      "sha256": "e103e35a1f9637404f297130dcc84b248e6908f5eb1836b3dcf0523720159f52",
+      "characters": 2049,
+      "serverPosition": 34
+    },
+    {
+      "phase": "offline-write-undo",
+      "sha256": "c77ab7f9594b4b02c8fc500c47fa4a8a4873e58d9b7f0fba338750aea23bcb2e",
+      "characters": 2048,
+      "serverPosition": 35
+    }
+  ],
+  "scope": "Same account, independent browser profiles and per-session actors; actual two-client native edits/live convergence/Undo/offline local reload/reconnect. No separate-account permissions, performance or physical device claim."
+}

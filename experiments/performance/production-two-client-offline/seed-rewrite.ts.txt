@@ -1,0 +1,232 @@
+import * as Effect from "effect/Effect"
+import * as Schema from "effect/Schema"
+import * as Redacted from "effect/Redacted"
+import * as FetchHttpClient from "effect/http/FetchHttpClient"
+import { apiDocuments } from "../../../src/cli/api-documents"
+import { join } from "node:path"
+
+let Configuration = Schema.Struct({
+	origin: Schema.String,
+	keyFile: Schema.String,
+	scope: Schema.String,
+	documents: Schema.Array(
+		Schema.Struct({ fixture: Schema.String, documentId: Schema.String }),
+	),
+	pendingCreates: Schema.optional(Schema.Array(Schema.String)),
+})
+let Fixture = Schema.Struct({
+	name: Schema.String,
+	path: Schema.String,
+	sourceFile: Schema.String,
+	query: Schema.optional(Schema.String),
+	token: Schema.optional(Schema.String),
+	selections: Schema.optional(Schema.Number),
+})
+let Manifest = Schema.Struct({
+	samples: Schema.Number,
+	output: Schema.String,
+	cells: Schema.Array(Schema.Unknown),
+	versions: Schema.Array(
+		Schema.Struct({
+			name: Schema.String,
+			kind: Schema.Literals(["original", "rewrite"]),
+			commit: Schema.String,
+			url: Schema.String,
+			seedProfile: Schema.String,
+			oracle: Schema.Array(Schema.String),
+			assets: Schema.Array(
+				Schema.Struct({ path: Schema.String, sha256: Schema.String }),
+			),
+			fixtures: Schema.Array(Fixture),
+		}),
+	),
+})
+let [manifestPath, oraclePath, output] = Bun.argv.slice(2)
+if (!manifestPath || !oraclePath || !output)
+	throw Error(
+		"Private manifest, oracle configuration and fixture directory required",
+	)
+let oracle = Schema.decodeUnknownSync(Configuration)(
+	await Bun.file(oraclePath).json(),
+)
+let key = Redacted.make((await Bun.file(oracle.keyFile).text()).trim())
+let api = apiDocuments(oracle.origin, key, oracle.scope)
+let manifest = Schema.decodeUnknownSync(Manifest)(
+	await Bun.file(manifestPath).json(),
+)
+let matched = manifest.versions.find(value => value.kind === "rewrite")
+if (!matched) throw Error("Rewrite version missing")
+let version = matched
+let definitions: {
+	name: string
+	title: string
+	source: string
+	query?: string
+	token?: string
+	selections?: number
+}[] = [
+ {name:'peer2',title:'Matrix peer2',source:('---\ntitle: Matrix peer2\n---\n'+'Peer live body text.\n'.repeat(130)).slice(0,2048)},
+	{
+		name: "rich128",
+		title: "Matrix rich128",
+		source: richFixture(),
+		query: "fixture",
+	},
+	{
+		name: "rich1m",
+		title: "Matrix rich1m",
+		source: richFixture(1048576,"Matrix rich1m"),
+		query: "fixture",
+	},
+	{
+		name: "long1m",
+		title: "Matrix long1m",
+		source: longFixture(),
+	},
+	{
+		name: "mc100",
+		title: "Matrix ranges 100",
+		source: multicursor(100,131072),
+		token: "ZXMARK",
+		selections: 100,
+	},
+	{
+		name: "mc1000",
+		title: "Matrix ranges 1000",
+		source: multicursor(1000,1048576),
+		token: "ZXMARK",
+		selections: 1000,
+	},
+	{
+		name: "mc512",
+		title: "Matrix ranges 512",
+		source: multicursor(512),
+		token: "ZXMARK",
+		selections: 512,
+	},
+	{
+		name: "mc2048",
+		title: "Matrix ranges 2048",
+		source: multicursor(2048),
+		token: "ZXMARK",
+		selections: 2048,
+	},
+]
+for (let fixture of definitions.filter(value=>!Bun.env.JOURNEY_FIXTURES||Bun.env.JOURNEY_FIXTURES.split(",").includes(value.name))) {
+	let sourceFile = join(output, fixture.name + ".txt")
+	await Bun.write(sourceFile, fixture.source)
+	let assigned = oracle.documents.find(value => value.fixture === fixture.name)
+	let existing = version.fixtures.find(value => value.name === fixture.name)
+	if (
+		existing &&
+		(!assigned || !existing.path.endsWith("/doc/" + assigned.documentId))
+	)
+		throw Error("Manifest and durable assignment differ")
+	if (!assigned && oracle.pendingCreates?.includes(fixture.name))
+		throw Error(
+			"Prior create outcome unknown; inspect server before assigning or retrying",
+		)
+	if (!assigned) {
+		oracle = {
+			...oracle,
+			pendingCreates: [...(oracle.pendingCreates ?? []), fixture.name],
+		}
+		await Bun.write(oraclePath, JSON.stringify(oracle, null, 2))
+	}
+	let created =
+		assigned ??
+		(await Effect.runPromise(
+			api
+				.create(fixture.source, fixture.title)
+				.pipe(Effect.provide(FetchHttpClient.layer)),
+		))
+	// Persist the assigned identity before readback: a failed read must not create a duplicate on retry.
+	if (!assigned)
+		oracle = {
+			...oracle,
+			documents: [
+				...oracle.documents,
+				{ fixture: fixture.name, documentId: created.documentId },
+			],
+			pendingCreates: (oracle.pendingCreates ?? []).filter(
+				name => name !== fixture.name,
+			),
+		}
+	await Bun.write(oraclePath, JSON.stringify(oracle, null, 2))
+	let read = await Effect.runPromise(
+		api.read(created.documentId).pipe(Effect.provide(FetchHttpClient.layer)),
+	)
+	if (read.content !== fixture.source)
+		throw Error(
+			"Public creation source differs; retained assignment requires inspection",
+		)
+	if (existing) {
+		console.log(
+			JSON.stringify({
+				fixture: fixture.name,
+				exactServerRead: true,
+				resumed: true,
+			}),
+		)
+		continue
+	}
+	version = {
+		...version,
+		fixtures: [
+			...version.fixtures,
+			{
+				name: fixture.name,
+				sourceFile,
+				path: "/app/spaces/" + read.spaceId + "/doc/" + read.documentId,
+				...(fixture.query ? { query: fixture.query } : {}),
+				...(fixture.token
+					? { token: fixture.token, selections: fixture.selections }
+					: {}),
+			},
+		],
+	}
+	manifest = {
+		...manifest,
+		versions: manifest.versions.map(value =>
+			value.kind === "rewrite" ? version : value,
+		),
+	}
+	await Bun.write(manifestPath, JSON.stringify(manifest, null, 2))
+	console.log(
+		JSON.stringify({
+			fixture: fixture.name,
+			characters: read.content.length,
+			exactServerRead: true,
+		}),
+	)
+}
+function multicursor(count: number,size=1048576) {
+	let header = "---\ntitle: Matrix ranges " + count + "\n---\n"
+	let line = "ZXMARK " + "Body words remain readable. ".repeat(16) + "\n"
+	let source = header + line.repeat(count)
+	return (
+		source +
+		"Body padding. ".repeat(
+			Math.max(0, Math.ceil((size - source.length) / 14)),
+		)
+	)
+}
+
+function richFixture(size=131072,title="Matrix rich128") {
+	let header = "---\ntitle: "+title+"\n---\n# "+title+"\n\n"
+	let paragraph =
+		"A responsiveness fixture with **bold words**, ==highlight== and [a reference](https://example.com).\n\n"
+	let length = size
+	return (
+		header +
+		paragraph.repeat(Math.ceil((length - header.length) / paragraph.length))
+	).slice(0, length)
+}
+
+function longFixture() {
+ let header="---\ntitle: Matrix long1m\n---\n"
+ let body="Plain long paragraph 😀 body words. ".repeat(32768).slice(0,1048576-header.length)
+ let last=body.charCodeAt(body.length-1)
+ if(last>=0xd800&&last<=0xdbff)body=body.slice(0,-1)+" "
+ return header+body
+}
