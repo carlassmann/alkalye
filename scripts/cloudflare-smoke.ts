@@ -1,3 +1,4 @@
+import { Database } from "bun:sqlite"
 import { mkdtemp, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join, resolve } from "node:path"
@@ -107,6 +108,74 @@ async function stop() {
 	child.kill("SIGTERM")
 	await child.exited
 	child = undefined
+}
+async function verifyLocalR2(state: {
+	document: string
+	digest: string
+	bytes: Uint8Array
+}) {
+	let objectKey: string | undefined
+	for await (let path of new Bun.Glob("**/*.sqlite").scan({
+		cwd: join(directory, "state"),
+		absolute: true,
+	})) {
+		let database = new Database(path, { readonly: true })
+		try {
+			let table = database
+				.query("SELECT name FROM sqlite_master WHERE name='document_blobs'")
+				.get()
+			if (!table) continue
+			let row = database
+				.query(
+					"SELECT external,length(bytes) AS retainedBytes,object_key FROM document_blobs WHERE document=? AND digest=?",
+				)
+				.get(state.document, state.digest)
+			if (!row) continue
+			let receipt = Schema.decodeUnknownSync(
+				Schema.Struct({
+					external: Schema.Literal(1),
+					retainedBytes: Schema.Literal(0),
+					object_key: Schema.String,
+				}),
+			)(row)
+			ensure(objectKey === undefined, "Multiple persisted attachment receipts")
+			objectKey = receipt.object_key
+		} finally {
+			database.close()
+		}
+	}
+	ensure(objectKey !== undefined, "Attachment is not stored externally in R2")
+	if (!objectKey) throw Error("R2 object receipt unavailable")
+	let output = join(directory, "r2.private.bin")
+	let log = Bun.file(join(directory, "r2-readback.log"))
+	let readback = Bun.spawn(
+		[
+			"bun",
+			"x",
+			"--no-install",
+			"wrangler",
+			"r2",
+			"object",
+			"get",
+			"alkalye-effect-rewrite-assets/" + objectKey,
+			"--local",
+			"--config",
+			config,
+			"--persist-to",
+			join(directory, "state"),
+			"--file",
+			output,
+		],
+		{ cwd: root, stdout: log, stderr: log },
+	)
+	if ((await readback.exited) !== 0)
+		throw Error("Direct local R2 readback failed")
+	let bytes = new Uint8Array(await Bun.file(output).arrayBuffer())
+	ensure(
+		bytes.length === state.bytes.length &&
+			bytes.every((value, index) => value === state.bytes[index]),
+		"Direct R2 bytes differ",
+	)
 }
 async function exercise() {
 	return Effect.runPromise(
@@ -236,6 +305,7 @@ try {
 	)
 	if (!remote) {
 		await stop()
+		await verifyLocalR2(state)
 		await start()
 	}
 	await Effect.runPromise(
@@ -274,7 +344,7 @@ try {
 	console.log(
 		remote
 			? "PASS deployed Worker: health, static app, signed auth, durable creation, access denial, durable blob, independent readback"
-			: "PASS local workerd: health, static app, signed auth, durable creation, access denial, durable blob, cold restart/readback",
+			: "PASS local workerd: health, static app, signed auth, durable creation, access denial, physical R2 bytes, cold restart/readback",
 	)
 	await stop()
 	await rm(directory, { recursive: true, force: true })
