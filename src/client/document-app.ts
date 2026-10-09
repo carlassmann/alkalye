@@ -833,12 +833,7 @@ function mountApplication() {
 						// Reloading flushes the open document's last edits first.
 						banner.offer(() =>
 							launch(
-								(selection?.opened.session.flush ?? Effect.void).pipe(
-									Effect.andThen(
-										Effect.sync(() => {
-											if (!events.signal.aborted) apply()
-										}),
-									),
+								reloadWithSavedDocument(apply).pipe(
 									Effect.onError(() =>
 										Effect.sync(() => banner.enableReload()),
 									),
@@ -859,6 +854,41 @@ function mountApplication() {
 					},
 				),
 			)
+		function reloadWithSavedDocument(apply: () => void) {
+			return Effect.suspend(() => {
+				let selected = selection
+				let activeEditor = editor
+				let wasInert = app.inert
+				let applied = false
+				app.inert = true
+				function hasUnrecordedText() {
+					return (
+						selected &&
+						activeEditor &&
+						activeEditor.source?.value !==
+							selected.opened.session.replica.text(selected.document)
+					)
+				}
+				return Effect.gen(function* () {
+					if (hasUnrecordedText())
+						yield* Effect.fail(new Error("Finish composing before reloading"))
+					yield* selected?.opened.session.flush ?? Effect.void
+					if (events.signal.aborted || selection !== selected) return
+					if (hasUnrecordedText())
+						yield* Effect.fail(
+							new Error("The document changed. Try reloading again"),
+						)
+					apply()
+					applied = true
+				}).pipe(
+					Effect.ensuring(
+						Effect.sync(() => {
+							if (!applied) app.inert = wasInert
+						}),
+					),
+				)
+			})
+		}
 		function finishOpening() {
 			if (!opening) return
 			opening = false
@@ -1069,7 +1099,9 @@ function mountApplication() {
 						themes: themeLibrary,
 						workbench: (theme: string) =>
 							router.go({ kind: "themeWorkbench", theme }),
-						prepareRestore: selection?.opened.session.flush ?? Effect.void,
+						prepareRestore: Effect.suspend(
+							() => selection?.opened.session.flush ?? Effect.void,
+						),
 						choose: (category: SettingsCategory) =>
 							router.go(
 								{
