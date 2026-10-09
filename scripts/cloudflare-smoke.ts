@@ -19,35 +19,47 @@ import { newDocument } from "../src/shared/documents"
 
 let root = resolve(import.meta.dir, "..")
 let directory = await mkdtemp(join(tmpdir(), "alkalye-cloudflare-smoke-"))
-let origin = "http://127.0.0.1:8791"
-let configurationSchema = Schema.StructWithRest(
-	Schema.Struct({
-		main: Schema.String,
-		assets: Schema.StructWithRest(Schema.Struct({ directory: Schema.String }), [
-			Schema.Record(Schema.String, Schema.Unknown),
-		]),
-	}),
-	[Schema.Record(Schema.String, Schema.Unknown)],
+let remoteIndex = Bun.argv.indexOf("--origin")
+let remote = remoteIndex >= 0
+let remoteOrigin = remote ? Bun.argv[remoteIndex + 1] : undefined
+if (remote && !remoteOrigin) throw Error("Provide a remote HTTPS origin")
+let origin = remoteOrigin ?? "http://127.0.0.1:8791"
+if (
+	remote &&
+	(new URL(origin).protocol !== "https:" || new URL(origin).origin !== origin)
 )
-let configuration = Schema.decodeUnknownSync(configurationSchema)(
-	Bun.JSONC.parse(await Bun.file(join(root, "wrangler.jsonc")).text()),
-)
-let localConfiguration = {
-	...configuration,
-	main: join(root, configuration.main),
-	assets: {
-		...configuration.assets,
-		directory: join(root, configuration.assets.directory),
-	},
-}
+	throw Error("Remote smoke requires an HTTPS origin without a path")
 let config = join(directory, "wrangler.json")
-await Bun.write(config, JSON.stringify(localConfiguration))
-await Bun.write(
-	join(directory, ".dev.vars"),
-	"ALKALYE_MASTER_KEY=" +
-		encode(crypto.getRandomValues(new Uint8Array(32))) +
-		"\n",
-)
+if (!remote) {
+	let configurationSchema = Schema.StructWithRest(
+		Schema.Struct({
+			main: Schema.String,
+			assets: Schema.StructWithRest(
+				Schema.Struct({ directory: Schema.String }),
+				[Schema.Record(Schema.String, Schema.Unknown)],
+			),
+		}),
+		[Schema.Record(Schema.String, Schema.Unknown)],
+	)
+	let configuration = Schema.decodeUnknownSync(configurationSchema)(
+		Bun.JSONC.parse(await Bun.file(join(root, "wrangler.jsonc")).text()),
+	)
+	let localConfiguration = {
+		...configuration,
+		main: join(root, configuration.main),
+		assets: {
+			...configuration.assets,
+			directory: join(root, configuration.assets.directory),
+		},
+	}
+	await Bun.write(config, JSON.stringify(localConfiguration))
+	await Bun.write(
+		join(directory, ".dev.vars"),
+		"ALKALYE_MASTER_KEY=" +
+			encode(crypto.getRandomValues(new Uint8Array(32))) +
+			"\n",
+	)
+}
 let child: ReturnType<typeof Bun.spawn> | undefined
 let runs = 0
 function ensure(value: boolean, message: string) {
@@ -56,34 +68,35 @@ function ensure(value: boolean, message: string) {
 async function start() {
 	runs++
 	let log = Bun.file(join(directory, `worker-${runs}.log`))
-	child = Bun.spawn(
-		[
-			"bun",
-			"x",
-			"--no-install",
-			"wrangler",
-			"dev",
-			"--config",
-			config,
-			"--local",
-			"--ip",
-			"127.0.0.1",
-			"--port",
-			"8791",
-			"--inspector-port",
-			"0",
-			"--persist-to",
-			join(directory, "state"),
-		],
-		{ cwd: root, stdout: log, stderr: log },
-	)
+	if (!remote)
+		child = Bun.spawn(
+			[
+				"bun",
+				"x",
+				"--no-install",
+				"wrangler",
+				"dev",
+				"--config",
+				config,
+				"--local",
+				"--ip",
+				"127.0.0.1",
+				"--port",
+				"8791",
+				"--inspector-port",
+				"0",
+				"--persist-to",
+				join(directory, "state"),
+			],
+			{ cwd: root, stdout: log, stderr: log },
+		)
 	let deadline = Date.now() + 30000
 	while (true) {
 		let response = await fetch(origin + "/api/health", {
 			signal: AbortSignal.timeout(1000),
 		}).catch(() => undefined)
 		if (response?.ok) break
-		if (child.exitCode !== null || Date.now() >= deadline)
+		if ((child && child.exitCode !== null) || Date.now() >= deadline)
 			throw Error(
 				`Local Worker readiness unavailable; retained log ${log.name}`,
 			)
@@ -123,6 +136,13 @@ async function exercise() {
 						HttpClientRequest.bearerToken(Redacted.make(login.token)),
 					),
 			})
+			yield* api.workspaces.create({
+				payload: {
+					workspace: "personal-" + identity.subject,
+					name: "Personal",
+					request: "personal-v1",
+				},
+			})
 			let document = crypto.randomUUID()
 			let content = "Cloudflare durable source 😀\nSecond line"
 			let action = yield* buildAction(
@@ -131,9 +151,34 @@ async function exercise() {
 				"Create",
 				replica => newDocument(replica, document, "Untitled", content),
 			)
+			yield* Effect.promise(() =>
+				Bun.write(
+					join(directory, "fixture.private.json"),
+					JSON.stringify({
+						document,
+						content,
+						subject: identity.subject,
+						token: login.token,
+						stage: "before-create",
+					}),
+				),
+			)
 			let position = yield* api.documents.create({
 				payload: { workspace: "personal-" + identity.subject, action },
 			})
+			yield* Effect.promise(() =>
+				Bun.write(
+					join(directory, "fixture.private.json"),
+					JSON.stringify({
+						document,
+						content,
+						subject: identity.subject,
+						token: login.token,
+						position,
+						stage: "created",
+					}),
+				),
+			)
 			let snapshot = yield* api.documents.snapshot({
 				params: { document },
 				query: { encoding: "compact" },
@@ -161,7 +206,7 @@ async function exercise() {
 			ensure(
 				stored.length === bytes.length &&
 					stored.every((value, index) => value === bytes[index]),
-				"R2 blob differs",
+				"durable blob differs",
 			)
 			return { document, content, token: login.token, position, digest, bytes }
 		}).pipe(
@@ -189,8 +234,10 @@ try {
 			(await page.text()).includes("app.js"),
 		"Document route redirected or lost its original URL",
 	)
-	await stop()
-	await start()
+	if (!remote) {
+		await stop()
+		await start()
+	}
 	await Effect.runPromise(
 		Effect.gen(function* () {
 			let api = yield* HttpApiClient.make(DocumentApi, {
@@ -217,7 +264,7 @@ try {
 			ensure(
 				bytes.length === state.bytes.length &&
 					bytes.every((value, index) => value === state.bytes[index]),
-				"Restart lost R2 blob",
+				"Restart lost durable blob",
 			)
 		}).pipe(
 			Effect.provide(FetchHttpClient.layer),
@@ -225,13 +272,15 @@ try {
 		),
 	)
 	console.log(
-		"PASS local workerd: health, static app, signed auth, durable creation, access denial, R2 blob, cold restart/readback",
+		remote
+			? "PASS deployed Worker: health, static app, signed auth, durable creation, access denial, durable blob, independent readback"
+			: "PASS local workerd: health, static app, signed auth, durable creation, access denial, durable blob, cold restart/readback",
 	)
 	await stop()
 	await rm(directory, { recursive: true, force: true })
 } catch (error) {
 	console.error(
-		"Local Worker smoke failed; private logs/state retained at",
+		"Worker smoke failed; private fixture/logs retained at",
 		directory,
 	)
 	throw error
