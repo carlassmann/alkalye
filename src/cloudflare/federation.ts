@@ -97,7 +97,7 @@ export function federatedWorkspaceLayer(environment: DeploymentEnvironment) {
 					size: Schema.Natural,
 				}),
 				execute: () =>
-					sql`SELECT b.document,b.digest,w.owner,CASE WHEN b.external=1 THEN b.size ELSE length(b.bytes) END AS size FROM document_blobs b JOIN workspace_documents d ON d.document=b.document JOIN workspaces w ON w.workspace=d.workspace JOIN directory_workspaces r ON r.workspace=w.workspace WHERE r.state!='active'`,
+					sql`SELECT b.document,b.digest,w.owner,CASE WHEN b.external=1 THEN b.size ELSE length(b.bytes) END AS size FROM document_blobs b JOIN workspace_documents d ON d.document=b.document JOIN workspaces w ON w.workspace=d.workspace JOIN directory_workspaces r ON r.workspace=w.workspace WHERE r.state!='active' AND NOT EXISTS(SELECT 1 FROM document_transfer_fences f WHERE f.document=b.document AND f.phase='retired')`,
 			})(undefined)
 			for (let usage of legacyUsage) yield* budget.importUsage(usage)
 
