@@ -19,6 +19,8 @@ let fullSuite = [
 	"tests/browser-storage.ts",
 	"tests/browser-library-sync.ts",
 	"tests/browser-service-worker.ts",
+	"tests/browser-updates.ts",
+	"tests/browser-installation.ts",
 	"tests/browser-motion.ts",
 	"tests/browser-floating-actions.ts",
 	"tests/browser-editor-context-menu.ts",

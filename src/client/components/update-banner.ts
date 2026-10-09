@@ -33,7 +33,12 @@ export class UpdateBannerElement extends HTMLElement {
 			"click",
 			event => {
 				if (!(event.target instanceof Element)) return
-				if (event.target.closest("[data-update-apply]")) {
+				let applyButton = event.target.closest("[data-update-apply]")
+				if (
+					applyButton instanceof HTMLButtonElement &&
+					!applyButton.disabled &&
+					this.apply
+				) {
 					for (let button of this.querySelectorAll("button"))
 						button.disabled = true
 					this.apply?.()
