@@ -81,6 +81,47 @@ describe("incremental document saves", () => {
 		)
 	})
 
+	test("keeps the order of multiple ranges when remote deletion collapses their anchors", async () => {
+		let doc = await createPersonalDocument(account, "abcdefg")
+		let pending = edit(captureDocumentSaveBase(doc), [
+			{ from: 1, to: 2, insert: "XX" },
+			{ from: 3, to: 4, insert: "YY" },
+		])
+		doc.content.deleteRange({ from: 1, to: 4 })
+		expect(persistDocumentEdits(doc, pending)).toBe("aXXYYefg")
+		expect(doc.content.toString()).toBe("aXXYYefg")
+	})
+
+	test("maps the next debounce batch against the saved remote and local text", async () => {
+		let doc = await createPersonalDocument(account, "abcdefgh")
+		let base = captureDocumentSaveBase(doc)
+		let first = edit(base, [
+			{ from: 1, to: 2, insert: "X" },
+			{ from: 5, to: 6, insert: "Y" },
+		])
+		let second = edit(base, { from: 2, insert: "Z" }, first)
+		doc.content.insertBefore(3, "REMOTE")
+		expect(persistDocumentEdits(doc, second)).toBe("aXZcREMOTEdeYgh")
+		let next = edit(captureDocumentSaveBase(doc), {
+			from: 3,
+			to: 12,
+			insert: "NEXT",
+		})
+		expect(persistDocumentEdits(doc, next)).toBe("aXZNEXTYgh")
+		expect(readDocumentText(doc.content)).toBe(doc.content.toString())
+	})
+
+	test("falls back without partially writing when both neighbours disappear", async () => {
+		let doc = await createPersonalDocument(account, "abcdef")
+		let pending = edit(captureDocumentSaveBase(doc), [
+			{ from: 1, insert: "X" },
+			{ from: 4, insert: "Y" },
+		])
+		doc.content.deleteRange({ from: 3, to: 5 })
+		expect(persistDocumentEdits(doc, pending)).toBeUndefined()
+		expect(doc.content.toString()).toBe("abcf")
+	})
+
 	test("keeps loaded comment anchors through positioned edits", async () => {
 		let doc = await createPersonalDocument(
 			account,
