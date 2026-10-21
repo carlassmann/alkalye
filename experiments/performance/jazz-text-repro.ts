@@ -21,6 +21,21 @@ let operations = [
 			text.insertAfter(position, "x")
 		},
 	},
+	{
+		name: "rawInsertBefore",
+		apply() {
+			text.$jazz.raw.insertBefore(position, "x")
+		},
+	},
+	{
+		name: "applyDiff",
+		apply() {
+			let before = text.toString()
+			text.$jazz.applyDiff(
+				before.slice(0, position) + "x" + before.slice(position),
+			)
+		},
+	},
 ]
 
 for (let subscribed of [false, true]) {

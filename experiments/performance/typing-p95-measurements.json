@@ -1,0 +1,418 @@
+{
+	"signature": "written with gpt-6.1-sol in t3 code",
+	"environment": {
+		"hardware": "Apple M5 Pro, 64 GiB",
+		"os": "macOS 27.0.1",
+		"bun": "1.4.3",
+		"chrome": "151.0.7922.34",
+		"jazz": "0.20.18",
+		"react": "19.2.3",
+		"viewport": [1280, 720]
+	},
+	"revisions": {
+		"old": "a749728a",
+		"current": "76509635",
+		"reference": "becd0f40",
+		"measuredEditorSaveSource": "8edb3b2f",
+		"rebasedMain": "73794f58"
+	},
+	"variants": {
+		"old": "Old main",
+		"current": "Current main",
+		"candidate": "PR",
+		"reference": "Native reference"
+	},
+	"units": "ms",
+	"runCsv": "typing-p95-runs.csv",
+	"runAggregation": "Median of three per-run statistics, interleaved rotating variant order. Burst has 80 queue-delay samples; isolated has 31 beforeinput-to-input samples. Peer includes autosave and two peer animation frames.",
+	"fixture": "Exact ASCII KiB sizes, frontmatter title, heading, repeated rich Markdown paragraphs, real LF newlines. Restored per cell in the final matrix. Baseline phase used a growing shared fixture.",
+	"fixtureParagraph": "A responsiveness fixture with **bold words**, ==highlight== and [a reference](https://example.com).\n\n",
+	"productionLoads": [
+		{
+			"kb": 2,
+			"rate": 1,
+			"run": 0,
+			"variant": "current",
+			"loadMs": 382
+		},
+		{
+			"kb": 2,
+			"rate": 1,
+			"run": 0,
+			"variant": "candidate",
+			"loadMs": 383.10009765625
+		},
+		{
+			"kb": 2,
+			"rate": 1,
+			"run": 1,
+			"variant": "candidate",
+			"loadMs": 378.800048828125
+		},
+		{
+			"kb": 2,
+			"rate": 1,
+			"run": 1,
+			"variant": "current",
+			"loadMs": 383.60009765625
+		},
+		{
+			"kb": 2,
+			"rate": 1,
+			"run": 2,
+			"variant": "current",
+			"loadMs": 378.800048828125
+		},
+		{
+			"kb": 2,
+			"rate": 1,
+			"run": 2,
+			"variant": "candidate",
+			"loadMs": 403.5
+		},
+		{
+			"kb": 2,
+			"rate": 4,
+			"run": 0,
+			"variant": "current",
+			"loadMs": 1399.800048828125
+		},
+		{
+			"kb": 2,
+			"rate": 4,
+			"run": 0,
+			"variant": "candidate",
+			"loadMs": 1352.10009765625
+		},
+		{
+			"kb": 2,
+			"rate": 4,
+			"run": 1,
+			"variant": "candidate",
+			"loadMs": 1328
+		},
+		{
+			"kb": 2,
+			"rate": 4,
+			"run": 1,
+			"variant": "current",
+			"loadMs": 1342.800048828125
+		},
+		{
+			"kb": 2,
+			"rate": 4,
+			"run": 2,
+			"variant": "current",
+			"loadMs": 1333.300048828125
+		},
+		{
+			"kb": 2,
+			"rate": 4,
+			"run": 2,
+			"variant": "candidate",
+			"loadMs": 1359.5
+		},
+		{
+			"kb": 128,
+			"rate": 1,
+			"run": 0,
+			"variant": "current",
+			"loadMs": 625.699951171875
+		},
+		{
+			"kb": 128,
+			"rate": 1,
+			"run": 0,
+			"variant": "candidate",
+			"loadMs": 622.300048828125
+		},
+		{
+			"kb": 128,
+			"rate": 1,
+			"run": 1,
+			"variant": "candidate",
+			"loadMs": 645.300048828125
+		},
+		{
+			"kb": 128,
+			"rate": 1,
+			"run": 1,
+			"variant": "current",
+			"loadMs": 630.199951171875
+		},
+		{
+			"kb": 128,
+			"rate": 1,
+			"run": 2,
+			"variant": "current",
+			"loadMs": 613.60009765625
+		},
+		{
+			"kb": 128,
+			"rate": 1,
+			"run": 2,
+			"variant": "candidate",
+			"loadMs": 630.89990234375
+		},
+		{
+			"kb": 128,
+			"rate": 4,
+			"run": 0,
+			"variant": "current",
+			"loadMs": 2286.800048828125
+		},
+		{
+			"kb": 128,
+			"rate": 4,
+			"run": 0,
+			"variant": "candidate",
+			"loadMs": 2295.800048828125
+		},
+		{
+			"kb": 128,
+			"rate": 4,
+			"run": 1,
+			"variant": "candidate",
+			"loadMs": 2246.89990234375
+		},
+		{
+			"kb": 128,
+			"rate": 4,
+			"run": 1,
+			"variant": "current",
+			"loadMs": 2221.39990234375
+		},
+		{
+			"kb": 128,
+			"rate": 4,
+			"run": 2,
+			"variant": "current",
+			"loadMs": 2216.10009765625
+		},
+		{
+			"kb": 128,
+			"rate": 4,
+			"run": 2,
+			"variant": "candidate",
+			"loadMs": 2228.60009765625
+		},
+		{
+			"kb": 1024,
+			"rate": 1,
+			"run": 0,
+			"variant": "current",
+			"loadMs": 3049.699951171875
+		},
+		{
+			"kb": 1024,
+			"rate": 1,
+			"run": 0,
+			"variant": "candidate",
+			"loadMs": 2927.300048828125
+		},
+		{
+			"kb": 1024,
+			"rate": 1,
+			"run": 1,
+			"variant": "candidate",
+			"loadMs": 2959.10009765625
+		},
+		{
+			"kb": 1024,
+			"rate": 1,
+			"run": 1,
+			"variant": "current",
+			"loadMs": 2932
+		},
+		{
+			"kb": 1024,
+			"rate": 1,
+			"run": 2,
+			"variant": "current",
+			"loadMs": 3009.300048828125
+		},
+		{
+			"kb": 1024,
+			"rate": 1,
+			"run": 2,
+			"variant": "candidate",
+			"loadMs": 3015.10009765625
+		},
+		{
+			"kb": 1024,
+			"rate": 4,
+			"run": 0,
+			"variant": "current",
+			"loadMs": 11785.60009765625
+		},
+		{
+			"kb": 1024,
+			"rate": 4,
+			"run": 0,
+			"variant": "candidate",
+			"loadMs": 11791.800048828123
+		},
+		{
+			"kb": 1024,
+			"rate": 4,
+			"run": 1,
+			"variant": "candidate",
+			"loadMs": 11722
+		},
+		{
+			"kb": 1024,
+			"rate": 4,
+			"run": 1,
+			"variant": "current",
+			"loadMs": 11943.300048828123
+		},
+		{
+			"kb": 1024,
+			"rate": 4,
+			"run": 2,
+			"variant": "current",
+			"loadMs": 11842.199951171877
+		},
+		{
+			"kb": 1024,
+			"rate": 4,
+			"run": 2,
+			"variant": "candidate",
+			"loadMs": 11913.5
+		}
+	],
+	"focusedDevelopmentLoads": [
+		{
+			"variant": "old",
+			"run": 0,
+			"kb": 2,
+			"rate": 1,
+			"loadMs": 575
+		},
+		{
+			"variant": "current",
+			"run": 0,
+			"kb": 2,
+			"rate": 1,
+			"loadMs": 527.699951171875
+		},
+		{
+			"variant": "candidate",
+			"run": 0,
+			"kb": 2,
+			"rate": 1,
+			"loadMs": 805.89990234375
+		},
+		{
+			"variant": "current",
+			"run": 1,
+			"kb": 2,
+			"rate": 1,
+			"loadMs": 529.89990234375
+		},
+		{
+			"variant": "candidate",
+			"run": 1,
+			"kb": 2,
+			"rate": 1,
+			"loadMs": 536.39990234375
+		},
+		{
+			"variant": "old",
+			"run": 1,
+			"kb": 2,
+			"rate": 1,
+			"loadMs": 533
+		},
+		{
+			"variant": "candidate",
+			"run": 2,
+			"kb": 2,
+			"rate": 1,
+			"loadMs": 536.800048828125
+		},
+		{
+			"variant": "old",
+			"run": 2,
+			"kb": 2,
+			"rate": 1,
+			"loadMs": 548
+		},
+		{
+			"variant": "current",
+			"run": 2,
+			"kb": 2,
+			"rate": 1,
+			"loadMs": 535.89990234375
+		}
+	],
+	"jazzApiReproducer": {
+		"runtime": "Bun 1x, 1 MiB ASCII text, median of three repetitions",
+		"rows": [
+			{
+				"kilobytes": 1024,
+				"subscribed": false,
+				"operation": "insertBefore",
+				"mutationMedianMs": 0.1854590000002645,
+				"readMedianMs": 19.7169159999994,
+				"notifications": 0
+			},
+			{
+				"kilobytes": 1024,
+				"subscribed": false,
+				"operation": "insertAfter",
+				"mutationMedianMs": 0.11766699999861885,
+				"readMedianMs": 20.057458999999653,
+				"notifications": 0
+			},
+			{
+				"kilobytes": 1024,
+				"subscribed": false,
+				"operation": "rawInsertBefore",
+				"mutationMedianMs": 0.11495800000011513,
+				"readMedianMs": 20.076458999999886,
+				"notifications": 0
+			},
+			{
+				"kilobytes": 1024,
+				"subscribed": false,
+				"operation": "applyDiff",
+				"mutationMedianMs": 69.02499999999964,
+				"readMedianMs": 22.706459000000905,
+				"notifications": 0
+			},
+			{
+				"kilobytes": 1024,
+				"subscribed": true,
+				"operation": "insertBefore",
+				"mutationMedianMs": 23.81041699999878,
+				"readMedianMs": 5.95166700000118,
+				"notifications": 3
+			},
+			{
+				"kilobytes": 1024,
+				"subscribed": true,
+				"operation": "insertAfter",
+				"mutationMedianMs": 23.25170900000012,
+				"readMedianMs": 5.984749999999622,
+				"notifications": 6
+			},
+			{
+				"kilobytes": 1024,
+				"subscribed": true,
+				"operation": "rawInsertBefore",
+				"mutationMedianMs": 22.584125000001222,
+				"readMedianMs": 5.825875000000451,
+				"notifications": 9
+			},
+			{
+				"kilobytes": 1024,
+				"subscribed": true,
+				"operation": "applyDiff",
+				"mutationMedianMs": 89.81424999999945,
+				"readMedianMs": 5.513665999998921,
+				"notifications": 12
+			}
+		]
+	}
+}
