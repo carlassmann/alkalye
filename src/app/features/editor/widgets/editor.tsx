@@ -202,6 +202,7 @@ function spellcheckForDocument(
 interface MarkdownEditorProps {
 	// Core
 	value: string
+	readValue?: () => string
 	onChange: (readContent: () => string, change: EditorChange) => void
 
 	// Cursor/focus callbacks
@@ -325,6 +326,7 @@ function MarkdownEditor(
 ) {
 	let {
 		value,
+		readValue,
 		onChange,
 		onCursorChange,
 		onFocus,
@@ -1002,12 +1004,14 @@ function MarkdownEditor(
 	useLayoutEffect(() => {
 		if (!view) return
 
+		// Deferred props can predate input handled since the render began.
+		let content = readValue?.() ?? value
 		let currentContent = view.state.doc.toString()
-		if (value !== currentContent && value !== lastExternalValue.current) {
-			applyContentPreservingSelection(view, value)
+		if (content !== currentContent && content !== lastExternalValue.current) {
+			applyContentPreservingSelection(view, content, true)
 		}
-		lastExternalValue.current = value
-	}, [value, view])
+		lastExternalValue.current = content
+	}, [readValue, value, view])
 
 	useEffect(() => {
 		if (view) {
