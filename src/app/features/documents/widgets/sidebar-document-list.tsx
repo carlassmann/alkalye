@@ -457,6 +457,7 @@ function DocumentListContent({
 											onDeleteDocs={deletedDocs => {
 												for (let d of deletedDocs) onDelete(d)
 											}}
+											onNewDocument={path => void onCreateFolder(path)}
 										/>
 									) : typeFilter === "deleted" ? (
 										<DeletedDocumentItem
