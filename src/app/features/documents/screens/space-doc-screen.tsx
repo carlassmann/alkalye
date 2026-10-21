@@ -545,7 +545,6 @@ function SpaceDocumentEditor({
 	) {
 		let applied = edits && persistDocumentEdits(liveDoc ?? doc, edits)
 		if (applied !== undefined) {
-			editorBaseContent.current = applied
 			editorSaveBase.current = captureDocumentSaveBase(liveDoc ?? doc)
 			syncBacklinks(applied)
 			if (me.$isLoaded) void syncThemeFromSource(me, docId, applied)
