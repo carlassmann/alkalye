@@ -1,4 +1,8 @@
 import assert from "node:assert/strict"
+import { execFile } from "node:child_process"
+import { readFile } from "node:fs/promises"
+import { setTimeout as delay } from "node:timers/promises"
+import { promisify } from "node:util"
 
 let [origin, accountPath] = process.argv.slice(2)
 if (!origin || !accountPath)
@@ -6,8 +10,9 @@ if (!origin || !accountPath)
 		"Usage: bun experiments/performance/deferred-save-race.ts <dev origin> <disposable account JSON>",
 	)
 let account: { credentials: unknown; docs: { kb: number; id: string }[] } =
-	await Bun.file(accountPath).json()
+	JSON.parse(await readFile(accountPath, "utf8"))
 let session = `deferred-save-race-${process.pid}`
+let run = promisify(execFile)
 
 try {
 	await browser("open", `${origin}/en/`)
@@ -48,7 +53,7 @@ try {
 		})
 	};true`)
 	await browser("wait", "--fn", "window.raceLog.length===1")
-	await Bun.sleep(1500)
+	await delay(1500)
 	assert.deepEqual(
 		await evaluate(`({log:window.raceLog,
 			editor:document.querySelector('.cm-content').cmTile.view.state.doc.toString(),
@@ -74,35 +79,17 @@ function evaluate(code: string) {
 }
 
 async function browser(...args: string[]): Promise<unknown> {
-	let child = Bun.spawn(
-		[
-			"agent-browser",
-			"--session",
-			session,
-			"--headed",
-			"false",
-			"--json",
-			...args,
-		],
+	let { stdout } = await run(
+		"agent-browser",
+		["--session", session, "--headed", "false", "--json", ...args],
 		{
 			env: { ...process.env, AGENT_BROWSER_DEFAULT_TIMEOUT: "30000" },
-			stdout: "pipe",
-			stderr: "pipe",
+			timeout: 45000,
+			maxBuffer: 2 * 1024 * 1024,
 		},
 	)
-	let timer = setTimeout(() => child.kill(), 45_000)
-	try {
-		let [output, error, exit] = await Promise.all([
-			new Response(child.stdout).text(),
-			new Response(child.stderr).text(),
-			child.exited,
-		])
-		if (exit !== 0) throw new Error(`agent-browser ${args[0]}: ${error}`)
-		let response: { success: boolean; data: { result?: unknown } } =
-			JSON.parse(output)
-		if (!response.success) throw new Error(`agent-browser ${args[0]} failed`)
-		return response.data.result ?? response.data
-	} finally {
-		clearTimeout(timer)
-	}
+	let response: { success: boolean; data: { result?: unknown } } =
+		JSON.parse(stdout)
+	if (!response.success) throw new Error(`agent-browser ${args[0]} failed`)
+	return response.data.result ?? response.data
 }
