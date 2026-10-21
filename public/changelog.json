@@ -1,5 +1,14 @@
 [
 	{
+		"id": 157,
+		"date": "2026-10-21",
+		"title": "Open workspaces in new tabs",
+		"notes": [
+			"Cmd-click (or Ctrl-click) any workspace in the workspace picker, including Personal, to open it in a new tab."
+		],
+		"pr": 0
+	},
+	{
 		"id": 156,
 		"date": "2026-10-21",
 		"title": "New documents inside folders",

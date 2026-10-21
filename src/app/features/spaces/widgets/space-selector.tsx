@@ -45,7 +45,6 @@ function SpaceSelector() {
 	let t = useIntl()
 	let me = useAccount(UserAccount, { resolve: spacesQuery })
 	let isAuthenticated = useIsAuthenticated()
-	let navigate = useNavigate()
 	let params = useParams({ strict: false })
 	let spaceId = params.spaceId ?? null
 	let [dialogOpen, setDialogOpen] = useState(false)
@@ -113,9 +112,7 @@ function SpaceSelector() {
 					</>
 				}
 			>
-				<DropdownMenuItem
-					onClick={() => navigate({ to: "/", search: { personal: true } })}
-				>
+				<DropdownMenuItem render={<Link to="/" search={{ personal: true }} />}>
 					<User className="size-4" />
 					<span>
 						<T k="spaces.selector.personal" />
