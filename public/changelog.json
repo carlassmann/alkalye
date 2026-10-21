@@ -1,5 +1,14 @@
 [
 	{
+		"id": 156,
+		"date": "2026-10-21",
+		"title": "New documents inside folders",
+		"notes": [
+			"Right-click a folder in the sidebar and choose New Document to start writing directly inside it."
+		],
+		"pr": 58
+	},
+	{
 		"id": 155,
 		"date": "2026-10-01",
 		"title": "MCP clients use your Alkalye permissions",
