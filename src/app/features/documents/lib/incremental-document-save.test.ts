@@ -227,6 +227,65 @@ describe("incremental document saves", () => {
 		doc.content.insertBefore(0, "New ")
 		expect(readDocumentText(doc.content)).toBe("New Start")
 	})
+
+	test.each(["A😀B", "Ae\u0301B", "A\r\nB"])(
+		"reuses the saved editor tree without flattening it again for %j",
+		async content => {
+			let doc = await createPersonalDocument(account, content)
+			let first = edit(captureDocumentSaveBase(doc), { from: 0, insert: "x" })
+			expect(persistDocumentEdits(doc, first)).toBe(`x${content}`)
+			let state = EditorState.create({ doc: first.after })
+			let next = state.update({ changes: { from: 0, insert: "y" } })
+			let read = vi.spyOn(state.doc, "toString")
+			let pending = composeDocumentEdits(
+				captureDocumentSaveBase(doc),
+				undefined,
+				{
+					changes: next.changes,
+					before: state.doc,
+					after: next.state.doc,
+				},
+			)
+			expect(read).not.toHaveBeenCalled()
+			read.mockRestore()
+			if (!pending) throw new Error("Saved editor base was rejected")
+			expect(persistDocumentEdits(doc, pending)).toBe(`yx${content}`)
+			expect(doc.content.toString()).toBe(`yx${content}`)
+		},
+	)
+
+	test("revalidates the saved editor tree after a remote write", async () => {
+		let doc = await createPersonalDocument(account, "Start")
+		let first = edit(captureDocumentSaveBase(doc), { from: 0, insert: "x" })
+		persistDocumentEdits(doc, first)
+		doc.content.insertBefore(0, "Remote ")
+		let state = EditorState.create({ doc: first.after })
+		let next = state.update({ changes: { from: 0, insert: "y" } })
+		expect(
+			composeDocumentEdits(captureDocumentSaveBase(doc), undefined, {
+				changes: next.changes,
+				before: state.doc,
+				after: next.state.doc,
+			}),
+		).toBeUndefined()
+		expect(doc.content.toString()).toBe("Remote xStart")
+	})
+
+	test("rejects a different editor tree with equal length after warming the cache", async () => {
+		let doc = await createPersonalDocument(account, "Start")
+		let first = edit(captureDocumentSaveBase(doc), { from: 0, insert: "x" })
+		persistDocumentEdits(doc, first)
+		let state = EditorState.create({ doc: "Other!" })
+		let next = state.update({ changes: { from: 0, insert: "y" } })
+		expect(
+			composeDocumentEdits(captureDocumentSaveBase(doc), undefined, {
+				changes: next.changes,
+				before: state.doc,
+				after: next.state.doc,
+			}),
+		).toBeUndefined()
+		expect(doc.content.toString()).toBe("xStart")
+	})
 })
 
 function edit(

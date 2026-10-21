@@ -53,6 +53,7 @@ import { useEditorSettings } from "@/app/features/editor"
 import { getDocumentTitle, addCopyToTitle } from "../lib/title"
 import { EditorToolbar } from "@/app/features/editor"
 import { DocumentSidebar } from "../widgets/document-sidebar"
+import { DeferredDocumentEditor } from "../widgets/deferred-document-editor"
 import { ListSidebar } from "../widgets/list-sidebar"
 import { SidebarDocumentList } from "../widgets/sidebar-document-list"
 import { SpaceSelector } from "@/app/features/spaces"
@@ -262,21 +263,37 @@ function SpaceDocScreen({ spaceId, id, loaderData }: SpaceDocScreenProps) {
 	)
 }
 
-function SpaceEditorContent({
-	space,
-	doc,
-	liveDoc,
-	spaceId,
-	docId,
-	loaderMe,
-}: {
+type SpaceEditorContentProps = {
 	space: LoadedSpace
 	doc: LoaderDocument
 	liveDoc: LoadedDocument | null
 	spaceId: string
 	docId: string
 	loaderMe: LoadedSettingsMe | null
-}) {
+}
+
+type LoadedEditorMe = ReturnType<
+	typeof useAccount<typeof UserAccount, typeof spaceMeResolve>
+>
+
+function SpaceEditorContent(props: SpaceEditorContentProps) {
+	let me = useAccount(UserAccount, { resolve: spaceMeResolve })
+	return (
+		<DeferredDocumentEditor key={me.$jazz.id}>
+			<SpaceDocumentEditor {...props} me={me} />
+		</DeferredDocumentEditor>
+	)
+}
+
+function SpaceDocumentEditor({
+	space,
+	doc,
+	liveDoc,
+	spaceId,
+	docId,
+	loaderMe,
+	me,
+}: SpaceEditorContentProps & { me: LoadedEditorMe }) {
 	let accountDataStartedAt = useRef(performance.now())
 	let t = useIntl()
 	let navigate = useNavigate()
@@ -328,7 +345,6 @@ function SpaceEditorContent({
 		useSidebar()
 
 	let isAuthenticated = useIsAuthenticated()
-	let me = useAccount(UserAccount, { resolve: spaceMeResolve })
 	useEffect(() => {
 		if (!me.$isLoaded) return
 		recordStartupTraceOnce("space-account-data-loaded", {
@@ -529,6 +545,8 @@ function SpaceEditorContent({
 	) {
 		let applied = edits && persistDocumentEdits(liveDoc ?? doc, edits)
 		if (applied !== undefined) {
+			editorBaseContent.current = applied
+			editorSaveBase.current = captureDocumentSaveBase(liveDoc ?? doc)
 			syncBacklinks(applied)
 			if (me.$isLoaded) void syncThemeFromSource(me, docId, applied)
 			if (cursor) updateCursor(cursor.from, cursor.to)

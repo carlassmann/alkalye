@@ -33,6 +33,7 @@ type OffsetRun = { index: number; offset: number }
 type EntryOffsets = { editor: OffsetRun[]; text: OffsetRun[]; length: number }
 
 let offsetsByEntries = new WeakMap<TextEntries, EntryOffsets>()
+let editorTextByEntries = new WeakMap<TextEntries, Text>()
 
 function captureDocumentSaveBase(
 	doc: BackgroundSaveDocument,
@@ -58,7 +59,10 @@ function composeDocumentEdits(
 			after: change.after,
 		}
 	}
-	if (base.text.replace(/\r\n?/g, "\n") !== change.before.toString()) return
+	if (editorTextByEntries.get(base.entries) !== change.before) {
+		if (base.text.replace(/\r\n?/g, "\n") !== change.before.toString()) return
+		editorTextByEntries.set(base.entries, change.before)
+	}
 	return { base, changes: change.changes, after: change.after }
 }
 
@@ -125,6 +129,8 @@ function persistDocumentEdits(
 		applyContentPatchesInBoundedTransactions(doc.content, patches)
 	}
 	cacheDocumentText(doc.content, content)
+	if (current === base.entries)
+		editorTextByEntries.set(doc.content.$jazz.raw.entries(), edits.after)
 	doc.$jazz.set("updatedAt", new Date())
 	syncDocumentMetadata(doc)
 	return content

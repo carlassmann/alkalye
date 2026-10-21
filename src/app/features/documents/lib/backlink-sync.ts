@@ -85,57 +85,39 @@ function useBacklinkSync(
 ) {
 	let { spaceId, initialContent = "" } = options
 
-	let me = useAccount(UserAccount, {
+	let personalDocumentIds = useAccount(UserAccount, {
 		resolve: backlinkMeResolve,
-	})
-
-	let space = useCoState(Space, spaceId, {
-		resolve: backlinkSpaceResolve,
-	})
-
-	let meRef = useRef(me)
-	let spaceRef = useRef(space)
-	let spaceIdRef = useRef(spaceId)
-
-	function getDocumentIds(): Set<string> {
-		let currentSpace = spaceRef.current
-		let currentMe = meRef.current
-
-		if (spaceIdRef.current) {
-			if (!currentSpace?.$isLoaded || !currentSpace.documents?.$isLoaded) {
-				return new Set()
-			}
-			return new Set(
-				currentSpace.documents.flatMap(d => {
-					if (!d?.$isLoaded || d.deletedAt) return []
-					return [d.$jazz.id]
-				}),
+		select(me) {
+			if (!me.$isLoaded || !me.root.documents.$isLoaded) return
+			return me.root.documents.flatMap(doc =>
+				doc?.$isLoaded && !doc.deletedAt && !doc.spaceId ? [doc.$jazz.id] : [],
 			)
-		}
+		},
+		equalityFn: sameDocumentIds,
+	})
 
-		if (!currentMe.$isLoaded || !currentMe.root?.documents?.$isLoaded) {
-			return new Set()
-		}
-		return new Set(
-			currentMe.root.documents.flatMap(d => {
-				if (!d?.$isLoaded || d.deletedAt || d.spaceId) return []
-				return [d.$jazz.id]
-			}),
-		)
-	}
+	let spaceDocumentIds = useCoState(Space, spaceId, {
+		resolve: backlinkSpaceResolve,
+		select(space) {
+			if (!space.$isLoaded || !space.documents.$isLoaded) return
+			return space.documents.flatMap(doc =>
+				doc?.$isLoaded && !doc.deletedAt ? [doc.$jazz.id] : [],
+			)
+		},
+		equalityFn: sameDocumentIds,
+	})
+
+	let documentIds = spaceId ? spaceDocumentIds : personalDocumentIds
+	let documentIdsRef = useRef(documentIds)
 
 	let timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 	let [coordinator] = useState(() => createBacklinkSyncCoordinator())
 	let sessionRef = useRef<BacklinkSyncSession | null>(null)
 
-	let docsReady = spaceId
-		? space?.$isLoaded && space.documents?.$isLoaded
-		: me.$isLoaded && me.root?.documents?.$isLoaded
+	let docsReady = documentIds !== undefined
 
 	useLayoutEffect(() => {
-		meRef.current = me
-		spaceRef.current = space
-		spaceIdRef.current = spaceId
+		documentIdsRef.current = documentIds
 		let previousSession = sessionRef.current
 		let session = coordinator.openSession(docId, initialContent)
 		sessionRef.current = session
@@ -148,9 +130,8 @@ function useBacklinkSync(
 		docId,
 		docsReady,
 		initialContent,
-		me,
+		documentIds,
 		readOnly,
-		space,
 		spaceId,
 	])
 
@@ -169,7 +150,7 @@ function useBacklinkSync(
 			attempt.lastSyncedLinkIds,
 			attempt.content,
 		)
-		let docIds = getDocumentIds()
+		let docIds = new Set(documentIdsRef.current)
 		let changes: BacklinkChange[] = []
 		for (let linkedId of addedIds) changes.push({ linkedId, operation: "add" })
 		for (let linkedId of removedIds) {
@@ -346,4 +327,17 @@ async function loadLinkTarget(id: string): Promise<LoadedDoc | null> {
 function canEditDoc(doc: LoadedDoc): boolean {
 	let role = doc.$jazz.owner.myRole?.()
 	return role === "admin" || role === "writer"
+}
+
+function sameDocumentIds(
+	previous: string[] | undefined,
+	next: string[] | undefined,
+) {
+	return (
+		previous === next ||
+		(previous !== undefined &&
+			next !== undefined &&
+			previous.length === next.length &&
+			previous.every((id, index) => id === next[index]))
+	)
 }

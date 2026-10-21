@@ -53,6 +53,7 @@ import { useEditorSettings } from "@/app/features/editor"
 import { getDocumentTitle, addCopyToTitle } from "../lib/title"
 import { EditorToolbar } from "@/app/features/editor"
 import { DocumentSidebar } from "../widgets/document-sidebar"
+import { DeferredDocumentEditor } from "../widgets/deferred-document-editor"
 import { ListSidebar } from "../widgets/list-sidebar"
 import { SidebarDocumentList } from "../widgets/sidebar-document-list"
 import { SpaceSelector } from "@/app/features/spaces"
@@ -289,7 +290,9 @@ function PersonalDocumentScreen(props: EditorContentProps) {
 	return (
 		<>
 			<PersonalDocumentSidebar me={me} docId={props.docId} />
-			<EditorContent key={props.docId} {...props} me={me} />
+			<DeferredDocumentEditor key={`${me.$jazz.id}/${props.docId}`}>
+				<EditorContent {...props} me={me} />
+			</DeferredDocumentEditor>
 		</>
 	)
 }
@@ -534,6 +537,8 @@ function EditorContent({
 	) {
 		let applied = edits && persistDocumentEdits(liveDoc ?? doc, edits)
 		if (applied !== undefined) {
+			editorBaseContent.current = applied
+			editorSaveBase.current = captureDocumentSaveBase(liveDoc ?? doc)
 			syncBacklinks(applied)
 			if (me.$isLoaded) void syncThemeFromSource(me, docId, applied)
 			if (cursor) updateCursor(cursor.from, cursor.to)

@@ -24,7 +24,7 @@ export default defineConfig({
 	},
 	test: {
 		exclude: ["node_modules", ".reference", "e2e"],
-		include: ["src/**/*.test.ts"],
+		include: ["src/**/*.test.{ts,tsx}"],
 		environment: "jsdom",
 		setupFiles: ["./src/test-setup.ts"],
 		sequence: {
