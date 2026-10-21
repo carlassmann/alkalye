@@ -1,3 +1,4 @@
+import type { EditorChange } from "@/app/features/documents"
 import { IconTransition } from "@/app/components/ui/icon-transition"
 import {
 	useImperativeHandle,
@@ -201,7 +202,7 @@ function spellcheckForDocument(
 interface MarkdownEditorProps {
 	// Core
 	value: string
-	onChange: (readContent: () => string) => void
+	onChange: (readContent: () => string, change: EditorChange) => void
 
 	// Cursor/focus callbacks
 	onCursorChange?: (from: number, to: number, selectionCount: number) => void
@@ -703,7 +704,11 @@ function MarkdownEditor(
 							transaction.annotation(externalContentChange),
 						)
 					) {
-						callbacksRef.current.onChange(() => update.state.doc.toString())
+						callbacksRef.current.onChange(() => update.state.doc.toString(), {
+							changes: update.changes,
+							before: update.startState.doc,
+							after: update.state.doc,
+						})
 					}
 					// Keep in-flight drop targets aligned with the live doc so
 					// images dropped while uploads await still land at the
