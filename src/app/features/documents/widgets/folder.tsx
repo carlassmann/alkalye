@@ -3,7 +3,14 @@ import { create } from "zustand"
 import { persist } from "zustand/middleware"
 import { Combobox } from "@base-ui/react/combobox"
 import { co } from "jazz-tools"
-import { Folder, Pencil, FolderInput, Trash2, Plus } from "lucide-react"
+import {
+	Folder,
+	Pencil,
+	FolderInput,
+	Trash2,
+	Plus,
+	FilePlus,
+} from "lucide-react"
 import {
 	ContextMenu,
 	ContextMenuContent,
@@ -119,6 +126,7 @@ interface FolderRowProps {
 	docsInFolder: LoadedDocument[]
 	existingFolders: string[]
 	onDeleteDocs?: (docs: LoadedDocument[]) => void
+	onNewDocument?: (path: string) => void
 }
 
 function FolderRow({
@@ -130,6 +138,7 @@ function FolderRow({
 	docsInFolder,
 	existingFolders,
 	onDeleteDocs,
+	onNewDocument,
 }: FolderRowProps) {
 	let t = useIntl()
 	let { renameFolder, removeFolder } = useFolderStore()
@@ -153,6 +162,12 @@ function FolderRow({
 					}
 				/>
 				<ContextMenuContent>
+					{onNewDocument && (
+						<ContextMenuItem onClick={() => onNewDocument(path)}>
+							<FilePlus />
+							{t("doc.newDocument")}
+						</ContextMenuItem>
+					)}
 					<ContextMenuItem onClick={() => setRenameOpen(true)}>
 						<Pencil />
 						{t("doc.rename")}
