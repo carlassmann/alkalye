@@ -1,3 +1,11 @@
+import { readDocumentText } from "../lib/document-text"
+import {
+	captureDocumentSaveBase,
+	composeDocumentEdits,
+	persistDocumentEdits,
+	type DocumentEdits,
+	type EditorChange,
+} from "../lib/incremental-document-save"
 import { IconTransition } from "@/app/components/ui/icon-transition"
 import { useEffect, useRef, useState } from "react"
 import {
@@ -306,11 +314,13 @@ function EditorContent({
 	let pendingSave = useRef<{
 		timeoutId: ReturnType<typeof setTimeout>
 		baseContent: string
+		edits: DocumentEdits | undefined
 		readContent: () => string
 		cursor: { from: number; to?: number } | null
 	} | null>(null)
 	let [optimisticContent, setOptimisticContent] = useState<string | null>(null)
-	let editorBaseContent = useRef(doc.content.toString())
+	let editorBaseContent = useRef(readDocumentText(doc.content))
+	let editorSaveBase = useRef(captureDocumentSaveBase(doc))
 
 	useEffect(() => {
 		setAutomationReadyState(true, "personal-doc")
@@ -382,9 +392,10 @@ function EditorContent({
 		})
 	}
 
-	let content = doc.content.toString()
+	let content = readDocumentText(doc.content)
 	if (!pendingSave.current && optimisticContent === null) {
 		editorBaseContent.current = content
+		editorSaveBase.current = captureDocumentSaveBase(doc)
 	}
 	let editorContent = getEditorContent(content)
 	let { syncBacklinks } = useBacklinkSync(docId, readOnly, {
@@ -415,9 +426,10 @@ function EditorContent({
 		let pendingContent = pendingSave.current.readContent()
 		let baseContent = pendingSave.current.baseContent
 		let cursor = pendingSave.current.cursor
+		let edits = pendingSave.current.edits
 		pendingSave.current = null
 		editorBaseContent.current = pendingContent
-		persistContent(pendingContent, cursor, baseContent)
+		persistContent(pendingContent, cursor, baseContent, edits)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [content])
 
@@ -518,7 +530,18 @@ function EditorContent({
 		pendingContent: string,
 		cursor: { from: number; to?: number } | null,
 		baseContent: string,
+		edits?: DocumentEdits,
 	) {
+		let applied = edits && persistDocumentEdits(liveDoc ?? doc, edits)
+		if (applied !== undefined) {
+			syncBacklinks(applied)
+			if (me.$isLoaded) void syncThemeFromSource(me, docId, applied)
+			if (cursor) updateCursor(cursor.from, cursor.to)
+			void waitForDocumentStorageSync(liveDoc ?? doc).then(() =>
+				signalDocumentSaved(docId, applied),
+			)
+			return
+		}
 		let save = backgroundSave.current
 		if (!save) {
 			persistContentOnMain(pendingContent, cursor, baseContent)
@@ -576,27 +599,37 @@ function EditorContent({
 		return appliedContent
 	}
 
-	function queueSave(readContent: () => string) {
+	function queueSave(readContent: () => string, change?: EditorChange) {
 		let queuedSave = pendingSave.current
 		if (queuedSave) clearTimeout(queuedSave.timeoutId)
 		let baseContent = queuedSave?.baseContent ?? editorBaseContent.current
+		let edits =
+			change && (!queuedSave || queuedSave.edits)
+				? composeDocumentEdits(
+						editorSaveBase.current,
+						queuedSave?.edits,
+						change,
+					)
+				: undefined
 		pendingSave.current = {
 			baseContent,
+			edits,
 			readContent,
 			cursor: queuedSave?.cursor ?? null,
 			timeoutId: setTimeout(() => {
 				let pendingContent = pendingSave.current?.readContent()
 				let cursor = pendingSave.current?.cursor
+				let edits = pendingSave.current?.edits
 				pendingSave.current = null
 				if (pendingContent === undefined) return
 				editorBaseContent.current = pendingContent
-				persistContent(pendingContent, cursor ?? null, baseContent)
+				persistContent(pendingContent, cursor ?? null, baseContent, edits)
 			}, DOCUMENT_SAVE_DEBOUNCE_MS),
 		}
 	}
 
-	function handleEditorChange(readContent: () => string) {
-		queueSave(readContent)
+	function handleEditorChange(readContent: () => string, change: EditorChange) {
+		queueSave(readContent, change)
 	}
 
 	function handleContentChange(newContent: string) {
@@ -616,12 +649,19 @@ function EditorContent({
 		let currentContent = editor.current?.getContent()
 		if (currentContent === undefined) return
 
+		let edits = pendingSave.current?.edits
 		if (pendingSave.current) {
 			clearTimeout(pendingSave.current.timeoutId)
 			pendingSave.current = null
 		}
+		let applied = edits && persistDocumentEdits(liveDoc ?? doc, edits)
+		if (applied !== undefined) {
+			syncBacklinks(applied)
+			if (me.$isLoaded) void syncThemeFromSource(me, docId, applied)
+			return
+		}
 
-		if (currentContent !== doc.content.toString()) {
+		if (currentContent !== readDocumentText(doc.content)) {
 			persistContentOnMain(currentContent, null, editorBaseContent.current)
 		}
 	}
