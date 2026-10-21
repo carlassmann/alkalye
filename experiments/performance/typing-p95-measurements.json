@@ -13,7 +13,7 @@
 		"old": "a749728a",
 		"current": "76509635",
 		"reference": "becd0f40",
-		"measuredEditorSaveSource": "8edb3b2f",
+		"measuredEditorSaveSource": "43ef4ca051c971cafaf1f80ca4635fe32bd6f99a",
 		"rebasedMain": "73794f58"
 	},
 	"variants": {
@@ -25,6 +25,7 @@
 	"units": "ms",
 	"runCsv": "typing-p95-runs.csv",
 	"runAggregation": "Median of three per-run statistics, interleaved rotating variant order. Burst has 80 queue-delay samples; isolated has 31 beforeinput-to-input samples. Peer includes autosave and two peer animation frames.",
+	"integrity": "Every final run verifies exact full text in writer and peer, including cumulative insertions after each isolated sample.",
 	"fixture": "Exact ASCII KiB sizes, frontmatter title, heading, repeated rich Markdown paragraphs, real LF newlines. Restored per cell in the final matrix. Baseline phase used a growing shared fixture.",
 	"fixtureParagraph": "A responsiveness fixture with **bold words**, ==highlight== and [a reference](https://example.com).\n\n",
 	"productionLoads": [
@@ -33,317 +34,252 @@
 			"rate": 1,
 			"run": 0,
 			"variant": "current",
-			"loadMs": 382
+			"loadMs": 457.89990234375
 		},
 		{
 			"kb": 2,
 			"rate": 1,
 			"run": 0,
 			"variant": "candidate",
-			"loadMs": 383.10009765625
+			"loadMs": 450.800048828125
 		},
 		{
 			"kb": 2,
 			"rate": 1,
 			"run": 1,
 			"variant": "candidate",
-			"loadMs": 378.800048828125
+			"loadMs": 456.699951171875
 		},
 		{
 			"kb": 2,
 			"rate": 1,
 			"run": 1,
 			"variant": "current",
-			"loadMs": 383.60009765625
+			"loadMs": 445.300048828125
 		},
 		{
 			"kb": 2,
 			"rate": 1,
 			"run": 2,
 			"variant": "current",
-			"loadMs": 378.800048828125
+			"loadMs": 451
 		},
 		{
 			"kb": 2,
 			"rate": 1,
 			"run": 2,
 			"variant": "candidate",
-			"loadMs": 403.5
+			"loadMs": 452.89990234375
 		},
 		{
 			"kb": 2,
 			"rate": 4,
 			"run": 0,
 			"variant": "current",
-			"loadMs": 1399.800048828125
+			"loadMs": 1574.39990234375
 		},
 		{
 			"kb": 2,
 			"rate": 4,
 			"run": 0,
 			"variant": "candidate",
-			"loadMs": 1352.10009765625
+			"loadMs": 1573.800048828125
 		},
 		{
 			"kb": 2,
 			"rate": 4,
 			"run": 1,
 			"variant": "candidate",
-			"loadMs": 1328
+			"loadMs": 1581.300048828125
 		},
 		{
 			"kb": 2,
 			"rate": 4,
 			"run": 1,
 			"variant": "current",
-			"loadMs": 1342.800048828125
+			"loadMs": 1624.89990234375
 		},
 		{
 			"kb": 2,
 			"rate": 4,
 			"run": 2,
 			"variant": "current",
-			"loadMs": 1333.300048828125
+			"loadMs": 1597.10009765625
 		},
 		{
 			"kb": 2,
 			"rate": 4,
 			"run": 2,
 			"variant": "candidate",
-			"loadMs": 1359.5
+			"loadMs": 1579.300048828125
 		},
 		{
 			"kb": 128,
 			"rate": 1,
 			"run": 0,
 			"variant": "current",
-			"loadMs": 625.699951171875
+			"loadMs": 686.10009765625
 		},
 		{
 			"kb": 128,
 			"rate": 1,
 			"run": 0,
 			"variant": "candidate",
-			"loadMs": 622.300048828125
+			"loadMs": 684.199951171875
 		},
 		{
 			"kb": 128,
 			"rate": 1,
 			"run": 1,
 			"variant": "candidate",
-			"loadMs": 645.300048828125
+			"loadMs": 681
 		},
 		{
 			"kb": 128,
 			"rate": 1,
 			"run": 1,
 			"variant": "current",
-			"loadMs": 630.199951171875
+			"loadMs": 692.300048828125
 		},
 		{
 			"kb": 128,
 			"rate": 1,
 			"run": 2,
 			"variant": "current",
-			"loadMs": 613.60009765625
+			"loadMs": 675.699951171875
 		},
 		{
 			"kb": 128,
 			"rate": 1,
 			"run": 2,
 			"variant": "candidate",
-			"loadMs": 630.89990234375
-		},
-		{
-			"kb": 128,
-			"rate": 4,
-			"run": 0,
-			"variant": "current",
-			"loadMs": 2286.800048828125
+			"loadMs": 687.89990234375
 		},
 		{
 			"kb": 128,
 			"rate": 4,
 			"run": 0,
+			"variant": "current",
+			"loadMs": 2479.199951171875
+		},
+		{
+			"kb": 128,
+			"rate": 4,
+			"run": 0,
 			"variant": "candidate",
-			"loadMs": 2295.800048828125
+			"loadMs": 2504.699951171875
 		},
 		{
 			"kb": 128,
 			"rate": 4,
 			"run": 1,
 			"variant": "candidate",
-			"loadMs": 2246.89990234375
+			"loadMs": 2512.300048828125
 		},
 		{
 			"kb": 128,
 			"rate": 4,
 			"run": 1,
 			"variant": "current",
-			"loadMs": 2221.39990234375
+			"loadMs": 2502.800048828125
 		},
 		{
 			"kb": 128,
 			"rate": 4,
 			"run": 2,
 			"variant": "current",
-			"loadMs": 2216.10009765625
+			"loadMs": 2459.89990234375
 		},
 		{
 			"kb": 128,
 			"rate": 4,
 			"run": 2,
 			"variant": "candidate",
-			"loadMs": 2228.60009765625
+			"loadMs": 2506.5
 		},
 		{
 			"kb": 1024,
 			"rate": 1,
 			"run": 0,
 			"variant": "current",
-			"loadMs": 3049.699951171875
+			"loadMs": 3100.39990234375
 		},
 		{
 			"kb": 1024,
 			"rate": 1,
 			"run": 0,
 			"variant": "candidate",
-			"loadMs": 2927.300048828125
+			"loadMs": 3096
 		},
 		{
 			"kb": 1024,
 			"rate": 1,
 			"run": 1,
 			"variant": "candidate",
-			"loadMs": 2959.10009765625
+			"loadMs": 3032.10009765625
 		},
 		{
 			"kb": 1024,
 			"rate": 1,
 			"run": 1,
 			"variant": "current",
-			"loadMs": 2932
+			"loadMs": 3071.89990234375
 		},
 		{
 			"kb": 1024,
 			"rate": 1,
 			"run": 2,
 			"variant": "current",
-			"loadMs": 3009.300048828125
+			"loadMs": 3092.39990234375
 		},
 		{
 			"kb": 1024,
 			"rate": 1,
 			"run": 2,
 			"variant": "candidate",
-			"loadMs": 3015.10009765625
+			"loadMs": 3132.39990234375
 		},
 		{
 			"kb": 1024,
 			"rate": 4,
 			"run": 0,
 			"variant": "current",
-			"loadMs": 11785.60009765625
+			"loadMs": 11830.800048828123
 		},
 		{
 			"kb": 1024,
 			"rate": 4,
 			"run": 0,
 			"variant": "candidate",
-			"loadMs": 11791.800048828123
+			"loadMs": 11680.5
 		},
 		{
 			"kb": 1024,
 			"rate": 4,
 			"run": 1,
 			"variant": "candidate",
-			"loadMs": 11722
+			"loadMs": 11730.10009765625
 		},
 		{
 			"kb": 1024,
 			"rate": 4,
 			"run": 1,
 			"variant": "current",
-			"loadMs": 11943.300048828123
+			"loadMs": 11930.199951171877
 		},
 		{
 			"kb": 1024,
 			"rate": 4,
 			"run": 2,
 			"variant": "current",
-			"loadMs": 11842.199951171877
+			"loadMs": 12332.199951171877
 		},
 		{
 			"kb": 1024,
 			"rate": 4,
 			"run": 2,
 			"variant": "candidate",
-			"loadMs": 11913.5
-		}
-	],
-	"focusedDevelopmentLoads": [
-		{
-			"variant": "old",
-			"run": 0,
-			"kb": 2,
-			"rate": 1,
-			"loadMs": 575
-		},
-		{
-			"variant": "current",
-			"run": 0,
-			"kb": 2,
-			"rate": 1,
-			"loadMs": 527.699951171875
-		},
-		{
-			"variant": "candidate",
-			"run": 0,
-			"kb": 2,
-			"rate": 1,
-			"loadMs": 805.89990234375
-		},
-		{
-			"variant": "current",
-			"run": 1,
-			"kb": 2,
-			"rate": 1,
-			"loadMs": 529.89990234375
-		},
-		{
-			"variant": "candidate",
-			"run": 1,
-			"kb": 2,
-			"rate": 1,
-			"loadMs": 536.39990234375
-		},
-		{
-			"variant": "old",
-			"run": 1,
-			"kb": 2,
-			"rate": 1,
-			"loadMs": 533
-		},
-		{
-			"variant": "candidate",
-			"run": 2,
-			"kb": 2,
-			"rate": 1,
-			"loadMs": 536.800048828125
-		},
-		{
-			"variant": "old",
-			"run": 2,
-			"kb": 2,
-			"rate": 1,
-			"loadMs": 548
-		},
-		{
-			"variant": "current",
-			"run": 2,
-			"kb": 2,
-			"rate": 1,
-			"loadMs": 535.89990234375
+			"loadMs": 12113.60009765625
 		}
 	],
 	"jazzApiReproducer": {

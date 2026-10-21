@@ -6,2268 +6,2903 @@
 	"leafSelfTimeFile": "typing-p95-trace-self.csv",
 	"variants": {
 		"current": {
-			"inputP95Ms": 478.59999990463257,
-			"delayedKeydowns": 18,
-			"overlappingLongTasks": 18,
-			"longTaskMs": 5777.538,
+			"inputP95Ms": 349.39999985694885,
+			"delayedKeydowns": 20,
+			"overlappingLongTasks": 19,
+			"longTaskMs": 4835.116,
 			"selfMs": {
-				"Jazz text serialization": 2013.034,
-				"React JSX creation": 1047.871,
-				"Jazz entry projection": 759.97,
-				"Other": 546.489,
-				"Garbage collection": 326.791,
-				"React development prop inspection": 318.791,
-				"Other Jazz work": 305.152,
-				"Other React work": 236.492,
-				"Editor statistics scans": 144.709,
-				"UTF-16 entry mapping": 56.972,
-				"Wasm": 21.267
+				"Jazz text serialization": 1212.836,
+				"React JSX creation": 1071.758,
+				"Other": 738.93,
+				"Jazz entry projection": 588.098,
+				"Other Jazz work": 326.432,
+				"React development prop inspection": 251.79,
+				"Garbage collection": 248.507,
+				"Other React work": 243.271,
+				"Editor statistics scans": 77.635,
+				"UTF-16 entry mapping": 52.894,
+				"Wasm": 22.965
 			},
 			"tasks": [
 				{
 					"index": 0,
-					"startMs": 47534.1,
-					"durationMs": 570.7,
+					"startMs": 44972.9,
+					"durationMs": 463.2,
 					"keys": [
 						{
 							"key": "a",
-							"delayMs": 529.9
+							"delayMs": 419.4
 						}
 					],
 					"selfMs": {
-						"Jazz text serialization": 259.226,
-						"Jazz entry projection": 113.24,
-						"React JSX creation": 69.823,
-						"Other": 39.418,
-						"React development prop inspection": 26.778,
-						"Editor statistics scans": 16.207,
-						"Other React work": 15.082,
-						"Garbage collection": 14.688,
-						"Other Jazz work": 8.57,
-						"UTF-16 entry mapping": 4.532,
-						"Wasm": 3.095
+						"Jazz text serialization": 173.239,
+						"Jazz entry projection": 91.285,
+						"Other": 65.544,
+						"React JSX creation": 55.064,
+						"React development prop inspection": 27.093,
+						"Garbage collection": 17.278,
+						"Other React work": 11.552,
+						"Editor statistics scans": 8.663,
+						"Other Jazz work": 6.349,
+						"UTF-16 entry mapping": 5.494,
+						"Wasm": 1.607
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							284.861
+							178.688
 						],
 						[
 							"toString /node_modules/.vite/deps/chunk-LXSRVLV6.js:4753",
-							78.056
+							79.574
 						],
 						[
 							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							25.578
+							25.195
 						]
 					]
 				},
 				{
 					"index": 1,
-					"startMs": 48139.2,
-					"durationMs": 111.7,
+					"startMs": 45464.5,
+					"durationMs": 106.7,
 					"keys": [
 						{
 							"key": "b",
-							"delayMs": 91.6
+							"delayMs": 80.9
 						}
 					],
 					"selfMs": {
-						"React JSX creation": 66.182,
-						"Other": 22.722,
-						"Other React work": 14.391,
-						"React development prop inspection": 5.586,
-						"Other Jazz work": 2.818,
-						"Wasm": 0.046
+						"React JSX creation": 50.514,
+						"Other": 32.766,
+						"Other React work": 16.628,
+						"React development prop inspection": 5.084,
+						"Other Jazz work": 1.643,
+						"Wasm": 0.018
 					},
 					"nearestAppCallersMs": [
 						[
 							"(anonymous) /src/app/features/editor/widgets/command-palette.tsx:321",
-							16.604
+							13.825
 						],
 						[
-							"exports.createElement /node_modules/.vite/deps/chunk-LWTPICGT.js:761",
-							5.978
+							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
+							5.004
 						],
 						[
-							"exports.jsx /node_modules/.vite/deps/chunk-47YGVLJD.js:239",
-							5.009
+							"(anonymous) /src/app/features/editor/widgets/command-palette.tsx:410",
+							4.339
 						]
 					]
 				},
 				{
 					"index": 2,
-					"startMs": 48751.6,
-					"durationMs": 627.6,
+					"startMs": 45586.2,
+					"durationMs": 107.3,
 					"keys": [
 						{
-							"key": "a",
-							"delayMs": 591.4
+							"key": "c",
+							"delayMs": 80.4
 						}
 					],
 					"selfMs": {
-						"Jazz text serialization": 217.808,
-						"Jazz entry projection": 136.312,
-						"Garbage collection": 98.135,
-						"React JSX creation": 56.164,
-						"Other": 43.378,
-						"React development prop inspection": 28.144,
-						"Other React work": 19.61,
-						"Editor statistics scans": 16.787,
-						"UTF-16 entry mapping": 5.055,
-						"Other Jazz work": 3.669,
-						"Wasm": 2.566
+						"React JSX creation": 49.772,
+						"Other": 34.871,
+						"Other React work": 13.185,
+						"React development prop inspection": 6.622,
+						"Other Jazz work": 2.116,
+						"Wasm": 0.779
 					},
 					"nearestAppCallersMs": [
 						[
-							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							352.403
+							"(anonymous) /src/app/features/editor/widgets/command-palette.tsx:321",
+							13.264
 						],
-						["(garbage collector) :1", 98.135],
+						[
+							"EditorContent /src/app/features/documents/screens/doc-screen.tsx:401",
+							5.199
+						],
 						[
 							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							26.875
+							5.199
 						]
 					]
 				},
 				{
 					"index": 3,
-					"startMs": 49412.3,
-					"durationMs": 104.1,
+					"startMs": 46134.7,
+					"durationMs": 595.7,
 					"keys": [
 						{
-							"key": "b",
-							"delayMs": 83.8
+							"key": "a",
+							"delayMs": 554.5
 						}
 					],
 					"selfMs": {
-						"React JSX creation": 58.989,
-						"Other": 17.88,
-						"Other React work": 15.781,
-						"React development prop inspection": 5.581,
-						"Garbage collection": 3.291,
-						"Other Jazz work": 2.427,
-						"Wasm": 0.136
+						"Garbage collection": 165.623,
+						"Jazz text serialization": 134.519,
+						"Jazz entry projection": 121.822,
+						"React JSX creation": 66.882,
+						"Other": 44.456,
+						"React development prop inspection": 28.96,
+						"Other React work": 12.373,
+						"Editor statistics scans": 9.547,
+						"UTF-16 entry mapping": 5.806,
+						"Other Jazz work": 4.356,
+						"Wasm": 1.359
 					},
 					"nearestAppCallersMs": [
 						[
-							"(anonymous) /src/app/features/editor/widgets/command-palette.tsx:321",
-							14.595
+							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
+							254.983
 						],
+						["(garbage collector) :1", 165.623],
 						[
-							"exports.jsx /node_modules/.vite/deps/chunk-47YGVLJD.js:239",
-							5.447
-						],
-						[
-							"(anonymous) /src/app/features/editor/widgets/command-palette.tsx:410",
-							5.032
+							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
+							27.981
 						]
 					]
 				},
 				{
 					"index": 4,
-					"startMs": 50019.9,
-					"durationMs": 597.9,
+					"startMs": 46756.3,
+					"durationMs": 103.3,
 					"keys": [
 						{
-							"key": "a",
-							"delayMs": 556.9
+							"key": "b",
+							"delayMs": 78.0
 						}
 					],
 					"selfMs": {
-						"Jazz text serialization": 224.636,
-						"Jazz entry projection": 86.646,
-						"Garbage collection": 85.35,
-						"React JSX creation": 63.138,
-						"Other Jazz work": 40.04,
-						"Other": 30.175,
-						"React development prop inspection": 30.083,
-						"Editor statistics scans": 16.662,
-						"Other React work": 12.988,
-						"UTF-16 entry mapping": 7.704,
-						"Wasm": 0.43
+						"React JSX creation": 51.648,
+						"Other": 34.313,
+						"Other React work": 10.58,
+						"React development prop inspection": 5.578,
+						"Other Jazz work": 0.991,
+						"Wasm": 0.128,
+						"Garbage collection": 0.057
 					},
 					"nearestAppCallersMs": [
 						[
-							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							339.731
+							"(anonymous) /src/app/features/editor/widgets/command-palette.tsx:321",
+							13.644
 						],
-						["(garbage collector) :1", 85.35],
 						[
 							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							27.728
+							4.422
+						],
+						[
+							"SidebarFormatMenu /src/app/features/editor/widgets/sidebar-format-menu.tsx:27",
+							4.347
 						]
 					]
 				},
 				{
 					"index": 5,
-					"startMs": 50646.2,
-					"durationMs": 102.7,
-					"keys": [
-						{
-							"key": "b",
-							"delayMs": 81.8
-						}
-					],
-					"selfMs": {
-						"React JSX creation": 56.084,
-						"Other": 26.989,
-						"Other React work": 10.444,
-						"React development prop inspection": 6.163,
-						"Other Jazz work": 3.028
-					},
-					"nearestAppCallersMs": [
-						[
-							"(anonymous) /src/app/features/editor/widgets/command-palette.tsx:321",
-							14.562
-						],
-						[
-							"exports.jsx /node_modules/.vite/deps/chunk-47YGVLJD.js:239",
-							6.891
-						],
-						[
-							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							5.334
-						]
-					]
-				},
-				{
-					"index": 6,
-					"startMs": 51245.9,
-					"durationMs": 497.8,
+					"startMs": 47338.3,
+					"durationMs": 409.7,
 					"keys": [
 						{
 							"key": "a",
-							"delayMs": 457.3
+							"delayMs": 364.4
 						}
 					],
 					"selfMs": {
-						"Jazz text serialization": 213.524,
-						"Jazz entry projection": 69.454,
-						"React JSX creation": 52.769,
-						"Other": 46.739,
-						"Other Jazz work": 40.59,
-						"React development prop inspection": 29.089,
-						"Editor statistics scans": 16.04,
-						"Garbage collection": 12.699,
-						"Other React work": 10.315,
-						"UTF-16 entry mapping": 6.346,
-						"Wasm": 0.246
+						"Jazz text serialization": 130.023,
+						"React JSX creation": 57.535,
+						"Jazz entry projection": 55.189,
+						"Other": 50.656,
+						"Other Jazz work": 30.002,
+						"React development prop inspection": 28.419,
+						"Garbage collection": 20.229,
+						"Other React work": 18.402,
+						"UTF-16 entry mapping": 9.39,
+						"Editor statistics scans": 7.496,
+						"Wasm": 2.313
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							314.066
+							212.172
 						],
 						[
 							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							28.022
+							27.051
 						],
+						["(garbage collector) :1", 20.229]
+					]
+				},
+				{
+					"index": 6,
+					"startMs": 47776.4,
+					"durationMs": 112.7,
+					"keys": [
+						{
+							"key": "b",
+							"delayMs": 75.5
+						}
+					],
+					"selfMs": {
+						"React JSX creation": 57.372,
+						"Other": 29.771,
+						"Other React work": 12.482,
+						"React development prop inspection": 5.498,
+						"Garbage collection": 3.561,
+						"Other Jazz work": 3.019,
+						"Wasm": 1.04
+					},
+					"nearestAppCallersMs": [
 						[
 							"(anonymous) /src/app/features/editor/widgets/command-palette.tsx:321",
-							14.169
+							15.802
+						],
+						[
+							"exports.jsx /node_modules/.vite/deps/chunk-47YGVLJD.js:239",
+							4.889
+						],
+						[
+							"SidebarFormatMenu /src/app/features/editor/widgets/sidebar-format-menu.tsx:27",
+							4.682
 						]
 					]
 				},
 				{
 					"index": 7,
-					"startMs": 51774.4,
-					"durationMs": 102.1,
+					"startMs": 48368.0,
+					"durationMs": 374.2,
 					"keys": [
 						{
-							"key": "b",
-							"delayMs": 85.4
+							"key": "a",
+							"delayMs": 331.4
 						}
 					],
 					"selfMs": {
-						"React JSX creation": 54.769,
-						"Other": 26.628,
-						"Other React work": 12.414,
-						"React development prop inspection": 5.253,
-						"Other Jazz work": 2.267,
-						"Wasm": 0.796
+						"Jazz text serialization": 129.673,
+						"React JSX creation": 60.597,
+						"Jazz entry projection": 54.052,
+						"Other": 41.796,
+						"Other Jazz work": 34.182,
+						"React development prop inspection": 18.934,
+						"Other React work": 13.837,
+						"Editor statistics scans": 9.042,
+						"UTF-16 entry mapping": 5.001,
+						"Garbage collection": 4.046,
+						"Wasm": 3.029
 					},
 					"nearestAppCallersMs": [
 						[
-							"(anonymous) /src/app/features/editor/widgets/command-palette.tsx:321",
-							15.682
-						],
-						[
-							"exports.jsx /node_modules/.vite/deps/chunk-47YGVLJD.js:239",
-							5.431
+							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
+							208.84
 						],
 						[
 							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							5.075
+							17.656
+						],
+						[
+							"(anonymous) /src/app/features/editor/widgets/command-palette.tsx:321",
+							13.862
 						]
 					]
 				},
 				{
 					"index": 8,
-					"startMs": 52365.4,
-					"durationMs": 545.7,
+					"startMs": 48769.0,
+					"durationMs": 103.8,
 					"keys": [
 						{
-							"key": "a",
-							"delayMs": 503.7
+							"key": "b",
+							"delayMs": 79.1
 						}
 					],
 					"selfMs": {
-						"Jazz text serialization": 221.75,
-						"Jazz entry projection": 78.97,
-						"React JSX creation": 62.791,
-						"Other": 40.746,
-						"Garbage collection": 38.791,
-						"Other Jazz work": 32.277,
-						"React development prop inspection": 30.77,
-						"Other React work": 17.475,
-						"Editor statistics scans": 15.793,
-						"UTF-16 entry mapping": 5.212,
-						"Wasm": 1.103
+						"React JSX creation": 59.941,
+						"Other": 28.821,
+						"Other React work": 9.254,
+						"React development prop inspection": 4.811,
+						"Other Jazz work": 0.967
 					},
 					"nearestAppCallersMs": [
 						[
-							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							317.008
+							"(anonymous) /src/app/features/editor/widgets/command-palette.tsx:321",
+							14.393
 						],
-						["(garbage collector) :1", 38.791],
 						[
-							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							29.421
+							"exports.createElement /node_modules/.vite/deps/chunk-LWTPICGT.js:761",
+							6.651
+						],
+						[
+							"(anonymous) /src/app/features/editor/widgets/command-palette.tsx:410",
+							5.217
 						]
 					]
 				},
 				{
 					"index": 9,
-					"startMs": 52942.8,
-					"durationMs": 98.8,
+					"startMs": 49358.2,
+					"durationMs": 377.6,
 					"keys": [
 						{
-							"key": "b",
-							"delayMs": 82.5
+							"key": "a",
+							"delayMs": 334.2
 						}
 					],
 					"selfMs": {
-						"React JSX creation": 52.814,
-						"Other": 23.075,
-						"Other React work": 13.578,
-						"React development prop inspection": 5.87,
-						"Other Jazz work": 2.214,
-						"Wasm": 1.262
+						"Jazz text serialization": 127.932,
+						"React JSX creation": 56.898,
+						"Other": 54.897,
+						"Jazz entry projection": 47.364,
+						"Other Jazz work": 41.038,
+						"React development prop inspection": 17.619,
+						"Other React work": 10.591,
+						"Editor statistics scans": 8.011,
+						"Garbage collection": 6.73,
+						"UTF-16 entry mapping": 4.988,
+						"Wasm": 1.552
 					},
 					"nearestAppCallersMs": [
 						[
-							"(anonymous) /src/app/features/editor/widgets/command-palette.tsx:321",
-							13.734
+							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
+							209.64
 						],
 						[
 							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							5.382
+							16.914
 						],
 						[
-							"exports.createElement /node_modules/.vite/deps/chunk-LWTPICGT.js:761",
-							4.543
+							"(anonymous) /src/app/features/editor/widgets/command-palette.tsx:321",
+							15.084
 						]
 					]
 				},
 				{
 					"index": 10,
-					"startMs": 53536.7,
-					"durationMs": 514.1,
-					"keys": [
-						{
-							"key": "a",
-							"delayMs": 478.6
-						}
-					],
-					"selfMs": {
-						"Jazz text serialization": 226.672,
-						"Jazz entry projection": 73.771,
-						"React JSX creation": 63.461,
-						"Other Jazz work": 34.245,
-						"Other": 32.053,
-						"React development prop inspection": 27.824,
-						"Garbage collection": 21.145,
-						"Editor statistics scans": 16.183,
-						"Other React work": 9.884,
-						"UTF-16 entry mapping": 6.557,
-						"Wasm": 2.321
-					},
-					"nearestAppCallersMs": [
-						[
-							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							323.864
-						],
-						[
-							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							27.311
-						],
-						["(garbage collector) :1", 21.145]
-					]
-				},
-				{
-					"index": 11,
-					"startMs": 54079.2,
-					"durationMs": 102.7,
+					"startMs": 49761.5,
+					"durationMs": 102.2,
 					"keys": [
 						{
 							"key": "b",
-							"delayMs": 86.0
+							"delayMs": 77.8
 						}
 					],
 					"selfMs": {
-						"React JSX creation": 55.107,
-						"Other": 28.833,
-						"Other React work": 8.401,
-						"React development prop inspection": 8.31,
-						"Other Jazz work": 2.04
+						"React JSX creation": 57.008,
+						"Other": 29.271,
+						"Other React work": 9.248,
+						"React development prop inspection": 3.694,
+						"Wasm": 1.728,
+						"Other Jazz work": 0.872,
+						"Garbage collection": 0.376
 					},
 					"nearestAppCallersMs": [
 						[
 							"(anonymous) /src/app/features/editor/widgets/command-palette.tsx:321",
-							15.079
+							15.869
+						],
+						[
+							"(anonymous) /src/app/features/editor/widgets/command-palette.tsx:410",
+							5.741
+						],
+						[
+							"exports.createElement /node_modules/.vite/deps/chunk-LWTPICGT.js:761",
+							4.641
+						]
+					]
+				},
+				{
+					"index": 11,
+					"startMs": 50347.9,
+					"durationMs": 392.1,
+					"keys": [
+						{
+							"key": "a",
+							"delayMs": 346.9
+						}
+					],
+					"selfMs": {
+						"Jazz text serialization": 130.039,
+						"React JSX creation": 59.382,
+						"Jazz entry projection": 55.585,
+						"Other": 43.728,
+						"Other Jazz work": 39.696,
+						"React development prop inspection": 20.916,
+						"Other React work": 14.413,
+						"Garbage collection": 11.94,
+						"Editor statistics scans": 10.896,
+						"UTF-16 entry mapping": 4.858,
+						"Wasm": 0.626
+					},
+					"nearestAppCallersMs": [
+						[
+							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
+							212.373
 						],
 						[
 							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							5.89
+							18.667
 						],
 						[
-							"getComponentNameFromType /node_modules/.vite/deps/chunk-47YGVLJD.js:13",
-							5.662
+							"(anonymous) /src/app/features/editor/widgets/command-palette.tsx:321",
+							14.935
 						]
 					]
 				},
 				{
 					"index": 12,
-					"startMs": 54684.9,
-					"durationMs": 497.6,
+					"startMs": 50765.0,
+					"durationMs": 97.2,
 					"keys": [
 						{
-							"key": "a",
-							"delayMs": 459.2
+							"key": "b",
+							"delayMs": 75.0
 						}
 					],
 					"selfMs": {
-						"Jazz text serialization": 218.853,
-						"Jazz entry projection": 68.378,
-						"React JSX creation": 54.372,
-						"Other Jazz work": 40.802,
-						"Other": 33.585,
-						"React development prop inspection": 31.587,
-						"Editor statistics scans": 16.248,
-						"Other React work": 13.658,
-						"Garbage collection": 9.837,
-						"UTF-16 entry mapping": 8.889,
-						"Wasm": 1.434
+						"React JSX creation": 53.87,
+						"Other": 27.093,
+						"Other React work": 11.11,
+						"React development prop inspection": 4.191,
+						"Other Jazz work": 0.841,
+						"Wasm": 0.071
 					},
 					"nearestAppCallersMs": [
 						[
-							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							319.098
+							"(anonymous) /src/app/features/editor/widgets/command-palette.tsx:321",
+							15.32
 						],
 						[
 							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							30.715
+							3.894
 						],
 						[
-							"(anonymous) /src/app/features/editor/widgets/command-palette.tsx:321",
-							12.19
+							"exports.createElement /node_modules/.vite/deps/chunk-LWTPICGT.js:761",
+							3.854
 						]
 					]
 				},
 				{
 					"index": 13,
-					"startMs": 55217.1,
-					"durationMs": 103.2,
+					"startMs": 51337.5,
+					"durationMs": 387.5,
 					"keys": [
 						{
-							"key": "b",
-							"delayMs": 84.1
+							"key": "a",
+							"delayMs": 346.0
 						}
 					],
 					"selfMs": {
-						"React JSX creation": 55.047,
-						"Other": 21.337,
-						"Other React work": 13.923,
-						"React development prop inspection": 5.811,
-						"Garbage collection": 3.504,
-						"Other Jazz work": 2.559,
-						"Wasm": 1.027
+						"Jazz text serialization": 129.167,
+						"Jazz entry projection": 58.82,
+						"React JSX creation": 57.911,
+						"Other Jazz work": 41.655,
+						"Other": 41.296,
+						"Other React work": 17.772,
+						"React development prop inspection": 16.76,
+						"Editor statistics scans": 8.634,
+						"Garbage collection": 8.012,
+						"UTF-16 entry mapping": 4.607,
+						"Wasm": 2.832
 					},
 					"nearestAppCallersMs": [
 						[
-							"(anonymous) /src/app/features/editor/widgets/command-palette.tsx:321",
-							15.952
-						],
-						[
-							"exports.jsx /node_modules/.vite/deps/chunk-47YGVLJD.js:239",
-							6.14
+							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
+							208.883
 						],
 						[
 							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							5.131
+							16.13
+						],
+						[
+							"(anonymous) /src/app/features/editor/widgets/command-palette.tsx:321",
+							14.68
 						]
 					]
 				},
 				{
 					"index": 14,
-					"startMs": 55826.5,
-					"durationMs": 498.6,
-					"keys": [
-						{
-							"key": "a",
-							"delayMs": 460.2
-						}
-					],
-					"selfMs": {
-						"Jazz text serialization": 216.462,
-						"Jazz entry projection": 69.05,
-						"React JSX creation": 57.072,
-						"Other Jazz work": 41.133,
-						"Other": 37.349,
-						"React development prop inspection": 29.664,
-						"Garbage collection": 14.861,
-						"Editor statistics scans": 12.888,
-						"Other React work": 12.002,
-						"UTF-16 entry mapping": 6.631,
-						"Wasm": 1.526
-					},
-					"nearestAppCallersMs": [
-						[
-							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							314.627
-						],
-						[
-							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							29.172
-						],
-						["(garbage collector) :1", 14.861]
-					]
-				},
-				{
-					"index": 15,
-					"startMs": 56349.4,
-					"durationMs": 98.8,
+					"startMs": 51753.1,
+					"durationMs": 104.8,
 					"keys": [
 						{
 							"key": "b",
-							"delayMs": 77.0
+							"delayMs": 94.3
 						}
 					],
 					"selfMs": {
-						"React JSX creation": 51.354,
-						"Other": 21.852,
-						"Other React work": 13.141,
-						"React development prop inspection": 5.954,
-						"Garbage collection": 3.763,
-						"Wasm": 1.569,
-						"Other Jazz work": 1.214
+						"React JSX creation": 57.879,
+						"Other": 28.93,
+						"Other React work": 11.585,
+						"React development prop inspection": 5.58,
+						"Other Jazz work": 0.735,
+						"Garbage collection": 0.042
 					},
 					"nearestAppCallersMs": [
 						[
 							"(anonymous) /src/app/features/editor/widgets/command-palette.tsx:321",
-							12.851
+							15.127
 						],
 						[
-							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							4.644
+							"exports.createElement /node_modules/.vite/deps/chunk-LWTPICGT.js:761",
+							6.253
 						],
 						[
 							"(anonymous) /src/app/features/editor/widgets/command-palette.tsx:410",
-							4.009
+							4.62
+						]
+					]
+				},
+				{
+					"index": 15,
+					"startMs": 52395.2,
+					"durationMs": 396.6,
+					"keys": [
+						{
+							"key": "a",
+							"delayMs": 349.4
+						}
+					],
+					"selfMs": {
+						"Jazz text serialization": 130.178,
+						"React JSX creation": 58.946,
+						"Other Jazz work": 52.765,
+						"Jazz entry projection": 50.808,
+						"Other": 45.51,
+						"React development prop inspection": 25.906,
+						"Other React work": 13.147,
+						"Editor statistics scans": 7.692,
+						"UTF-16 entry mapping": 5.806,
+						"Garbage collection": 3.75,
+						"Wasm": 2.069
+					},
+					"nearestAppCallersMs": [
+						[
+							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
+							212.49
+						],
+						[
+							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
+							24.494
+						],
+						[
+							"syncMetadata /src/app/features/documents/lib/metadata.ts:65",
+							15.177
 						]
 					]
 				},
 				{
 					"index": 16,
-					"startMs": 56958.2,
-					"durationMs": 501.3,
-					"keys": [
-						{
-							"key": "a",
-							"delayMs": 467.4
-						}
-					],
-					"selfMs": {
-						"Jazz text serialization": 214.103,
-						"Jazz entry projection": 64.149,
-						"React JSX creation": 60.798,
-						"Other Jazz work": 43.799,
-						"Other": 31.247,
-						"React development prop inspection": 30.137,
-						"Editor statistics scans": 17.901,
-						"Garbage collection": 15.79,
-						"Other React work": 14.47,
-						"UTF-16 entry mapping": 6.046,
-						"Wasm": 2.902
-					},
-					"nearestAppCallersMs": [
-						[
-							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							309.985
-						],
-						[
-							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							28.203
-						],
-						["(garbage collector) :1", 15.79]
-					]
-				},
-				{
-					"index": 17,
-					"startMs": 57483.1,
-					"durationMs": 101.9,
+					"startMs": 52815.9,
+					"durationMs": 106.5,
 					"keys": [
 						{
 							"key": "b",
-							"delayMs": 77.9
+							"delayMs": 82.7
 						}
 					],
 					"selfMs": {
-						"React JSX creation": 57.137,
-						"Other": 22.483,
-						"Other React work": 8.935,
-						"React development prop inspection": 6.187,
-						"Garbage collection": 4.937,
-						"Other Jazz work": 1.46,
-						"Wasm": 0.808
+						"React JSX creation": 53.4,
+						"Other": 27.971,
+						"Other React work": 14.095,
+						"React development prop inspection": 4.724,
+						"Garbage collection": 3.581,
+						"Other Jazz work": 1.644,
+						"Wasm": 1.058
 					},
 					"nearestAppCallersMs": [
 						[
 							"(anonymous) /src/app/features/editor/widgets/command-palette.tsx:321",
-							15.181
+							14.93
 						],
 						[
 							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							5.788
+							4.407
 						],
 						[
-							"exports.jsx /node_modules/.vite/deps/chunk-47YGVLJD.js:239",
-							5.169
+							"EditorContent /src/app/features/documents/screens/doc-screen.tsx:401",
+							4.279
+						]
+					]
+				},
+				{
+					"index": 17,
+					"startMs": 53404.2,
+					"durationMs": 397.4,
+					"keys": [
+						{
+							"key": "a",
+							"delayMs": 352.5
+						}
+					],
+					"selfMs": {
+						"Jazz text serialization": 128.066,
+						"Other Jazz work": 61.979,
+						"React JSX creation": 53.633,
+						"Jazz entry projection": 53.173,
+						"Other": 53.118,
+						"React development prop inspection": 16.276,
+						"Other React work": 10.841,
+						"Editor statistics scans": 7.654,
+						"UTF-16 entry mapping": 6.944,
+						"Garbage collection": 3.282,
+						"Wasm": 2.437
+					},
+					"nearestAppCallersMs": [
+						[
+							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
+							215.3
+						],
+						[
+							"syncMetadata /src/app/features/documents/lib/metadata.ts:65",
+							19.549
+						],
+						[
+							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
+							14.721
+						]
+					]
+				},
+				{
+					"index": 18,
+					"startMs": 53829.2,
+					"durationMs": 96.8,
+					"keys": [
+						{
+							"key": "b",
+							"delayMs": 72.0
+						}
+					],
+					"selfMs": {
+						"React JSX creation": 53.506,
+						"Other": 24.122,
+						"Other React work": 12.176,
+						"React development prop inspection": 5.125,
+						"Other Jazz work": 1.582,
+						"Wasm": 0.319
+					},
+					"nearestAppCallersMs": [
+						[
+							"(anonymous) /src/app/features/editor/widgets/command-palette.tsx:321",
+							12.845
+						],
+						[
+							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
+							4.102
+						],
+						[
+							"(anonymous) /src/app/features/editor/widgets/command-palette.tsx:410",
+							3.843
 						]
 					]
 				}
 			]
 		},
 		"candidate": {
-			"inputP95Ms": 357.2000000476837,
+			"inputP95Ms": 299.39999985694885,
 			"delayedKeydowns": 22,
-			"overlappingLongTasks": 13,
-			"longTaskMs": 5322.54,
+			"overlappingLongTasks": 18,
+			"longTaskMs": 6083.692,
 			"selfMs": {
-				"Jazz text serialization": 2328.311,
-				"Jazz entry projection": 1181.973,
-				"Other Jazz work": 568.624,
-				"Garbage collection": 379.844,
-				"React development prop inspection": 343.403,
-				"Other": 250.898,
-				"React JSX creation": 121.064,
-				"UTF-16 entry mapping": 71.116,
-				"Other React work": 64.198,
-				"Wasm": 13.109
+				"Jazz text serialization": 2362.58,
+				"Jazz entry projection": 1102.131,
+				"Other Jazz work": 1079.564,
+				"Other": 402.911,
+				"React development prop inspection": 366.949,
+				"Garbage collection": 361.953,
+				"React JSX creation": 175.965,
+				"Other React work": 98.219,
+				"UTF-16 entry mapping": 92.953,
+				"Wasm": 40.468
 			},
 			"tasks": [
 				{
 					"index": 0,
-					"startMs": 31629.2,
-					"durationMs": 452.1,
+					"startMs": 32085.6,
+					"durationMs": 325.7,
 					"keys": [
 						{
 							"key": "a",
-							"delayMs": 415.9
+							"delayMs": 277.6
 						}
 					],
 					"selfMs": {
-						"Jazz text serialization": 218.995,
-						"Jazz entry projection": 139.874,
-						"Garbage collection": 41.607,
-						"Other": 17.611,
-						"React JSX creation": 9.421,
-						"Other Jazz work": 8.672,
-						"UTF-16 entry mapping": 6.728,
-						"Other React work": 5.193,
-						"Wasm": 2.973,
-						"React development prop inspection": 1.074
+						"Jazz text serialization": 169.808,
+						"Jazz entry projection": 90.776,
+						"Other": 19.092,
+						"Garbage collection": 16.009,
+						"React JSX creation": 11.471,
+						"Other Jazz work": 6.521,
+						"UTF-16 entry mapping": 6.148,
+						"Other React work": 3.008,
+						"Wasm": 2.013,
+						"React development prop inspection": 0.851
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							266.397
+							177.474
 						],
 						[
 							"toString /node_modules/.vite/deps/chunk-LXSRVLV6.js:4753",
-							80.461
+							72.279
 						],
-						["(garbage collector) :1", 41.607]
+						["(garbage collector) :1", 16.009]
 					]
 				},
 				{
 					"index": 1,
-					"startMs": 32430.5,
-					"durationMs": 379.8,
+					"startMs": 32634.7,
+					"durationMs": 309.4,
 					"keys": [
 						{
-							"key": "a",
-							"delayMs": 90.8
+							"key": "f",
+							"delayMs": 292.5
 						}
 					],
 					"selfMs": {
-						"Jazz text serialization": 170.79,
-						"Jazz entry projection": 94.645,
-						"Other Jazz work": 31.929,
-						"React development prop inspection": 23.432,
-						"Other": 17.613,
-						"Garbage collection": 13.428,
-						"React JSX creation": 11.2,
-						"Other React work": 8.357,
-						"UTF-16 entry mapping": 7.076,
-						"Wasm": 1.366
+						"Jazz text serialization": 125.343,
+						"Jazz entry projection": 93.693,
+						"Other": 28.586,
+						"React development prop inspection": 25.36,
+						"Garbage collection": 11.875,
+						"React JSX creation": 8.155,
+						"Other React work": 6.622,
+						"UTF-16 entry mapping": 6.0,
+						"Wasm": 1.949,
+						"Other Jazz work": 1.865
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							286.377
+							217.703
 						],
 						[
-							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							22.568
+							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
+							23.763
 						],
-						["(garbage collector) :1", 13.428]
+						["(garbage collector) :1", 11.875]
 					]
 				},
 				{
 					"index": 2,
-					"startMs": 33144.8,
-					"durationMs": 553.6,
+					"startMs": 33117.9,
+					"durationMs": 292.5,
 					"keys": [
 						{
 							"key": "a",
-							"delayMs": 310.2
+							"delayMs": 86.0
 						}
 					],
 					"selfMs": {
-						"Jazz text serialization": 178.405,
-						"Garbage collection": 140.236,
-						"Jazz entry projection": 118.975,
-						"Other Jazz work": 45.45,
-						"React development prop inspection": 29.736,
-						"Other": 20.66,
-						"React JSX creation": 9.505,
-						"UTF-16 entry mapping": 5.506,
-						"Other React work": 4.632,
-						"Wasm": 0.544
+						"Jazz text serialization": 126.076,
+						"Jazz entry projection": 52.261,
+						"Other Jazz work": 36.816,
+						"React development prop inspection": 28.606,
+						"Other": 19.311,
+						"React JSX creation": 9.243,
+						"Other React work": 8.333,
+						"UTF-16 entry mapping": 5.624,
+						"Wasm": 3.148,
+						"Garbage collection": 3.076
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							333.248
+							206.902
 						],
-						["(garbage collector) :1", 140.236],
 						[
-							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							28.7
-						]
+							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
+							27.85
+						],
+						["run :1", 6.547]
 					]
 				},
 				{
 					"index": 3,
-					"startMs": 34035.6,
-					"durationMs": 469.2,
+					"startMs": 33598.0,
+					"durationMs": 293.9,
 					"keys": [
 						{
-							"key": "a",
-							"delayMs": 228.7
+							"key": "f",
+							"delayMs": 268.8
 						}
 					],
 					"selfMs": {
-						"Jazz text serialization": 175.043,
-						"Jazz entry projection": 117.14,
-						"Garbage collection": 60.78,
-						"Other Jazz work": 44.61,
-						"React development prop inspection": 30.595,
-						"Other": 16.058,
-						"React JSX creation": 12.165,
-						"UTF-16 entry mapping": 9.066,
-						"Other React work": 3.562,
-						"Wasm": 0.134
+						"Jazz text serialization": 129.383,
+						"Jazz entry projection": 49.818,
+						"Other Jazz work": 36.15,
+						"Other": 28.045,
+						"React development prop inspection": 22.979,
+						"React JSX creation": 9.828,
+						"Other React work": 6.514,
+						"Garbage collection": 5.387,
+						"UTF-16 entry mapping": 4.651,
+						"Wasm": 1.169
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							325.742
+							210.923
 						],
-						["(garbage collector) :1", 60.78],
 						[
-							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							28.627
-						]
+							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
+							22.155
+						],
+						["run :1", 8.227]
 					]
 				},
 				{
 					"index": 4,
-					"startMs": 34801.6,
-					"durationMs": 379.8,
+					"startMs": 34116.1,
+					"durationMs": 294.7,
 					"keys": [
 						{
-							"key": "h",
-							"delayMs": 359.2
+							"key": "a",
+							"delayMs": 79.6
 						}
 					],
 					"selfMs": {
-						"Jazz text serialization": 181.568,
-						"Jazz entry projection": 75.585,
-						"Other Jazz work": 37.533,
-						"React development prop inspection": 28.103,
-						"Other": 24.439,
-						"Garbage collection": 9.01,
-						"React JSX creation": 8.47,
-						"Other React work": 7.369,
-						"UTF-16 entry mapping": 6.852,
-						"Wasm": 0.873
+						"Jazz text serialization": 128.18,
+						"Jazz entry projection": 52.957,
+						"Other Jazz work": 35.087,
+						"React development prop inspection": 24.067,
+						"Other": 21.385,
+						"Other React work": 8.221,
+						"React JSX creation": 8.096,
+						"Garbage collection": 6.968,
+						"UTF-16 entry mapping": 5.639,
+						"Wasm": 4.113
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							284.249
+							208.082
 						],
 						[
-							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							28.067
+							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
+							23.025
 						],
-						["(garbage collector) :1", 9.01]
+						["run :1", 8.059]
 					]
 				},
 				{
 					"index": 5,
-					"startMs": 35397.7,
-					"durationMs": 360.3,
+					"startMs": 34638.8,
+					"durationMs": 301.3,
 					"keys": [
 						{
-							"key": "a",
-							"delayMs": 277.2
+							"key": "g",
+							"delayMs": 271.8
 						}
 					],
 					"selfMs": {
-						"Jazz text serialization": 175.97,
-						"Jazz entry projection": 71.502,
-						"Other Jazz work": 40.674,
-						"React development prop inspection": 31.29,
-						"Other": 12.987,
-						"React JSX creation": 10.365,
-						"Garbage collection": 8.032,
-						"UTF-16 entry mapping": 4.608,
-						"Other React work": 3.531,
-						"Wasm": 1.353
+						"Jazz text serialization": 129.747,
+						"Jazz entry projection": 56.358,
+						"Other Jazz work": 34.381,
+						"React development prop inspection": 25.672,
+						"Other": 25.553,
+						"React JSX creation": 10.612,
+						"UTF-16 entry mapping": 6.373,
+						"Other React work": 5.963,
+						"Garbage collection": 4.614,
+						"Wasm": 2.001
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							278.168
+							210.675
 						],
 						[
-							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							28.533
+							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
+							24.759
 						],
-						["(garbage collector) :1", 8.032]
+						[
+							"syncMetadata /src/app/features/documents/lib/metadata.ts:65",
+							8.056
+						]
 					]
 				},
 				{
 					"index": 6,
-					"startMs": 36060.7,
-					"durationMs": 365.3,
+					"startMs": 35113.2,
+					"durationMs": 292.6,
 					"keys": [
 						{
 							"key": "a",
-							"delayMs": 79.0
+							"delayMs": 119.9
 						}
 					],
 					"selfMs": {
-						"Jazz text serialization": 172.992,
-						"Jazz entry projection": 77.104,
-						"Other Jazz work": 38.929,
-						"React development prop inspection": 28.111,
-						"Other": 16.402,
-						"React JSX creation": 12.138,
-						"Garbage collection": 10.107,
-						"Other React work": 5.211,
-						"UTF-16 entry mapping": 4.279
+						"Jazz text serialization": 128.466,
+						"Jazz entry projection": 51.54,
+						"Other Jazz work": 45.609,
+						"React development prop inspection": 20.87,
+						"Other": 20.24,
+						"React JSX creation": 10.642,
+						"UTF-16 entry mapping": 6.149,
+						"Other React work": 3.942,
+						"Garbage collection": 3.677,
+						"Wasm": 1.464
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							273.73
+							210.51
 						],
 						[
-							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							27.798
+							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
+							20.144
 						],
-						["(garbage collector) :1", 10.107]
+						[
+							"syncMetadata /src/app/features/documents/lib/metadata.ts:65",
+							10.532
+						]
 					]
 				},
 				{
 					"index": 7,
-					"startMs": 36740.2,
-					"durationMs": 374.1,
+					"startMs": 35621.5,
+					"durationMs": 300.5,
 					"keys": [
 						{
-							"key": "a",
-							"delayMs": 93.7
+							"key": "g",
+							"delayMs": 275.3
 						}
 					],
 					"selfMs": {
-						"Jazz text serialization": 178.208,
-						"Jazz entry projection": 73.391,
-						"Other Jazz work": 48.747,
-						"React development prop inspection": 27.585,
-						"Other": 19.014,
-						"React JSX creation": 10.347,
-						"Garbage collection": 7.538,
-						"Other React work": 4.798,
-						"UTF-16 entry mapping": 4.451,
-						"Wasm": 0.032
+						"Jazz text serialization": 131.113,
+						"Other Jazz work": 53.266,
+						"Jazz entry projection": 46.756,
+						"Other": 23.539,
+						"React development prop inspection": 19.361,
+						"React JSX creation": 9.352,
+						"UTF-16 entry mapping": 6.116,
+						"Other React work": 5.128,
+						"Garbage collection": 3.212,
+						"Wasm": 2.611
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							283.84
+							215.615
 						],
 						[
-							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							27.137
+							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
+							16.413
 						],
 						[
 							"syncMetadata /src/app/features/documents/lib/metadata.ts:65",
-							9.739
+							13.898
 						]
 					]
 				},
 				{
 					"index": 8,
-					"startMs": 37409.6,
-					"durationMs": 378.9,
+					"startMs": 36080.7,
+					"durationMs": 472.9,
 					"keys": [
 						{
-							"key": "h",
-							"delayMs": 357.5
+							"key": "a",
+							"delayMs": 281.2
 						}
 					],
 					"selfMs": {
-						"Jazz text serialization": 177.035,
-						"Jazz entry projection": 79.127,
-						"Other Jazz work": 46.079,
-						"React development prop inspection": 29.553,
-						"Other": 24.113,
-						"Garbage collection": 7.827,
-						"React JSX creation": 5.899,
-						"Other React work": 4.223,
-						"UTF-16 entry mapping": 4.123,
-						"Wasm": 0.936
+						"Garbage collection": 137.814,
+						"Jazz text serialization": 131.057,
+						"Jazz entry projection": 93.767,
+						"Other Jazz work": 48.154,
+						"Other": 21.588,
+						"React development prop inspection": 18.887,
+						"React JSX creation": 8.47,
+						"Other React work": 5.286,
+						"UTF-16 entry mapping": 4.484,
+						"Wasm": 3.429
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							283.437
+							250.071
 						],
+						["(garbage collector) :1", 137.814],
 						[
-							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							27.857
-						],
-						[
-							"syncMetadata /src/app/features/documents/lib/metadata.ts:65",
-							10.828
+							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
+							17.807
 						]
 					]
 				},
 				{
 					"index": 9,
-					"startMs": 37992.0,
-					"durationMs": 375.9,
+					"startMs": 36763.6,
+					"durationMs": 356.1,
 					"keys": [
 						{
-							"key": "a",
-							"delayMs": 284.8
+							"key": "f",
+							"delayMs": 343.5
 						}
 					],
 					"selfMs": {
-						"Jazz text serialization": 172.069,
-						"Jazz entry projection": 84.18,
-						"Other Jazz work": 46.82,
-						"React development prop inspection": 28.426,
-						"Other": 17.944,
-						"Garbage collection": 8.841,
-						"React JSX creation": 7.524,
-						"Other React work": 4.628,
-						"UTF-16 entry mapping": 4.596,
-						"Wasm": 0.875
+						"Jazz text serialization": 130.515,
+						"Jazz entry projection": 60.612,
+						"Other Jazz work": 55.714,
+						"Garbage collection": 41.856,
+						"Other": 22.545,
+						"React development prop inspection": 21.498,
+						"React JSX creation": 9.913,
+						"UTF-16 entry mapping": 7.173,
+						"Other React work": 5.185,
+						"Wasm": 1.117
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							277.357
+							214.802
 						],
+						["(garbage collector) :1", 41.856],
 						[
-							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							26.875
-						],
-						[
-							"syncMetadata /src/app/features/documents/lib/metadata.ts:65",
-							14.622
+							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
+							20.666
 						]
 					]
 				},
 				{
 					"index": 10,
-					"startMs": 38653.9,
-					"durationMs": 384.8,
+					"startMs": 37302.2,
+					"durationMs": 320.3,
 					"keys": [
 						{
-							"key": "h",
-							"delayMs": 359.4
+							"key": "a",
+							"delayMs": 115.1
 						}
 					],
 					"selfMs": {
-						"Jazz text serialization": 175.099,
-						"Jazz entry projection": 82.543,
-						"Other Jazz work": 54.056,
-						"React development prop inspection": 27.269,
-						"Other": 17.093,
-						"React JSX creation": 10.1,
-						"Garbage collection": 7.767,
-						"UTF-16 entry mapping": 4.859,
-						"Other React work": 4.476,
-						"Wasm": 1.49
+						"Jazz text serialization": 128.599,
+						"Jazz entry projection": 63.797,
+						"Other Jazz work": 59.135,
+						"Other": 20.022,
+						"React development prop inspection": 19.869,
+						"React JSX creation": 9.613,
+						"Garbage collection": 8.703,
+						"UTF-16 entry mapping": 4.556,
+						"Other React work": 3.823,
+						"Wasm": 2.21
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							281.62
-						],
-						[
-							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							27.117
+							215.11
 						],
 						[
 							"syncMetadata /src/app/features/documents/lib/metadata.ts:65",
-							16.818
+							23.394
+						],
+						[
+							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
+							19.033
 						]
 					]
 				},
 				{
 					"index": 11,
-					"startMs": 39246.4,
-					"durationMs": 383.4,
+					"startMs": 37811.6,
+					"durationMs": 327.3,
 					"keys": [
 						{
-							"key": "a",
-							"delayMs": 290.5
+							"key": "f",
+							"delayMs": 299.4
 						}
 					],
 					"selfMs": {
-						"Jazz text serialization": 175.194,
-						"Jazz entry projection": 75.48,
-						"Other Jazz work": 59.197,
-						"React development prop inspection": 30.545,
-						"Other": 19.985,
-						"Garbage collection": 8.419,
-						"React JSX creation": 7.736,
-						"UTF-16 entry mapping": 4.361,
-						"Wasm": 1.599,
-						"Other React work": 0.931
+						"Jazz text serialization": 128.275,
+						"Other Jazz work": 64.918,
+						"Jazz entry projection": 57.104,
+						"Other": 23.551,
+						"React development prop inspection": 19.374,
+						"Garbage collection": 12.251,
+						"React JSX creation": 9.569,
+						"Other React work": 5.256,
+						"UTF-16 entry mapping": 3.79,
+						"Wasm": 3.239
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							279.187
-						],
-						[
-							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							28.976
+							213.18
 						],
 						[
 							"syncMetadata /src/app/features/documents/lib/metadata.ts:65",
-							19.652
+							27.417
+						],
+						[
+							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
+							18.196
 						]
 					]
 				},
 				{
 					"index": 12,
-					"startMs": 39925.1,
-					"durationMs": 465.2,
+					"startMs": 38312.8,
+					"durationMs": 336.1,
 					"keys": [
 						{
-							"key": "h",
-							"delayMs": 443.4
+							"key": "a",
+							"delayMs": 123.7
 						}
 					],
 					"selfMs": {
-						"Jazz text serialization": 176.943,
-						"Jazz entry projection": 92.427,
-						"Other Jazz work": 65.928,
-						"Garbage collection": 56.252,
-						"React development prop inspection": 27.684,
-						"Other": 26.979,
-						"Other React work": 7.287,
-						"React JSX creation": 6.194,
-						"UTF-16 entry mapping": 4.611,
-						"Wasm": 0.934
+						"Jazz text serialization": 128.916,
+						"Other Jazz work": 75.808,
+						"Jazz entry projection": 58.234,
+						"Other": 19.367,
+						"React development prop inspection": 17.768,
+						"React JSX creation": 14.693,
+						"Garbage collection": 11.548,
+						"Other React work": 4.946,
+						"UTF-16 entry mapping": 4.079,
+						"Wasm": 0.747
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							299.07
+							213.084
 						],
-						["(garbage collector) :1", 56.252],
 						[
-							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							27.285
+							"syncMetadata /src/app/features/documents/lib/metadata.ts:65",
+							32.102
+						],
+						[
+							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
+							17.738
 						]
+					]
+				},
+				{
+					"index": 13,
+					"startMs": 38845.4,
+					"durationMs": 350.1,
+					"keys": [
+						{
+							"key": "f",
+							"delayMs": 328.3
+						}
+					],
+					"selfMs": {
+						"Jazz text serialization": 130.668,
+						"Other Jazz work": 88.098,
+						"Jazz entry projection": 55.678,
+						"Other": 21.796,
+						"React development prop inspection": 20.326,
+						"React JSX creation": 11.129,
+						"Garbage collection": 9.949,
+						"Other React work": 5.316,
+						"UTF-16 entry mapping": 4.585,
+						"Wasm": 2.534
+					},
+					"nearestAppCallersMs": [
+						[
+							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
+							217.871
+						],
+						[
+							"syncMetadata /src/app/features/documents/lib/metadata.ts:65",
+							39.36
+						],
+						[
+							"persistDocumentEdits /src/app/features/documents/lib/incremental-document-save.ts:35",
+							19.167
+						]
+					]
+				},
+				{
+					"index": 14,
+					"startMs": 39357.6,
+					"durationMs": 347.5,
+					"keys": [
+						{
+							"key": "a",
+							"delayMs": 128.6
+						}
+					],
+					"selfMs": {
+						"Jazz text serialization": 126.937,
+						"Other Jazz work": 93.394,
+						"Jazz entry projection": 56.567,
+						"React development prop inspection": 19.917,
+						"Other": 18.115,
+						"React JSX creation": 10.956,
+						"Garbage collection": 10.655,
+						"Other React work": 4.905,
+						"UTF-16 entry mapping": 4.861,
+						"Wasm": 1.237
+					},
+					"nearestAppCallersMs": [
+						[
+							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
+							214.121
+						],
+						[
+							"syncMetadata /src/app/features/documents/lib/metadata.ts:65",
+							42.043
+						],
+						[
+							"persistDocumentEdits /src/app/features/documents/lib/incremental-document-save.ts:35",
+							19.769
+						]
+					]
+				},
+				{
+					"index": 15,
+					"startMs": 39919.9,
+					"durationMs": 357.7,
+					"keys": [
+						{
+							"key": "g",
+							"delayMs": 332.0
+						}
+					],
+					"selfMs": {
+						"Jazz text serialization": 128.207,
+						"Other Jazz work": 107.985,
+						"Jazz entry projection": 47.796,
+						"Other": 24.701,
+						"React development prop inspection": 20.791,
+						"Garbage collection": 8.298,
+						"React JSX creation": 6.818,
+						"Other React work": 5.943,
+						"UTF-16 entry mapping": 4.482,
+						"Wasm": 2.699
+					},
+					"nearestAppCallersMs": [
+						[
+							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
+							213.561
+						],
+						[
+							"syncMetadata /src/app/features/documents/lib/metadata.ts:65",
+							47.555
+						],
+						[
+							"persistDocumentEdits /src/app/features/documents/lib/incremental-document-save.ts:35",
+							23.411
+						]
+					]
+				},
+				{
+					"index": 16,
+					"startMs": 40433.7,
+					"durationMs": 364.2,
+					"keys": [
+						{
+							"key": "a",
+							"delayMs": 176.9
+						}
+					],
+					"selfMs": {
+						"Jazz text serialization": 127.271,
+						"Other Jazz work": 113.733,
+						"Jazz entry projection": 51.303,
+						"Other": 20.357,
+						"React development prop inspection": 20.137,
+						"Garbage collection": 9.999,
+						"React JSX creation": 8.193,
+						"Other React work": 5.323,
+						"UTF-16 entry mapping": 4.886,
+						"Wasm": 3.047
+					},
+					"nearestAppCallersMs": [
+						[
+							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
+							212.415
+						],
+						[
+							"syncMetadata /src/app/features/documents/lib/metadata.ts:65",
+							54.975
+						],
+						[
+							"persistDocumentEdits /src/app/features/documents/lib/incremental-document-save.ts:35",
+							26.427
+						]
+					]
+				},
+				{
+					"index": 17,
+					"startMs": 40989.1,
+					"durationMs": 440.7,
+					"keys": [
+						{
+							"key": "f",
+							"delayMs": 414.7
+						}
+					],
+					"selfMs": {
+						"Jazz text serialization": 134.019,
+						"Other Jazz work": 122.93,
+						"Jazz entry projection": 63.114,
+						"Garbage collection": 56.062,
+						"Other": 25.118,
+						"React development prop inspection": 20.616,
+						"React JSX creation": 9.212,
+						"Other React work": 4.505,
+						"UTF-16 entry mapping": 3.357,
+						"Wasm": 1.741
+					},
+					"nearestAppCallersMs": [
+						[
+							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
+							227.367
+						],
+						[
+							"syncMetadata /src/app/features/documents/lib/metadata.ts:65",
+							61.94
+						],
+						["(garbage collector) :1", 56.062]
 					]
 				}
 			]
 		},
 		"current-1x": {
-			"inputP95Ms": 75.39999985694885,
+			"inputP95Ms": 64.29999995231628,
 			"delayedKeydowns": 9,
 			"overlappingLongTasks": 9,
-			"longTaskMs": 1708.1299999999999,
+			"longTaskMs": 1492.737,
 			"selfMs": {
-				"Garbage collection": 372.629,
-				"Other Jazz work": 335.917,
-				"Jazz text serialization": 300.05,
-				"Wasm": 251.005,
-				"Jazz entry projection": 127.935,
-				"React JSX creation": 111.147,
-				"Other": 96.857,
-				"React development prop inspection": 54.325,
-				"Other React work": 27.479,
-				"Editor statistics scans": 18.478,
-				"UTF-16 entry mapping": 12.31
+				"Other Jazz work": 319.673,
+				"Jazz text serialization": 300.196,
+				"Wasm": 244.564,
+				"Jazz entry projection": 170.856,
+				"Garbage collection": 136.685,
+				"React JSX creation": 110.274,
+				"Other": 103.181,
+				"React development prop inspection": 45.828,
+				"Other React work": 27.866,
+				"Editor statistics scans": 19.477,
+				"UTF-16 entry mapping": 14.137
 			},
 			"tasks": [
 				{
 					"index": 0,
-					"startMs": 20877.4,
-					"durationMs": 702.2,
+					"startMs": 20812.0,
+					"durationMs": 630.2,
 					"keys": [
 						{
 							"key": "a",
-							"delayMs": 456.1
+							"delayMs": 386.8
 						}
 					],
 					"selfMs": {
-						"Other Jazz work": 270.781,
-						"Wasm": 248.58,
-						"Garbage collection": 90.469,
-						"Jazz text serialization": 42.047,
-						"Jazz entry projection": 32.843,
-						"Other": 17.462
+						"Other Jazz work": 263.836,
+						"Wasm": 241.726,
+						"Jazz text serialization": 40.17,
+						"Jazz entry projection": 36.219,
+						"Garbage collection": 27.755,
+						"Other": 20.521
 					},
 					"nearestAppCallersMs": [
-						["wasm-function[45] wasm://wasm/001b2a86:1", 174.008],
+						["wasm-function[45] wasm://wasm/001b2a86:1", 170.903],
 						[
 							"decryptTransaction /node_modules/.vite/deps/chunk-LXSRVLV6.js:5420",
-							150.264
+							148.451
 						],
-						["(garbage collector) :1", 90.469]
+						[
+							"reconcileArchivedDocumentContentUnsafe /src/app/features/documents/lib/document-generations.ts:244",
+							79.934
+						]
 					]
 				},
 				{
 					"index": 1,
-					"startMs": 22054.1,
-					"durationMs": 139.5,
+					"startMs": 21920.7,
+					"durationMs": 106.3,
 					"keys": [
 						{
 							"key": "a",
-							"delayMs": 91.1
+							"delayMs": 63.1
 						}
 					],
 					"selfMs": {
-						"Jazz text serialization": 41.096,
-						"Garbage collection": 34.889,
-						"React JSX creation": 15.949,
-						"Other": 11.389,
-						"Jazz entry projection": 11.299,
-						"Other Jazz work": 9.567,
-						"React development prop inspection": 5.535,
-						"Other React work": 5.18,
-						"Editor statistics scans": 2.482,
-						"UTF-16 entry mapping": 1.872,
-						"Wasm": 0.254
+						"Jazz text serialization": 40.559,
+						"React JSX creation": 16.054,
+						"Jazz entry projection": 14.538,
+						"Other": 12.842,
+						"Other Jazz work": 6.444,
+						"React development prop inspection": 4.215,
+						"Other React work": 3.362,
+						"Garbage collection": 3.325,
+						"Editor statistics scans": 2.291,
+						"UTF-16 entry mapping": 2.173,
+						"Wasm": 0.462
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							39.018
+							40.041
 						],
-						["(garbage collector) :1", 34.889],
-						["toString /node_modules/.vite/deps/chunk-LXSRVLV6.js:4753", 19.296]
+						[
+							"toString /node_modules/.vite/deps/chunk-LXSRVLV6.js:4753",
+							17.357
+						],
+						[
+							"(anonymous) /src/app/features/editor/widgets/command-palette.tsx:321",
+							3.944
+						]
 					]
 				},
 				{
 					"index": 2,
-					"startMs": 22696.9,
-					"durationMs": 117.9,
+					"startMs": 22515.1,
+					"durationMs": 91.2,
 					"keys": [
 						{
 							"key": "a",
-							"delayMs": 71.3
+							"delayMs": 49.6
 						}
 					],
 					"selfMs": {
-						"Jazz text serialization": 30.182,
-						"Garbage collection": 29.683,
-						"React JSX creation": 13.038,
-						"Jazz entry projection": 11.722,
-						"Other": 10.7,
-						"Other Jazz work": 8.588,
-						"React development prop inspection": 6.812,
-						"Other React work": 3.317,
-						"Editor statistics scans": 2.25,
-						"UTF-16 entry mapping": 1.508,
-						"Wasm": 0.125
+						"Jazz text serialization": 30.321,
+						"Jazz entry projection": 13.18,
+						"React JSX creation": 12.952,
+						"Other": 11.713,
+						"Other Jazz work": 7.756,
+						"React development prop inspection": 5.644,
+						"Other React work": 3.67,
+						"Garbage collection": 2.356,
+						"Editor statistics scans": 1.993,
+						"UTF-16 entry mapping": 1.505,
+						"Wasm": 0.152
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							47.959
+							49.925
 						],
-						["(garbage collector) :1", 29.683],
 						[
 							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							6.812
+							5.5
+						],
+						[
+							"(anonymous) /src/app/features/editor/widgets/command-palette.tsx:321",
+							3.504
 						]
 					]
 				},
 				{
 					"index": 3,
-					"startMs": 23318.4,
-					"durationMs": 113.2,
+					"startMs": 23084.0,
+					"durationMs": 91.0,
 					"keys": [
 						{
 							"key": "a",
-							"delayMs": 66.9
+							"delayMs": 49.3
 						}
 					],
 					"selfMs": {
-						"Jazz text serialization": 31.929,
-						"Garbage collection": 23.153,
-						"React JSX creation": 14.049,
-						"Jazz entry projection": 12.629,
-						"Other": 9.833,
-						"React development prop inspection": 7.298,
-						"Other Jazz work": 7.101,
-						"Other React work": 2.962,
-						"Editor statistics scans": 2.275,
-						"UTF-16 entry mapping": 1.427,
-						"Wasm": 0.503
+						"Jazz text serialization": 31.082,
+						"Jazz entry projection": 15.009,
+						"React JSX creation": 12.966,
+						"Other": 10.466,
+						"Other Jazz work": 6.56,
+						"React development prop inspection": 5.774,
+						"Other React work": 2.615,
+						"Garbage collection": 2.396,
+						"Editor statistics scans": 1.954,
+						"UTF-16 entry mapping": 1.579,
+						"Wasm": 0.562
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							49.469
+							51.375
 						],
-						["(garbage collector) :1", 23.153],
 						[
 							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							7.047
+							5.474
+						],
+						[
+							"(anonymous) /src/app/features/editor/widgets/command-palette.tsx:321",
+							3.648
 						]
 					]
 				},
 				{
 					"index": 4,
-					"startMs": 23912.3,
-					"durationMs": 138.2,
+					"startMs": 23655.1,
+					"durationMs": 126.4,
 					"keys": [
 						{
 							"key": "a",
-							"delayMs": 90.7
+							"delayMs": 78.3
 						}
 					],
 					"selfMs": {
-						"Garbage collection": 49.106,
-						"Jazz text serialization": 31.31,
-						"React JSX creation": 13.365,
-						"Jazz entry projection": 11.665,
-						"Other": 10.349,
-						"Other Jazz work": 7.804,
-						"React development prop inspection": 7.021,
-						"Other React work": 2.97,
-						"Editor statistics scans": 2.368,
-						"UTF-16 entry mapping": 1.821,
-						"Wasm": 0.387
+						"Jazz text serialization": 31.747,
+						"Jazz entry projection": 23.173,
+						"Garbage collection": 20.14,
+						"React JSX creation": 15.278,
+						"Other": 11.018,
+						"Other Jazz work": 7.647,
+						"React development prop inspection": 6.004,
+						"Other React work": 4.897,
+						"Editor statistics scans": 4.367,
+						"UTF-16 entry mapping": 1.487,
+						"Wasm": 0.596
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							49.386
+							61.512
 						],
-						["(garbage collector) :1", 49.106],
+						["(garbage collector) :1", 20.14],
 						[
 							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							6.891
+							5.347
 						]
 					]
 				},
 				{
 					"index": 5,
-					"startMs": 24532.6,
-					"durationMs": 126.8,
+					"startMs": 24259.8,
+					"durationMs": 92.5,
 					"keys": [
 						{
 							"key": "a",
-							"delayMs": 76.5
+							"delayMs": 50.3
 						}
 					],
 					"selfMs": {
-						"Garbage collection": 37.227,
-						"Jazz text serialization": 31.239,
-						"React JSX creation": 13.872,
-						"Jazz entry projection": 12.762,
-						"Other": 9.74,
-						"Other Jazz work": 7.743,
-						"React development prop inspection": 6.974,
-						"Other React work": 2.98,
-						"Editor statistics scans": 2.187,
-						"UTF-16 entry mapping": 1.82,
-						"Wasm": 0.258
+						"Jazz text serialization": 31.262,
+						"React JSX creation": 14.211,
+						"Jazz entry projection": 13.189,
+						"Other": 8.686,
+						"Other Jazz work": 7.804,
+						"React development prop inspection": 7.26,
+						"Garbage collection": 3.024,
+						"Editor statistics scans": 2.445,
+						"Other React work": 2.428,
+						"UTF-16 entry mapping": 1.69,
+						"Wasm": 0.456
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							50.101
+							50.89
 						],
-						["(garbage collector) :1", 37.227],
 						[
 							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							6.721
+							6.807
+						],
+						[
+							"(anonymous) /src/app/features/editor/widgets/command-palette.tsx:321",
+							3.53
 						]
 					]
 				},
 				{
 					"index": 6,
-					"startMs": 25144.2,
-					"durationMs": 125.0,
+					"startMs": 24828.7,
+					"durationMs": 107.8,
 					"keys": [
 						{
 							"key": "a",
-							"delayMs": 75.4
+							"delayMs": 64.7
 						}
 					],
 					"selfMs": {
-						"Garbage collection": 36.552,
-						"Jazz text serialization": 30.673,
-						"React JSX creation": 13.85,
-						"Jazz entry projection": 11.344,
-						"Other": 9.077,
-						"Other Jazz work": 8.12,
-						"React development prop inspection": 6.911,
-						"Other React work": 4.356,
-						"Editor statistics scans": 2.346,
-						"UTF-16 entry mapping": 1.555,
-						"Wasm": 0.258
+						"Jazz text serialization": 31.695,
+						"Garbage collection": 18.143,
+						"Jazz entry projection": 16.25,
+						"React JSX creation": 13.497,
+						"Other": 7.275,
+						"Other Jazz work": 6.301,
+						"React development prop inspection": 5.344,
+						"Other React work": 4.848,
+						"Editor statistics scans": 2.75,
+						"UTF-16 entry mapping": 1.55,
+						"Wasm": 0.142
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							48.603
+							52.867
 						],
-						["(garbage collector) :1", 36.552],
+						["(garbage collector) :1", 18.143],
 						[
 							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							6.789
+							5.205
 						]
 					]
 				},
 				{
 					"index": 7,
-					"startMs": 25754.3,
-					"durationMs": 122.5,
+					"startMs": 25410.7,
+					"durationMs": 139.8,
 					"keys": [
 						{
 							"key": "a",
-							"delayMs": 72.7
+							"delayMs": 99.6
 						}
 					],
 					"selfMs": {
-						"Garbage collection": 35.401,
-						"Jazz text serialization": 30.86,
-						"React JSX creation": 13.349,
-						"Jazz entry projection": 11.308,
-						"Other": 9.104,
-						"Other Jazz work": 8.738,
-						"React development prop inspection": 6.771,
-						"Other React work": 3.365,
-						"Editor statistics scans": 2.18,
-						"UTF-16 entry mapping": 1.159,
-						"Wasm": 0.255
+						"Garbage collection": 41.209,
+						"Jazz text serialization": 32.461,
+						"Jazz entry projection": 22.595,
+						"React JSX creation": 12.96,
+						"Other": 9.99,
+						"Other Jazz work": 7.374,
+						"React development prop inspection": 5.566,
+						"Other React work": 3.327,
+						"Editor statistics scans": 2.146,
+						"UTF-16 entry mapping": 1.998,
+						"Wasm": 0.157
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							48.814
+							60.911
 						],
-						["(garbage collector) :1", 35.401],
+						["(garbage collector) :1", 41.209],
 						[
 							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							6.771
+							5.413
 						]
 					]
 				},
 				{
 					"index": 8,
-					"startMs": 26361.0,
-					"durationMs": 122.9,
+					"startMs": 26026.7,
+					"durationMs": 107.7,
 					"keys": [
 						{
 							"key": "a",
-							"delayMs": 74.8
+							"delayMs": 64.3
 						}
 					],
 					"selfMs": {
-						"Garbage collection": 36.149,
-						"Jazz text serialization": 30.714,
-						"React JSX creation": 13.675,
-						"Jazz entry projection": 12.363,
-						"Other": 9.203,
-						"Other Jazz work": 7.475,
-						"React development prop inspection": 7.003,
-						"Editor statistics scans": 2.39,
-						"Other React work": 2.349,
-						"UTF-16 entry mapping": 1.148,
-						"Wasm": 0.385
+						"Jazz text serialization": 30.899,
+						"Garbage collection": 18.337,
+						"Jazz entry projection": 16.703,
+						"React JSX creation": 12.356,
+						"Other": 10.67,
+						"React development prop inspection": 6.021,
+						"Other Jazz work": 5.951,
+						"Other React work": 2.719,
+						"UTF-16 entry mapping": 2.155,
+						"Editor statistics scans": 1.531,
+						"Wasm": 0.311
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							49.519
+							52.645
 						],
-						["(garbage collector) :1", 36.149],
+						["(garbage collector) :1", 18.337],
 						[
 							"addValueToProperties /node_modules/.vite/deps/chunk-7WFJW54G.js:2956",
-							6.624
+							5.584
 						]
 					]
 				}
 			]
 		},
 		"candidate-1x": {
-			"inputP95Ms": 111,
-			"delayedKeydowns": 24,
-			"overlappingLongTasks": 24,
-			"longTaskMs": 3287.351,
+			"inputP95Ms": 108.79999995231628,
+			"delayedKeydowns": 34,
+			"overlappingLongTasks": 34,
+			"longTaskMs": 3589.265,
 			"selfMs": {
-				"Jazz text serialization": 916.723,
-				"Garbage collection": 887.184,
-				"Other Jazz work": 528.683,
-				"Jazz entry projection": 336.988,
-				"Wasm": 258.453,
-				"Other": 131.704,
-				"React development prop inspection": 130.869,
-				"React JSX creation": 43.141,
-				"UTF-16 entry mapping": 29.761,
-				"Other React work": 23.845
+				"Jazz text serialization": 1256.179,
+				"Other Jazz work": 778.233,
+				"Jazz entry projection": 543.19,
+				"Garbage collection": 276.666,
+				"Wasm": 257.229,
+				"Other": 183.445,
+				"React development prop inspection": 161.028,
+				"React JSX creation": 55.907,
+				"UTF-16 entry mapping": 42.32,
+				"Other React work": 35.068
 			},
 			"tasks": [
 				{
 					"index": 0,
-					"startMs": 16969.1,
-					"durationMs": 139.8,
+					"startMs": 18523.8,
+					"durationMs": 103.3,
 					"keys": [
 						{
 							"key": "a",
-							"delayMs": 95.8
+							"delayMs": 60.9
 						}
 					],
 					"selfMs": {
-						"Jazz text serialization": 65.677,
-						"Garbage collection": 40.782,
-						"Jazz entry projection": 21.424,
-						"Other": 4.805,
-						"React JSX creation": 2.363,
-						"UTF-16 entry mapping": 2.054,
-						"Other React work": 1.284,
-						"Other Jazz work": 1.183,
-						"Wasm": 0.259
+						"Jazz text serialization": 63.149,
+						"Jazz entry projection": 21.662,
+						"Other": 6.506,
+						"Garbage collection": 5.745,
+						"UTF-16 entry mapping": 2.182,
+						"React JSX creation": 1.746,
+						"Other Jazz work": 1.034,
+						"Other React work": 0.93,
+						"Wasm": 0.162,
+						"React development prop inspection": 0.154
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							64.927
+							62.916
 						],
-						["(garbage collector) :1", 40.782],
-						["toString /node_modules/.vite/deps/chunk-LXSRVLV6.js:4753", 20.398]
+						[
+							"toString /node_modules/.vite/deps/chunk-LXSRVLV6.js:4753",
+							20.524
+						],
+						["(garbage collector) :1", 5.745]
 					]
 				},
 				{
 					"index": 1,
-					"startMs": 17167.1,
-					"durationMs": 128.3,
+					"startMs": 18674.0,
+					"durationMs": 105.0,
 					"keys": [
 						{
 							"key": "c",
-							"delayMs": 111.0
+							"delayMs": 79.9
 						}
 					],
 					"selfMs": {
-						"Jazz text serialization": 51.763,
-						"Garbage collection": 37.618,
-						"Jazz entry projection": 13.747,
-						"Other Jazz work": 7.091,
-						"Other": 6.511,
-						"React development prop inspection": 5.585,
-						"React JSX creation": 2.181,
-						"UTF-16 entry mapping": 1.861,
-						"Other React work": 1.403,
-						"Wasm": 0.53
+						"Jazz text serialization": 52.766,
+						"Jazz entry projection": 24.252,
+						"Garbage collection": 9.247,
+						"Other": 6.663,
+						"React development prop inspection": 5.935,
+						"React JSX creation": 2.145,
+						"UTF-16 entry mapping": 1.72,
+						"Other React work": 1.494,
+						"Wasm": 0.455,
+						"Other Jazz work": 0.372
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							71.79
+							75.421
 						],
-						["(garbage collector) :1", 37.618],
+						["(garbage collector) :1", 9.247],
 						[
 							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
-							5.342
+							5.935
 						]
 					]
 				},
 				{
 					"index": 2,
-					"startMs": 17380.7,
-					"durationMs": 140.1,
+					"startMs": 18854.2,
+					"durationMs": 94.0,
 					"keys": [
 						{
-							"key": "f",
-							"delayMs": 112.5
+							"key": "e",
+							"delayMs": 93.7
 						}
 					],
 					"selfMs": {
-						"Jazz text serialization": 51.698,
-						"Garbage collection": 42.928,
-						"Jazz entry projection": 18.49,
-						"Other Jazz work": 8.842,
-						"React development prop inspection": 7.1,
-						"Other": 5.435,
-						"React JSX creation": 2.188,
-						"UTF-16 entry mapping": 1.358,
-						"Other React work": 1.295,
-						"Wasm": 0.748
+						"Jazz text serialization": 52.176,
+						"Jazz entry projection": 13.078,
+						"Other Jazz work": 8.137,
+						"React development prop inspection": 6.689,
+						"Other": 4.91,
+						"Garbage collection": 3.563,
+						"React JSX creation": 1.968,
+						"UTF-16 entry mapping": 1.703,
+						"Other React work": 1.354,
+						"Wasm": 0.406
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							76.954
+							71.243
 						],
-						["(garbage collector) :1", 42.928],
 						[
 							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
-							6.979
-						]
+							6.689
+						],
+						["(garbage collector) :1", 3.563]
 					]
 				},
 				{
 					"index": 3,
-					"startMs": 17596.7,
-					"durationMs": 124.4,
+					"startMs": 19032.1,
+					"durationMs": 113.8,
 					"keys": [
 						{
 							"key": "h",
-							"delayMs": 121.3
+							"delayMs": 91.3
 						}
 					],
 					"selfMs": {
-						"Jazz text serialization": 51.581,
-						"Garbage collection": 34.608,
-						"Jazz entry projection": 11.953,
-						"Other Jazz work": 7.966,
-						"React development prop inspection": 7.071,
-						"Other": 6.189,
-						"React JSX creation": 1.952,
-						"Other React work": 1.302,
-						"UTF-16 entry mapping": 1.272,
-						"Wasm": 0.52
+						"Jazz text serialization": 53.186,
+						"Jazz entry projection": 23.368,
+						"Other Jazz work": 10.156,
+						"Garbage collection": 8.56,
+						"React development prop inspection": 6.933,
+						"Other": 6.026,
+						"React JSX creation": 2.571,
+						"UTF-16 entry mapping": 1.428,
+						"Other React work": 1.212,
+						"Wasm": 0.386
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							69.225
+							84.188
 						],
-						["(garbage collector) :1", 34.608],
+						["(garbage collector) :1", 8.56],
 						[
 							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
-							6.802
+							6.634
 						]
 					]
 				},
 				{
 					"index": 4,
-					"startMs": 18535.3,
-					"durationMs": 117.5,
+					"startMs": 19927.1,
+					"durationMs": 84.3,
 					"keys": [
 						{
 							"key": "a",
-							"delayMs": 71.2
+							"delayMs": 40.9
 						}
 					],
 					"selfMs": {
-						"Jazz text serialization": 51.263,
-						"Garbage collection": 37.612,
-						"Jazz entry projection": 11.907,
-						"Other Jazz work": 9.7,
-						"Other": 2.676,
-						"React JSX creation": 1.812,
-						"UTF-16 entry mapping": 1.364,
-						"Other React work": 0.898,
-						"Wasm": 0.133,
-						"React development prop inspection": 0.12
+						"Jazz text serialization": 50.495,
+						"Jazz entry projection": 13.481,
+						"Other Jazz work": 9.606,
+						"Other": 3.338,
+						"Garbage collection": 2.768,
+						"UTF-16 entry mapping": 1.693,
+						"React JSX creation": 1.363,
+						"Other React work": 1.204,
+						"Wasm": 0.315
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							70.17
+							70.54
 						],
-						["(garbage collector) :1", 37.612],
+						["(garbage collector) :1", 2.768],
 						[
-							"entryOffsets /src/app/features/documents/lib/incremental-document-save.ts:129",
-							1.364
+							"syncMetadata /src/app/features/documents/lib/metadata.ts:65",
+							2.128
 						]
 					]
 				},
 				{
 					"index": 5,
-					"startMs": 18738.2,
-					"durationMs": 121.0,
+					"startMs": 20086.0,
+					"durationMs": 138.5,
 					"keys": [
 						{
 							"key": "d",
-							"delayMs": 94.3
+							"delayMs": 111.0
 						}
 					],
 					"selfMs": {
-						"Jazz text serialization": 51.822,
-						"Garbage collection": 28.946,
-						"Jazz entry projection": 12.596,
-						"Other Jazz work": 9.747,
-						"React development prop inspection": 7.459,
-						"Other": 4.703,
-						"React JSX creation": 2.838,
-						"UTF-16 entry mapping": 1.439,
-						"Other React work": 1.246,
-						"Wasm": 0.246
+						"Jazz text serialization": 52.638,
+						"Garbage collection": 35.882,
+						"Jazz entry projection": 22.681,
+						"Other Jazz work": 10.512,
+						"React development prop inspection": 5.895,
+						"Other": 4.877,
+						"React JSX creation": 2.281,
+						"UTF-16 entry mapping": 1.663,
+						"Other React work": 1.484,
+						"Wasm": 0.621
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							70.847
+							81.917
 						],
-						["(garbage collector) :1", 28.946],
+						["(garbage collector) :1", 35.882],
 						[
 							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
-							7.104
+							5.649
 						]
 					]
 				},
 				{
 					"index": 6,
-					"startMs": 18945.6,
-					"durationMs": 128.0,
+					"startMs": 20256.6,
+					"durationMs": 106.8,
 					"keys": [
 						{
-							"key": "g",
-							"delayMs": 104.9
+							"key": "e",
+							"delayMs": 103.7
 						}
 					],
 					"selfMs": {
-						"Jazz text serialization": 51.979,
-						"Garbage collection": 35.838,
-						"Jazz entry projection": 13.664,
-						"Other Jazz work": 9.087,
-						"React development prop inspection": 7.368,
-						"Other": 5.527,
-						"React JSX creation": 1.918,
-						"UTF-16 entry mapping": 1.301,
-						"Other React work": 1.033,
-						"Wasm": 0.241
+						"Jazz text serialization": 50.854,
+						"Jazz entry projection": 14.214,
+						"Other Jazz work": 13.595,
+						"Garbage collection": 9.16,
+						"React development prop inspection": 6.993,
+						"Other": 6.889,
+						"React JSX creation": 2.453,
+						"UTF-16 entry mapping": 1.948,
+						"Other React work": 0.581,
+						"Wasm": 0.151
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							70.747
+							72.809
 						],
-						["(garbage collector) :1", 35.838],
+						["(garbage collector) :1", 9.16],
 						[
 							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
-							6.831
+							6.84
 						]
 					]
 				},
 				{
 					"index": 7,
-					"startMs": 19710.9,
-					"durationMs": 695.8,
+					"startMs": 20431.7,
+					"durationMs": 100.7,
 					"keys": [
 						{
-							"key": "a",
-							"delayMs": 451.2
+							"key": "g",
+							"delayMs": 98.7
 						}
 					],
 					"selfMs": {
-						"Other Jazz work": 264.568,
-						"Wasm": 248.767,
-						"Garbage collection": 91.387,
-						"Jazz text serialization": 41.281,
-						"Jazz entry projection": 29.994,
-						"Other": 19.759
-					},
-					"nearestAppCallersMs": [
-						["wasm-function[45] wasm://wasm/001b2a86:1", 175.127],
-						[
-							"decryptTransaction /node_modules/.vite/deps/chunk-LXSRVLV6.js:5420",
-							145.133
-						],
-						["(garbage collector) :1", 91.387]
-					]
-				},
-				{
-					"index": 8,
-					"startMs": 20887.9,
-					"durationMs": 110.9,
-					"keys": [
-						{
-							"key": "a",
-							"delayMs": 67.7
-						}
-					],
-					"selfMs": {
-						"Garbage collection": 40.124,
-						"Jazz text serialization": 31.568,
-						"Jazz entry projection": 16.57,
-						"Other Jazz work": 14.915,
-						"React JSX creation": 2.317,
-						"Other": 2.214,
-						"UTF-16 entry mapping": 1.804,
-						"Other React work": 0.891,
-						"Wasm": 0.385,
-						"React development prop inspection": 0.12
+						"Jazz text serialization": 50.915,
+						"Other Jazz work": 16.027,
+						"Jazz entry projection": 13.488,
+						"React development prop inspection": 7.04,
+						"Other": 5.028,
+						"Garbage collection": 3.64,
+						"React JSX creation": 1.84,
+						"Other React work": 1.228,
+						"UTF-16 entry mapping": 1.22,
+						"Wasm": 0.302
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							57.873
+							73.336
 						],
-						["(garbage collector) :1", 40.124],
+						[
+							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
+							6.593
+						],
 						[
 							"syncMetadata /src/app/features/documents/lib/metadata.ts:65",
-							3.103
+							4.67
+						]
+					]
+				},
+				{
+					"index": 8,
+					"startMs": 20555.8,
+					"durationMs": 99.5,
+					"keys": [
+						{
+							"key": "h",
+							"delayMs": 87.8
+						}
+					],
+					"selfMs": {
+						"Jazz text serialization": 50.21,
+						"Other Jazz work": 17.828,
+						"Jazz entry projection": 12.74,
+						"React development prop inspection": 6.994,
+						"Other": 5.175,
+						"Garbage collection": 3.996,
+						"UTF-16 entry mapping": 1.211,
+						"Other React work": 0.898,
+						"Wasm": 0.459
+					},
+					"nearestAppCallersMs": [
+						[
+							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
+							72.629
+						],
+						[
+							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
+							6.84
+						],
+						[
+							"syncMetadata /src/app/features/documents/lib/metadata.ts:65",
+							5.585
 						]
 					]
 				},
 				{
 					"index": 9,
-					"startMs": 21026.8,
-					"durationMs": 125.2,
+					"startMs": 21139.7,
+					"durationMs": 642.6,
 					"keys": [
 						{
-							"key": "b",
-							"delayMs": 119.0
+							"key": "g",
+							"delayMs": 630.4
 						}
 					],
 					"selfMs": {
-						"Garbage collection": 42.126,
-						"Jazz text serialization": 31.497,
-						"Other Jazz work": 16.881,
-						"Jazz entry projection": 15.704,
-						"Other": 7.087,
-						"React development prop inspection": 7.008,
-						"React JSX creation": 1.924,
-						"UTF-16 entry mapping": 1.524,
-						"Wasm": 0.77,
-						"Other React work": 0.631
+						"Other Jazz work": 270.435,
+						"Wasm": 244.295,
+						"Jazz text serialization": 40.342,
+						"Jazz entry projection": 36.078,
+						"Garbage collection": 31.334,
+						"Other": 20.148
 					},
 					"nearestAppCallersMs": [
+						["wasm-function[45] wasm://wasm/001b2a86:1", 170.395],
 						[
-							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							57.352
+							"decryptTransaction /node_modules/.vite/deps/chunk-LXSRVLV6.js:5420",
+							147.576
 						],
-						["(garbage collector) :1", 42.126],
 						[
-							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
-							6.75
+							"reconcileArchivedDocumentContentUnsafe /src/app/features/documents/lib/document-generations.ts:244",
+							82.43
 						]
 					]
 				},
 				{
 					"index": 10,
-					"startMs": 21180.7,
-					"durationMs": 105.7,
+					"startMs": 22064.6,
+					"durationMs": 74.5,
 					"keys": [
 						{
-							"key": "c",
-							"delayMs": 100.0
+							"key": "a",
+							"delayMs": 28.7
 						}
 					],
 					"selfMs": {
-						"Garbage collection": 31.383,
-						"Jazz text serialization": 31.056,
-						"Other Jazz work": 16.061,
-						"Jazz entry projection": 11.334,
-						"React development prop inspection": 6.534,
-						"Other": 4.05,
-						"React JSX creation": 2.304,
-						"UTF-16 entry mapping": 1.409,
-						"Other React work": 1.189,
-						"Wasm": 0.376
+						"Jazz text serialization": 30.251,
+						"Other Jazz work": 19.635,
+						"Jazz entry projection": 14.525,
+						"Other": 3.099,
+						"Garbage collection": 2.483,
+						"React JSX creation": 1.733,
+						"UTF-16 entry mapping": 1.076,
+						"Other React work": 1.062,
+						"Wasm": 0.463,
+						"React development prop inspection": 0.135
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							50.904
+							53.346
 						],
-						["(garbage collector) :1", 31.383],
 						[
-							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
-							6.534
+							"syncMetadata /src/app/features/documents/lib/metadata.ts:65",
+							7.544
+						],
+						[
+							"persistDocumentEdits /src/app/features/documents/lib/incremental-document-save.ts:35",
+							3.526
 						]
 					]
 				},
 				{
 					"index": 11,
-					"startMs": 21315.5,
-					"durationMs": 110.9,
+					"startMs": 22165.0,
+					"durationMs": 86.9,
 					"keys": [
 						{
-							"key": "d",
-							"delayMs": 106.5
+							"key": "b",
+							"delayMs": 79.9
 						}
 					],
 					"selfMs": {
-						"Garbage collection": 34.945,
-						"Jazz text serialization": 30.993,
-						"Other Jazz work": 15.792,
-						"Jazz entry projection": 12.523,
-						"React development prop inspection": 6.652,
-						"Other": 5.89,
-						"React JSX creation": 1.677,
-						"Other React work": 1.156,
-						"UTF-16 entry mapping": 1.02,
-						"Wasm": 0.261
+						"Jazz text serialization": 30.469,
+						"Other Jazz work": 24.473,
+						"Jazz entry projection": 13.899,
+						"Other": 5.6,
+						"Garbage collection": 4.443,
+						"React development prop inspection": 4.228,
+						"React JSX creation": 1.991,
+						"UTF-16 entry mapping": 0.909,
+						"Other React work": 0.6,
+						"Wasm": 0.298
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							51.74
+							54.921
 						],
-						["(garbage collector) :1", 34.945],
 						[
-							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
-							6.412
-						]
+							"syncMetadata /src/app/features/documents/lib/metadata.ts:65",
+							9.396
+						],
+						["(garbage collector) :1", 4.443]
 					]
 				},
 				{
 					"index": 12,
-					"startMs": 21456.0,
-					"durationMs": 115.8,
+					"startMs": 22279.0,
+					"durationMs": 88.8,
 					"keys": [
 						{
-							"key": "e",
-							"delayMs": 110.4
+							"key": "c",
+							"delayMs": 82.3
 						}
 					],
 					"selfMs": {
-						"Garbage collection": 38.785,
-						"Jazz text serialization": 30.892,
-						"Other Jazz work": 18.039,
-						"Jazz entry projection": 11.734,
-						"React development prop inspection": 6.568,
-						"Other": 5.688,
-						"React JSX creation": 1.924,
-						"UTF-16 entry mapping": 1.027,
-						"Other React work": 0.911,
-						"Wasm": 0.259
+						"Jazz text serialization": 30.623,
+						"Other Jazz work": 24.668,
+						"Jazz entry projection": 14.972,
+						"Other": 4.519,
+						"React development prop inspection": 4.261,
+						"Garbage collection": 4.132,
+						"React JSX creation": 2.278,
+						"Other React work": 1.655,
+						"UTF-16 entry mapping": 1.209,
+						"Wasm": 0.438
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							51.221
+							55.249
 						],
-						["(garbage collector) :1", 38.785],
 						[
-							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
-							6.568
+							"syncMetadata /src/app/features/documents/lib/metadata.ts:65",
+							10.736
+						],
+						[
+							"persistDocumentEdits /src/app/features/documents/lib/incremental-document-save.ts:35",
+							4.877
 						]
 					]
 				},
 				{
 					"index": 13,
-					"startMs": 21598.9,
-					"durationMs": 113.5,
+					"startMs": 22396.1,
+					"durationMs": 90.6,
 					"keys": [
 						{
-							"key": "f",
-							"delayMs": 106.2
+							"key": "d",
+							"delayMs": 84.6
 						}
 					],
 					"selfMs": {
-						"Garbage collection": 35.05,
-						"Jazz text serialization": 30.804,
-						"Other Jazz work": 19.846,
-						"Jazz entry projection": 11.751,
-						"React development prop inspection": 6.928,
-						"Other": 4.627,
-						"React JSX creation": 1.797,
-						"Other React work": 1.157,
-						"UTF-16 entry mapping": 1.144,
-						"Wasm": 0.388
+						"Jazz text serialization": 30.404,
+						"Other Jazz work": 28.416,
+						"Jazz entry projection": 14.381,
+						"Other": 5.453,
+						"React development prop inspection": 5.135,
+						"Garbage collection": 2.523,
+						"React JSX creation": 1.832,
+						"UTF-16 entry mapping": 1.051,
+						"Other React work": 1.046,
+						"Wasm": 0.311
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							51.144
+							55.669
 						],
-						["(garbage collector) :1", 35.05],
 						[
 							"syncMetadata /src/app/features/documents/lib/metadata.ts:65",
-							7.415
+							11.663
+						],
+						[
+							"persistDocumentEdits /src/app/features/documents/lib/incremental-document-save.ts:35",
+							5.74
 						]
 					]
 				},
 				{
 					"index": 14,
-					"startMs": 21727.0,
-					"durationMs": 105.2,
+					"startMs": 22514.9,
+					"durationMs": 95.3,
 					"keys": [
 						{
-							"key": "g",
-							"delayMs": 84.1
+							"key": "e",
+							"delayMs": 89.7
 						}
 					],
 					"selfMs": {
-						"Jazz text serialization": 31.076,
-						"Garbage collection": 26.559,
-						"Other Jazz work": 21.117,
-						"Jazz entry projection": 12.699,
-						"React development prop inspection": 6.661,
-						"Other": 4.691,
-						"Other React work": 1.024,
-						"UTF-16 entry mapping": 1.023,
-						"Wasm": 0.396
+						"Other Jazz work": 32.804,
+						"Jazz text serialization": 30.136,
+						"Jazz entry projection": 13.169,
+						"Other": 4.897,
+						"React development prop inspection": 4.833,
+						"Garbage collection": 4.517,
+						"Other React work": 1.948,
+						"React JSX creation": 1.377,
+						"UTF-16 entry mapping": 1.062,
+						"Wasm": 0.601
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							52.571
+							55.846
 						],
-						["(garbage collector) :1", 26.559],
 						[
 							"syncMetadata /src/app/features/documents/lib/metadata.ts:65",
-							8.464
+							13.314
+						],
+						[
+							"persistDocumentEdits /src/app/features/documents/lib/incremental-document-save.ts:35",
+							6.747
 						]
 					]
 				},
 				{
 					"index": 15,
-					"startMs": 21846.7,
-					"durationMs": 105.7,
+					"startMs": 22638.3,
+					"durationMs": 126.9,
 					"keys": [
 						{
-							"key": "h",
-							"delayMs": 85.1
+							"key": "f",
+							"delayMs": 120.9
 						}
 					],
 					"selfMs": {
-						"Jazz text serialization": 30.686,
-						"Garbage collection": 24.58,
-						"Other Jazz work": 22.795,
-						"Jazz entry projection": 13.176,
-						"React development prop inspection": 6.788,
-						"Other": 4.767,
-						"Other React work": 1.114,
-						"UTF-16 entry mapping": 0.986,
-						"Wasm": 0.641,
-						"React JSX creation": 0.129
+						"Other Jazz work": 59.269,
+						"Jazz text serialization": 30.249,
+						"Jazz entry projection": 14.498,
+						"Garbage collection": 7.585,
+						"Other": 6.002,
+						"React development prop inspection": 4.66,
+						"React JSX creation": 2.399,
+						"Other React work": 1.201,
+						"UTF-16 entry mapping": 0.899,
+						"Wasm": 0.15
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							52.946
+							56.517
 						],
-						["(garbage collector) :1", 24.58],
 						[
 							"syncMetadata /src/app/features/documents/lib/metadata.ts:65",
-							9.471
+							31.785
+						],
+						[
+							"persistDocumentEdits /src/app/features/documents/lib/incremental-document-save.ts:35",
+							14.81
 						]
 					]
 				},
 				{
 					"index": 16,
-					"startMs": 22718.6,
-					"durationMs": 92.9,
+					"startMs": 22786.2,
+					"durationMs": 130.0,
 					"keys": [
 						{
-							"key": "a",
-							"delayMs": 43.4
+							"key": "g",
+							"delayMs": 108.8
 						}
 					],
 					"selfMs": {
-						"Garbage collection": 35.87,
-						"Jazz text serialization": 31.248,
-						"Jazz entry projection": 12.608,
-						"Other Jazz work": 6.436,
-						"Other": 2.734,
-						"React JSX creation": 1.672,
-						"UTF-16 entry mapping": 1.039,
-						"Other React work": 0.756,
-						"Wasm": 0.511
+						"Other Jazz work": 41.059,
+						"Jazz text serialization": 31.476,
+						"Garbage collection": 22.22,
+						"Jazz entry projection": 21.005,
+						"React development prop inspection": 6.047,
+						"Other": 5.052,
+						"Other React work": 1.493,
+						"UTF-16 entry mapping": 1.049,
+						"Wasm": 0.456,
+						"React JSX creation": 0.153
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							50.427
+							67.772
 						],
-						["(garbage collector) :1", 35.87],
+						["(garbage collector) :1", 22.22],
 						[
-							"entryOffsets /src/app/features/documents/lib/incremental-document-save.ts:129",
-							1.039
+							"syncMetadata /src/app/features/documents/lib/metadata.ts:65",
+							17.338
 						]
 					]
 				},
 				{
 					"index": 17,
-					"startMs": 22838.0,
-					"durationMs": 101.2,
+					"startMs": 22930.8,
+					"durationMs": 106.7,
 					"keys": [
 						{
-							"key": "b",
-							"delayMs": 94.3
+							"key": "h",
+							"delayMs": 87.2
 						}
 					],
 					"selfMs": {
-						"Garbage collection": 34.109,
-						"Jazz text serialization": 30.913,
-						"Jazz entry projection": 14.243,
-						"React development prop inspection": 7.245,
-						"Other Jazz work": 5.448,
-						"Other": 4.417,
-						"React JSX creation": 2.496,
-						"UTF-16 entry mapping": 1.01,
-						"Other React work": 0.993,
-						"Wasm": 0.368
+						"Other Jazz work": 41.834,
+						"Jazz text serialization": 31.311,
+						"Jazz entry projection": 13.302,
+						"React development prop inspection": 7.499,
+						"Other": 5.005,
+						"Garbage collection": 4.902,
+						"UTF-16 entry mapping": 1.353,
+						"Wasm": 0.767,
+						"Other React work": 0.447,
+						"React JSX creation": 0.304
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							50.27
+							58.675
 						],
-						["(garbage collector) :1", 34.109],
 						[
-							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
-							7.088
+							"syncMetadata /src/app/features/documents/lib/metadata.ts:65",
+							19.449
+						],
+						[
+							"persistDocumentEdits /src/app/features/documents/lib/incremental-document-save.ts:35",
+							9.237
 						]
 					]
 				},
 				{
 					"index": 18,
-					"startMs": 22970.0,
-					"durationMs": 98.9,
+					"startMs": 23808.1,
+					"durationMs": 60.6,
 					"keys": [
 						{
-							"key": "c",
-							"delayMs": 95.1
+							"key": "a",
+							"delayMs": 18.6
 						}
 					],
 					"selfMs": {
-						"Garbage collection": 33.283,
-						"Jazz text serialization": 30.392,
-						"Jazz entry projection": 10.755,
-						"Other Jazz work": 8.458,
-						"React development prop inspection": 6.768,
-						"Other": 5.019,
-						"React JSX creation": 2.188,
-						"UTF-16 entry mapping": 1.1,
-						"Other React work": 0.504,
-						"Wasm": 0.393
+						"Jazz text serialization": 30.761,
+						"Jazz entry projection": 14.033,
+						"Other Jazz work": 7.344,
+						"Other": 2.303,
+						"React JSX creation": 2.131,
+						"Garbage collection": 2.012,
+						"UTF-16 entry mapping": 1.242,
+						"Other React work": 0.604,
+						"React development prop inspection": 0.15
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							48.204
+							51.242
 						],
-						["(garbage collector) :1", 33.283],
+						["(garbage collector) :1", 2.012],
 						[
-							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
-							6.643
+							"entryOffsets /src/app/features/documents/lib/incremental-document-save.ts:129",
+							1.242
 						]
 					]
 				},
 				{
 					"index": 19,
-					"startMs": 23095.7,
-					"durationMs": 99.0,
+					"startMs": 23894.8,
+					"durationMs": 96.9,
 					"keys": [
 						{
-							"key": "d",
-							"delayMs": 90.8
+							"key": "b",
+							"delayMs": 89.2
 						}
 					],
 					"selfMs": {
-						"Jazz text serialization": 31.432,
-						"Garbage collection": 31.235,
-						"Jazz entry projection": 12.469,
-						"React development prop inspection": 7.391,
-						"Other Jazz work": 6.606,
-						"Other": 5.072,
-						"React JSX creation": 2.132,
-						"Other React work": 1.229,
-						"UTF-16 entry mapping": 1.161,
-						"Wasm": 0.253
+						"Jazz text serialization": 31.84,
+						"Garbage collection": 21.443,
+						"Jazz entry projection": 18.867,
+						"React development prop inspection": 7.224,
+						"Other Jazz work": 6.367,
+						"Other": 6.167,
+						"React JSX creation": 2.405,
+						"UTF-16 entry mapping": 1.048,
+						"Other React work": 0.913,
+						"Wasm": 0.593
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							49.489
+							56.326
 						],
-						["(garbage collector) :1", 31.235],
+						["(garbage collector) :1", 21.443],
 						[
 							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
-							7.011
+							7.065
 						]
 					]
 				},
 				{
 					"index": 20,
-					"startMs": 23225.2,
-					"durationMs": 106.9,
+					"startMs": 24017.8,
+					"durationMs": 121.4,
 					"keys": [
 						{
-							"key": "e",
-							"delayMs": 97.8
+							"key": "c",
+							"delayMs": 112.7
 						}
 					],
 					"selfMs": {
-						"Jazz text serialization": 35.343,
-						"Garbage collection": 33.673,
-						"Jazz entry projection": 12.673,
-						"Other Jazz work": 8.605,
-						"React development prop inspection": 7.236,
-						"Other": 4.542,
-						"React JSX creation": 1.852,
-						"Other React work": 1.278,
-						"UTF-16 entry mapping": 1.016,
-						"Wasm": 0.652
+						"Garbage collection": 43.898,
+						"Jazz text serialization": 31.282,
+						"Jazz entry projection": 22.781,
+						"Other Jazz work": 7.524,
+						"React development prop inspection": 5.684,
+						"Other": 5.078,
+						"React JSX creation": 1.75,
+						"Other React work": 1.579,
+						"UTF-16 entry mapping": 1.517,
+						"Wasm": 0.323
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							54.404
+							61.122
 						],
-						["(garbage collector) :1", 33.673],
+						["(garbage collector) :1", 43.898],
 						[
 							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
-							6.978
+							5.453
 						]
 					]
 				},
 				{
 					"index": 21,
-					"startMs": 23360.3,
-					"durationMs": 99.3,
+					"startMs": 24165.9,
+					"durationMs": 92.8,
 					"keys": [
 						{
-							"key": "f",
+							"key": "d",
 							"delayMs": 85.2
 						}
 					],
 					"selfMs": {
-						"Garbage collection": 31.146,
-						"Jazz text serialization": 31.14,
-						"Jazz entry projection": 11.394,
-						"Other Jazz work": 9.519,
-						"React development prop inspection": 7.075,
-						"Other": 4.272,
-						"React JSX creation": 2.167,
-						"UTF-16 entry mapping": 1.287,
-						"Other React work": 0.765,
-						"Wasm": 0.506
+						"Jazz text serialization": 31.1,
+						"Garbage collection": 19.82,
+						"Jazz entry projection": 17.997,
+						"Other Jazz work": 7.82,
+						"Other": 6.001,
+						"React development prop inspection": 5.492,
+						"React JSX creation": 1.974,
+						"UTF-16 entry mapping": 1.656,
+						"Other React work": 0.75,
+						"Wasm": 0.154
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							49.874
+							54.961
 						],
-						["(garbage collector) :1", 31.146],
+						["(garbage collector) :1", 19.82],
 						[
 							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
-							6.944
+							5.426
 						]
 					]
 				},
 				{
 					"index": 22,
-					"startMs": 23489.8,
-					"durationMs": 101.2,
+					"startMs": 24284.9,
+					"durationMs": 69.9,
 					"keys": [
 						{
-							"key": "g",
-							"delayMs": 96.2
+							"key": "e",
+							"delayMs": 61.4
 						}
 					],
 					"selfMs": {
-						"Garbage collection": 33.189,
-						"Jazz text serialization": 30.179,
-						"Jazz entry projection": 11.57,
-						"Other Jazz work": 10.287,
-						"React development prop inspection": 6.641,
-						"Other": 4.717,
-						"React JSX creation": 1.65,
-						"UTF-16 entry mapping": 1.148,
-						"Other React work": 1.137,
-						"Wasm": 0.728
+						"Jazz text serialization": 30.555,
+						"Jazz entry projection": 14.145,
+						"Other Jazz work": 8.139,
+						"React development prop inspection": 5.581,
+						"Other": 3.7,
+						"Garbage collection": 2.793,
+						"React JSX creation": 2.254,
+						"UTF-16 entry mapping": 1.359,
+						"Other React work": 0.917,
+						"Wasm": 0.452
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							49.513
+							50.297
 						],
-						["(garbage collector) :1", 33.189],
 						[
 							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
-							6.515
-						]
+							5.423
+						],
+						["(garbage collector) :1", 2.793]
 					]
 				},
 				{
 					"index": 23,
-					"startMs": 23618.1,
-					"durationMs": 100.3,
+					"startMs": 24381.1,
+					"durationMs": 71.3,
 					"keys": [
 						{
-							"key": "h",
-							"delayMs": 90.3
+							"key": "f",
+							"delayMs": 62.9
 						}
 					],
 					"selfMs": {
-						"Garbage collection": 31.408,
-						"Jazz text serialization": 30.44,
-						"Jazz entry projection": 12.01,
-						"Other Jazz work": 9.694,
-						"React development prop inspection": 6.551,
-						"Other": 6.312,
-						"React JSX creation": 1.66,
-						"UTF-16 entry mapping": 1.414,
-						"Other React work": 0.649,
-						"Wasm": 0.122
+						"Jazz text serialization": 31.468,
+						"Other Jazz work": 12.626,
+						"Jazz entry projection": 10.929,
+						"React development prop inspection": 5.871,
+						"Other": 4.197,
+						"React JSX creation": 2.126,
+						"Garbage collection": 1.951,
+						"UTF-16 entry mapping": 1.206,
+						"Other React work": 0.453,
+						"Wasm": 0.452
 					},
 					"nearestAppCallersMs": [
 						[
 							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
-							48.867
+							51.281
 						],
-						["(garbage collector) :1", 31.408],
 						[
 							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
-							6.551
+							5.324
+						],
+						[
+							"syncMetadata /src/app/features/documents/lib/metadata.ts:65",
+							2.103
+						]
+					]
+				},
+				{
+					"index": 24,
+					"startMs": 24481.1,
+					"durationMs": 68.9,
+					"keys": [
+						{
+							"key": "g",
+							"delayMs": 64.2
+						}
+					],
+					"selfMs": {
+						"Jazz text serialization": 30.74,
+						"Jazz entry projection": 12.697,
+						"Other Jazz work": 11.228,
+						"React development prop inspection": 4.947,
+						"Other": 4.163,
+						"React JSX creation": 2.135,
+						"Other React work": 1.341,
+						"UTF-16 entry mapping": 0.901,
+						"Wasm": 0.481,
+						"Garbage collection": 0.295
+					},
+					"nearestAppCallersMs": [
+						[
+							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
+							50.294
+						],
+						[
+							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
+							4.806
+						],
+						[
+							"syncMetadata /src/app/features/documents/lib/metadata.ts:65",
+							2.759
+						]
+					]
+				},
+				{
+					"index": 25,
+					"startMs": 24579.1,
+					"durationMs": 74.5,
+					"keys": [
+						{
+							"key": "h",
+							"delayMs": 69.1
+						}
+					],
+					"selfMs": {
+						"Jazz text serialization": 30.681,
+						"Other Jazz work": 13.437,
+						"Jazz entry projection": 13.098,
+						"Other": 5.633,
+						"React development prop inspection": 4.976,
+						"Garbage collection": 2.624,
+						"React JSX creation": 1.201,
+						"UTF-16 entry mapping": 1.198,
+						"Other React work": 1.048,
+						"Wasm": 0.58
+					},
+					"nearestAppCallersMs": [
+						[
+							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
+							51.943
+						],
+						[
+							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
+							4.516
+						],
+						[
+							"syncMetadata /src/app/features/documents/lib/metadata.ts:65",
+							3.619
+						]
+					]
+				},
+				{
+					"index": 26,
+					"startMs": 25415.7,
+					"durationMs": 60.3,
+					"keys": [
+						{
+							"key": "a",
+							"delayMs": 18.8
+						}
+					],
+					"selfMs": {
+						"Jazz text serialization": 30.787,
+						"Jazz entry projection": 13.506,
+						"Other Jazz work": 7.14,
+						"Garbage collection": 2.516,
+						"React JSX creation": 2.15,
+						"Other": 1.492,
+						"UTF-16 entry mapping": 1.079,
+						"Other React work": 0.927,
+						"Wasm": 0.444,
+						"React development prop inspection": 0.27
+					},
+					"nearestAppCallersMs": [
+						[
+							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
+							50.827
+						],
+						["(garbage collector) :1", 2.516],
+						[
+							"entryOffsets /src/app/features/documents/lib/incremental-document-save.ts:129",
+							1.079
+						]
+					]
+				},
+				{
+					"index": 27,
+					"startMs": 25502.2,
+					"durationMs": 68.3,
+					"keys": [
+						{
+							"key": "b",
+							"delayMs": 61.4
+						}
+					],
+					"selfMs": {
+						"Jazz text serialization": 30.346,
+						"Jazz entry projection": 13.548,
+						"Other Jazz work": 6.118,
+						"React development prop inspection": 5.704,
+						"Other": 4.998,
+						"Garbage collection": 2.7,
+						"React JSX creation": 1.867,
+						"Other React work": 1.37,
+						"UTF-16 entry mapping": 1.043,
+						"Wasm": 0.611
+					},
+					"nearestAppCallersMs": [
+						[
+							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
+							49.58
+						],
+						[
+							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
+							5.472
+						],
+						["(garbage collector) :1", 2.7]
+					]
+				},
+				{
+					"index": 28,
+					"startMs": 25597.3,
+					"durationMs": 68.1,
+					"keys": [
+						{
+							"key": "c",
+							"delayMs": 61.7
+						}
+					],
+					"selfMs": {
+						"Jazz text serialization": 30.569,
+						"Jazz entry projection": 14.343,
+						"Other Jazz work": 6.309,
+						"React development prop inspection": 5.882,
+						"Other": 4.699,
+						"React JSX creation": 1.819,
+						"Garbage collection": 1.771,
+						"Other React work": 1.366,
+						"UTF-16 entry mapping": 1.044,
+						"Wasm": 0.31
+					},
+					"nearestAppCallersMs": [
+						[
+							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
+							50.639
+						],
+						[
+							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
+							5.436
+						],
+						["(garbage collector) :1", 1.771]
+					]
+				},
+				{
+					"index": 29,
+					"startMs": 25691.6,
+					"durationMs": 70.6,
+					"keys": [
+						{
+							"key": "d",
+							"delayMs": 62.7
+						}
+					],
+					"selfMs": {
+						"Jazz text serialization": 30.692,
+						"Jazz entry projection": 13.467,
+						"Other Jazz work": 8.144,
+						"React development prop inspection": 5.98,
+						"Other": 4.602,
+						"Garbage collection": 3.497,
+						"React JSX creation": 1.846,
+						"UTF-16 entry mapping": 1.227,
+						"Other React work": 0.644,
+						"Wasm": 0.459
+					},
+					"nearestAppCallersMs": [
+						[
+							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
+							50.362
+						],
+						[
+							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
+							5.3
+						],
+						["(garbage collector) :1", 3.497]
+					]
+				},
+				{
+					"index": 30,
+					"startMs": 25788.4,
+					"durationMs": 70.0,
+					"keys": [
+						{
+							"key": "e",
+							"delayMs": 61.8
+						}
+					],
+					"selfMs": {
+						"Jazz text serialization": 30.805,
+						"Jazz entry projection": 11.427,
+						"Other Jazz work": 8.787,
+						"React development prop inspection": 5.918,
+						"Other": 5.859,
+						"Garbage collection": 2.976,
+						"React JSX creation": 1.835,
+						"UTF-16 entry mapping": 1.064,
+						"Other React work": 0.9,
+						"Wasm": 0.443
+					},
+					"nearestAppCallersMs": [
+						[
+							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
+							49.524
+						],
+						[
+							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
+							5.619
+						],
+						["(garbage collector) :1", 2.976]
+					]
+				},
+				{
+					"index": 31,
+					"startMs": 25887.6,
+					"durationMs": 68.7,
+					"keys": [
+						{
+							"key": "f",
+							"delayMs": 62.6
+						}
+					],
+					"selfMs": {
+						"Jazz text serialization": 31.081,
+						"Jazz entry projection": 12.04,
+						"Other Jazz work": 10.89,
+						"Other": 6.184,
+						"React development prop inspection": 4.515,
+						"React JSX creation": 1.674,
+						"UTF-16 entry mapping": 1.048,
+						"Other React work": 0.61,
+						"Wasm": 0.31,
+						"Garbage collection": 0.307
+					},
+					"nearestAppCallersMs": [
+						[
+							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
+							50.529
+						],
+						[
+							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
+							4.243
+						],
+						["run :1", 2.258]
+					]
+				},
+				{
+					"index": 32,
+					"startMs": 25975.2,
+					"durationMs": 68.8,
+					"keys": [
+						{
+							"key": "g",
+							"delayMs": 51.0
+						}
+					],
+					"selfMs": {
+						"Jazz text serialization": 31.407,
+						"Jazz entry projection": 13.259,
+						"Other Jazz work": 12.319,
+						"React development prop inspection": 4.775,
+						"Other": 4.122,
+						"UTF-16 entry mapping": 1.214,
+						"Other React work": 1.05,
+						"Wasm": 0.295,
+						"Garbage collection": 0.158,
+						"React JSX creation": 0.154
+					},
+					"nearestAppCallersMs": [
+						[
+							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
+							52.497
+						],
+						[
+							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
+							4.401
+						],
+						[
+							"syncMetadata /src/app/features/documents/lib/metadata.ts:65",
+							2.56
+						]
+					]
+				},
+				{
+					"index": 33,
+					"startMs": 26060.8,
+					"durationMs": 70.0,
+					"keys": [
+						{
+							"key": "h",
+							"delayMs": 52.4
+						}
+					],
+					"selfMs": {
+						"Jazz text serialization": 30.415,
+						"Other Jazz work": 14.181,
+						"Jazz entry projection": 12.26,
+						"Other": 5.06,
+						"React development prop inspection": 4.628,
+						"Garbage collection": 1.205,
+						"UTF-16 entry mapping": 1.098,
+						"Other React work": 0.759,
+						"Wasm": 0.286,
+						"React JSX creation": 0.152
+					},
+					"nearestAppCallersMs": [
+						[
+							"applyContentPatchesInBoundedTransactions /src/app/features/comments/lib/comments.ts:179",
+							51.219
+						],
+						[
+							"addValueToProperties /node_modules/.vite/deps/chunk-PM6R6UEY.js:2956",
+							4.34
+						],
+						[
+							"syncMetadata /src/app/features/documents/lib/metadata.ts:65",
+							3.457
 						]
 					]
 				}
