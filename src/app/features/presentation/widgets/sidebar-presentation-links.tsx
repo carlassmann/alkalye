@@ -1,3 +1,4 @@
+import { readDocumentText } from "@/app/features/documents"
 import { Link } from "@tanstack/react-router"
 import { co } from "jazz-tools"
 import { SidebarMenuButton, SidebarMenuItem } from "@/app/components/ui/sidebar"
@@ -17,7 +18,7 @@ interface SidebarPresentationLinksProps {
 
 function SidebarPresentationLinks({ doc }: SidebarPresentationLinksProps) {
 	let docId = doc.$jazz.id
-	let content = doc.content?.toString() ?? ""
+	let content = readDocumentText(doc.content)
 	let isPresentation = getPresentationMode(content)
 	let readOnly = !canEdit(doc)
 

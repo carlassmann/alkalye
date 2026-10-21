@@ -1,3 +1,4 @@
+import { readDocumentText } from "@/app/features/documents/lib/document-text"
 import { co } from "jazz-tools"
 import type { TextPos } from "jazz-tools"
 import { stringifyOpID } from "cojson"
@@ -109,7 +110,7 @@ function createCommentThread(
 ) {
 	if (!areCommentsEnabled(doc)) return null
 
-	let content = doc.content.toString()
+	let content = readDocumentText(doc.content)
 	let from = Math.min(
 		content.length,
 		Math.max(0, Math.min(selection.from, selection.to)),
@@ -161,7 +162,7 @@ function createCommentThreadFromQuoteOccurrence(
 ) {
 	if (!areCommentsEnabled(doc)) return null
 
-	let content = doc.content.toString()
+	let content = readDocumentText(doc.content)
 	let selected = quote.trim()
 	if (!selected) return null
 
@@ -182,7 +183,7 @@ function restoreExportedComments(
 	sourceContent?: string,
 ) {
 	let threads = co.list(CommentThread).create([], doc.$jazz.owner)
-	let targetContent = doc.content.toString()
+	let targetContent = readDocumentText(doc.content)
 	let changes = sourceContent
 		? getContentChanges(sourceContent, targetContent)
 		: getContentChanges(targetContent, targetContent)
@@ -304,7 +305,7 @@ function getCommentRange(
 	let tracked = getTrackedCommentRange(doc, anchor)
 	if (tracked) return tracked
 
-	let recovered = recoverRange(doc.content.toString(), anchor)
+	let recovered = recoverRange(readDocumentText(doc.content), anchor)
 	if (recovered) return { ...recovered, orphaned: false }
 
 	return orphanedRange()
@@ -314,7 +315,7 @@ function applyContentDiffWithCommentAnchors(
 	doc: LoadedAnchorDocument,
 	newContent: string,
 ) {
-	let oldContent = doc.content.toString()
+	let oldContent = readDocumentText(doc.content)
 	if (oldContent === newContent) return
 	if (newContent.startsWith(oldContent)) {
 		doc.content.insertBefore(
@@ -339,8 +340,13 @@ function applyDocumentContentPatches(
 	newContent: string,
 	patches: DocumentContentPatch[],
 ) {
-	let changes = getContentChanges(doc.content.toString(), newContent)
-	let updates = getActiveCommentAnchorThreads(doc).map(thread => ({
+	let threads = getActiveCommentAnchorThreads(doc)
+	if (threads.length === 0) {
+		applyContentPatchesInBoundedTransactions(doc.content, patches)
+		return
+	}
+	let changes = getContentChanges(readDocumentText(doc.content), newContent)
+	let updates = threads.map(thread => ({
 		thread,
 		range: mapCommentRange(
 			getCommentRange(doc, thread.anchor),
@@ -399,7 +405,7 @@ function replaceDocumentContentMappingAnchors(
 	content: co.loaded<ReturnType<typeof co.plainText>>,
 ) {
 	let newContent = content.toString()
-	let changes = getContentChanges(doc.content.toString(), newContent)
+	let changes = getContentChanges(readDocumentText(doc.content), newContent)
 	let updates = getActiveCommentAnchorThreads(doc).map(thread => ({
 		thread,
 		range: mapCommentRange(
@@ -520,14 +526,14 @@ function cloneCommentThreads(
 }
 
 function getExportComments(doc: LoadedCommentDocument): ExportComment[] {
-	return getExportCommentsForContent(doc, doc.content.toString())
+	return getExportCommentsForContent(doc, readDocumentText(doc.content))
 }
 
 function getExportCommentsForContent(
 	doc: LoadedCommentDocument,
 	transformedContent: string,
 ): ExportComment[] {
-	let content = doc.content.toString()
+	let content = readDocumentText(doc.content)
 	let changes = getContentChanges(content, transformedContent)
 	return getActiveCommentThreads(doc).map(thread => {
 		let range = mapCommentRange(
@@ -683,7 +689,7 @@ function makeAnchor(
 	to: number,
 	previous?: CommentAnchorData,
 ): CommentAnchorData {
-	let content = doc.content.toString()
+	let content = readDocumentText(doc.content)
 	let safeFrom = Math.max(0, Math.min(from, content.length))
 	let safeTo = Math.max(safeFrom, Math.min(to, content.length))
 	let quotes = deriveAnchorQuotes(content.slice(safeFrom, safeTo), previous)

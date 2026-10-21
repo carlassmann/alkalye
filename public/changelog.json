@@ -1,5 +1,14 @@
 [
 	{
+		"id": 157,
+		"date": "2026-10-21",
+		"title": "Keep typing while large documents save",
+		"notes": [
+			"Write in large documents with shorter pauses during autosave, including when collaborators are editing."
+		],
+		"pr": 59
+	},
+	{
 		"id": 156,
 		"date": "2026-10-21",
 		"title": "New documents inside folders",

@@ -1,3 +1,4 @@
+import { readDocumentText } from "../lib/document-text"
 import { useState, useSyncExternalStore } from "react"
 import { useNavigate } from "@tanstack/react-router"
 import { co, Group } from "jazz-tools"
@@ -110,7 +111,7 @@ function SidebarFileMenu({ doc, editor, me, spaceId }: SidebarFileMenuProps) {
 	// Themes carry binary assets, so load them on demand when exporting
 	let account = useAccount(UserAccount)
 
-	let content = doc.content?.toString() ?? ""
+	let content = doc.content?.$isLoaded ? readDocumentText(doc.content) : ""
 	let readOnly = !canEdit(doc)
 	let docGroup = getDocumentGroup(doc)
 	let isAdmin = docGroup?.myRole() === "admin"
@@ -596,7 +597,7 @@ function makeDuplicate(
 	return async function handleDuplicate() {
 		if (!me?.root?.documents?.$isLoaded) return
 
-		let content = doc.content?.toString() ?? ""
+		let content = doc.content?.$isLoaded ? readDocumentText(doc.content) : ""
 		let newContent = addCopyToTitle(content)
 
 		let now = new Date()
