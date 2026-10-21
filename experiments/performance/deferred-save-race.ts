@@ -64,7 +64,39 @@ try {
 			jazz: "Remote yxStart",
 		},
 	)
-	console.log("Remote text survives input before the deferred editor refresh")
+	await evaluate(`{
+  let view=document.querySelector('.cm-content').cmTile.view;
+  let Selection=view.state.selection.constructor;
+  view.dispatch({selection:Selection.create([Selection.cursor(0),Selection.cursor(2)])})
+ };true`)
+	await browser(
+		"wait",
+		"--fn",
+		"document.body.innerText.includes('2 selections')",
+	)
+	await evaluate(`{
+  let view=document.querySelector('.cm-content').cmTile.view;
+  let Selection=view.state.selection.constructor;
+  for(let positions of [[0,2,4],[0],[0,2]])
+   view.dispatch({selection:Selection.create(positions.map(position=>Selection.cursor(position)))})
+ };true`)
+	await browser(
+		"wait",
+		"--fn",
+		"document.body.innerText.includes('2 selections')",
+	)
+	await evaluate(`{
+  let view=document.querySelector('.cm-content').cmTile.view;
+  view.dispatch({selection:{anchor:0}})
+ };true`)
+	await browser(
+		"wait",
+		"--fn",
+		"!document.body.innerText.includes('selections')",
+	)
+	console.log(
+		"Remote text and rapid selection-count updates survive deferred refreshes",
+	)
 } finally {
 	await browser("close")
 }

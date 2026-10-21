@@ -310,6 +310,7 @@ function EditorContent({
 		"idle",
 	)
 	let [selectionCount, setSelectionCount] = useState(1)
+	let lastSelectionCount = useRef(1)
 	let [rightTab, setRightTab] = useState("tools")
 	let [selectedCommentThreadId, setSelectedCommentThreadId] = useState<
 		string | null
@@ -641,7 +642,11 @@ function EditorContent({
 	}
 
 	function handleCursorChange(from: number, to: number, count: number) {
-		setSelectionCount(count)
+		// Equal state updates can still render while deferred work is pending.
+		if (lastSelectionCount.current !== count) {
+			lastSelectionCount.current = count
+			setSelectionCount(count)
+		}
 		if (pendingSave.current) {
 			pendingSave.current.cursor = { from, to }
 		} else {
