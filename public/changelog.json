@@ -1,5 +1,14 @@
 [
 	{
+		"id": 159,
+		"date": "2026-10-21",
+		"title": "Fewer typing pauses on slower devices",
+		"notes": [
+			"Keep typing through autosave with fewer pauses in large documents on slower devices."
+		],
+		"pr": 61
+	},
+	{
 		"id": 158,
 		"date": "2026-10-21",
 		"title": "Open workspaces in new tabs",
