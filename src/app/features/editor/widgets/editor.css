@@ -63,7 +63,10 @@
 .markdown-editor {
 	--toolbar-height: 48px;
 	position: fixed;
-	top: calc(var(--toolbar-height) + env(safe-area-inset-top));
+	top: calc(
+		var(--toolbar-height) + env(safe-area-inset-top) +
+			var(--screen-keyboard-top-offset, 0px)
+	);
 	left: 0;
 	right: 0;
 	bottom: 0;
