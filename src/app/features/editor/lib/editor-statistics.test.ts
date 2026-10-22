@@ -102,6 +102,61 @@ describe("editor statistics", () => {
 		expect(vi.getTimerCount()).toBe(0)
 	})
 
+	test("retries one transient worker failure without another edit", async () => {
+		let first = makeWorker(),
+			second = makeWorker()
+		let make = vi.fn().mockReturnValueOnce(first).mockReturnValue(second)
+		let client = createEditorStatistics(
+			Text.of(["recover without typing"]),
+			make,
+			createInteractionWork(),
+		)
+		let publish = vi.fn()
+		client.subscribe(publish)
+		await vi.advanceTimersByTimeAsync(1)
+		first.onerror?.(new ErrorEvent("error"))
+		await vi.advanceTimersByTimeAsync(1_001)
+		expect(make).toHaveBeenCalledTimes(2)
+		second.reply()
+		await vi.advanceTimersByTimeAsync(1)
+		expect(publish).toHaveBeenLastCalledWith(getStats("recover without typing"))
+		client.dispose()
+	})
+
+	test("bounds retries and cancels recovery when the badge is hidden", async () => {
+		let first = makeWorker(),
+			second = makeWorker()
+		let make = vi.fn().mockReturnValueOnce(first).mockReturnValue(second)
+		let client = createEditorStatistics(
+			Text.of(["text"]),
+			make,
+			createInteractionWork(),
+		)
+		client.subscribe(() => {})
+		await vi.advanceTimersByTimeAsync(1)
+		first.onerror?.(new ErrorEvent("error"))
+		await vi.advanceTimersByTimeAsync(1_001)
+		second.onmessageerror?.(new MessageEvent("messageerror"))
+		await vi.advanceTimersByTimeAsync(20_000)
+		expect(make).toHaveBeenCalledTimes(2)
+		client.dispose()
+		let hiddenWorker = makeWorker(),
+			hiddenMake = vi.fn(() => hiddenWorker)
+		let hiddenClient = createEditorStatistics(
+			Text.of(["hidden"]),
+			hiddenMake,
+			createInteractionWork(),
+		)
+		let unsubscribe = hiddenClient.subscribe(() => {})
+		await vi.advanceTimersByTimeAsync(1)
+		hiddenWorker.onerror?.(new ErrorEvent("error"))
+		unsubscribe()
+		await vi.advanceTimersByTimeAsync(20_000)
+		expect(hiddenMake).toHaveBeenCalledOnce()
+		hiddenClient.dispose()
+		expect(vi.getTimerCount()).toBe(0)
+	})
+
 	test("terminates a failed worker and resets from current content on the next edit", async () => {
 		let work = createInteractionWork(),
 			first = makeWorker(),

@@ -1,5 +1,14 @@
 [
 	{
+		"id": 159,
+		"date": "2026-10-22",
+		"title": "Keep background updates out of typing",
+		"notes": [
+			"Word, sentence, and task counts update in the background while you write. Document titles, backlinks, and theme changes wait for a quiet moment."
+		],
+		"pr": 62
+	},
+	{
 		"id": 158,
 		"date": "2026-10-21",
 		"title": "Open workspaces in new tabs",

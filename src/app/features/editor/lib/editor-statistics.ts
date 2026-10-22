@@ -38,6 +38,8 @@ function createEditorStatistics(
 	let requestKey = {}
 	let publishKey = {}
 	let disposed = false
+	let retryCount = 0
+	let retryTimer: ReturnType<typeof setTimeout> | undefined
 
 	function queue() {
 		if (disposed || !listeners.size || inFlight !== undefined) return
@@ -53,9 +55,9 @@ function createEditorStatistics(
 				worker.onmessage = receive
 				worker.onerror = event => {
 					event.preventDefault()
-					resetWorker()
+					recoverWorker()
 				}
-				worker.onmessageerror = resetWorker
+				worker.onmessageerror = recoverWorker
 			}
 			let request: StatisticsRequest
 			if (changes === undefined) {
@@ -75,10 +77,10 @@ function createEditorStatistics(
 			inFlight = revision
 			sentRevision = revision
 			changes = ChangeSet.empty(content.length)
-			timeout = setTimeout(resetWorker, 10_000)
+			timeout = setTimeout(recoverWorker, 10_000)
 			worker.postMessage(request)
 		} catch {
-			resetWorker()
+			recoverWorker()
 		}
 	}
 
@@ -87,6 +89,7 @@ function createEditorStatistics(
 		if (disposed || response.revision !== inFlight) return
 		clearTimeout(timeout)
 		inFlight = undefined
+		retryCount = 0
 		if (response.type === "resync") {
 			resetWorker()
 			queue()
@@ -102,7 +105,15 @@ function createEditorStatistics(
 		queue()
 	}
 
+	function recoverWorker() {
+		resetWorker()
+		if (disposed || !listeners.size || retryCount >= 1) return
+		retryCount++
+		retryTimer = setTimeout(queue, 1_000)
+	}
+
 	function resetWorker() {
+		clearTimeout(retryTimer)
 		clearTimeout(timeout)
 		work.cancel(requestKey)
 		work.cancel(publishKey)
@@ -123,6 +134,8 @@ function createEditorStatistics(
 			if (disposed) return
 			content = nextContent
 			revision++
+			retryCount = 0
+			clearTimeout(retryTimer)
 			if (changes) changes = changes.compose(nextChanges)
 			queue()
 		},

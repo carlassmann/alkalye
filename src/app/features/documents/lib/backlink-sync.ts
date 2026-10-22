@@ -1,7 +1,4 @@
-import {
-	interactionWork,
-	yieldBackgroundWork,
-} from "@/app/lib/interaction-work"
+import { yieldBackgroundWork } from "@/app/lib/interaction-work"
 import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import { Document } from "./schema"
 import { Space, UserAccount } from "@/schema"
@@ -129,7 +126,7 @@ function useBacklinkSync(
 	}
 
 	let [coordinator] = useState(() =>
-		createBacklinkSyncCoordinator(() => interactionWork.waitForIdle()),
+		createBacklinkSyncCoordinator(() => yieldBackgroundWork(500)),
 	)
 	let sessionRef = useRef<BacklinkSyncSession | null>(null)
 

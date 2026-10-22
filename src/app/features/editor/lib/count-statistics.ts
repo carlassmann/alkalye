@@ -5,6 +5,17 @@ export { getStats }
 let FRONTMATTER_RE = /^---\r?\n[\s\S]*?\r?\n---\r?\n?/
 let TASK_RE = /^\s*[-*+]\s\[([ xX])\]/gm
 
+function getStats(content: string): EditorStatistics {
+	let words = countWords(content)
+	let sentences = countSentences(content)
+	let { done, total } = countTasks(content)
+	return {
+		words: `${words}`,
+		sentences: `${sentences}`,
+		tasks: `${done} / ${total}`,
+	}
+}
+
 function stripFrontmatter(content: string): string {
 	return content.replace(FRONTMATTER_RE, "")
 }
@@ -37,15 +48,4 @@ function countTasks(text: string): { done: number; total: number } {
 		if (match[1] !== " ") done++
 	}
 	return { done, total }
-}
-
-function getStats(content: string): EditorStatistics {
-	let words = countWords(content)
-	let sentences = countSentences(content)
-	let { done, total } = countTasks(content)
-	return {
-		words: `${words}`,
-		sentences: `${sentences}`,
-		tasks: `${done} / ${total}`,
-	}
 }

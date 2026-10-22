@@ -102,7 +102,12 @@ function syncDocumentMetadata(
 	doc: DocumentWithContent,
 	options: SyncMetadataOptions = {},
 ) {
-	let contentChanged = options.contentChanged ?? true
+	let key = `metadata:${doc.$jazz.id}`
+	let pending = pendingMetadata.get(key)
+	pendingMetadata.delete(key)
+	interactionWork.cancel(key)
+	let contentChanged =
+		(options.contentChanged ?? true) || (pending?.contentChanged ?? false)
 	let contentUpdatedAt =
 		contentChanged || !doc.contentUpdatedAt
 			? doc.updatedAt

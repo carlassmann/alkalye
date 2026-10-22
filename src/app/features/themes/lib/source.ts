@@ -1,4 +1,4 @@
-import { interactionWork } from "@/app/lib/interaction-work"
+import { yieldBackgroundWork } from "@/app/lib/interaction-work"
 import { z } from "jazz-tools"
 import { ThemeType, ThemePreset } from "./schema"
 import { Group, co } from "jazz-tools"
@@ -406,7 +406,7 @@ async function syncThemeFromSource(
 	content: string,
 ): Promise<boolean> {
 	latestSourceContent.set(documentId, content)
-	await interactionWork.waitForIdle()
+	await yieldBackgroundWork(500)
 	if (latestSourceContent.get(documentId) !== content) return false
 	try {
 		let sourceId = getThemeSourceId(content)

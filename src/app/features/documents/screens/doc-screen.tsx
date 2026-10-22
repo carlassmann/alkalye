@@ -148,6 +148,7 @@ import {
 	createDocumentMetadata,
 	needsMetadataBackfill,
 	scheduleDocumentMetadata,
+	syncDocumentMetadata,
 } from "../lib/metadata"
 import { useDocumentCompaction } from "../hooks/use-document-compaction"
 import {
@@ -656,6 +657,7 @@ function EditorContent({
 		}
 		let applied = edits && persistDocumentEdits(liveDoc ?? doc, edits)
 		if (applied !== undefined) {
+			syncDocumentMetadata(liveDoc ?? doc)
 			syncBacklinks(applied)
 			if (me.$isLoaded) void syncThemeFromSource(me, docId, applied)
 			return
@@ -663,6 +665,8 @@ function EditorContent({
 
 		if (currentContent !== readDocumentText(doc.content)) {
 			persistContentOnMain(currentContent, null, editorBaseContent.current)
+		} else if (canEdit(doc) && needsMetadataBackfill(doc)) {
+			syncDocumentMetadata(liveDoc ?? doc, { contentChanged: false })
 		}
 	}
 
