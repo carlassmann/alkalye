@@ -155,11 +155,17 @@
 .markdown-editor .cm-scroller {
 	overflow: auto !important;
 	overscroll-behavior: contain;
+	padding-top: var(--find-panel-height, 0px);
+}
+
+/* The space below the text belongs to .cm-content rather than the scroller.
+   iOS scrolls the window to fit the focused element when it is shorter than
+   the screen, which shifts short documents whenever the keyboard opens. */
+.markdown-editor .cm-scroller .cm-content {
 	padding-bottom: calc(
 		30dvh + var(--screen-keyboard-bottom-inset, 0px) +
 			env(safe-area-inset-bottom)
 	);
-	padding-top: var(--find-panel-height, 0px);
 	transition: padding-bottom var(--screen-keyboard-transition-duration)
 		var(--screen-keyboard-transition-easing);
 }
@@ -258,7 +264,7 @@
 
 @media (prefers-reduced-motion: reduce) {
 	.markdown-editor,
-	.markdown-editor .cm-scroller,
+	.markdown-editor .cm-content,
 	.editor-toolbar,
 	.editor-floating-actions {
 		transition: none;
