@@ -26,6 +26,7 @@ function useScreenKeyboardBottomInset(
 		}
 
 		let viewport = maybeViewport
+		let editor = maybeEditor
 		let root = document.documentElement
 		let baselineHeight = getViewportHeight(viewport)
 		let frame = 0
@@ -49,16 +50,29 @@ function useScreenKeyboardBottomInset(
 			scheduleUpdate()
 		}
 
+		// iOS reports the viewport only after the keyboard has finished hiding.
+		// Starting the reset on blur moves the toolbar and editor along with it.
+		function resetTopOffsetWhenKeyboardHides(event: FocusEvent) {
+			if (isEditableElement(event.relatedTarget)) return
+			root.style.setProperty(screenKeyboardTopOffsetProperty, "0px")
+		}
+
 		updateInset()
 		viewport.addEventListener("resize", scheduleUpdate)
 		viewport.addEventListener("scroll", scheduleUpdate)
 		window.addEventListener("orientationchange", resetBaseline)
+		editor.addEventListener("focusout", resetTopOffsetWhenKeyboardHides)
+		// Focus can leave and return without the viewport changing, so no
+		// viewport event would restore the offset cleared on blur.
+		editor.addEventListener("focusin", scheduleUpdate)
 
 		return () => {
 			cancelAnimationFrame(frame)
 			viewport.removeEventListener("resize", scheduleUpdate)
 			viewport.removeEventListener("scroll", scheduleUpdate)
 			window.removeEventListener("orientationchange", resetBaseline)
+			editor.removeEventListener("focusout", resetTopOffsetWhenKeyboardHides)
+			editor.removeEventListener("focusin", scheduleUpdate)
 			removeViewportOffset(root)
 		}
 	}, [containerRef])
@@ -170,6 +184,11 @@ function setViewportOffset(root: HTMLElement, viewportOffset: ViewportOffset) {
 function removeViewportOffset(root: HTMLElement) {
 	root.style.removeProperty(screenKeyboardTopOffsetProperty)
 	root.style.removeProperty(screenKeyboardBottomInsetProperty)
+}
+
+function isEditableElement(target: EventTarget | null) {
+	if (!(target instanceof HTMLElement)) return false
+	return target.isContentEditable || target.matches("input, textarea, select")
 }
 
 function getViewportHeight(viewport: VisualViewport) {

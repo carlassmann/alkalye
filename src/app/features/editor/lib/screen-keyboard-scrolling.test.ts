@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest"
 import {
+	getCaretRevealDelta,
 	getScreenKeyboardScrollMargins,
 	viewportChangeMayHideCaret,
 } from "./screen-keyboard-scrolling"
@@ -54,5 +55,19 @@ describe("viewportChangeMayHideCaret", () => {
 				scale: 2,
 			}),
 		).toBe(false)
+	})
+})
+
+describe("getCaretRevealDelta", () => {
+	it("scrolls down by the part of the caret below the visible area", () => {
+		expect(getCaretRevealDelta({ top: 520, bottom: 552 }, 110, 400)).toBe(152)
+	})
+
+	it("scrolls up by the part of the caret above the visible area", () => {
+		expect(getCaretRevealDelta({ top: 80, bottom: 112 }, 110, 400)).toBe(-30)
+	})
+
+	it("leaves a visible caret alone", () => {
+		expect(getCaretRevealDelta({ top: 200, bottom: 232 }, 110, 400)).toBe(0)
 	})
 })
