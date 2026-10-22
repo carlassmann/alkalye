@@ -53,10 +53,6 @@ import { useEditorSettings } from "@/app/features/editor"
 import { getDocumentTitle, addCopyToTitle } from "../lib/title"
 import { EditorToolbar } from "@/app/features/editor"
 import { DocumentSidebar } from "../widgets/document-sidebar"
-import {
-	DeferredDocumentEditor,
-	useCurrentDocumentGetter,
-} from "../widgets/deferred-document-editor"
 import { ListSidebar } from "../widgets/list-sidebar"
 import { SidebarDocumentList } from "../widgets/sidebar-document-list"
 import { SpaceSelector } from "@/app/features/spaces"
@@ -293,12 +289,7 @@ function PersonalDocumentScreen(props: EditorContentProps) {
 	return (
 		<>
 			<PersonalDocumentSidebar me={me} docId={props.docId} />
-			<DeferredDocumentEditor
-				key={`${me.$jazz.id}/${props.docId}`}
-				document={props.liveDoc ?? props.doc}
-			>
-				<EditorContent {...props} me={me} />
-			</DeferredDocumentEditor>
+			<EditorContent key={props.docId} {...props} me={me} />
 		</>
 	)
 }
@@ -308,33 +299,26 @@ function EditorContent({
 	liveDoc,
 	docId,
 	me,
-}: EditorContentProps & {
-	me: LoadedMe
-}) {
+}: EditorContentProps & { me: LoadedMe }) {
 	let t = useIntl()
-	let getCurrentDocument = useCurrentDocumentGetter()
 	let navigate = useNavigate()
 	let editor = useMarkdownEditorRef()
 	let [saveCopyState, setSaveCopyState] = useState<"idle" | "saving" | "saved">(
 		"idle",
 	)
 	let [selectionCount, setSelectionCount] = useState(1)
-	let lastSelectionCount = useRef(1)
 	let [rightTab, setRightTab] = useState("tools")
 	let [selectedCommentThreadId, setSelectedCommentThreadId] = useState<
 		string | null
 	>(null)
 	let pendingSave = useRef<{
 		timeoutId: ReturnType<typeof setTimeout>
-		baseContent: string | EditorChange["before"]
+		baseContent: string
 		edits: DocumentEdits | undefined
 		readContent: () => string
 		cursor: { from: number; to?: number } | null
 	} | null>(null)
-	let [optimisticContent, setOptimisticContentState] = useState<string | null>(
-		null,
-	)
-	let optimisticContentRef = useRef<string | null>(null)
+	let [optimisticContent, setOptimisticContent] = useState<string | null>(null)
 	let editorBaseContent = useRef(readDocumentText(doc.content))
 	let editorSaveBase = useRef(captureDocumentSaveBase(doc))
 
@@ -409,6 +393,10 @@ function EditorContent({
 	}
 
 	let content = readDocumentText(doc.content)
+	if (!pendingSave.current && optimisticContent === null) {
+		editorBaseContent.current = content
+		editorSaveBase.current = captureDocumentSaveBase(doc)
+	}
 	let editorContent = getEditorContent(content)
 	let { syncBacklinks } = useBacklinkSync(docId, readOnly, {
 		initialContent: content,
@@ -541,28 +529,27 @@ function EditorContent({
 	function persistContent(
 		pendingContent: string,
 		cursor: { from: number; to?: number } | null,
-		baseContent: string | EditorChange["before"],
+		baseContent: string,
 		edits?: DocumentEdits,
 	) {
-		let applied = edits && persistDocumentEdits(getCurrentDocument(), edits)
+		let applied = edits && persistDocumentEdits(liveDoc ?? doc, edits)
 		if (applied !== undefined) {
-			editorSaveBase.current = captureDocumentSaveBase(getCurrentDocument())
 			syncBacklinks(applied)
 			if (me.$isLoaded) void syncThemeFromSource(me, docId, applied)
 			if (cursor) updateCursor(cursor.from, cursor.to)
-			void waitForDocumentStorageSync(getCurrentDocument()).then(() =>
+			void waitForDocumentStorageSync(liveDoc ?? doc).then(() =>
 				signalDocumentSaved(docId, applied),
 			)
 			return
 		}
 		let save = backgroundSave.current
 		if (!save) {
-			persistContentOnMain(pendingContent, cursor, baseContent.toString())
+			persistContentOnMain(pendingContent, cursor, baseContent)
 			return
 		}
 		setOptimisticContent(pendingContent)
 		void save
-			.save(pendingContent, baseContent.toString())
+			.save(pendingContent, baseContent)
 			.then(appliedContent => {
 				setOptimisticContent(current =>
 					current === pendingContent ? null : current,
@@ -581,30 +568,11 @@ function EditorContent({
 				let appliedContent = persistContentOnMain(
 					pendingContent,
 					cursor,
-					baseContent.toString(),
+					baseContent,
 				)
-				await waitForDocumentStorageSync(getCurrentDocument())
+				await waitForDocumentStorageSync(liveDoc ?? doc)
 				signalDocumentSaved(docId, appliedContent)
 			})
-	}
-
-	function setOptimisticContent(
-		next: string | null | ((current: string | null) => string | null),
-	) {
-		let content =
-			typeof next === "function" ? next(optimisticContentRef.current) : next
-		optimisticContentRef.current = content
-		setOptimisticContentState(content)
-	}
-
-	function readEditorContent() {
-		if (pendingSave.current) return pendingSave.current.readContent()
-		if (optimisticContentRef.current !== null)
-			return optimisticContentRef.current
-		let content = readDocumentText(getCurrentDocument().content)
-		editorBaseContent.current = content
-		editorSaveBase.current = captureDocumentSaveBase(getCurrentDocument())
-		return content
 	}
 
 	function getEditorContent(persistedContent: string) {
@@ -619,7 +587,7 @@ function EditorContent({
 		cursor: { from: number; to?: number } | null,
 		baseContent: string,
 	) {
-		let currentDoc = getCurrentDocument()
+		let currentDoc = liveDoc ?? doc
 		let appliedContent = persistDocumentContentSynchronously(
 			currentDoc,
 			pendingContent,
@@ -634,8 +602,7 @@ function EditorContent({
 	function queueSave(readContent: () => string, change?: EditorChange) {
 		let queuedSave = pendingSave.current
 		if (queuedSave) clearTimeout(queuedSave.timeoutId)
-		let baseContent =
-			queuedSave?.baseContent ?? change?.before ?? editorBaseContent.current
+		let baseContent = queuedSave?.baseContent ?? editorBaseContent.current
 		let edits =
 			change && (!queuedSave || queuedSave.edits)
 				? composeDocumentEdits(
@@ -670,11 +637,7 @@ function EditorContent({
 	}
 
 	function handleCursorChange(from: number, to: number, count: number) {
-		// Equal state updates can still render while deferred work is pending.
-		if (lastSelectionCount.current !== count) {
-			lastSelectionCount.current = count
-			setSelectionCount(count)
-		}
+		setSelectionCount(count)
 		if (pendingSave.current) {
 			pendingSave.current.cursor = { from, to }
 		} else {
@@ -687,13 +650,11 @@ function EditorContent({
 		if (currentContent === undefined) return
 
 		let edits = pendingSave.current?.edits
-		let baseContent =
-			pendingSave.current?.baseContent ?? editorBaseContent.current
 		if (pendingSave.current) {
 			clearTimeout(pendingSave.current.timeoutId)
 			pendingSave.current = null
 		}
-		let applied = edits && persistDocumentEdits(getCurrentDocument(), edits)
+		let applied = edits && persistDocumentEdits(liveDoc ?? doc, edits)
 		if (applied !== undefined) {
 			syncBacklinks(applied)
 			if (me.$isLoaded) void syncThemeFromSource(me, docId, applied)
@@ -701,7 +662,7 @@ function EditorContent({
 		}
 
 		if (currentContent !== readDocumentText(doc.content)) {
-			persistContentOnMain(currentContent, null, baseContent.toString())
+			persistContentOnMain(currentContent, null, editorBaseContent.current)
 		}
 	}
 
@@ -835,7 +796,6 @@ function EditorContent({
 					key={docId}
 					ref={editor}
 					value={editorContent}
-					readValue={readEditorContent}
 					onChange={handleEditorChange}
 					onCursorChange={handleCursorChange}
 					placeholder={t("doc.startWriting")}

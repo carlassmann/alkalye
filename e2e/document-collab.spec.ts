@@ -147,42 +147,6 @@ test("simultaneous writers converge without rolling back local text", async ({
 	}
 })
 
-test("remote edits survive undoing local typing", async ({ page }) => {
-	await waitForEditorBoot(page)
-	await createAccount(page)
-	let created = await create(page, { title: "Remote undo", body: "original" })
-	let invite = await createDocumentInvite(page, {
-		docId: created.id,
-		role: "writer",
-	})
-	await page.keyboard.press("Escape")
-	let collaborator = await openAcceptedDocumentInvite(page, {
-		link: invite.link,
-	})
-	try {
-		await waitForEditorBoot(collaborator.page, {
-			path: `/app/doc/${created.id}`,
-		})
-		let ownerEditor = editorFor(page)
-		let collaboratorEditor = editorFor(collaborator.page)
-		await ownerEditor.click()
-		await ownerEditor.press("ControlOrMeta+End")
-		await page.keyboard.type(" local addition")
-		await expect(collaboratorEditor).toContainText("local addition")
-		await collaboratorEditor.click()
-		await collaboratorEditor.press("ControlOrMeta+Home")
-		await collaborator.page.keyboard.type("remote addition\n")
-		await expect(ownerEditor).toContainText("remote addition")
-		await ownerEditor.press("ControlOrMeta+z")
-		await expect(ownerEditor).toContainText("remote addition")
-		await expect(ownerEditor).not.toContainText("local addition")
-		await expect(collaboratorEditor).toContainText("remote addition")
-		await expect(collaboratorEditor).not.toContainText("local addition")
-	} finally {
-		await collaborator.context.close()
-	}
-})
-
 function editorFor(page: Page) {
 	return page.getByTestId(testIds.doc.editor).locator(".cm-content")
 }
