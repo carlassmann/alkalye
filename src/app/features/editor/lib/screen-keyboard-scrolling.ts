@@ -78,9 +78,8 @@ function waitForKeyboardTransitions(view: EditorView) {
 	return Promise.race([Promise.all(transitions), timeout])
 }
 
-function getRevealScrollBehavior(): ScrollBehavior {
-	let reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
-	return reducedMotion.matches ? "auto" : "smooth"
+function prefersReducedMotion() {
+	return window.matchMedia("(prefers-reduced-motion: reduce)").matches
 }
 
 let screenKeyboardScrollMargins = EditorView.scrollMargins.of(view =>
@@ -171,7 +170,7 @@ let revealCaretOnViewportChange = ViewPlugin.fromClass(
 					if (top === null || !this.isCurrent(request)) return
 					this.view.scrollDOM.scrollTo({
 						top,
-						behavior: getRevealScrollBehavior(),
+						behavior: prefersReducedMotion() ? "auto" : "smooth",
 					})
 				},
 			})
