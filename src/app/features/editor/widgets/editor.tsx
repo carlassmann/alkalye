@@ -1,3 +1,4 @@
+import { editorStatisticsExtension } from "../lib/editor-statistics-extension"
 import type { EditorChange } from "@/app/features/documents"
 import { IconTransition } from "@/app/components/ui/icon-transition"
 import {
@@ -779,7 +780,11 @@ function MarkdownEditor(
 
 		let state = EditorState.create({
 			doc: initRef.current.value,
-			extensions: [EditorState.allowMultipleSelections.of(true), extensions],
+			extensions: [
+				EditorState.allowMultipleSelections.of(true),
+				editorStatisticsExtension,
+				extensions,
+			],
 		})
 
 		let editorView = new EditorView({

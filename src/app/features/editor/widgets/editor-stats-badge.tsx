@@ -1,3 +1,4 @@
+import { useEditorStatistics } from "../hooks/use-editor-statistics"
 import type { co } from "jazz-tools"
 import {
 	DropdownMenu,
@@ -20,23 +21,20 @@ type SettingsCoMap = co.loaded<typeof Settings>
 type EditorSettings = NonNullable<SettingsCoMap["editor"]>
 
 interface EditorStatsBadgeProps {
-	content: string
+	editor: Parameters<typeof useEditorStatistics>[0]
 	selectionCount?: number
 	settings: SettingsCoMap | null | undefined
 }
 
-let FRONTMATTER_RE = /^---\r?\n[\s\S]*?\r?\n---\r?\n?/
-let TASK_RE = /^\s*[-*+]\s\[([ xX])\]/gm
-
 function EditorStatsBadge({
-	content,
+	editor,
 	settings,
 	selectionCount = 1,
 }: EditorStatsBadgeProps) {
 	let t = useIntl()
 	let { leftOpen, isMobile } = useSidebar()
 	let editorSettings = { ...DEFAULT_EDITOR_SETTINGS, ...settings?.editor }
-	let stats = getStats(content)
+	let stats = useEditorStatistics(editor, editorSettings.showStatsBadge)
 	let unitLabels: { value: StatsUnit; label: string }[] = [
 		{ value: "words", label: t("editor.stats.words") },
 		{ value: "sentences", label: t("editor.stats.sentences") },
@@ -124,51 +122,6 @@ function updateEditorSettings(
 
 function isStatsUnit(value: string): value is StatsUnit {
 	return value === "words" || value === "sentences" || value === "tasks"
-}
-
-function stripFrontmatter(content: string): string {
-	return content.replace(FRONTMATTER_RE, "")
-}
-
-function countWords(text: string): number {
-	let stripped = stripFrontmatter(text)
-	let words = stripped.split(/\s+/).filter(Boolean)
-	return words.length
-}
-
-function countSentences(text: string): number {
-	let stripped = stripFrontmatter(text)
-	let cleaned = stripped
-		.replace(/```[\s\S]*?```/g, "")
-		.replace(/`[^`]+`/g, "")
-		.replace(/!\[.*?\]\(.*?\)/g, "")
-		.replace(/\[([^\]]+)\]\(.*?\)/g, "$1")
-		.replace(/^#+\s*/gm, "")
-	let sentences = cleaned.split(/[.!?]+(?:\s|$)/).filter(s => s.trim())
-	return sentences.length
-}
-
-function countTasks(text: string): { done: number; total: number } {
-	let done = 0
-	let total = 0
-	let match: RegExpExecArray | null
-	TASK_RE.lastIndex = 0
-	while ((match = TASK_RE.exec(text)) !== null) {
-		total++
-		if (match[1] !== " ") done++
-	}
-	return { done, total }
-}
-
-function getStats(content: string): Record<StatsUnit, string> {
-	let words = countWords(content)
-	let sentences = countSentences(content)
-	let { done, total } = countTasks(content)
-	return {
-		words: `${words}`,
-		sentences: `${sentences}`,
-		tasks: `${done} / ${total}`,
-	}
 }
 
 function formatMenuStat(

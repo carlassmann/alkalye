@@ -1,3 +1,7 @@
+import {
+	interactionWork,
+	yieldBackgroundWork,
+} from "@/app/lib/interaction-work"
 import { useEffect, useRef } from "react"
 import { co } from "jazz-tools"
 import { Document } from "../lib/schema"
@@ -21,17 +25,26 @@ function useMetadataBackfillQueue(docs: MetadataBackfillDocument[]) {
 
 	useEffect(() => {
 		let cancelled = false
+		let cancellation = new AbortController()
 		let timer = setTimeout(() => void backfillDocuments(), 800)
 		return () => {
 			cancelled = true
+			cancellation.abort()
 			clearTimeout(timer)
 		}
 
 		async function backfillDocuments() {
+			await interactionWork.waitForIdle(10_000, cancellation.signal)
+			if (cancelled) return
 			let candidates = docsRef.current.filter(
 				doc => needsMetadataBackfill(doc) && canEdit(doc),
 			)
+			let sliceStartedAt = performance.now()
 			for (let doc of candidates) {
+				if (performance.now() - sliceStartedAt >= 16) {
+					await yieldBackgroundWork()
+					sliceStartedAt = performance.now()
+				}
 				if (cancelled) return
 				await backfillMetadata(doc)
 			}

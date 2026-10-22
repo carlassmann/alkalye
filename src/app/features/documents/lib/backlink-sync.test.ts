@@ -35,6 +35,33 @@ describe("backlink sync link changes", () => {
 })
 
 describe("backlink sync coordinator", () => {
+	test("coalesces while waiting for idle and ignores a closed session", async () => {
+		let gate = makeDeferred()
+		let coordinator = createBacklinkSyncCoordinator(() => gate.promise)
+		let session = coordinator.openSession("source", "")
+		coordinator.setReady(session, true)
+		coordinator.queue(session, "[[old]]")
+		let seen: string[] = []
+		let runAttempt: Parameters<typeof coordinator.run>[1] = async attempt => {
+			seen.push(attempt.content)
+			return {
+				status: "synced",
+				currentLinkIds: getWikilinkIds(attempt.content),
+			}
+		}
+		let running = coordinator.run(session, runAttempt)
+		coordinator.queue(session, "[[newest]]")
+		expect(seen).toEqual([])
+		gate.resolve()
+		await running
+		expect(seen).toEqual(["[[newest]]"])
+		coordinator.queue(session, "[[closed]]")
+		let closing = coordinator.run(session, runAttempt)
+		coordinator.closeSession(session)
+		await closing
+		expect(seen).toEqual(["[[newest]]"])
+	})
+
 	test("does not let delayed document work consume the next session queue", async () => {
 		let delayed = makeDeferred()
 		let attempts: Array<{

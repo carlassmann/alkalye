@@ -147,7 +147,7 @@ import { makeFolderDocumentContent } from "../lib/folders"
 import {
 	createDocumentMetadata,
 	needsMetadataBackfill,
-	syncDocumentMetadata,
+	scheduleDocumentMetadata,
 } from "../lib/metadata"
 import { useDocumentCompaction } from "../hooks/use-document-compaction"
 import {
@@ -435,7 +435,7 @@ function EditorContent({
 
 	useEffect(() => {
 		if (!canEdit(doc) || !needsMetadataBackfill(doc)) return
-		syncDocumentMetadata(doc, { contentChanged: false })
+		scheduleDocumentMetadata(doc, { contentChanged: false })
 	}, [doc])
 
 	let sidebarAssets: SidebarAsset[] = getLoadedAssets(liveDoc?.assets).map(a =>
@@ -856,7 +856,7 @@ function EditorContent({
 					onThemeChange={handleContentChange}
 				/>
 				<EditorStatsBadge
-					content={content}
+					editor={editor}
 					settings={editorSettings}
 					selectionCount={selectionCount}
 				/>

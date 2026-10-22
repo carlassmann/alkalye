@@ -139,7 +139,11 @@ import { loadThemesForPdf, syncThemeFromSource } from "@/app/features/themes"
 import { testIds } from "@/app/lib/test-ids"
 import { useIntl } from "@/shared/intl/setup"
 import { makeFolderDocumentContent } from "../lib/folders"
-import { needsMetadataBackfill, syncDocumentMetadata } from "../lib/metadata"
+import {
+	needsMetadataBackfill,
+	syncDocumentMetadata,
+	scheduleDocumentMetadata,
+} from "../lib/metadata"
 import { useDocumentCompaction } from "../hooks/use-document-compaction"
 import {
 	DOCUMENT_SAVE_DEBOUNCE_MS,
@@ -432,7 +436,7 @@ function SpaceEditorContent({
 
 	useEffect(() => {
 		if (!canEdit(doc) || !needsMetadataBackfill(doc)) return
-		syncDocumentMetadata(doc, { contentChanged: false })
+		scheduleDocumentMetadata(doc, { contentChanged: false })
 	}, [doc])
 
 	let sidebarAssets: SidebarAsset[] = getLoadedAssets(liveDoc?.assets).map(a =>
@@ -851,7 +855,7 @@ function SpaceEditorContent({
 					onThemeChange={handleContentChange}
 				/>
 				<EditorStatsBadge
-					content={content}
+					editor={editor}
 					settings={editorSettings}
 					selectionCount={selectionCount}
 				/>

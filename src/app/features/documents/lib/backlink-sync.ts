@@ -1,3 +1,7 @@
+import {
+	interactionWork,
+	yieldBackgroundWork,
+} from "@/app/lib/interaction-work"
 import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import { Document } from "./schema"
 import { Space, UserAccount } from "@/schema"
@@ -124,8 +128,9 @@ function useBacklinkSync(
 		)
 	}
 
-	let timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-	let [coordinator] = useState(() => createBacklinkSyncCoordinator())
+	let [coordinator] = useState(() =>
+		createBacklinkSyncCoordinator(() => interactionWork.waitForIdle()),
+	)
 	let sessionRef = useRef<BacklinkSyncSession | null>(null)
 
 	let docsReady = spaceId
@@ -136,13 +141,9 @@ function useBacklinkSync(
 		meRef.current = me
 		spaceRef.current = space
 		spaceIdRef.current = spaceId
-		let previousSession = sessionRef.current
 		let session = coordinator.openSession(docId, initialContent)
 		sessionRef.current = session
 		coordinator.setReady(session, Boolean(docsReady && !readOnly))
-		if (previousSession !== session && timeoutRef.current) {
-			clearTimeout(timeoutRef.current)
-		}
 	}, [
 		coordinator,
 		docId,
@@ -158,7 +159,6 @@ function useBacklinkSync(
 		return () => {
 			let session = sessionRef.current
 			if (session) coordinator.closeSession(session)
-			if (timeoutRef.current) clearTimeout(timeoutRef.current)
 		}
 	}, [coordinator])
 
@@ -176,7 +176,12 @@ function useBacklinkSync(
 			changes.push({ linkedId, operation: "remove" })
 		}
 
+		let sliceStartedAt = performance.now()
 		for (let change of changes) {
+			if (performance.now() - sliceStartedAt >= 16) {
+				await yieldBackgroundWork()
+				sliceStartedAt = performance.now()
+			}
 			if (!attempt.shouldContinue()) return { status: "interrupted" }
 			let { linkedId, operation } = change
 			if (!docIds.has(linkedId)) continue
@@ -213,11 +218,7 @@ function useBacklinkSync(
 		let session = sessionRef.current
 		if (!session || session.sourceId !== docId) return
 		coordinator.queue(session, content)
-		if (timeoutRef.current) clearTimeout(timeoutRef.current)
-		timeoutRef.current = setTimeout(
-			() => void coordinator.run(session, runBacklinkSyncAttempt),
-			400,
-		)
+		void coordinator.run(session, runBacklinkSyncAttempt)
 	}
 
 	return { syncBacklinks: sync }
@@ -239,7 +240,7 @@ function getBacklinkLinkChanges(
 	}
 }
 
-function createBacklinkSyncCoordinator() {
+function createBacklinkSyncCoordinator(beforeAttempt?: () => Promise<void>) {
 	let activeSession: BacklinkSyncSession | null = null
 	let runningAttempt: Promise<CompletedBacklinkSyncAttempt> | null = null
 
@@ -284,6 +285,8 @@ function createBacklinkSyncCoordinator() {
 		session: BacklinkSyncSession,
 		runAttempt: RunBacklinkSyncAttempt,
 	) {
+		if (beforeAttempt) await beforeAttempt()
+		if (!shouldRun(session)) return "completed" as const
 		let content = session.queuedContent
 		if (content === null) return "completed" as const
 		session.queuedContent = null

@@ -1,3 +1,4 @@
+import { interactionWork } from "@/app/lib/interaction-work"
 import { readDocumentText } from "@/app/features/documents/lib/document-text"
 import { co } from "jazz-tools"
 import { Document } from "./schema"
@@ -7,6 +8,7 @@ import { getPresentationMode } from "@/app/features/presentation/lib/presentatio
 
 export {
 	syncDocumentMetadata,
+	scheduleDocumentMetadata,
 	backfillDocumentMetadata,
 	extractDocumentMetadata,
 	createDocumentMetadata,
@@ -70,6 +72,30 @@ function createDocumentMetadata(content: string, updatedAt: Date) {
 		contentUpdatedAt: updatedAt,
 		metadataUpdatedAt: updatedAt,
 	}
+}
+
+let pendingMetadata = new Map<
+	string,
+	{ doc: DocumentWithContent; contentChanged: boolean }
+>()
+
+function scheduleDocumentMetadata(
+	doc: DocumentWithContent,
+	options: SyncMetadataOptions = {},
+) {
+	let key = `metadata:${doc.$jazz.id}`
+	let contentChanged =
+		(options.contentChanged ?? true) ||
+		(pendingMetadata.get(key)?.contentChanged ?? false)
+	pendingMetadata.set(key, { doc, contentChanged })
+	interactionWork.schedule(key, () => {
+		let pending = pendingMetadata.get(key)
+		pendingMetadata.delete(key)
+		if (pending)
+			syncDocumentMetadata(pending.doc, {
+				contentChanged: pending.contentChanged,
+			})
+	})
 }
 
 function syncDocumentMetadata(

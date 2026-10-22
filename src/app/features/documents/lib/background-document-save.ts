@@ -6,7 +6,7 @@ import {
 } from "@/app/features/comments/lib/comments"
 import { calculateDocumentContentPatches } from "./document-diff"
 import { mergeDocumentContent } from "./merge-document-content"
-import { syncDocumentMetadata } from "./metadata"
+import { scheduleDocumentMetadata, syncDocumentMetadata } from "./metadata"
 import { Document } from "./schema"
 import type {
 	DocumentContentPatch,
@@ -123,7 +123,7 @@ function createBackgroundDocumentSave(
 
 	async function finishSave(doc: BackgroundSaveDocument) {
 		doc.$jazz.set("updatedAt", new Date())
-		syncDocumentMetadata(doc)
+		scheduleDocumentMetadata(doc)
 		await waitForDocumentStorageSync(doc)
 	}
 

@@ -12,7 +12,7 @@ import {
 	readDocumentText,
 	type TextEntries,
 } from "./document-text"
-import { syncDocumentMetadata } from "./metadata"
+import { scheduleDocumentMetadata } from "./metadata"
 
 export { captureDocumentSaveBase, composeDocumentEdits, persistDocumentEdits }
 export type { DocumentSaveBase, DocumentEdits, EditorChange }
@@ -126,7 +126,7 @@ function persistDocumentEdits(
 	}
 	cacheDocumentText(doc.content, content)
 	doc.$jazz.set("updatedAt", new Date())
-	syncDocumentMetadata(doc)
+	scheduleDocumentMetadata(doc)
 	return content
 }
 

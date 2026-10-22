@@ -1,4 +1,6 @@
-import { beforeEach, describe, expect, test } from "vitest"
+import { interactionWork } from "@/app/lib/interaction-work"
+import { waitForDocumentStorageSync } from "./background-document-save"
+import { beforeEach, describe, expect, test, vi } from "vitest"
 import { createJazzTestAccount, setupJazzTestSync } from "jazz-tools/testing"
 import { UserAccount } from "@/schema"
 import { createPersonalDocument } from "./documents"
@@ -8,6 +10,7 @@ import {
 	extractDocumentMetadata,
 	needsMetadataBackfill,
 	syncDocumentMetadata,
+	scheduleDocumentMetadata,
 } from "./metadata"
 import { togglePinned } from "@/app/features/editor"
 import { applyContentDiffWithCommentAnchors } from "@/app/features/comments"
@@ -23,6 +26,28 @@ describe("document metadata", () => {
 			isCurrentActiveAccount: true,
 			AccountSchema: UserAccount,
 		})
+	})
+
+	test("durably saves text while metadata waits, then derives the latest title", async () => {
+		let doc = await createPersonalDocument(account, "# Old")
+		interactionWork.interact()
+		try {
+			doc.content.$jazz.applyDiff("# Intermediate")
+			doc.$jazz.set("updatedAt", new Date())
+			scheduleDocumentMetadata(doc)
+			doc.content.$jazz.applyDiff("# Latest")
+			doc.$jazz.set("updatedAt", new Date())
+			scheduleDocumentMetadata(doc)
+			scheduleDocumentMetadata(doc, { contentChanged: false })
+			await waitForDocumentStorageSync(doc)
+			expect(doc.content.toString()).toBe("# Latest")
+			expect(doc.title).toBe("Old")
+			interactionWork.release()
+			await vi.waitFor(() => expect(doc.title).toBe("Latest"))
+			expect(doc.contentUpdatedAt?.getTime()).toBe(doc.updatedAt.getTime())
+		} finally {
+			interactionWork.release()
+		}
 	})
 
 	test("extracts sidebar metadata from frontmatter and body", () => {
