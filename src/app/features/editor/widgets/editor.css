@@ -262,6 +262,10 @@
 	color: color-mix(in srgb, var(--accent-foreground) 70%, transparent);
 }
 
+:root[data-screen-keyboard-settling] :is(.markdown-editor, .editor-toolbar) {
+	transition: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
 	.markdown-editor,
 	.markdown-editor .cm-content,

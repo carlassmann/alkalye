@@ -90,14 +90,15 @@ let screenKeyboardScrollMargins = EditorView.scrollMargins.of(view =>
 	),
 )
 
-// Only a shrinking or shifting viewport can cover the caret. Growing
-// viewports and pinch-zoom panning must not yank the user's scroll position.
+// Only a shrinking viewport or a window scrolled further down can cover the
+// caret. Growing viewports, the window scrolling back up and pinch-zoom
+// panning must not yank the user's scroll position.
 function viewportChangeMayHideCaret(
 	previous: ViewportGeometry,
 	next: ViewportGeometry,
 ) {
 	if (next.scale !== 1) return false
-	return next.height < previous.height || next.offsetTop !== previous.offsetTop
+	return next.height < previous.height || next.offsetTop > previous.offsetTop
 }
 
 function readViewportGeometry(viewport: VisualViewport): ViewportGeometry {
@@ -128,8 +129,7 @@ let revealCaretOnViewportChange = ViewPlugin.fromClass(
 			})
 		}
 
-		// A pending reveal must never override a newer viewport state or a
-		// user who has started scrolling.
+		// A pending reveal must never override a user who has started scrolling.
 		cancelReveal = () => {
 			cancelAnimationFrame(this.frame)
 			this.revealRequest += 1
@@ -141,8 +141,8 @@ let revealCaretOnViewportChange = ViewPlugin.fromClass(
 			if (!this.viewport || !this.geometry) return
 			let previous = this.geometry
 			this.geometry = readViewportGeometry(this.viewport)
-			this.cancelReveal()
 			if (!viewportChangeMayHideCaret(previous, this.geometry)) return
+			this.cancelReveal()
 			let request = this.revealRequest
 			this.frame = requestAnimationFrame(() => {
 				this.frame = requestAnimationFrame(async () => {

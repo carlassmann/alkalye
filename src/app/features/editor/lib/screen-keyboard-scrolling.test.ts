@@ -41,6 +41,13 @@ describe("viewportChangeMayHideCaret", () => {
 		)
 	})
 
+	it("keeps the scroll position when the window scrolls back up", () => {
+		let open = { height: 505, offsetTop: 77, scale: 1 }
+		expect(viewportChangeMayHideCaret(open, { ...open, offsetTop: 0 })).toBe(
+			false,
+		)
+	})
+
 	it("keeps the scroll position when the viewport grows", () => {
 		expect(viewportChangeMayHideCaret({ ...full, height: 505 }, full)).toBe(
 			false,

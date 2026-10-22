@@ -5,7 +5,10 @@ export { useScreenKeyboardBottomInset, useScreenKeyboardFloatingBottomOffset }
 
 let screenKeyboardBottomInsetProperty = "--screen-keyboard-bottom-inset"
 let screenKeyboardTopOffsetProperty = "--screen-keyboard-top-offset"
+let screenKeyboardSettlingAttribute = "data-screen-keyboard-settling"
 let keyboardInsetThreshold = 80
+// Outlasts the window scroll iOS animates when the keyboard opens.
+let keyboardScrollSettleDelay = 400
 let floatingBottomOffset = 16
 let floatingKeyboardAccessoryOffset = 8
 let floatingKeyboardOverlayAccessoryOffset = 72
@@ -30,6 +33,7 @@ function useScreenKeyboardBottomInset(
 		let root = document.documentElement
 		let baselineHeight = getViewportHeight(viewport)
 		let frame = 0
+		let settleTimer = 0
 
 		function updateInset() {
 			baselineHeight = Math.max(baselineHeight, getViewportHeight(viewport))
@@ -38,6 +42,32 @@ function useScreenKeyboardBottomInset(
 
 			setViewportOffset(root, viewportOffset)
 			logKeyboardInset("scroll", viewport, baselineHeight, viewportOffset)
+
+			clearTimeout(settleTimer)
+			if (viewportOffset.topOffset > 0) {
+				settleTimer = window.setTimeout(
+					undoWindowScroll,
+					keyboardScrollSettleDelay,
+				)
+			}
+		}
+
+		// iOS animates the window back down when the keyboard hides, which the
+		// top offset cannot follow exactly. Undoing the scroll while the keyboard
+		// rests leaves nothing to animate. The offset and the window scroll cancel
+		// out, so the text does not move.
+		function undoWindowScroll() {
+			if (viewport.scale !== 1 || !editor.contains(document.activeElement)) {
+				return
+			}
+			root.setAttribute(screenKeyboardSettlingAttribute, "")
+			root.style.setProperty(screenKeyboardTopOffsetProperty, "0px")
+			window.scrollTo(0, 0)
+			requestAnimationFrame(() => {
+				requestAnimationFrame(() => {
+					root.removeAttribute(screenKeyboardSettlingAttribute)
+				})
+			})
 		}
 
 		function scheduleUpdate() {
@@ -68,6 +98,8 @@ function useScreenKeyboardBottomInset(
 
 		return () => {
 			cancelAnimationFrame(frame)
+			clearTimeout(settleTimer)
+			root.removeAttribute(screenKeyboardSettlingAttribute)
 			viewport.removeEventListener("resize", scheduleUpdate)
 			viewport.removeEventListener("scroll", scheduleUpdate)
 			window.removeEventListener("orientationchange", resetBaseline)
