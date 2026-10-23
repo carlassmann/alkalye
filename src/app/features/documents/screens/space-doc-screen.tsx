@@ -1223,7 +1223,7 @@ function useHealSpaceDocIds(space: LoadedSpace, spaceId: string) {
 let spaceMeResolve = {
 	profile: true,
 	root: {
-		documents: { $each: true },
+		documents: { $each: { $onError: "catch" } },
 		settings: true,
 	},
 } as const satisfies ResolveQuery<typeof UserAccount>

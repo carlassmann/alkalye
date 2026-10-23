@@ -35,7 +35,7 @@ let settingsResolve = {
 
 let meResolve = {
 	root: {
-		documents: { $each: true },
+		documents: { $each: { $onError: "catch" } },
 		spaces: {
 			$each: {
 				documents: { $each: true },

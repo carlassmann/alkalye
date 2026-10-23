@@ -18,14 +18,20 @@ import { needsMetadataBackfill } from "./metadata"
 
 describe("document loading performance queries", () => {
 	test("account launch query loads document metadata shallowly", () => {
-		expect(meResolve.root.documents).toEqual({ $each: true })
+		expect(meResolve.root.documents).toEqual({ $each: { $onError: "catch" } })
 		expect(meResolve.root.spaces.$each.documents).toEqual({ $each: true })
-		expect(personalMeResolve.root.documents).toEqual({ $each: true })
-		expect(spaceMeResolve.root.documents).toEqual({ $each: true })
+		expect(personalMeResolve.root.documents).toEqual({
+			$each: { $onError: "catch" },
+		})
+		expect(spaceMeResolve.root.documents).toEqual({
+			$each: { $onError: "catch" },
+		})
 	})
 
 	test("home fallback and space loaders avoid document content scans", () => {
-		expect(homeDocumentsQuery.root.documents).toEqual({ $each: true })
+		expect(homeDocumentsQuery.root.documents).toEqual({
+			$each: { $onError: "catch" },
+		})
 		expect(spaceLoaderResolve.documents).toBe(true)
 		expect(spaceResolve.documents).toEqual({ $each: true })
 	})
