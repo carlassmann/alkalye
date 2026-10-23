@@ -15,7 +15,7 @@ export { homeLoader, homeDocumentsQuery, findFallbackHomeDocument }
 
 let homeDocumentsQuery = {
 	root: {
-		documents: { $each: true },
+		documents: { $each: { $onError: "catch" } },
 	},
 } as const satisfies ResolveQuery<typeof UserAccount>
 

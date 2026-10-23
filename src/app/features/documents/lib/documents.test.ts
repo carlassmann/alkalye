@@ -29,6 +29,7 @@ import {
 	getDocumentOwner,
 } from "@/app/features/sharing/lib/document-sharing"
 import type { co } from "jazz-tools"
+import { homeLoader } from "../screens/home-screen"
 
 describe("Document Collaboration", () => {
 	let adminAccount: co.loaded<typeof UserAccount>
@@ -122,6 +123,62 @@ describe("Document Collaboration", () => {
 		setActiveAccount(otherAccount)
 		let loadedDocAfterRevoke = await Document.load(doc.$jazz.id)
 		expect(loadedDocAfterRevoke.$jazz.loadingState).toEqual("unauthorized")
+	})
+
+	describe("Personal after access revocation", () => {
+		beforeEach(async () => {
+			let { root } = await otherAccount.$jazz.ensureLoaded({
+				resolve: { root: { documents: true } },
+			})
+			root.documents.$jazz.splice(0, root.documents.length)
+			let { link } = await createDocumentInvite(doc, "reader")
+			let invite = parseInviteLink(link)
+			await acceptDocumentInvite(otherAccount, invite)
+			revokeDocumentInvite(doc, invite.inviteGroupId)
+			await otherAccount.$jazz.waitForAllCoValuesSync()
+			setActiveAccount(otherAccount)
+		})
+
+		test("opens an accessible document despite a revoked entry", async () => {
+			let personalDoc = await createPersonalDocument(otherAccount, "Personal")
+
+			await expect(
+				homeLoader({ context: { me: otherAccount }, deps: { personal: true } }),
+			).rejects.toMatchObject({
+				options: { to: "/doc/$id", params: { id: personalDoc.$jazz.id } },
+			})
+
+			let { root } = await otherAccount.$jazz.ensureLoaded({
+				resolve: { root: { documents: true } },
+			})
+			expect(root.documents.map(item => item.$jazz.id)).toEqual([
+				doc.$jazz.id,
+				personalDoc.$jazz.id,
+			])
+			let ownerDoc = await Document.load(doc.$jazz.id, {
+				loadAs: adminAccount,
+				resolve: { content: true },
+			})
+			if (!ownerDoc.$isLoaded) throw new Error("Owner lost document access")
+			expect(ownerDoc.content.toString()).toBe("Test content")
+		})
+
+		test("creates an accessible document when only revoked entries remain", async () => {
+			await expect(
+				homeLoader({ context: { me: otherAccount }, deps: { personal: true } }),
+			).rejects.toMatchObject({ options: { to: "/doc/$id" } })
+
+			let { root } = await otherAccount.$jazz.ensureLoaded({
+				resolve: { root: { documents: true } },
+			})
+			expect(root.documents.length).toBe(2)
+			expect(root.documents[0]?.$jazz.id).toBe(doc.$jazz.id)
+			let newId = root.documents[1]?.$jazz.id
+			if (!newId) throw new Error("No replacement document was created")
+			let newDoc = await Document.load(newId, { resolve: { content: true } })
+			if (!newDoc.$isLoaded) throw new Error("New document is inaccessible")
+			expect(newDoc.content.toString()).toBe("")
+		})
 	})
 
 	test("accepting a revoked invite should throw", async () => {

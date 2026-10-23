@@ -76,7 +76,7 @@ type LoadedDocument = co.loaded<
 >
 type LoadedMe = co.loaded<
 	typeof UserAccount,
-	{ root: { documents: { $each: true }; settings: true } }
+	{ root: { documents: true; settings: true } }
 >
 type EditorRef = React.RefObject<MarkdownEditorRef | null>
 
