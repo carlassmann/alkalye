@@ -59,7 +59,7 @@
 	--screen-keyboard-transition-duration: 220ms;
 	--screen-keyboard-transition-easing: cubic-bezier(0.215, 0.61, 0.355, 1);
 	/* Fitted to the window scroll iOS animates when the keyboard opens, so
-	   the toolbar and editor offsets cancel it out instead of trailing it. */
+	   the toolbar offset cancels it out instead of trailing it. */
 	--screen-keyboard-scroll-duration: 190ms;
 	--screen-keyboard-scroll-easing: cubic-bezier(0.35, 0.3, 0.65, 1);
 }
@@ -67,10 +67,7 @@
 .markdown-editor {
 	--toolbar-height: 48px;
 	position: fixed;
-	top: calc(
-		var(--toolbar-height) + env(safe-area-inset-top) +
-			var(--screen-keyboard-top-offset, 0px)
-	);
+	top: calc(var(--toolbar-height) + env(safe-area-inset-top));
 	left: 0;
 	right: 0;
 	bottom: 0;
@@ -80,8 +77,6 @@
 	flex-direction: column;
 	background: var(--editor-background);
 	color: var(--editor-foreground);
-	transition: top var(--screen-keyboard-scroll-duration)
-		var(--screen-keyboard-scroll-easing);
 }
 
 .editor-toolbar {
@@ -104,8 +99,6 @@
 @media (min-width: 768px) {
 	.markdown-editor {
 		transition:
-			top var(--screen-keyboard-scroll-duration)
-				var(--screen-keyboard-scroll-easing),
 			padding-left 200ms ease-in,
 			padding-right 200ms ease-in;
 	}
@@ -262,7 +255,8 @@
 	color: color-mix(in srgb, var(--accent-foreground) 70%, transparent);
 }
 
-:root[data-screen-keyboard-settling] :is(.markdown-editor, .editor-toolbar) {
+:root[data-screen-keyboard-settling]
+	:is(.editor-toolbar, .markdown-editor .cm-content) {
 	transition: none;
 }
 

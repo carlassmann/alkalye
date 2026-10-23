@@ -118,6 +118,7 @@ let revealCaretOnViewportChange = ViewPlugin.fromClass(
 		geometry = this.viewport && readViewportGeometry(this.viewport)
 		frame = 0
 		revealRequest = 0
+		revealPending = false
 
 		constructor(view: EditorView) {
 			this.view = view
@@ -131,6 +132,7 @@ let revealCaretOnViewportChange = ViewPlugin.fromClass(
 
 		// A pending reveal must never override a user who has started scrolling.
 		cancelReveal = () => {
+			this.revealPending = false
 			cancelAnimationFrame(this.frame)
 			this.revealRequest += 1
 		}
@@ -141,13 +143,22 @@ let revealCaretOnViewportChange = ViewPlugin.fromClass(
 			if (!this.viewport || !this.geometry) return
 			let previous = this.geometry
 			this.geometry = readViewportGeometry(this.viewport)
-			if (!viewportChangeMayHideCaret(previous, this.geometry)) return
+			if (viewportChangeMayHideCaret(previous, this.geometry)) {
+				this.revealPending = true
+			}
+			// While iOS keeps the window scrolled, its own scroll is revealing the
+			// caret. Gliding the editor at the same time would fight it, so the
+			// reveal waits until the window scroll has moved into the editor.
+			if (!this.revealPending || window.scrollY > 0) return
 			this.cancelReveal()
 			let request = this.revealRequest
 			this.frame = requestAnimationFrame(() => {
 				this.frame = requestAnimationFrame(async () => {
 					await waitForKeyboardTransitions(this.view)
-					if (this.isCurrent(request)) this.revealCaret(request)
+					if (!this.isCurrent(request)) return
+					// iOS may only now have started its own window scroll.
+					if (window.scrollY > 0) this.revealPending = true
+					else this.revealCaret(request)
 				})
 			})
 		}

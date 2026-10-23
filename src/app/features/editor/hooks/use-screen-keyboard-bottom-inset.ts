@@ -8,7 +8,7 @@ let screenKeyboardTopOffsetProperty = "--screen-keyboard-top-offset"
 let screenKeyboardSettlingAttribute = "data-screen-keyboard-settling"
 let keyboardInsetThreshold = 80
 // Outlasts the window scroll iOS animates when the keyboard opens.
-let keyboardScrollSettleDelay = 400
+let keyboardScrollSettleDelay = 300
 let floatingBottomOffset = 16
 let floatingKeyboardAccessoryOffset = 8
 let floatingKeyboardOverlayAccessoryOffset = 72
@@ -36,6 +36,11 @@ function useScreenKeyboardBottomInset(
 		let settleTimer = 0
 
 		function updateInset() {
+			if (root.hasAttribute(screenKeyboardSettlingAttribute)) {
+				// The viewport reports the reset window scroll a few frames late.
+				if (viewport.offsetTop > 0) return
+				requestAnimationFrame(finishSettling)
+			}
 			baselineHeight = Math.max(baselineHeight, getViewportHeight(viewport))
 
 			let viewportOffset = getViewportOffset(viewport, baselineHeight)
@@ -46,28 +51,38 @@ function useScreenKeyboardBottomInset(
 			clearTimeout(settleTimer)
 			if (viewportOffset.topOffset > 0) {
 				settleTimer = window.setTimeout(
-					undoWindowScroll,
+					moveWindowScrollIntoEditor,
 					keyboardScrollSettleDelay,
 				)
 			}
 		}
 
-		// iOS animates the window back down when the keyboard hides, which the
-		// top offset cannot follow exactly. Undoing the scroll while the keyboard
-		// rests leaves nothing to animate. The offset and the window scroll cancel
-		// out, so the text does not move.
-		function undoWindowScroll() {
-			if (viewport.scale !== 1 || !editor.contains(document.activeElement)) {
+		// iOS reveals a caret behind the keyboard by scrolling the window, which
+		// slides the whole editor up. Once that animation has finished, the
+		// scroll moves into the editor's own scroller in a single frame, so the
+		// text does not move and the window has nothing to animate back on close.
+		function moveWindowScrollIntoEditor() {
+			let scroller = editor.querySelector(".cm-scroller")
+			if (
+				!scroller ||
+				viewport.scale !== 1 ||
+				!editor.contains(document.activeElement)
+			) {
 				return
 			}
+			let windowScroll = window.scrollY
 			root.setAttribute(screenKeyboardSettlingAttribute, "")
-			root.style.setProperty(screenKeyboardTopOffsetProperty, "0px")
 			window.scrollTo(0, 0)
-			requestAnimationFrame(() => {
-				requestAnimationFrame(() => {
-					root.removeAttribute(screenKeyboardSettlingAttribute)
-				})
-			})
+			// The viewport reports the reset scroll only a few frames later.
+			setViewportOffset(root, getViewportOffset(viewport, baselineHeight, 0))
+			scroller.scrollTop += windowScroll
+			settleTimer = window.setTimeout(finishSettling, keyboardScrollSettleDelay)
+		}
+
+		function finishSettling() {
+			if (!root.hasAttribute(screenKeyboardSettlingAttribute)) return
+			root.removeAttribute(screenKeyboardSettlingAttribute)
+			scheduleUpdate()
 		}
 
 		function scheduleUpdate() {
@@ -181,8 +196,9 @@ interface ViewportOffset {
 function getViewportOffset(
 	viewport: VisualViewport,
 	baselineHeight: number,
+	viewportTop = viewport.offsetTop,
 ): ViewportOffset {
-	let topOffset = Math.max(0, viewport.offsetTop)
+	let topOffset = Math.max(0, viewportTop)
 	let heightReduction = Math.max(0, baselineHeight - viewport.height)
 	let bottomInset = Math.max(0, baselineHeight - viewport.height - topOffset)
 	let fixedBottomInset = Math.max(
