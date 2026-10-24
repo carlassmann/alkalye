@@ -1,3 +1,5 @@
+export { readDocumentText } from "./lib/document-text"
+export type { EditorChange } from "./lib/incremental-document-save"
 // schema
 export {
 	Document,

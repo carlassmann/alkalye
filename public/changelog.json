@@ -1,7 +1,7 @@
 [
 	{
-		"id": 156,
-		"date": "2026-10-22",
+		"id": 159,
+		"date": "2026-10-24",
 		"title": "Lines stay reachable with the iPhone keyboard open",
 		"notes": [
 			"Tapping a line near the top of a document on iPhone no longer hides it, or the lines above it, behind the toolbar.",
@@ -9,6 +9,33 @@
 			"Opening and closing the keyboard no longer makes the document jump. The text glides into place to keep the cursor in view."
 		],
 		"pr": 64
+	},
+	{
+		"id": 158,
+		"date": "2026-10-21",
+		"title": "Open workspaces in new tabs",
+		"notes": [
+			"Cmd-click (or Ctrl-click) any workspace in the workspace picker, including Personal, to open it in a new tab."
+		],
+		"pr": 60
+	},
+	{
+		"id": 157,
+		"date": "2026-10-21",
+		"title": "Keep typing while large documents save",
+		"notes": [
+			"Write in large documents with shorter pauses during autosave, including when collaborators are editing."
+		],
+		"pr": 59
+	},
+	{
+		"id": 156,
+		"date": "2026-10-21",
+		"title": "New documents inside folders",
+		"notes": [
+			"Right-click a folder in the sidebar and choose New Document to start writing directly inside it."
+		],
+		"pr": 58
 	},
 	{
 		"id": 155,

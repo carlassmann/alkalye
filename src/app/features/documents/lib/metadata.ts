@@ -1,3 +1,4 @@
+import { readDocumentText } from "@/app/features/documents/lib/document-text"
 import { co } from "jazz-tools"
 import { Document } from "./schema"
 import { getDocumentTitle, isDocumentPinned } from "./title"
@@ -120,7 +121,7 @@ function syncMetadata(
 	contentUpdatedAt: Date,
 	metadataUpdatedAt: Date,
 ) {
-	let content = doc.content.toString()
+	let content = readDocumentText(doc.content)
 	let meta = extractDocumentMetadata(content)
 
 	if (doc.title !== meta.title) {

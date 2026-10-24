@@ -25,6 +25,7 @@ let baseDocumentsMessages = messages({
 	"doc.preview": "Preview",
 	"doc.new": "New",
 	"doc.newFolder": "New Folder",
+	"doc.newDocument": "New Document",
 	"doc.deleteDialog.title": "Delete document?",
 	"doc.deleteDialog.description":
 		"This will move the document to trash. You can restore it later.",
@@ -218,6 +219,7 @@ let deDocumentsMessages = translate(baseDocumentsMessages, {
 	"doc.preview": "Vorschau",
 	"doc.new": "Neu",
 	"doc.newFolder": "Neuer Ordner",
+	"doc.newDocument": "Neues Dokument",
 	"doc.deleteDialog.title": "Dokument löschen?",
 	"doc.deleteDialog.description":
 		"Dies verschiebt das Dokument in den Papierkorb. Du kannst es später wiederherstellen.",
