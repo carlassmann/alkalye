@@ -7,7 +7,9 @@ let screenKeyboardBottomInsetProperty = "--screen-keyboard-bottom-inset"
 let screenKeyboardTopOffsetProperty = "--screen-keyboard-top-offset"
 let screenKeyboardSettlingAttribute = "data-screen-keyboard-settling"
 let keyboardInsetThreshold = 80
-// Outlasts the window scroll iOS animates when the keyboard opens.
+// Outlasts the window scroll iOS animates when the keyboard opens. WebKit
+// runs it for a fixed 250ms on every device (WKWebViewIOS.mm,
+// defaultAnimationDurationAtSameScale).
 let keyboardScrollSettleDelay = 300
 let floatingBottomOffset = 16
 let floatingKeyboardAccessoryOffset = 8
@@ -96,7 +98,7 @@ function useScreenKeyboardBottomInset(
 		}
 
 		// iOS reports the viewport only after the keyboard has finished hiding.
-		// Starting the reset on blur moves the toolbar and editor along with it.
+		// Starting the reset on blur moves the toolbar along with it.
 		function resetTopOffsetWhenKeyboardHides(event: FocusEvent) {
 			if (isEditableElement(event.relatedTarget)) return
 			root.style.setProperty(screenKeyboardTopOffsetProperty, "0px")

@@ -10,7 +10,7 @@ export {
 }
 
 let comfortableBottomMarginRatio = 0.3
-let keyboardTransitionProperties = new Set(["top", "padding-bottom"])
+let keyboardTransitionProperties = new Set(["padding-bottom"])
 let maxKeyboardTransitionWait = 400
 
 interface ViewportGeometry {
@@ -60,8 +60,8 @@ function measureCaretRevealScrollTop(view: EditorView) {
 	return delta === 0 ? null : view.scrollDOM.scrollTop + delta
 }
 
-// The editor offset and the keyboard padding animate after the viewport
-// changes. Measuring mid-transition reads moving geometry.
+// The keyboard padding animates after the viewport changes. Measuring
+// mid-transition reads moving geometry.
 function waitForKeyboardTransitions(view: EditorView) {
 	let editor = view.dom.closest(".markdown-editor") ?? view.dom
 	let transitions = editor

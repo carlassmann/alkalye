@@ -261,7 +261,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.markdown-editor,
 	.markdown-editor .cm-content,
 	.editor-toolbar,
 	.editor-floating-actions {
