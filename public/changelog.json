@@ -1,12 +1,23 @@
 [
 	{
-		"id": 159,
+		"id": 160,
 		"date": "2026-10-23",
 		"title": "Keep Personal accessible after sharing ends",
 		"notes": [
 			"Open Personal and keep using your other documents after access to a shared document is revoked."
 		],
 		"pr": 66
+	},
+	{
+		"id": 159,
+		"date": "2026-10-24",
+		"title": "Lines stay reachable with the iPhone keyboard open",
+		"notes": [
+			"Tapping a line near the top of a document on iPhone no longer hides it, or the lines above it, behind the toolbar.",
+			"The cursor stays visible above the keyboard while you type, including when you press Return near the bottom of the screen.",
+			"Opening and closing the keyboard no longer makes the document jump. The text glides into place to keep the cursor in view."
+		],
+		"pr": 64
 	},
 	{
 		"id": 158,
