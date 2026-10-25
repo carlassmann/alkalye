@@ -1,5 +1,14 @@
 [
 	{
+		"id": 160,
+		"date": "2026-10-23",
+		"title": "Keep Personal accessible after sharing ends",
+		"notes": [
+			"Open Personal and keep using your other documents after access to a shared document is revoked."
+		],
+		"pr": 66
+	},
+	{
 		"id": 159,
 		"date": "2026-10-24",
 		"title": "Lines stay reachable with the iPhone keyboard open",
