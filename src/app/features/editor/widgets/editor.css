@@ -58,6 +58,10 @@
 	--screen-keyboard-top-offset: 0px;
 	--screen-keyboard-transition-duration: 220ms;
 	--screen-keyboard-transition-easing: cubic-bezier(0.215, 0.61, 0.355, 1);
+	/* Fitted to the window scroll iOS animates when the keyboard opens, so
+	   the toolbar offset cancels it out instead of trailing it. */
+	--screen-keyboard-scroll-duration: 190ms;
+	--screen-keyboard-scroll-easing: cubic-bezier(0.35, 0.3, 0.65, 1);
 }
 
 .markdown-editor {
@@ -77,8 +81,8 @@
 
 .editor-toolbar {
 	transition:
-		padding-top var(--screen-keyboard-transition-duration)
-			var(--screen-keyboard-transition-easing),
+		padding-top var(--screen-keyboard-scroll-duration)
+			var(--screen-keyboard-scroll-easing),
 		left 200ms ease-in,
 		right 200ms ease-in;
 }
@@ -113,8 +117,8 @@
 
 	.editor-toolbar {
 		transition:
-			padding-top var(--screen-keyboard-transition-duration)
-				var(--screen-keyboard-transition-easing),
+			padding-top var(--screen-keyboard-scroll-duration)
+				var(--screen-keyboard-scroll-easing),
 			left 200ms ease-in,
 			right 200ms ease-in;
 	}
@@ -144,11 +148,17 @@
 .markdown-editor .cm-scroller {
 	overflow: auto !important;
 	overscroll-behavior: contain;
+	padding-top: var(--find-panel-height, 0px);
+}
+
+/* The space below the text belongs to .cm-content rather than the scroller.
+   iOS scrolls the window to fit the focused element when it is shorter than
+   the screen, which shifts short documents whenever the keyboard opens. */
+.markdown-editor .cm-scroller .cm-content {
 	padding-bottom: calc(
 		30dvh + var(--screen-keyboard-bottom-inset, 0px) +
 			env(safe-area-inset-bottom)
 	);
-	padding-top: var(--find-panel-height, 0px);
 	transition: padding-bottom var(--screen-keyboard-transition-duration)
 		var(--screen-keyboard-transition-easing);
 }
@@ -245,8 +255,13 @@
 	color: color-mix(in srgb, var(--accent-foreground) 70%, transparent);
 }
 
+:root[data-screen-keyboard-settling]
+	:is(.editor-toolbar, .markdown-editor .cm-content) {
+	transition: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
-	.markdown-editor .cm-scroller,
+	.markdown-editor .cm-content,
 	.editor-toolbar,
 	.editor-floating-actions {
 		transition: none;

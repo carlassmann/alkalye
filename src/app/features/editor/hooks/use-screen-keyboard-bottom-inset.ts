@@ -5,7 +5,12 @@ export { useScreenKeyboardBottomInset, useScreenKeyboardFloatingBottomOffset }
 
 let screenKeyboardBottomInsetProperty = "--screen-keyboard-bottom-inset"
 let screenKeyboardTopOffsetProperty = "--screen-keyboard-top-offset"
+let screenKeyboardSettlingAttribute = "data-screen-keyboard-settling"
 let keyboardInsetThreshold = 80
+// Outlasts the window scroll iOS animates when the keyboard opens. WebKit
+// runs it for a fixed 250ms on every device (WKWebViewIOS.mm,
+// defaultAnimationDurationAtSameScale).
+let keyboardScrollSettleDelay = 300
 let floatingBottomOffset = 16
 let floatingKeyboardAccessoryOffset = 8
 let floatingKeyboardOverlayAccessoryOffset = 72
@@ -26,17 +31,60 @@ function useScreenKeyboardBottomInset(
 		}
 
 		let viewport = maybeViewport
+		let editor = maybeEditor
 		let root = document.documentElement
 		let baselineHeight = getViewportHeight(viewport)
 		let frame = 0
+		let settleTimer = 0
 
 		function updateInset() {
+			if (root.hasAttribute(screenKeyboardSettlingAttribute)) {
+				// The viewport reports the reset window scroll a few frames late.
+				if (viewport.offsetTop > 0) return
+				requestAnimationFrame(finishSettling)
+			}
 			baselineHeight = Math.max(baselineHeight, getViewportHeight(viewport))
 
 			let viewportOffset = getViewportOffset(viewport, baselineHeight)
 
 			setViewportOffset(root, viewportOffset)
 			logKeyboardInset("scroll", viewport, baselineHeight, viewportOffset)
+
+			clearTimeout(settleTimer)
+			if (viewportOffset.topOffset > 0) {
+				settleTimer = window.setTimeout(
+					moveWindowScrollIntoEditor,
+					keyboardScrollSettleDelay,
+				)
+			}
+		}
+
+		// iOS reveals a caret behind the keyboard by scrolling the window, which
+		// slides the whole editor up. Once that animation has finished, the
+		// scroll moves into the editor's own scroller in a single frame, so the
+		// text does not move and the window has nothing to animate back on close.
+		function moveWindowScrollIntoEditor() {
+			let scroller = editor.querySelector(".cm-scroller")
+			if (
+				!scroller ||
+				viewport.scale !== 1 ||
+				!editor.contains(document.activeElement)
+			) {
+				return
+			}
+			let windowScroll = window.scrollY
+			root.setAttribute(screenKeyboardSettlingAttribute, "")
+			window.scrollTo(0, 0)
+			// The viewport reports the reset scroll only a few frames later.
+			setViewportOffset(root, getViewportOffset(viewport, baselineHeight, 0))
+			scroller.scrollTop += windowScroll
+			settleTimer = window.setTimeout(finishSettling, keyboardScrollSettleDelay)
+		}
+
+		function finishSettling() {
+			if (!root.hasAttribute(screenKeyboardSettlingAttribute)) return
+			root.removeAttribute(screenKeyboardSettlingAttribute)
+			scheduleUpdate()
 		}
 
 		function scheduleUpdate() {
@@ -49,16 +97,31 @@ function useScreenKeyboardBottomInset(
 			scheduleUpdate()
 		}
 
+		// iOS reports the viewport only after the keyboard has finished hiding.
+		// Starting the reset on blur moves the toolbar along with it.
+		function resetTopOffsetWhenKeyboardHides(event: FocusEvent) {
+			if (isEditableElement(event.relatedTarget)) return
+			root.style.setProperty(screenKeyboardTopOffsetProperty, "0px")
+		}
+
 		updateInset()
 		viewport.addEventListener("resize", scheduleUpdate)
 		viewport.addEventListener("scroll", scheduleUpdate)
 		window.addEventListener("orientationchange", resetBaseline)
+		editor.addEventListener("focusout", resetTopOffsetWhenKeyboardHides)
+		// Focus can leave and return without the viewport changing, so no
+		// viewport event would restore the offset cleared on blur.
+		editor.addEventListener("focusin", scheduleUpdate)
 
 		return () => {
 			cancelAnimationFrame(frame)
+			clearTimeout(settleTimer)
+			root.removeAttribute(screenKeyboardSettlingAttribute)
 			viewport.removeEventListener("resize", scheduleUpdate)
 			viewport.removeEventListener("scroll", scheduleUpdate)
 			window.removeEventListener("orientationchange", resetBaseline)
+			editor.removeEventListener("focusout", resetTopOffsetWhenKeyboardHides)
+			editor.removeEventListener("focusin", scheduleUpdate)
 			removeViewportOffset(root)
 		}
 	}, [containerRef])
@@ -135,8 +198,9 @@ interface ViewportOffset {
 function getViewportOffset(
 	viewport: VisualViewport,
 	baselineHeight: number,
+	viewportTop = viewport.offsetTop,
 ): ViewportOffset {
-	let topOffset = Math.max(0, viewport.offsetTop)
+	let topOffset = Math.max(0, viewportTop)
 	let heightReduction = Math.max(0, baselineHeight - viewport.height)
 	let bottomInset = Math.max(0, baselineHeight - viewport.height - topOffset)
 	let fixedBottomInset = Math.max(
@@ -170,6 +234,11 @@ function setViewportOffset(root: HTMLElement, viewportOffset: ViewportOffset) {
 function removeViewportOffset(root: HTMLElement) {
 	root.style.removeProperty(screenKeyboardTopOffsetProperty)
 	root.style.removeProperty(screenKeyboardBottomInsetProperty)
+}
+
+function isEditableElement(target: EventTarget | null) {
+	if (!(target instanceof HTMLElement)) return false
+	return target.isContentEditable || target.matches("input, textarea, select")
 }
 
 function getViewportHeight(viewport: VisualViewport) {

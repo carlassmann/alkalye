@@ -121,6 +121,7 @@ import { createBacklinkDecorations } from "../lib/backlink-decorations"
 import { findExtension, selectMatch } from "../lib/find-extension"
 import { FindPanel } from "./find-panel"
 import { fileDropCursor, clearFileDropCursor } from "../lib/file-drop-cursor"
+import { screenKeyboardScrolling } from "../lib/screen-keyboard-scrolling"
 import { EditorContextMenu } from "./editor-context-menu"
 
 import { useIsMobile } from "@/app/hooks/use-mobile"
@@ -688,9 +689,7 @@ function MarkdownEditor(
 				}
 			}),
 			highlightActiveLine(),
-			EditorView.scrollMargins.of(view => ({
-				bottom: view.scrollDOM.clientHeight * 0.3,
-			})),
+			screenKeyboardScrolling,
 			EditorView.lineWrapping,
 			EditorView.clickAddsSelectionRange.of(event => event.altKey),
 			EditorView.contentAttributes.of({
