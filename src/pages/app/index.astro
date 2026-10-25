@@ -44,7 +44,7 @@ let metaDescription =
 		<meta name="author" content="Alkalye" />
 		<meta id="theme-color" name="theme-color" content="#ffffff" />
 		<meta name="apple-mobile-web-app-capable" content="yes" />
-		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="default" />
 		<meta name="apple-mobile-web-app-title" content="Alkalye" />
 		<link rel="icon" type="image/png" href="/icons/alkalye-icon.png" />
 		<link rel="apple-touch-icon" href="/icons/alkalye-icon.png" />
@@ -228,10 +228,24 @@ let metaDescription =
 				}
 				if (isStandalone) {
 					sessionStorage.setItem("pwa-session", "1")
+					let measureSafeAreaTop = () => {
+						let probe = document.createElement("div")
+						probe.style.paddingTop = "env(safe-area-inset-top)"
+						document.documentElement.append(probe)
+						let inset = parseFloat(getComputedStyle(probe).paddingTop)
+						probe.remove()
+						return inset
+					}
 					let setAppHeight = () => {
 						let isPortrait = window.innerHeight >= window.innerWidth
+						// Installs from before the "default" status bar style keep black-translucent
+						// and draw under the status bar, where innerHeight can come up short.
+						let drawsUnderStatusBar = measureSafeAreaTop() > 0
 						let screenHeight = isPortrait ? screen.height : screen.width
-						let height = Math.max(window.innerHeight, screenHeight)
+						let height =
+							isPortrait && !drawsUnderStatusBar
+								? window.innerHeight
+								: Math.max(window.innerHeight, screenHeight)
 
 						document.documentElement.style.setProperty(
 							"--app-height",
