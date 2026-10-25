@@ -1,5 +1,15 @@
 [
 	{
+		"id": 161,
+		"date": "2026-10-25",
+		"title": "Sharp toolbar in the iPhone Home Screen app",
+		"notes": [
+			"On iOS 26 and later, the toolbar and sidebar buttons at the top of the Home Screen app are no longer blurred.",
+			"If you added Alkalye to your Home Screen before this update, remove it and add it again to get the fix."
+		],
+		"pr": 67
+	},
+	{
 		"id": 160,
 		"date": "2026-10-23",
 		"title": "Keep Personal accessible after sharing ends",
