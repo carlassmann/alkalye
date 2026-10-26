@@ -48,15 +48,21 @@
 	color: currentColor;
 }
 
-/* iOS hides its selection handles when the native caret is transparent, as drawSelection makes it */
+/* iOS hides its selection handles when the native caret is transparent, as drawSelection makes it.
+   The native highlight then covers the main range, so the drawn layer would double it. */
 @media (pointer: coarse) {
 	.markdown-editor .cm-editor .cm-content,
 	.markdown-editor .cm-editor .cm-content .cm-line {
 		caret-color: var(--brand) !important;
 	}
 
-	.markdown-editor .cm-editor .cm-cursor-primary {
+	.markdown-editor .cm-editor .cm-cursor-primary,
+	.markdown-editor .cm-editor .cm-selectionLayer {
 		display: none;
+	}
+
+	.markdown-editor .cm-secondarySelection {
+		background-color: var(--brand-subtle);
 	}
 }
 
