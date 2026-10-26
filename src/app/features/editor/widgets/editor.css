@@ -42,6 +42,24 @@
 	background-color: var(--brand-subtle) !important;
 }
 
+/* drawSelection hides the native highlight but leaves its white HighlightText color */
+.markdown-editor .cm-line::selection,
+.markdown-editor .cm-line ::selection {
+	color: currentColor;
+}
+
+/* iOS hides its selection handles when the native caret is transparent, as drawSelection makes it */
+@media (pointer: coarse) {
+	.markdown-editor .cm-editor .cm-content,
+	.markdown-editor .cm-editor .cm-content .cm-line {
+		caret-color: var(--brand) !important;
+	}
+
+	.markdown-editor .cm-editor .cm-cursor-primary {
+		display: none;
+	}
+}
+
 .markdown-editor .cm-cursor-primary {
 	border-left: 2px solid var(--brand) !important;
 }
