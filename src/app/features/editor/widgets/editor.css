@@ -58,7 +58,7 @@
 
 	.markdown-editor .cm-editor .cm-cursor-primary,
 	.markdown-editor .cm-editor .cm-selectionLayer {
-		display: none;
+		display: none !important;
 	}
 
 	.markdown-editor .cm-secondarySelection {
