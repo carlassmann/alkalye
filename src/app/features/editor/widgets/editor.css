@@ -61,8 +61,13 @@
 		display: none !important;
 	}
 
-	.markdown-editor .cm-secondarySelection {
+	.markdown-editor .cm-editor.cm-focused .cm-secondarySelection {
 		background-color: var(--brand-subtle);
+	}
+
+	/* Closing the keyboard blurs the editor and clears the native highlight, but CodeMirror keeps the selection */
+	.markdown-editor .cm-editor:not(.cm-focused) .cm-selectionMatch {
+		outline: none;
 	}
 }
 
