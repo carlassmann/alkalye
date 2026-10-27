@@ -28,6 +28,9 @@ async function printHtmlToPdf(params: {
 				"--no-first-run",
 				"--no-default-browser-check",
 				"--no-pdf-header-footer",
+				// Lets the page finish async work (font loading, slide fitting)
+				// before Chrome prints; without it slides print unfitted.
+				"--virtual-time-budget=10000",
 				`--user-data-dir=${join(workDir, "profile")}`,
 				`--print-to-pdf=${resolve(params.outputPath)}`,
 				pathToFileURL(htmlPath).href,

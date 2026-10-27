@@ -92,6 +92,8 @@ describe("help", () => {
 		expect(result.stdout).toMatch(/--pdf/)
 		expect(result.stdout).toMatch(/--file/)
 		expect(result.stdout).toMatch(/--theme/)
+		expect(result.stdout).toMatch(/--layout/)
+		expect(result.stdout).toMatch(/--aspect/)
 	})
 
 	test("root help includes --quiet option", async () => {

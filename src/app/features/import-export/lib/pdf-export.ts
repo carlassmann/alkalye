@@ -6,8 +6,21 @@ import {
 	resolvePrintTheme,
 	toPrintTheme,
 } from "./printable-html"
+import {
+	buildPrintableSlides,
+	type SlideAspectRatio,
+	type SlidePrintLayout,
+} from "./printable-slides"
+import { getAppPrintFonts } from "./app-print-fonts"
+import { parsePresentationTheme } from "@/app/features/presentation/lib/presentation"
+import {
+	findSlideScale,
+	fitPrintedSlides,
+	waitForPrintedSlideAssets,
+} from "@/app/features/presentation/lib/slide-fit"
 
-export { printToPdf, renderPrintableMarkdown }
+export { printToPdf, printSlidesToPdf, renderPrintableMarkdown }
+export type { SlideAspectRatio, SlidePrintLayout }
 
 async function printToPdf(params: {
 	content: string
@@ -21,7 +34,7 @@ async function printToPdf(params: {
 	let { theme, preset } = resolvePrintTheme({
 		content,
 		themes,
-		defaultPreviewTheme,
+		defaultThemeName: defaultPreviewTheme,
 	})
 	let printableHtml = await buildPrintableDocument({
 		content,
@@ -34,11 +47,46 @@ async function printToPdf(params: {
 	openPrintWindow(printableHtml)
 }
 
+async function printSlidesToPdf(params: {
+	content: string
+	themes: LoadedThemes | undefined
+	defaultSlideshowTheme: string | null
+	defaultSyntaxTheme: string | null
+	assets: PrintableAsset[]
+	layout: SlidePrintLayout
+	aspectRatio: SlideAspectRatio
+	wikilinkTitles?: Map<string, string>
+}) {
+	let { content, themes, defaultSlideshowTheme, ...rest } = params
+	let { theme, preset } = resolvePrintTheme({
+		content,
+		themes,
+		defaultThemeName: defaultSlideshowTheme,
+		appearance: parsePresentationTheme(content) ?? "light",
+	})
+	let printableHtml = await buildPrintableSlides({
+		...rest,
+		content,
+		theme: theme ? await toPrintTheme(theme, preset) : null,
+		parseHtml: parseHtmlInBrowser,
+		appFonts: getAppPrintFonts(),
+	})
+
+	// Scripts in the imported document do not run, so slides are fitted here.
+	openPrintWindow(printableHtml, async document => {
+		await waitForPrintedSlideAssets(document)
+		fitPrintedSlides(document, findSlideScale)
+	})
+}
+
 function parseHtmlInBrowser(html: string): Document {
 	return new DOMParser().parseFromString(html, "text/html")
 }
 
-function openPrintWindow(html: string): void {
+function openPrintWindow(
+	html: string,
+	prepare?: (document: Document) => Promise<void>,
+): void {
 	let printWindow = window.open("", "_blank")
 	if (!printWindow) {
 		let blob = new Blob([html], { type: "text/html" })
@@ -53,14 +101,18 @@ function openPrintWindow(html: string): void {
 		imported,
 		printWindow.document.documentElement,
 	)
-	void printWhenReady(printWindow)
+	void printWhenReady(printWindow, prepare)
 }
 
-async function printWhenReady(printWindow: Window) {
+async function printWhenReady(
+	printWindow: Window,
+	prepare?: (document: Document) => Promise<void>,
+) {
 	if (printWindow.document.fonts?.ready) {
 		await printWindow.document.fonts.ready
 	}
 	await waitForImages(printWindow.document)
+	await prepare?.(printWindow.document)
 	printWindow.print()
 }
 

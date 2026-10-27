@@ -248,6 +248,7 @@ async function loadThemesForPdf(me: co.loaded<typeof UserAccount>) {
 	return {
 		themes: root.themes,
 		defaultPreviewTheme: root.settings?.defaultPreviewTheme ?? null,
+		defaultSlideshowTheme: root.settings?.defaultSlideshowTheme ?? null,
 		defaultSyntaxTheme: root.settings?.syntaxTheme ?? null,
 	}
 }

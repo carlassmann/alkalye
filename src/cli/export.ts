@@ -21,6 +21,17 @@ import {
 	toPrintTheme,
 	type PrintTheme,
 } from "@/app/features/import-export/lib/printable-html"
+import {
+	buildPrintableSlides,
+	slideAspectRatios,
+	type SlideAspectRatio,
+	type SlidePrintLayout,
+} from "@/app/features/import-export/lib/printable-slides"
+import {
+	getPresentationMode,
+	parsePresentationTheme,
+} from "@/app/features/presentation/lib/presentation"
+import type { PrintableAsset } from "@/app/features/assets"
 import { CliUsageError, FilesystemError, NotFoundError } from "@/cli/errors"
 import { createAuthenticatedJazz } from "@/cli/jazz"
 import {
@@ -31,6 +42,7 @@ import {
 	staleOkOption,
 } from "@/cli/options"
 import { printHtmlToPdf } from "@/cli/pdf"
+import { loadAppPrintFonts } from "@/cli/print-fonts"
 import {
 	getOptionString,
 	loadAccount,
@@ -43,6 +55,11 @@ import { compileThemeSource } from "@/cli/themes"
 export { docExportCommand, compileLocalPrintTheme, isLocalThemePath }
 
 let minimumPrintTimeoutMs = 60_000
+let exportLayouts = ["document", "slides", "notes"] as const
+
+type ExportLayout = (typeof exportLayouts)[number]
+type ExportFormat = { layout: ExportLayout; aspectRatio: SlideAspectRatio }
+type ThemeLibrary = Awaited<ReturnType<typeof loadThemesForPdf>>
 
 let docExportCommand = Command.make(
 	"export",
@@ -63,6 +80,15 @@ let docExportCommand = Command.make(
 				"Theme name, ID, or path to a local .theme.md file.",
 			),
 		),
+		layout: Options.optional(Options.choice("layout", exportLayouts)).pipe(
+			Options.withDescription(
+				"document, slides, or notes (slides with speaker notes). Presentations default to slides.",
+			),
+		),
+		aspect: Options.choice("aspect", slideAspectRatios).pipe(
+			Options.withDefault("16:9"),
+			Options.withDescription("Slide aspect ratio for slides and notes."),
+		),
 		offline: offlineOption,
 		local: localOption,
 		staleOk: staleOkOption,
@@ -74,6 +100,7 @@ let docExportCommand = Command.make(
 			let pdfPath = getOptionString(args.pdf)
 			let htmlPath = getOptionString(args.html)
 			let themeOption = getOptionString(args.theme)
+			let layout = getOptionString(args.layout)
 			if (!docId === !filePath) {
 				throw new CliUsageError({
 					message: "Pass either a doc ID or --file <markdown>",
@@ -85,9 +112,10 @@ let docExportCommand = Command.make(
 				})
 			}
 
+			let format = { layout, aspectRatio: args.aspect }
 			let html = filePath
-				? await renderLocalFile(filePath, themeOption, config)
-				: await renderDoc(docId ?? "", themeOption, config, {
+				? await renderLocalFile(filePath, themeOption, format, config)
+				: await renderDoc(docId ?? "", themeOption, format, config, {
 						allowStale: args.offline || args.local || args.staleOk,
 					})
 
@@ -107,20 +135,24 @@ let docExportCommand = Command.make(
 		}),
 )
 
-async function compileLocalPrintTheme(path: string): Promise<PrintTheme> {
+async function compileLocalPrintTheme(
+	path: string,
+	appearance: "light" | "dark" = "light",
+): Promise<PrintTheme> {
 	let source = await readFile(path, "utf8").catch(() => {
 		throw new FilesystemError({ message: `Cannot read theme ${path}` })
 	})
 	let compiled = compileThemeSource(source)
 	let presets = compiled.metadata?.presets ?? []
 	let preset =
-		presets.find(candidate => candidate.appearance === "light") ??
+		presets.find(candidate => candidate.appearance === appearance) ??
 		presets[0] ??
 		null
 	return {
 		name: compiled.metadata?.name ?? basename(path, ".theme.md"),
 		css: scopeThemeCss(compiled.css, PRINT_THEME_SCOPE),
 		template: compiled.template ?? null,
+		slideTemplate: compiled.slideTemplate ?? null,
 		fontFaceRules: "",
 		presetVariables: preset ? buildPresetVariables(preset) : "",
 	}
@@ -133,31 +165,35 @@ function isLocalThemePath(themeRef: string) {
 async function renderLocalFile(
 	filePath: string,
 	themeOption: string | undefined,
+	requested: { layout: string | undefined; aspectRatio: SlideAspectRatio },
 	config: CliConfig,
 ) {
 	let content = await readFile(filePath, "utf8").catch(() => {
 		throw new FilesystemError({ message: `Cannot read ${filePath}` })
 	})
+	let format = resolveExportFormat(content, requested)
+	let appearance = getPrintAppearance(content, format)
 	let themeRef = themeOption ?? getThemeId(content) ?? getThemeName(content)
 	let theme = !themeRef
 		? null
 		: isLocalThemePath(themeRef)
-			? await compileLocalPrintTheme(themeRef)
-			: await withAccountThemes(config, themes =>
-					resolveNamedTheme(themes, themeRef),
+			? await compileLocalPrintTheme(themeRef, appearance)
+			: await withThemeLibrary(config, library =>
+					resolveNamedTheme(library.themes, themeRef, appearance),
 				)
-	return buildPrintableDocument({
+	return renderExport({
 		content,
+		format,
 		theme,
 		assets: [],
 		defaultSyntaxTheme: null,
-		parseHtml: parseHtmlWithJsdom,
 	})
 }
 
 async function renderDoc(
 	docId: string,
 	themeOption: string | undefined,
+	requested: { layout: string | undefined; aspectRatio: SlideAspectRatio },
 	config: CliConfig,
 	options: { allowStale: boolean },
 ) {
@@ -168,36 +204,77 @@ async function renderDoc(
 			timeoutMs: config.timeoutMs,
 		})
 		let content = doc.content.toString()
+		let format = resolveExportFormat(content, requested)
+		let appearance = getPrintAppearance(content, format)
 		let account = await loadAccount(jazz, config.timeoutMs)
 		let library = await loadThemesForPdf(account)
 		let theme = !themeOption
-			? await resolveDocTheme(content, library)
+			? await resolveDocTheme(content, library, format)
 			: isLocalThemePath(themeOption)
-				? await compileLocalPrintTheme(themeOption)
-				: await resolveNamedTheme(library.themes, themeOption)
-		return await buildPrintableDocument({
+				? await compileLocalPrintTheme(themeOption, appearance)
+				: await resolveNamedTheme(library.themes, themeOption, appearance)
+		return await renderExport({
 			content,
+			format,
 			theme,
 			assets: await loadPrintableAssets(doc),
 			defaultSyntaxTheme: library.defaultSyntaxTheme,
-			parseHtml: parseHtmlWithJsdom,
 		})
 	} finally {
 		await jazz.done()
 	}
 }
 
-async function withAccountThemes<T>(
+function resolveExportFormat(
+	content: string,
+	requested: { layout: string | undefined; aspectRatio: SlideAspectRatio },
+): ExportFormat {
+	let layout = exportLayouts.find(candidate => candidate === requested.layout)
+	return {
+		layout: layout ?? (getPresentationMode(content) ? "slides" : "document"),
+		aspectRatio: requested.aspectRatio,
+	}
+}
+
+function getPrintAppearance(content: string, format: ExportFormat) {
+	return format.layout === "document"
+		? "light"
+		: (parsePresentationTheme(content) ?? "light")
+}
+
+async function renderExport(params: {
+	content: string
+	format: ExportFormat
+	theme: PrintTheme | null
+	assets: PrintableAsset[]
+	defaultSyntaxTheme: string | null
+}) {
+	let { format, ...rest } = params
+	let slideLayout = toSlideLayout(format.layout)
+	if (!slideLayout) {
+		return buildPrintableDocument({ ...rest, parseHtml: parseHtmlWithJsdom })
+	}
+	return buildPrintableSlides({
+		...rest,
+		appFonts: await loadAppPrintFonts(),
+		layout: slideLayout,
+		aspectRatio: format.aspectRatio,
+		parseHtml: parseHtmlWithJsdom,
+	})
+}
+
+function toSlideLayout(layout: ExportLayout): SlidePrintLayout | null {
+	return layout === "document" ? null : layout
+}
+
+async function withThemeLibrary<T>(
 	config: CliConfig,
-	pickTheme: (
-		themes: Awaited<ReturnType<typeof loadThemesForPdf>>["themes"],
-	) => Promise<T>,
+	pickTheme: (library: ThemeLibrary) => Promise<T>,
 ) {
 	let jazz = await createAuthenticatedJazz(config)
 	try {
 		let account = await loadAccount(jazz, config.timeoutMs)
-		let library = await loadThemesForPdf(account)
-		return await pickTheme(library.themes)
+		return await pickTheme(await loadThemesForPdf(account))
 	} finally {
 		await jazz.done()
 	}
@@ -205,26 +282,34 @@ async function withAccountThemes<T>(
 
 async function resolveDocTheme(
 	content: string,
-	library: Awaited<ReturnType<typeof loadThemesForPdf>>,
+	library: ThemeLibrary,
+	format: ExportFormat,
 ): Promise<PrintTheme | null> {
+	let isSlides = format.layout !== "document"
 	let { theme, preset } = resolvePrintTheme({
 		content,
 		themes: library.themes,
-		defaultPreviewTheme: library.defaultPreviewTheme,
+		defaultThemeName: isSlides
+			? library.defaultSlideshowTheme
+			: library.defaultPreviewTheme,
+		appearance: getPrintAppearance(content, format),
 	})
 	return theme ? toPrintTheme(theme, preset) : null
 }
 
 async function resolveNamedTheme(
-	themes: Awaited<ReturnType<typeof loadThemesForPdf>>["themes"],
+	themes: ThemeLibrary["themes"],
 	themeRef: string,
+	appearance: "light" | "dark",
 ): Promise<PrintTheme> {
 	let theme =
 		findThemeById(themes, themeRef) ?? findThemeByName(themes, themeRef)
 	if (!theme)
 		throw new NotFoundError({ message: `Theme not found: ${themeRef}` })
 	let preset =
-		findPresetByAppearance(theme, "light") ?? getThemePresets(theme)[0] ?? null
+		findPresetByAppearance(theme, appearance) ??
+		getThemePresets(theme)[0] ??
+		null
 	return toPrintTheme(theme, preset)
 }
 

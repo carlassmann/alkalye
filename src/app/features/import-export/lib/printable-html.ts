@@ -38,6 +38,7 @@ export {
 	resolvePrintTheme,
 	toPrintTheme,
 	buildPresetVariables,
+	escapeHtml,
 	PRINT_THEME_SCOPE,
 	type PrintTheme,
 	type HtmlParser,
@@ -50,6 +51,7 @@ type PrintTheme = {
 	name: string
 	css: string
 	template: string | null
+	slideTemplate: string | null
 	fontFaceRules: string
 	presetVariables: string
 }
@@ -87,9 +89,10 @@ async function buildPrintableDocument(params: {
 function resolvePrintTheme(params: {
 	content: string
 	themes: LoadedThemes | undefined
-	defaultPreviewTheme: string | null
+	defaultThemeName: string | null
+	appearance?: "light" | "dark"
 }): { theme: LoadedTheme | null; preset: ThemePresetType | null } {
-	let { content, themes, defaultPreviewTheme } = params
+	let { content, themes, defaultThemeName, appearance = "light" } = params
 	let themeName = getThemeName(content)
 	let themeId = getThemeId(content)
 	let presetName = getPresetName(content)
@@ -97,8 +100,8 @@ function resolvePrintTheme(params: {
 	let isAppearanceOnlyTheme = themeName === "light" || themeName === "dark"
 	let effectiveThemeName = isAppearanceOnlyTheme ? null : themeName
 
-	if (!effectiveThemeName && defaultPreviewTheme) {
-		effectiveThemeName = defaultPreviewTheme
+	if (!effectiveThemeName && defaultThemeName) {
+		effectiveThemeName = defaultThemeName
 	}
 
 	let theme = themeId
@@ -110,7 +113,9 @@ function resolvePrintTheme(params: {
 	if (!theme) return { theme: null, preset: null }
 	if (presetName) return { theme, preset: findPresetByName(theme, presetName) }
 	let preset =
-		findPresetByAppearance(theme, "light") ?? getThemePresets(theme)[0] ?? null
+		findPresetByAppearance(theme, appearance) ??
+		getThemePresets(theme)[0] ??
+		null
 	return { theme, preset }
 }
 
@@ -123,6 +128,9 @@ async function toPrintTheme(
 		name: theme.name,
 		css: theme.sourceDocId ? scopeThemeCss(css, PRINT_THEME_SCOPE) : css,
 		template: theme.template?.$isLoaded ? theme.template.toString() : null,
+		slideTemplate: theme.slideTemplate?.$isLoaded
+			? theme.slideTemplate.toString()
+			: null,
 		fontFaceRules: await buildFontFaceRulesBase64(theme),
 		presetVariables: preset ? buildPresetVariables(preset) : "",
 	}
@@ -184,6 +192,15 @@ function buildPresetVariables(preset: ThemePresetType): string {
 	vars.push(`--theme-accent: ${colors.accent}`)
 
 	return `:root {\n\t${vars.join(";\n\t")};\n}`
+}
+
+function escapeHtml(str: string): string {
+	return str
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/"/g, "&quot;")
+		.replace(/'/g, "&#039;")
 }
 
 function buildPrintableHtml(params: {
@@ -452,13 +469,4 @@ function getFontFormat(mimeType: string): string {
 		"font/otf": "opentype",
 	}
 	return formats[mimeType] ?? "woff2"
-}
-
-function escapeHtml(str: string): string {
-	return str
-		.replace(/&/g, "&amp;")
-		.replace(/</g, "&lt;")
-		.replace(/>/g, "&gt;")
-		.replace(/"/g, "&quot;")
-		.replace(/'/g, "&#039;")
 }

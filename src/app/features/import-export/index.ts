@@ -22,7 +22,12 @@ export {
 	type ExportAsset,
 	type ExportDoc,
 } from "./lib/export"
-export { printToPdf } from "./lib/pdf-export"
+export {
+	printToPdf,
+	printSlidesToPdf,
+	type SlideAspectRatio,
+	type SlidePrintLayout,
+} from "./lib/pdf-export"
 export {
 	createWikilinkExtension,
 	type WikilinkTitleResolver,

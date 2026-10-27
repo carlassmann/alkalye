@@ -16,6 +16,9 @@ import {
 	DropdownMenuTrigger,
 	DropdownMenuSeparator,
 	DropdownMenuShortcut,
+	DropdownMenuSub,
+	DropdownMenuSubContent,
+	DropdownMenuSubTrigger,
 } from "@/app/components/ui/dropdown-menu"
 import { ConfirmDialog } from "@/app/components/ui/confirm-dialog"
 import { testIds } from "@/app/lib/test-ids"
@@ -46,8 +49,13 @@ import {
 	shareDocument,
 	saveDocumentAs,
 	printToPdf,
+	printSlidesToPdf,
 	type ExportAsset,
+	type SlideAspectRatio,
+	type SlidePrintLayout,
 } from "@/app/features/import-export"
+import { parseWikiLinks } from "@/app/features/editor"
+import { resolveDocTitles } from "../lib/wikilink-titles"
 import {
 	applyContentDiffWithCommentAnchors,
 	copyCommentsAndApplyContent,
@@ -118,6 +126,7 @@ function SidebarFileMenu({ doc, editor, me, spaceId }: SidebarFileMenuProps) {
 	let isPinned = parseFrontmatter(content).frontmatter?.pinned === true
 	let isPresentation = getPresentationMode(content)
 	let handlePrintPdf = makePrintPdf(content, account, doc)
+	let makePrintSlides = makePrintSlidesFactory(content, account, doc)
 	let canShare = canShareDocument()
 
 	return (
@@ -221,6 +230,28 @@ function SidebarFileMenu({ doc, editor, me, spaceId }: SidebarFileMenuProps) {
 								{getShortcutLabel("print")}
 							</DropdownMenuShortcut>
 						</DropdownMenuItem>
+						{isPresentation && (
+							<DropdownMenuSub>
+								<DropdownMenuSubTrigger>
+									{t("doc.printSlides")}
+								</DropdownMenuSubTrigger>
+								<DropdownMenuSubContent>
+									{slidePrintOptions.map(option => (
+										<DropdownMenuItem
+											key={`${option.layout}-${option.aspectRatio}`}
+											onClick={makePrintSlides(option)}
+										>
+											{t(
+												option.layout === "notes"
+													? "doc.printSlides.withNotes"
+													: "doc.printSlides.slidesOnly",
+												{ aspectRatio: option.aspectRatio },
+											)}
+										</DropdownMenuItem>
+									))}
+								</DropdownMenuSubContent>
+							</DropdownMenuSub>
+						)}
 						<DropdownMenuItem
 							onClick={makeDuplicate(doc, me, spaceId, navigate)}
 							data-testid={testIds.doc.duplicateButton}
@@ -553,6 +584,47 @@ function makePrintPdf(
 			defaultSyntaxTheme,
 			assets,
 		})
+	}
+}
+
+let slidePrintOptions: {
+	layout: SlidePrintLayout
+	aspectRatio: SlideAspectRatio
+}[] = [
+	{ layout: "slides", aspectRatio: "16:9" },
+	{ layout: "slides", aspectRatio: "4:3" },
+	{ layout: "notes", aspectRatio: "16:9" },
+	{ layout: "notes", aspectRatio: "4:3" },
+]
+
+function makePrintSlidesFactory(
+	content: string,
+	account: ReturnType<typeof useAccount<typeof UserAccount>>,
+	doc: LoadedDocument,
+) {
+	return function makePrintSlides(option: (typeof slidePrintOptions)[number]) {
+		return async function handlePrintSlides() {
+			if (!account.$isLoaded) return
+			let { themes, defaultSlideshowTheme, defaultSyntaxTheme } =
+				await loadThemesForPdf(account)
+			let wikilinks = await resolveDocTitles(
+				parseWikiLinks(content).map(link => link.id),
+			)
+			await printSlidesToPdf({
+				content,
+				themes,
+				defaultSlideshowTheme,
+				defaultSyntaxTheme,
+				assets: getLoadedAssets(doc.assets).map(toPrintableAsset),
+				layout: option.layout,
+				aspectRatio: option.aspectRatio,
+				wikilinkTitles: new Map(
+					Array.from(wikilinks.values())
+						.filter(link => link.exists)
+						.map(link => [link.id, link.title]),
+				),
+			})
+		}
 	}
 }
 
