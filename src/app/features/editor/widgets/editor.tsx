@@ -50,7 +50,10 @@ import {
 	highlightSelectionMatches,
 	selectSelectionMatches,
 } from "@codemirror/search"
-import { selectNextOccurrence } from "../lib/multiple-selections"
+import {
+	secondarySelectionMarks,
+	selectNextOccurrence,
+} from "../lib/multiple-selections"
 import { bracketMatching, syntaxTree } from "@codemirror/language"
 import { Image as JazzImage } from "jazz-tools/react"
 import { editorBaseExtensions, richMarkdownExtensions } from "../lib/extensions"
@@ -534,6 +537,7 @@ function MarkdownEditor(
 			history(),
 			keymap.of([...defaultKeymap, ...historyKeymap]),
 			drawSelection(),
+			secondarySelectionMarks,
 			highlightSelectionMatches({ minSelectionLength: 1 }),
 			Prec.highest(
 				keymap.of([

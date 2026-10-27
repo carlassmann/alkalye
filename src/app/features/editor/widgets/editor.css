@@ -42,6 +42,35 @@
 	background-color: var(--brand-subtle) !important;
 }
 
+/* drawSelection hides the native highlight but leaves its white HighlightText color */
+.markdown-editor .cm-line::selection,
+.markdown-editor .cm-line ::selection {
+	color: currentColor;
+}
+
+/* iOS hides its selection handles when the native caret is transparent, as drawSelection makes it.
+   The native highlight then covers the main range, so the drawn layer would double it. */
+@media (pointer: coarse) {
+	.markdown-editor .cm-editor .cm-content,
+	.markdown-editor .cm-editor .cm-content .cm-line {
+		caret-color: var(--brand) !important;
+	}
+
+	.markdown-editor .cm-editor .cm-cursor-primary,
+	.markdown-editor .cm-editor .cm-selectionLayer {
+		display: none !important;
+	}
+
+	.markdown-editor .cm-editor.cm-focused .cm-secondarySelection {
+		background-color: var(--brand-subtle);
+	}
+
+	/* Closing the keyboard blurs the editor and clears the native highlight, but CodeMirror keeps the selection */
+	.markdown-editor .cm-editor:not(.cm-focused) .cm-selectionMatch {
+		outline: none;
+	}
+}
+
 .markdown-editor .cm-cursor-primary {
 	border-left: 2px solid var(--brand) !important;
 }

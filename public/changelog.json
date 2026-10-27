@@ -1,5 +1,15 @@
 [
 	{
+		"id": 162,
+		"date": "2026-10-26",
+		"title": "Clearer text selection in the editor",
+		"notes": [
+			"Selected text stays readable instead of turning white.",
+			"On iPhone and iPad, selection handles are back, so you can adjust a selection by dragging."
+		],
+		"pr": 68
+	},
+	{
 		"id": 161,
 		"date": "2026-10-25",
 		"title": "Sharp toolbar in the iPhone Home Screen app",
