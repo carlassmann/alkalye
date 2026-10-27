@@ -93,6 +93,29 @@ describe("buildPrintableSlides", () => {
 		expect(html).toContain(".brand{color:red}")
 	})
 
+	test("drops scripts from notes and slide templates but keeps the fit script", async () => {
+		let html = await buildPrintableSlides({
+			content: `${deck}\n<img src="x" onerror="alert(1)">`,
+			theme: {
+				...emptyTheme,
+				slideTemplate:
+					"<html><body><main data-content></main><script>alert(2)</script></body></html>",
+			},
+			assets: [],
+			defaultSyntaxTheme: null,
+			parseHtml: html => new JSDOM(html).window.document,
+			layout: "notes",
+			aspectRatio: "16:9",
+		})
+		let document = parse(html)
+
+		expect(html).not.toContain("onerror")
+		expect(document.querySelectorAll("script")).toHaveLength(1)
+		expect(document.querySelector("script")?.textContent).toContain(
+			"slidesFitted",
+		)
+	})
+
 	test("embeds a fit script that parses as standalone JavaScript", async () => {
 		let document = parse(await build({ layout: "slides", aspectRatio: "16:9" }))
 		let script = document.querySelector("script")?.textContent ?? ""

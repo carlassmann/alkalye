@@ -1,5 +1,12 @@
 import { spawn } from "node:child_process"
-import { access, mkdtemp, rm, writeFile } from "node:fs/promises"
+import {
+	access,
+	copyFile,
+	mkdtemp,
+	readFile,
+	rm,
+	writeFile,
+} from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join, resolve } from "node:path"
 import process from "node:process"
@@ -19,6 +26,7 @@ async function printHtmlToPdf(params: {
 	let workDir = await mkdtemp(join(tmpdir(), "alkalye-pdf-"))
 	try {
 		let htmlPath = join(workDir, "document.html")
+		let pdfPath = join(workDir, "document.pdf")
 		await writeFile(htmlPath, params.html, "utf8")
 		await runChrome(
 			chrome,
@@ -32,14 +40,17 @@ async function printHtmlToPdf(params: {
 				// before Chrome prints; without it slides print unfitted.
 				"--virtual-time-budget=10000",
 				`--user-data-dir=${join(workDir, "profile")}`,
-				`--print-to-pdf=${resolve(params.outputPath)}`,
+				`--print-to-pdf=${pdfPath}`,
 				pathToFileURL(htmlPath).href,
 			],
 			params.timeoutMs,
 		)
-		await access(resolve(params.outputPath)).catch(() => {
+		// Chrome exits 0 even when it cannot write, so the PDF is checked
+		// before it replaces anything at the destination.
+		await assertPdf(pdfPath)
+		await copyFile(pdfPath, resolve(params.outputPath)).catch(error => {
 			throw new FilesystemError({
-				message: `Chrome did not write a PDF to ${params.outputPath}`,
+				message: `Cannot write ${params.outputPath}: ${error instanceof Error ? error.message : String(error)}`,
 			})
 		})
 	} finally {
@@ -112,4 +123,10 @@ function runChrome(executable: string, args: string[], timeoutMs: number) {
 				)
 		})
 	})
+}
+
+async function assertPdf(path: string) {
+	let bytes = await readFile(path).catch(() => null)
+	if (bytes?.subarray(0, 5).toString("latin1") === "%PDF-") return
+	throw new FilesystemError({ message: "Chrome did not produce a PDF" })
 }

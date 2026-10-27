@@ -1,14 +1,13 @@
 import { Args, Command, Options } from "@effect/cli"
 import { JSDOM } from "jsdom"
 import { readFile, writeFile } from "node:fs/promises"
-import { basename, resolve } from "node:path"
+import { basename, dirname, resolve } from "node:path"
 import { getLoadedAssets, toPrintableAsset } from "@/app/features/assets"
 import {
 	findThemeById,
 	findThemeByName,
 	findPresetByAppearance,
 	getThemeId,
-	getThemeName,
 	getThemePresets,
 	loadThemesForPdf,
 } from "@/app/features/themes/lib/document-theme"
@@ -16,6 +15,7 @@ import { scopeThemeCss } from "@/app/features/themes/lib/renderer"
 import {
 	buildPresetVariables,
 	buildPrintableDocument,
+	getNamedTheme,
 	PRINT_THEME_SCOPE,
 	resolvePrintTheme,
 	toPrintTheme,
@@ -41,6 +41,7 @@ import {
 	offlineOption,
 	staleOkOption,
 } from "@/cli/options"
+import { embedLocalImages } from "@/cli/local-images"
 import { printHtmlToPdf } from "@/cli/pdf"
 import { loadAppPrintFonts } from "@/cli/print-fonts"
 import {
@@ -173,7 +174,7 @@ async function renderLocalFile(
 	})
 	let format = resolveExportFormat(content, requested)
 	let appearance = getPrintAppearance(content, format)
-	let themeRef = themeOption ?? getThemeId(content) ?? getThemeName(content)
+	let themeRef = themeOption ?? getThemeId(content) ?? getNamedTheme(content)
 	let theme = !themeRef
 		? null
 		: isLocalThemePath(themeRef)
@@ -181,13 +182,14 @@ async function renderLocalFile(
 			: await withThemeLibrary(config, library =>
 					resolveNamedTheme(library.themes, themeRef, appearance),
 				)
-	return renderExport({
+	let html = await renderExport({
 		content,
 		format,
 		theme,
 		assets: [],
 		defaultSyntaxTheme: null,
 	})
+	return embedLocalImages(html, dirname(resolve(filePath)))
 }
 
 async function renderDoc(

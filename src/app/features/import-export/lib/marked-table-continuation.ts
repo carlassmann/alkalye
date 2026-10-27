@@ -15,6 +15,7 @@ function createTableContinuationExtension(): MarkedExtension {
 				tokenizer(src) {
 					let match = src.match(/^(?:[ \t]*\|[^\n]*\|[ \t]*(?:\n|$))+/)
 					if (!match) return undefined
+					if (startsNewTable(match[0])) return undefined
 					let table = findPrecedingTable(this.lexer.tokens)
 					if (!table) return undefined
 
@@ -79,6 +80,11 @@ function findPrecedingTable(tokens: { type: string }[]): Tokens.Table | null {
 
 function isTableToken(token: { type: string }): token is Tokens.Table {
 	return token.type === "table"
+}
+
+function startsNewTable(rows: string): boolean {
+	let secondRow = rows.split("\n")[1] ?? ""
+	return /^[ \t]*\|(?:[ \t]*:?-+:?[ \t]*\|)+[ \t]*$/.test(secondRow)
 }
 
 function splitRow(line: string, columnCount: number): string[] {

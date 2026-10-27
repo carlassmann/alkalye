@@ -1,7 +1,7 @@
 import { Marked } from "marked"
 import markedFootnote from "marked-footnote"
 import markedShiki from "marked-shiki"
-import { type co } from "jazz-tools"
+import { co } from "jazz-tools"
 import { type Theme, type ThemeAsset } from "@/schema"
 import { parseFrontmatter } from "@/app/features/editor/lib/frontmatter"
 import {
@@ -24,6 +24,7 @@ import { createTableContinuationExtension } from "./marked-table-continuation"
 import {
 	blobToBase64,
 	replaceAssetSources,
+	sanitizePrintableHtml,
 	type HtmlParser,
 } from "./print-media"
 import {
@@ -36,6 +37,7 @@ export {
 	buildPrintableDocument,
 	renderPrintableMarkdown,
 	resolvePrintTheme,
+	getNamedTheme,
 	toPrintTheme,
 	buildPresetVariables,
 	escapeHtml,
@@ -93,16 +95,9 @@ function resolvePrintTheme(params: {
 	appearance?: "light" | "dark"
 }): { theme: LoadedTheme | null; preset: ThemePresetType | null } {
 	let { content, themes, defaultThemeName, appearance = "light" } = params
-	let themeName = getThemeName(content)
 	let themeId = getThemeId(content)
 	let presetName = getPresetName(content)
-
-	let isAppearanceOnlyTheme = themeName === "light" || themeName === "dark"
-	let effectiveThemeName = isAppearanceOnlyTheme ? null : themeName
-
-	if (!effectiveThemeName && defaultThemeName) {
-		effectiveThemeName = defaultThemeName
-	}
+	let effectiveThemeName = getNamedTheme(content) ?? defaultThemeName
 
 	let theme = themeId
 		? findThemeById(themes ?? null, themeId)
@@ -117,6 +112,12 @@ function resolvePrintTheme(params: {
 		getThemePresets(theme)[0] ??
 		null
 	return { theme, preset }
+}
+
+// `theme: light` and `theme: dark` pick an appearance, not a saved theme.
+function getNamedTheme(content: string): string | null {
+	let themeName = getThemeName(content)
+	return themeName === "light" || themeName === "dark" ? null : themeName
 }
 
 async function toPrintTheme(
@@ -214,9 +215,9 @@ function buildPrintableHtml(params: {
 	let rendered = theme?.template
 		? renderTemplateWithContent(theme.template, documentContent, parseHtml)
 		: null
-	let bodyContent = createPrintableThemeRoot(
-		theme?.name ?? "",
-		rendered ?? documentContent,
+	let bodyContent = sanitizePrintableHtml(
+		createPrintableThemeRoot(theme?.name ?? "", rendered ?? documentContent),
+		parseHtml,
 	)
 	let fontFaceRules = theme?.fontFaceRules ?? ""
 	let presetVariables = theme?.presetVariables ?? ""
@@ -444,7 +445,8 @@ async function buildFontFaceRulesBase64(theme: LoadedTheme): Promise<string> {
 		if (!loaded.data?.$isLoaded) continue
 		if (!loaded.mimeType.startsWith("font/")) continue
 
-		let blob = loaded.data.toBlob()
+		// toBlob() skips fonts whose chunks are still syncing.
+		let blob = await co.fileStream().loadAsBlob(loaded.data.$jazz.id)
 		if (!blob) continue
 
 		let base64 = await blobToBase64(blob)

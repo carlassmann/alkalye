@@ -22,7 +22,11 @@ import {
 } from "@/app/features/syntax-highlighting"
 import { getSlideshowBaseCss } from "@/app/features/themes/lib/default-theme"
 import { escapeHtml, type PrintTheme } from "./printable-html"
-import { replaceAssetSources, type HtmlParser } from "./print-media"
+import {
+	replaceAssetSources,
+	sanitizePrintableHtml,
+	type HtmlParser,
+} from "./print-media"
 
 export {
 	buildPrintableSlides,
@@ -113,9 +117,8 @@ async function buildPrintableSlides(params: {
 				})
 			: `<section class="print-page">${slideHtml}</section>`
 	})
-	let body = await replaceAssetSources(
-		pages.join("\n"),
-		params.assets,
+	let body = sanitizePrintableHtml(
+		await replaceAssetSources(pages.join("\n"), params.assets, parseHtml),
 		parseHtml,
 	)
 

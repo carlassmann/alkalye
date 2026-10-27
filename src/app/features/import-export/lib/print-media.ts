@@ -1,6 +1,12 @@
+import DOMPurify from "dompurify"
 import type { PrintableAsset } from "@/app/features/assets"
 
-export { replaceAssetSources, blobToBase64, type HtmlParser }
+export {
+	replaceAssetSources,
+	sanitizePrintableHtml,
+	blobToBase64,
+	type HtmlParser,
+}
 
 type HtmlParser = (html: string) => Document
 
@@ -31,6 +37,16 @@ async function replaceAssetSources(
 	}
 
 	return document.body.innerHTML
+}
+
+// Markdown and theme templates may carry raw HTML. The app's print window
+// shares its origin and CLI Chrome runs scripts, so only markup is kept.
+function sanitizePrintableHtml(
+	html: string,
+	parseHtml: HtmlParser = parseHtmlInBrowser,
+): string {
+	let view = parseHtml("").defaultView ?? window
+	return DOMPurify(view).sanitize(html, { FORCE_BODY: true })
 }
 
 async function blobToBase64(blob: Blob): Promise<string> {
