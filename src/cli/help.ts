@@ -115,6 +115,7 @@ let groups: Record<string, GroupDef> = {
 					["restore", "Restore a soft-deleted document"],
 					["purge", "Permanently delete a document"],
 					["leave", "Leave a shared personal document"],
+					["export", "Export a document or Markdown file as PDF"],
 				],
 			},
 			{
@@ -381,6 +382,24 @@ let leaves: Record<string, LeafDef> = {
 			"alkalye doc content co_xyz",
 			"alkalye doc content co_xyz | head -20",
 			"alkalye doc content co_xyz --json",
+		],
+	},
+	"doc export": {
+		summary: "Export a document or local Markdown file as PDF or HTML.",
+		usage: "alkalye doc export <doc-id | --file <md>> --pdf <out.pdf>",
+		options: [
+			"--pdf <path>          Write a PDF (needs Google Chrome or Chromium)",
+			"--html <path>         Write the printable HTML",
+			"--file <md>           Export a local Markdown file instead of a doc",
+			"--theme <ref>         Theme name, ID, or local .theme.md path",
+			"--offline             Use cached local data without remote freshness checks",
+			"--stale-ok            Allow cached data if remote sync is incomplete",
+		],
+		examples: [
+			"alkalye doc export co_xyz --pdf doc.pdf",
+			"alkalye doc export --file invoice.md --theme letter.theme.md --pdf invoice.pdf",
+			"alkalye doc export co_xyz --theme Syntwin --html preview.html",
+			"ALKALYE_CHROME=/usr/bin/chromium alkalye doc export co_xyz --pdf doc.pdf",
 		],
 	},
 	"doc create": {

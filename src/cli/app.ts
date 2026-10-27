@@ -47,6 +47,7 @@ import {
 import { setDocumentTitle } from "@/cli/document-title"
 import { docAssetCommand } from "@/cli/assets"
 import { docCommentCommand } from "@/cli/doc-comments"
+import { docExportCommand } from "@/cli/export"
 import { themeCommand } from "@/cli/themes"
 import { CliUsageError, PermissionError } from "@/cli/errors"
 import {
@@ -779,6 +780,7 @@ let docCommand = Command.make("doc").pipe(
 		docRestore,
 		docPurge,
 		docLeave,
+		docExportCommand,
 		docCommentCommand,
 		docAssetCommand,
 		docShareCommand,

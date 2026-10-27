@@ -85,6 +85,15 @@ describe("help", () => {
 		expect(result.stdout).toMatch(/--passphrase-stdin/)
 	})
 
+	test("prints leaf command help for doc export", async () => {
+		let result = await runCli(["doc", "export", "--help"])
+
+		expect(result.exitCode).toBe(0)
+		expect(result.stdout).toMatch(/--pdf/)
+		expect(result.stdout).toMatch(/--file/)
+		expect(result.stdout).toMatch(/--theme/)
+	})
+
 	test("root help includes --quiet option", async () => {
 		let result = await runCli(["--help"])
 
@@ -112,6 +121,15 @@ describe("errors", () => {
 		expect(result.exitCode).toBe(7)
 		expect(result.stderr).toMatch(/\/\.well-known\/alkalye-cli\.json/)
 		expect(result.stderr).not.toMatch(/UnknownException/)
+	})
+
+	test("doc export without a source returns exit code 2", async () => {
+		let result = await runCli(["doc", "export", "--pdf", "out.pdf"], {
+			ALKALYE_SYNC_PEER: "ws://localhost",
+		})
+
+		expect(result.exitCode).toBe(2)
+		expect(result.stderr).toMatch(/doc ID or --file/)
 	})
 
 	test("missing content source returns exit code 2", async () => {

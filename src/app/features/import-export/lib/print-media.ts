@@ -1,13 +1,16 @@
 import type { PrintableAsset } from "@/app/features/assets"
 
-export { replaceAssetSources }
+export { replaceAssetSources, blobToBase64, type HtmlParser }
+
+type HtmlParser = (html: string) => Document
 
 async function replaceAssetSources(
 	html: string,
 	assets: PrintableAsset[],
+	parseHtml: HtmlParser = parseHtmlInBrowser,
 ): Promise<string> {
-	let parser = new DOMParser()
-	let document = parser.parseFromString(html, "text/html")
+	if (assets.length === 0) return html
+	let document = parseHtml(html)
 	let assetsById = new Map(assets.map(asset => [asset.id, asset]))
 
 	for (let image of document.querySelectorAll("img")) {
@@ -28,6 +31,17 @@ async function replaceAssetSources(
 	}
 
 	return document.body.innerHTML
+}
+
+async function blobToBase64(blob: Blob): Promise<string> {
+	// Browsers and jsdom read blobs via FileReader; Node blobs (CLI) lack it.
+	if (typeof FileReader !== "undefined") return readBase64WithFileReader(blob)
+	let bytes = new Uint8Array(await blob.arrayBuffer())
+	let binary = ""
+	for (let offset = 0; offset < bytes.length; offset += 0x8000) {
+		binary += String.fromCharCode(...bytes.subarray(offset, offset + 0x8000))
+	}
+	return btoa(binary)
 }
 
 async function createVideoPoster(blob: Blob): Promise<string | null> {
@@ -78,17 +92,22 @@ function waitForMediaEvent(video: HTMLVideoElement, eventName: "loadeddata") {
 	})
 }
 
-function blobToDataUri(blob: Blob): Promise<string> {
+function parseHtmlInBrowser(html: string): Document {
+	return new DOMParser().parseFromString(html, "text/html")
+}
+
+async function blobToDataUri(blob: Blob): Promise<string> {
+	return `data:${blob.type};base64,${await blobToBase64(blob)}`
+}
+
+function readBase64WithFileReader(blob: Blob): Promise<string> {
 	return new Promise((resolve, reject) => {
 		let reader = new FileReader()
-		reader.onloadend = () => {
-			if (typeof reader.result === "string") {
-				resolve(reader.result)
-				return
-			}
-			reject(new Error("Could not read blob"))
+		reader.onload = () => {
+			let result = typeof reader.result === "string" ? reader.result : ""
+			resolve(result.slice(result.indexOf(",") + 1))
 		}
-		reader.onerror = reject
+		reader.onerror = () => reject(reader.error)
 		reader.readAsDataURL(blob)
 	})
 }
