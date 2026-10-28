@@ -26,6 +26,7 @@ export {
 	validateThemeTemplate,
 	serializeThemeSource,
 	createThemeSourceDocument,
+	buildThemeSourceDocument,
 	createThemeSourceDocumentContent,
 	syncThemeFromSource,
 	getThemeSourceId,
@@ -285,6 +286,26 @@ function hasThemeDefinition(source: ThemeSource): boolean {
 	)
 }
 
+function buildThemeSourceDocument(
+	account: co.loaded<typeof UserAccount>,
+	params: { themeId: string; name: string; source: string },
+) {
+	let content = createThemeSourceDocumentContent(params)
+	let group = Group.create({ owner: account })
+	let now = new Date()
+	return Document.create(
+		{
+			version: 1,
+			content: co.plainText().create(content, group),
+			comments: co.list(CommentThread).create([], group),
+			...createDocumentMetadata(content, now),
+			createdAt: now,
+			updatedAt: now,
+		},
+		group,
+	)
+}
+
 function isThemeFence(
 	info: string,
 	tickCount: number,
@@ -381,20 +402,7 @@ async function createThemeSourceDocument(
 	if (!loaded.root?.documents?.$isLoaded)
 		throw new Error("Personal documents are not loaded")
 
-	let content = createThemeSourceDocumentContent(params)
-	let group = Group.create({ owner: account })
-	let now = new Date()
-	let document = Document.create(
-		{
-			version: 1,
-			content: co.plainText().create(content, group),
-			comments: co.list(CommentThread).create([], group),
-			...createDocumentMetadata(content, now),
-			createdAt: now,
-			updatedAt: now,
-		},
-		group,
-	)
+	let document = buildThemeSourceDocument(account, params)
 	loaded.root.documents.$jazz.push(document)
 	return document
 }

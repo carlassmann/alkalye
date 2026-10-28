@@ -78,8 +78,10 @@ function extractGlobalFlags(args: string[]): GlobalFlagResult {
 			envVars.ALKALYE_CLI_HOME = arg.slice("--home=".length)
 			index += 1
 		} else if (arg === "--timeout" && nextArg && !nextArg.startsWith("-")) {
+			envVars.ALKALYE_TIMEOUT = nextArg
 			index += 2
 		} else if (arg.startsWith("--timeout=")) {
+			envVars.ALKALYE_TIMEOUT = arg.slice("--timeout=".length)
 			index += 1
 		} else if (arg === "--json" || arg === "-j") {
 			strippedArgs.push(arg)

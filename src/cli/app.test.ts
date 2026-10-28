@@ -163,6 +163,20 @@ describe("quiet", () => {
 	})
 })
 
+describe("timeout", () => {
+	test.each([["--timeout", "0"], ["--timeout=0"]])(
+		"%s is applied, not dropped",
+		async (...flag) => {
+			let result = await runCli(["auth", "whoami", ...flag], {
+				ALKALYE_SYNC_PEER: "ws://localhost",
+			})
+
+			expect(result.exitCode).toBe(7)
+			expect(result.stderr).toMatch(/Timeout must be a positive integer/)
+		},
+	)
+})
+
 describe("command identity", () => {
 	test("sync flush reports its own command name in json errors", async () => {
 		let result = await runCli(["sync", "flush", "--json"], {

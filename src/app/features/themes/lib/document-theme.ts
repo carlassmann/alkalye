@@ -30,13 +30,14 @@ type ResolvedTheme = {
 	isLoading: boolean
 }
 
+type ThemeQuery = {
+	css: true
+	template: true
+	slideTemplate: true
+	assets: { $each: { data: true } }
+}
 type ThemesQuery = {
-	$each: {
-		css: true
-		template: true
-		slideTemplate: true
-		assets: { $each: { data: true } }
-	}
+	$each: ThemeQuery & { $onError: "catch" }
 }
 type LoadedThemes = co.loaded<
 	ReturnType<typeof co.list<typeof Theme>>,
@@ -72,12 +73,12 @@ function getPresetName(content: string): string | null {
 function findThemeByName(
 	themes: LoadedThemes | null | undefined,
 	themeName: string,
-): co.loaded<typeof Theme, ThemesQuery["$each"]> | null {
+): co.loaded<typeof Theme, ThemeQuery> | null {
 	if (!themes) return null
 
 	let lowerName = themeName.toLowerCase()
 	for (let theme of themes) {
-		if (theme?.name?.toLowerCase() === lowerName && theme.$isLoaded) {
+		if (theme?.$isLoaded && theme.name.toLowerCase() === lowerName) {
 			return theme
 		}
 	}
@@ -87,7 +88,7 @@ function findThemeByName(
 function findThemeById(
 	themes: LoadedThemes | null | undefined,
 	themeId: string,
-): co.loaded<typeof Theme, ThemesQuery["$each"]> | null {
+): co.loaded<typeof Theme, ThemeQuery> | null {
 	if (!themes) return null
 	for (let theme of themes) {
 		if (theme?.$isLoaded && theme.$jazz.id === themeId) return theme
@@ -236,6 +237,7 @@ let themesQuery = {
 				template: true,
 				slideTemplate: true,
 				assets: { $each: { data: true } },
+				$onError: "catch",
 			},
 		},
 	},
