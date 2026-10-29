@@ -20,6 +20,11 @@ import {
 	type TextSegment,
 } from "../lib/presentation"
 import {
+	findSlideScale,
+	getSlideGridTemplate,
+	slideBaseSizes,
+} from "../lib/slide-fit"
+import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
@@ -424,12 +429,6 @@ function isEditableTarget(target: EventTarget | null): boolean {
 	)
 }
 
-let baseSizes: Record<PresentationSize, { h1: number; body: number }> = {
-	S: { h1: 72, body: 36 },
-	M: { h1: 96, body: 48 },
-	L: { h1: 120, body: 60 },
-}
-
 type SlideContainerStyle = React.CSSProperties & {
 	"--slide-h1-size": string
 	"--slide-body-size": string
@@ -511,22 +510,9 @@ function ScaledSlideContainer({
 	)
 	let blockCount = blocks.length
 
-	let gridTemplate: { cols: string; rows: string }
-	if (blockCount === 1) {
-		gridTemplate = { cols: "1fr", rows: "1fr" }
-	} else if (blockCount === 2) {
-		gridTemplate = isPortrait
-			? { cols: "1fr", rows: "1fr 1fr" }
-			: { cols: "1fr 1fr", rows: "1fr" }
-	} else if (blockCount === 3) {
-		gridTemplate = isPortrait
-			? { cols: "1fr", rows: "1fr 1fr 1fr" }
-			: { cols: "1fr 1fr 1fr", rows: "1fr" }
-	} else {
-		gridTemplate = { cols: "1fr 1fr", rows: "1fr 1fr" }
-	}
+	let gridTemplate = getSlideGridTemplate(blockCount, isPortrait)
 
-	let baseSize = baseSizes[size]
+	let baseSize = slideBaseSizes[size]
 	let isImageOnly = blocks.every(block =>
 		block.content.every(content => content.type === "image"),
 	)
@@ -616,73 +602,7 @@ function ScaledSlideContainer({
 				content.style.gridTemplateRows = gridTemplate.rows
 				content.style.gridTemplateColumns = gridTemplate.cols
 
-				let overflowSensitiveElements = Array.from(
-					content.querySelectorAll<HTMLElement>("pre, table"),
-				)
-				let overflowMeasurementElements = Array.from(
-					content.querySelectorAll<HTMLElement>(
-						"h1,h2,h3,h4,h5,h6,p,pre,table,blockquote,ol,ul,img",
-					),
-				)
-
-				function fits(s: number): boolean {
-					content.style.setProperty("--slide-h1-size", `${baseSize.h1 * s}px`)
-					content.style.setProperty(
-						"--slide-body-size",
-						`${baseSize.body * s}px`,
-					)
-					content.style.setProperty("--slide-scale", `${s}`)
-					void content.offsetHeight
-
-					if (content.scrollWidth > maxW + 1) return false
-					if (content.scrollHeight > maxH + 1) return false
-
-					let cells = Array.from(content.children).flatMap(child =>
-						child instanceof HTMLElement ? [child] : [],
-					)
-					for (let cell of cells) {
-						if (cell.scrollWidth > cell.clientWidth + 1) return false
-						if (cell.scrollHeight > cell.clientHeight + 1) return false
-					}
-
-					for (let el of overflowSensitiveElements) {
-						if (el.scrollWidth > el.clientWidth + 1) return false
-						if (el.scrollHeight > el.clientHeight + 1) return false
-					}
-
-					// scrollWidth/scrollHeight ignore margins; themes can add huge margins.
-					// Measure block element boxes + margins against container bounds.
-					let contentRect = content.getBoundingClientRect()
-					for (let el of overflowMeasurementElements) {
-						let rect = el.getBoundingClientRect()
-						let style = getComputedStyle(el)
-						let marginTop = Number.parseFloat(style.marginTop) || 0
-						let marginRight = Number.parseFloat(style.marginRight) || 0
-						let marginBottom = Number.parseFloat(style.marginBottom) || 0
-						let marginLeft = Number.parseFloat(style.marginLeft) || 0
-
-						if (rect.right + marginRight > contentRect.right + 1) return false
-						if (rect.bottom + marginBottom > contentRect.bottom + 1)
-							return false
-						if (rect.left - marginLeft < contentRect.left - 1) return false
-						if (rect.top - marginTop < contentRect.top - 1) return false
-					}
-
-					return true
-				}
-
-				let low = 5
-				let high = 100
-				while (low <= high) {
-					let mid = Math.floor((low + high) / 2)
-					if (fits(mid / 100)) {
-						low = mid + 1
-					} else {
-						high = mid - 1
-					}
-				}
-
-				let finalScale = Math.max(5, Math.min(high, 100)) / 100
+				let finalScale = findSlideScale(content, { maxW, maxH, baseSize })
 
 				setMaxDimensions({ w: maxW, h: maxH })
 				content.style.width = previousWidth

@@ -360,7 +360,81 @@ describe("CLI themes", () => {
 			deleteAccountTheme(other, theme.$jazz.id),
 		).rejects.toBeInstanceOf(NotFoundError)
 	})
+
+	test("adds nothing to the library when the upload does not finish", async () => {
+		let documentsBefore = await countDocuments(account)
+
+		await expect(
+			createThemeFromSource(account, {
+				source: validSource,
+				waitForUpload: () => Promise.reject(new Error("upload timed out")),
+			}),
+		).rejects.toThrow("upload timed out")
+
+		expect(await listAccountThemes(account)).toEqual([])
+		expect(await countDocuments(account)).toBe(documentsBefore)
+	})
+
+	test("keeps the current CSS when an update upload does not finish", async () => {
+		let theme = await createThemeFromSource(account, {
+			name: "CLI theme",
+			source: validSource,
+		})
+		let cssId = theme.css.$jazz.id
+
+		await expect(
+			updateThemeFromSource(account, {
+				themeId: theme.$jazz.id,
+				source: updatedSource,
+				waitForUpload: () => Promise.reject(new Error("upload timed out")),
+			}),
+		).rejects.toThrow("upload timed out")
+
+		expect(theme.css.$jazz.id).toBe(cssId)
+		expect(theme.css.toString()).toContain("color: red")
+	})
+
+	test("lists, gets, and deletes around a theme that cannot be loaded", async () => {
+		let theme = await createThemeFromSource(account, {
+			name: "Readable theme",
+			source: validSource,
+		})
+		let other = await createJazzTestAccount({
+			isCurrentActiveAccount: false,
+			AccountSchema: UserAccount,
+		})
+		let unreadable = await createThemeFromSource(other, {
+			name: "Unreadable theme",
+			source: validSource,
+		})
+		let library = await account.$jazz.ensureLoaded({
+			resolve: { root: { themes: true } },
+		})
+		library.root.themes?.$jazz.push(unreadable)
+
+		expect(
+			(await listAccountThemes(account)).map(item => item.$jazz.id),
+		).toEqual([theme.$jazz.id])
+		expect((await getAccountTheme(account, theme.$jazz.id)).name).toBe(
+			"Readable theme",
+		)
+
+		expect(await deleteAccountTheme(account, unreadable.$jazz.id)).toEqual({
+			sourceDocId: null,
+		})
+		let reloaded = await account.$jazz.ensureLoaded({
+			resolve: { root: { themes: true } },
+		})
+		expect(reloaded.root.themes?.$jazz.raw.asArray()).toEqual([theme.$jazz.id])
+	})
 })
+
+async function countDocuments(account: co.loaded<typeof UserAccount>) {
+	let loaded = await account.$jazz.ensureLoaded({
+		resolve: { root: { documents: true } },
+	})
+	return loaded.root.documents.length
+}
 
 let validSource = `# CLI theme
 

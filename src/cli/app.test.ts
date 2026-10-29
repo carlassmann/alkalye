@@ -85,6 +85,17 @@ describe("help", () => {
 		expect(result.stdout).toMatch(/--passphrase-stdin/)
 	})
 
+	test("prints leaf command help for doc export", async () => {
+		let result = await runCli(["doc", "export", "--help"])
+
+		expect(result.exitCode).toBe(0)
+		expect(result.stdout).toMatch(/--pdf/)
+		expect(result.stdout).toMatch(/--file/)
+		expect(result.stdout).toMatch(/--theme/)
+		expect(result.stdout).toMatch(/--layout/)
+		expect(result.stdout).toMatch(/--aspect/)
+	})
+
 	test("root help includes --quiet option", async () => {
 		let result = await runCli(["--help"])
 
@@ -114,6 +125,15 @@ describe("errors", () => {
 		expect(result.stderr).not.toMatch(/UnknownException/)
 	})
 
+	test("doc export without a source returns exit code 2", async () => {
+		let result = await runCli(["doc", "export", "--pdf", "out.pdf"], {
+			ALKALYE_SYNC_PEER: "ws://localhost",
+		})
+
+		expect(result.exitCode).toBe(2)
+		expect(result.stderr).toMatch(/doc ID or --file/)
+	})
+
 	test("missing content source returns exit code 2", async () => {
 		let result = await runCli(["doc", "create"], {
 			ALKALYE_SYNC_PEER: "ws://localhost",
@@ -141,6 +161,20 @@ describe("quiet", () => {
 
 		expect(result.stderr).toMatch(/Not logged in/)
 	})
+})
+
+describe("timeout", () => {
+	test.each([["--timeout", "0"], ["--timeout=0"]])(
+		"%s is applied, not dropped",
+		async (...flag) => {
+			let result = await runCli(["auth", "whoami", ...flag], {
+				ALKALYE_SYNC_PEER: "ws://localhost",
+			})
+
+			expect(result.exitCode).toBe(7)
+			expect(result.stderr).toMatch(/Timeout must be a positive integer/)
+		},
+	)
 })
 
 describe("command identity", () => {

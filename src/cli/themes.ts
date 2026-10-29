@@ -6,7 +6,7 @@ import { getDocumentTitle } from "@/app/features/documents"
 import { persistDocumentContentSynchronously } from "@/app/features/documents/lib/background-document-save"
 import { Document, Theme, UserAccount } from "@/schema"
 import {
-	createThemeSourceDocument,
+	buildThemeSourceDocument,
 	createThemeSourceDocumentContent,
 	parseThemeSource,
 	hasThemeDefinition,
@@ -19,7 +19,12 @@ import {
 	sanitizeHtmlWithWindow,
 } from "@/app/features/themes/lib/sanitize"
 import { serializePortableTheme } from "@/app/features/themes/lib/export"
-import { NotFoundError, PermissionError, ValidationError } from "@/cli/errors"
+import {
+	NotFoundError,
+	PermissionError,
+	SyncPeerError,
+	ValidationError,
+} from "@/cli/errors"
 import { descriptions } from "@/cli/help"
 import { createAuthenticatedJazz } from "@/cli/jazz"
 import { globalOptions, nameOption } from "@/cli/options"
@@ -28,6 +33,7 @@ import {
 	loadAccount,
 	runCommand,
 	syncMutation,
+	type JazzContext,
 } from "@/cli/runtime"
 
 export {
@@ -48,13 +54,13 @@ type ThemeResolve = {
 }
 
 type LoadedTheme = co.loaded<typeof Theme, ThemeResolve>
-type LoadedThemeList = co.loaded<
-	ReturnType<typeof co.list<typeof Theme>>,
-	{ $each: ThemeResolve }
->
 type LoadedThemeAccount = co.loaded<
 	typeof UserAccount,
-	{ root: { documents: true; themes: { $each: ThemeResolve } } }
+	typeof themeLibraryResolve
+>
+type LoadedThemeList = co.loaded<
+	ReturnType<typeof co.list<typeof Theme>>,
+	typeof themeLibraryResolve.root.themes
 >
 type ThemeLibrary = {
 	account: LoadedThemeAccount
@@ -75,6 +81,26 @@ type ThemeSummary = {
 	createdAt: string
 	updatedAt: string
 }
+
+// A theme whose upload never finished stays unavailable for good. It must not
+// take the rest of the library down with it.
+let themeLibraryResolve = {
+	root: {
+		documents: true,
+		themes: {
+			$each: {
+				css: true,
+				template: true,
+				slideTemplate: true,
+				$onError: "catch",
+			},
+		},
+	},
+} as const
+
+// Theme sources embed fonts as base64 text, which takes far longer to upload
+// than the default sync timeout allows.
+let themeUploadTimeoutMs = 120_000
 
 let themeIdArg = Args.text({ name: "theme-id" }).pipe(
 	Args.withDescription("Theme ID."),
@@ -148,11 +174,13 @@ let themeCreate = Command.make(
 			let jazz = await createAuthenticatedJazz(config)
 			try {
 				let account = await loadAccount(jazz, config.timeoutMs)
+				let uploadTimeoutMs = getThemeUploadTimeout(config.timeoutMs)
 				let theme = await createThemeFromSource(account, {
 					source,
 					name: getOptionString(args.name),
+					waitForUpload: () => waitForThemeUpload(jazz, uploadTimeoutMs),
 				})
-				await syncMutation(jazz, config.timeoutMs)
+				await syncMutation(jazz, uploadTimeoutMs)
 				return summarizeTheme(theme, config.baseUrl)
 			} finally {
 				await jazz.done()
@@ -174,12 +202,14 @@ let themeUpdate = Command.make(
 			let jazz = await createAuthenticatedJazz(config)
 			try {
 				let account = await loadAccount(jazz, config.timeoutMs)
+				let uploadTimeoutMs = getThemeUploadTimeout(config.timeoutMs)
 				let theme = await updateThemeFromSource(account, {
 					themeId: args.themeId,
 					source,
 					name: getOptionString(args.name),
+					waitForUpload: () => waitForThemeUpload(jazz, uploadTimeoutMs),
 				})
-				await syncMutation(jazz, config.timeoutMs)
+				await syncMutation(jazz, uploadTimeoutMs)
 				return summarizeTheme(theme, config.baseUrl)
 			} finally {
 				await jazz.done()
@@ -239,7 +269,11 @@ function compileThemeSource(source: string): CompiledThemeSource {
 
 async function createThemeFromSource(
 	account: co.loaded<typeof UserAccount>,
-	params: { source: string; name?: string },
+	params: {
+		source: string
+		name?: string
+		waitForUpload?: () => Promise<void>
+	},
 ): Promise<LoadedTheme> {
 	let compiled = compileThemeSource(params.source)
 	let library = await loadThemeLibrary(account)
@@ -270,19 +304,27 @@ async function createThemeFromSource(
 		},
 		owner,
 	)
-	let source = await createThemeSourceDocument(library.account, {
+	let source = buildThemeSourceDocument(library.account, {
 		themeId: theme.$jazz.id,
 		name,
 		source: params.source,
 	})
 	theme.$jazz.set("sourceDocId", source.$jazz.id)
+	// Linked before its upload finishes, a theme can end up unloadable everywhere.
+	await params.waitForUpload?.()
+	library.account.root.documents.$jazz.push(source)
 	themes.$jazz.push(theme)
 	return theme
 }
 
 async function updateThemeFromSource(
 	account: co.loaded<typeof UserAccount>,
-	params: { themeId: string; source: string; name?: string },
+	params: {
+		themeId: string
+		source: string
+		name?: string
+		waitForUpload?: () => Promise<void>
+	},
 ): Promise<LoadedTheme> {
 	let compiled = compileThemeSource(params.source)
 	let library = await loadThemeLibrary(account)
@@ -297,19 +339,27 @@ async function updateThemeFromSource(
 		source: params.source,
 	})
 
-	theme.$jazz.set("css", co.plainText().create(compiled.css, theme.$jazz.owner))
-	theme.$jazz.set(
-		"template",
-		compiled.template
-			? co.plainText().create(compiled.template, theme.$jazz.owner)
-			: undefined,
-	)
-	theme.$jazz.set(
-		"slideTemplate",
-		compiled.slideTemplate
-			? co.plainText().create(compiled.slideTemplate, theme.$jazz.owner)
-			: undefined,
-	)
+	let owner = theme.$jazz.owner
+	let css = co.plainText().create(compiled.css, owner)
+	let template = compiled.template
+		? co.plainText().create(compiled.template, owner)
+		: undefined
+	let slideTemplate = compiled.slideTemplate
+		? co.plainText().create(compiled.slideTemplate, owner)
+		: undefined
+	let createdSource = existingSource
+		? undefined
+		: buildThemeSourceDocument(library.account, {
+				themeId: theme.$jazz.id,
+				name,
+				source: params.source,
+			})
+	// Pointed at before its upload finishes, new CSS leaves the theme unloadable.
+	await params.waitForUpload?.()
+
+	theme.$jazz.set("css", css)
+	theme.$jazz.set("template", template)
+	theme.$jazz.set("slideTemplate", slideTemplate)
 	if (theme.name !== name) theme.$jazz.set("name", name)
 	if (compiled.metadata) {
 		if (compiled.metadata.type) theme.$jazz.set("type", compiled.metadata.type)
@@ -325,13 +375,10 @@ async function updateThemeFromSource(
 	}
 	if (existingSource) {
 		persistDocumentContentSynchronously(existingSource, nextSource)
-	} else {
-		let source = await createThemeSourceDocument(library.account, {
-			themeId: theme.$jazz.id,
-			name,
-			source: params.source,
-		})
-		theme.$jazz.set("sourceDocId", source.$jazz.id)
+	}
+	if (createdSource) {
+		library.account.root.documents.$jazz.push(createdSource)
+		theme.$jazz.set("sourceDocId", createdSource.$jazz.id)
 	}
 	theme.$jazz.set("updatedAt", new Date())
 	return theme
@@ -362,14 +409,12 @@ async function deleteAccountTheme(
 	let library = await loadThemeLibrary(account)
 	if (!library.themes)
 		throw new NotFoundError({ message: `Theme not found: ${themeId}` })
-	let index = Array.from(library.themes).findIndex(
-		theme => theme?.$jazz.id === themeId,
-	)
+	let index = library.themes.$jazz.raw.asArray().indexOf(themeId)
 	if (index < 0)
 		throw new NotFoundError({ message: `Theme not found: ${themeId}` })
-	let theme = findAccountTheme(library.themes, themeId)
+	let theme = library.themes[index]
 	library.themes.$jazz.splice(index, 1)
-	return { sourceDocId: theme.sourceDocId ?? null }
+	return { sourceDocId: theme?.$isLoaded ? (theme.sourceDocId ?? null) : null }
 }
 
 function themeWorkbenchUrl(baseUrl: string, themeId: string) {
@@ -381,12 +426,7 @@ async function loadThemeLibrary(
 	account: co.loaded<typeof UserAccount>,
 ): Promise<ThemeLibrary> {
 	let loaded = await account.$jazz.ensureLoaded({
-		resolve: {
-			root: {
-				documents: true,
-				themes: { $each: { css: true, template: true, slideTemplate: true } },
-			},
-		},
+		resolve: themeLibraryResolve,
 	})
 	if (!loaded.root) {
 		throw new ValidationError({ message: "Personal themes are not loaded" })
@@ -510,4 +550,18 @@ function summarizeTheme(theme: LoadedTheme, baseUrl: string): ThemeSummary {
 		createdAt: theme.createdAt.toISOString(),
 		updatedAt: theme.updatedAt.toISOString(),
 	}
+}
+
+async function waitForThemeUpload(jazz: JazzContext, timeoutMs: number) {
+	try {
+		await syncMutation(jazz, timeoutMs)
+	} catch {
+		throw new SyncPeerError({
+			message: `Theme upload did not finish within ${timeoutMs} ms, so it was not added to your library. Retry with a longer --timeout.`,
+		})
+	}
+}
+
+function getThemeUploadTimeout(timeoutMs: number) {
+	return Math.max(timeoutMs, themeUploadTimeoutMs)
 }

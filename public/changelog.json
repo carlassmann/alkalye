@@ -1,5 +1,17 @@
 [
 	{
+		"id": 163,
+		"date": "2026-10-28",
+		"title": "PDF export for slides and from the command line",
+		"notes": [
+			"Print a presentation as slides only or as notes pages with your speaker notes, in 16:9 or 4:3, from File → Print Slides to PDF.",
+			"Export documents and presentations as PDF from the command line with alkalye doc export, using any of your themes or a local theme file.",
+			"New Letter theme for invoices and correspondence, in the style of iA Writer's monospaced PDFs.",
+			"Creating or updating a theme from the command line waits for the upload to finish, so a slow connection no longer leaves a broken theme in your library. The --timeout option now takes effect."
+		],
+		"pr": 69
+	},
+	{
 		"id": 162,
 		"date": "2026-10-26",
 		"title": "Clearer text selection in the editor",

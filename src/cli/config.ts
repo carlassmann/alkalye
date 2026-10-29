@@ -33,7 +33,9 @@ async function resolveCliConfig(flags: CliFlags): Promise<CliConfig> {
 		flags.home ??
 		process.env.ALKALYE_CLI_HOME ??
 		join(homedir(), ".alkalye", "cli")
-	let timeoutMs = flags.timeout ?? 10_000
+	let timeoutMs =
+		flags.timeout ??
+		(process.env.ALKALYE_TIMEOUT ? Number(process.env.ALKALYE_TIMEOUT) : 10_000)
 	if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
 		throw new ConfigError({ message: "Timeout must be a positive integer" })
 	}

@@ -6,6 +6,7 @@ import {
 	getThemeName,
 	getPresetName,
 	findThemeByName,
+	loadThemesForPdf,
 	resolveDocumentTheme,
 } from "./document-theme"
 
@@ -190,6 +191,32 @@ describe("resolveDocumentTheme", () => {
 			expect(resolved.theme?.$jazz.id).toBe(theme.$jazz.id)
 		},
 	)
+})
+
+describe("loadThemesForPdf", () => {
+	it("skips a theme that cannot be loaded", async () => {
+		let account = await createJazzTestAccount({
+			isCurrentActiveAccount: true,
+			AccountSchema: UserAccount,
+		})
+		let other = await createJazzTestAccount({
+			isCurrentActiveAccount: false,
+			AccountSchema: UserAccount,
+		})
+		let readable = await createDefaultTheme(account)
+		let unreadable = await createDefaultTheme(other)
+		let library = await account.$jazz.ensureLoaded({
+			resolve: { root: { themes: true } },
+		})
+		library.root.themes?.$jazz.push(unreadable)
+
+		let { themes } = await loadThemesForPdf(account)
+
+		expect(findThemeByName(themes, readable.name)?.$jazz.id).toBe(
+			readable.$jazz.id,
+		)
+		expect(themes?.filter(theme => theme?.$isLoaded)).toHaveLength(1)
+	})
 })
 
 /**

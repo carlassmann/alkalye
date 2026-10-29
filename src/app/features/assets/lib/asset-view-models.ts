@@ -1,4 +1,4 @@
-import type { co } from "jazz-tools"
+import { co } from "jazz-tools"
 import { Asset } from "./schema"
 
 export { getLoadedAssets, toEditorAsset, toSidebarAsset, toPrintableAsset }
@@ -101,13 +101,13 @@ function toPrintableAsset(asset: co.loaded<typeof Asset>): PrintableAsset {
 					let loaded = await asset.$jazz.ensureLoaded({
 						resolve: { image: { original: true } },
 					})
-					return loaded.image.original.toBlob()
+					return loadCompleteBlob(loaded.image.original.$jazz.id)
 				}
 				case "video": {
 					let loaded = await asset.$jazz.ensureLoaded({
 						resolve: { video: true },
 					})
-					return loaded.video.toBlob()
+					return loadCompleteBlob(loaded.video.$jazz.id)
 				}
 				case "tldraw": {
 					let loaded = await asset.$jazz.ensureLoaded({
@@ -115,13 +115,21 @@ function toPrintableAsset(asset: co.loaded<typeof Asset>): PrintableAsset {
 							revision: { lightPreview: { original: true } },
 						},
 					})
-					return loaded.revision.lightPreview.original.toBlob()
+					return loadCompleteBlob(
+						loaded.revision.lightPreview.original.$jazz.id,
+					)
 				}
 				default:
 					return unsupportedAsset(asset)
 			}
 		},
 	}
+}
+
+// toBlob() returns undefined while chunks are still syncing, which a fresh CLI
+// session hits on every asset; loadAsBlob waits for the stream to end.
+function loadCompleteBlob(fileStreamId: string) {
+	return co.fileStream().loadAsBlob(fileStreamId)
 }
 
 function unsupportedAsset(asset: never): never {
