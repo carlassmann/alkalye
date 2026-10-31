@@ -121,6 +121,7 @@ import {
 	presentationExtensions,
 } from "@/app/features/presentation"
 import { SidebarFileMenu } from "../widgets/sidebar-file-menu"
+import { DocumentCommands } from "../widgets/document-commands"
 import { SidebarEditMenu } from "@/app/features/editor"
 import { SidebarFormatMenu } from "@/app/features/editor"
 import { SidebarCollaboration } from "@/app/features/sharing"
@@ -791,6 +792,14 @@ function EditorContent({
 				personal-doc.
 			</p>
 
+			{liveDoc && (
+				<DocumentCommands
+					doc={liveDoc}
+					editor={editor}
+					me={me.$isLoaded ? me : undefined}
+					documents={wikiLinkDocs}
+				/>
+			)}
 			<div className="markdown-editor flex-1" data-testid={testIds.doc.editor}>
 				<MarkdownEditor
 					key={docId}

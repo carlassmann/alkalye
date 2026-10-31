@@ -8,6 +8,7 @@ import {
 	MarkdownEditor,
 	useMarkdownEditorRef,
 	SidebarEditorNavigation,
+	type CommandId,
 } from "@/app/features/editor"
 import {
 	getPresentationMode,
@@ -1625,6 +1626,29 @@ function LocalEditorContent({
 		if (!result.ok) toast.error(assetErrorMessage(result.error))
 	}
 
+	async function handleOpenFile() {
+		if (isDirty) {
+			let confirmed = window.confirm(t("doc.localFile.confirmNewFile"))
+			if (!confirmed) return
+		}
+
+		await saveCurrentFile(activeFile.id, t)
+
+		let result = await openLocalFile()
+		if (result) {
+			useLocalFileStore.getState().addFile({
+				id: result.id,
+				filename: result.filename,
+				lastOpened: Date.now(),
+				lastModified: result.lastModified,
+				content: result.content,
+				lastSavedContent: result.content,
+				hasUnsavedChanges: false,
+				isActive: true,
+			})
+		}
+	}
+
 	let handlersRef = useRef({
 		handleSave: async () => {
 			let currentFile = useLocalFileStore.getState().getActiveFile()
@@ -1636,6 +1660,7 @@ function LocalEditorContent({
 		toggleRight,
 		togglePreview: () => setIsPreview(!isPreview),
 		toggleFocusMode,
+		openFile: handleOpenFile,
 	})
 
 	useEffect(() => {
@@ -1646,6 +1671,7 @@ function LocalEditorContent({
 			toggleRight,
 			togglePreview: () => setIsPreview(!isPreview),
 			toggleFocusMode: handlersRef.current.toggleFocusMode,
+			openFile: handleOpenFile,
 		}
 	})
 
@@ -1687,6 +1713,11 @@ function LocalEditorContent({
 				e.preventDefault()
 				handlersRef.current.togglePreview()
 			}
+
+			if (isShortcutEvent(e, "openDocument")) {
+				e.preventDefault()
+				void handlersRef.current.openFile()
+			}
 		}
 
 		function handleRunShortcut(event: Event) {
@@ -1698,6 +1729,7 @@ function LocalEditorContent({
 			else if (id === "rightSidebar") handlersRef.current.toggleRight()
 			else if (id === "preview") handlersRef.current.togglePreview()
 			else if (id === "focusMode") handlersRef.current.toggleFocusMode()
+			else if (id === "openDocument") void handlersRef.current.openFile()
 		}
 
 		document.addEventListener("keydown", handleKeyDown)
@@ -1707,29 +1739,6 @@ function LocalEditorContent({
 			document.removeEventListener("alkalye:run-shortcut", handleRunShortcut)
 		}
 	}, [])
-
-	async function handleOpenFile() {
-		if (isDirty) {
-			let confirmed = window.confirm(t("doc.localFile.confirmNewFile"))
-			if (!confirmed) return
-		}
-
-		await saveCurrentFile(activeFile.id, t)
-
-		let result = await openLocalFile()
-		if (result) {
-			useLocalFileStore.getState().addFile({
-				id: result.id,
-				filename: result.filename,
-				lastOpened: Date.now(),
-				lastModified: result.lastModified,
-				content: result.content,
-				lastSavedContent: result.content,
-				hasUnsavedChanges: false,
-				isActive: true,
-			})
-		}
-	}
 
 	function handleDownload(file: LocalFileEntry) {
 		let title = getDocumentTitle(file.content) || "Untitled"
@@ -1871,6 +1880,7 @@ function LocalEditorContent({
 						}
 						placeholder={t("doc.startWriting")}
 						documents={documents}
+						hiddenCommands={syncedOnlyCommands}
 						autoSortTasks={editorSettings?.editor?.autoSortTasks}
 						spellcheck={editorSettings?.editor?.spellcheck ?? true}
 						spellcheckLanguage={editorSettings?.editor?.spellcheckLanguage}
@@ -2294,3 +2304,17 @@ function SettingsButton() {
 		</Tooltip>
 	)
 }
+
+let syncedOnlyCommands: CommandId[] = [
+	"newDocument",
+	"renameDocument",
+	"deleteDocument",
+	"duplicateDocument",
+	"togglePin",
+	"addTag",
+	"moveToFolder",
+	"moveToSpace",
+	"turnIntoPresentation",
+	"downloadDocument",
+	"timeMachine",
+]

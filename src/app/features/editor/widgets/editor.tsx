@@ -245,6 +245,9 @@ interface MarkdownEditorProps {
 	// Extension slot for feature-supplied codemirror extensions
 	extensions?: Extension[]
 
+	// Commands the host screen can't run, hidden from the palette
+	hiddenCommands?: CommandId[]
+
 	// Config
 	placeholder?: string
 	readOnly?: boolean
@@ -345,6 +348,7 @@ function MarkdownEditor(
 		onEditTldraw,
 		onAddComment,
 		extensions: externalExtensions,
+		hiddenCommands,
 		placeholder,
 		readOnly,
 		className,
@@ -1202,7 +1206,7 @@ function MarkdownEditor(
 			setOutlineOpen(true)
 			return
 		}
-		if (!isShortcutId(id)) return
+		if (!isShortcutId(id)) return void dispatchRunShortcut(id)
 		let editorCommand = editorShortcutCommand(id, autoSortRef.current)
 		if (editorCommand) {
 			runCommand(editorCommand)
@@ -1234,6 +1238,10 @@ function MarkdownEditor(
 		if (id === "cut") return void cut()
 		if (id === "copy") return void copy()
 		if (id === "paste" || id === "rawPaste") return void paste()
+		dispatchRunShortcut(id)
+	}
+
+	function dispatchRunShortcut(id: CommandId) {
 		document.dispatchEvent(
 			new CustomEvent("alkalye:run-shortcut", { detail: id }),
 		)
@@ -1492,6 +1500,7 @@ function MarkdownEditor(
 				open={commandPaletteOpen}
 				onOpenChange={setCommandPaletteOpen}
 				onRun={runShortcut}
+				hiddenCommands={hiddenCommands}
 			/>
 			<ShortcutsDialog
 				open={shortcutsOpen}

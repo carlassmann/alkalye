@@ -61,3 +61,8 @@ export {
 } from "./lib/wikilink-parser"
 
 export { setupKeyboardShortcuts } from "./lib/keyboard-shortcuts"
+export {
+	QuickJumpDialog,
+	type CommandId,
+	type DocumentCommandId,
+} from "./widgets/command-palette"

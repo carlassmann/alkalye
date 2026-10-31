@@ -1,9 +1,7 @@
-import { readDocumentText } from "../lib/document-text"
-import { useState, useSyncExternalStore } from "react"
+import { useSyncExternalStore } from "react"
 import { useNavigate } from "@tanstack/react-router"
-import { co, Group } from "jazz-tools"
 import { useAccount } from "jazz-tools/react"
-import { toast } from "sonner"
+import { FileText } from "lucide-react"
 import {
 	SidebarMenuButton,
 	SidebarMenuItem,
@@ -20,73 +18,45 @@ import {
 	DropdownMenuSubContent,
 	DropdownMenuSubTrigger,
 } from "@/app/components/ui/dropdown-menu"
-import { ConfirmDialog } from "@/app/components/ui/confirm-dialog"
 import { testIds } from "@/app/lib/test-ids"
-import { MoveToFolderDialog } from "./move-to-folder-dialog"
-import { MoveToSpaceDialog } from "@/app/features/spaces"
-import { FileText } from "lucide-react"
 import { getShortcutLabel } from "@/app/lib/shortcut-registry"
 import { isFocusMode, toggleFocusMode } from "@/app/lib/focus-mode"
-import { Document, UserAccount } from "@/schema"
-import {
-	canEdit,
-	getDocumentGroup,
-	leavePersonalDocument,
-} from "@/app/features/sharing"
-import {
-	parseFrontmatter,
-	togglePinned,
-	getFrontmatterRange,
-	getFrontmatterInsertion,
-	getFrontmatterFieldValueRange,
-} from "@/app/features/editor"
-import { unfoldEffect } from "@codemirror/language"
+import { UserAccount } from "@/schema"
+import { canEdit, getDocumentGroup } from "@/app/features/sharing"
+import { parseFrontmatter, parseWikiLinks } from "@/app/features/editor"
 import { getPresentationMode } from "@/app/features/presentation"
-import { getDocumentTitle, addCopyToTitle } from "../lib/title"
 import {
-	exportDocument,
 	canShareDocument,
 	shareDocument,
 	saveDocumentAs,
 	printToPdf,
 	printSlidesToPdf,
-	type ExportAsset,
 	type SlideAspectRatio,
 	type SlidePrintLayout,
 } from "@/app/features/import-export"
-import { parseWikiLinks } from "@/app/features/editor"
+import { getExportComments } from "@/app/features/comments"
+import { getLoadedAssets, toPrintableAsset } from "@/app/features/assets"
+import { loadThemesForPdf } from "@/app/features/themes"
+import { useIntl } from "@/shared/intl/setup"
+import { readDocumentText } from "../lib/document-text"
+import { getDocumentTitle } from "../lib/title"
 import { resolveDocTitles } from "../lib/wikilink-titles"
 import {
-	applyContentDiffWithCommentAnchors,
-	copyCommentsAndApplyContent,
-	getExportComments,
-} from "@/app/features/comments"
-import type { MarkdownEditorRef } from "@/app/features/editor"
-import {
-	getLoadedAssets,
-	serializeAsset,
-	toPrintableAsset,
-} from "@/app/features/assets"
-
-import { loadThemesForPdf } from "@/app/features/themes"
-import { createDocumentMetadata, syncDocumentMetadata } from "../lib/metadata"
-import { useIntl } from "@/shared/intl/setup"
+	getExportAssets,
+	makeAddTag,
+	makeDownload,
+	makeDuplicate,
+	makeOpenTimeMachine,
+	makeRename,
+	makeTogglePin,
+	makeTurnIntoPresentation,
+	type EditorRef,
+	type LoadedDocument,
+	type LoadedMe,
+} from "../lib/document-file-actions"
+import { runDocumentCommand } from "./document-commands"
 
 export { SidebarFileMenu }
-
-type LoadedDocument = co.loaded<
-	typeof Document,
-	{
-		content: true
-		assets: true
-		comments: { $each: { replies: true } }
-	}
->
-type LoadedMe = co.loaded<
-	typeof UserAccount,
-	{ root: { documents: true; settings: true } }
->
-type EditorRef = React.RefObject<MarkdownEditorRef | null>
 
 interface SidebarFileMenuProps {
 	doc: LoadedDocument
@@ -109,10 +79,6 @@ function SidebarFileMenu({ doc, editor, me, spaceId }: SidebarFileMenuProps) {
 	} = useSidebar()
 
 	let focusMode = useFocusMode()
-	let [deleteOpen, setDeleteOpen] = useState(false)
-	let [leaveOpen, setLeaveOpen] = useState(false)
-	let [moveOpen, setMoveOpen] = useState(false)
-	let [moveSpaceOpen, setMoveSpaceOpen] = useState(false)
 
 	let docWithContent = doc
 
@@ -130,194 +96,160 @@ function SidebarFileMenu({ doc, editor, me, spaceId }: SidebarFileMenuProps) {
 	let canShare = canShareDocument()
 
 	return (
-		<>
-			<SidebarMenuItem>
-				<DropdownMenu>
-					<DropdownMenuTrigger
-						render={
-							<SidebarMenuButton
-								nativeButton
-								data-testid={testIds.doc.fileMenuButton}
-							>
-								<FileText className="size-4" />
-								<span>{t("doc.file")}</span>
-							</SidebarMenuButton>
-						}
-					/>
-					<DropdownMenuContent
-						align={isMobile ? "center" : "start"}
-						side={isMobile ? "bottom" : "left"}
+		<SidebarMenuItem>
+			<DropdownMenu>
+				<DropdownMenuTrigger
+					render={
+						<SidebarMenuButton
+							nativeButton
+							data-testid={testIds.doc.fileMenuButton}
+						>
+							<FileText className="size-4" />
+							<span>{t("doc.file")}</span>
+						</SidebarMenuButton>
+					}
+				/>
+				<DropdownMenuContent
+					align={isMobile ? "center" : "start"}
+					side={isMobile ? "bottom" : "left"}
+				>
+					<DropdownMenuItem onClick={toggleFocusMode}>
+						{focusMode ? t("doc.exitFocusMode") : t("doc.focusMode")}
+						<DropdownMenuShortcut>
+							{getShortcutLabel("focusMode")}
+						</DropdownMenuShortcut>
+					</DropdownMenuItem>
+					<DropdownMenuItem
+						onClick={makeOpenTimeMachine(
+							doc,
+							navigate,
+							setLeftOpen,
+							setRightOpen,
+							setLeftOpenMobile,
+							setRightOpenMobile,
+						)}
 					>
-						<DropdownMenuItem onClick={toggleFocusMode}>
-							{focusMode ? t("doc.exitFocusMode") : t("doc.focusMode")}
+						{t("doc.timeMachine")}
+					</DropdownMenuItem>
+					<DropdownMenuSeparator />
+					<DropdownMenuItem
+						onClick={makeRename(editor, isMobile, setRightOpenMobile)}
+						disabled={readOnly}
+					>
+						{t("doc.rename")}
+						<DropdownMenuShortcut>
+							{getShortcutLabel("renameDocument")}
+						</DropdownMenuShortcut>
+					</DropdownMenuItem>
+					<DropdownMenuItem
+						onClick={makeTogglePin(docWithContent)}
+						disabled={readOnly}
+					>
+						{isPinned ? t("doc.unpin") : t("doc.pin")}
+					</DropdownMenuItem>
+					<DropdownMenuItem
+						onClick={makeAddTag(editor, isMobile, setRightOpenMobile)}
+						disabled={readOnly}
+					>
+						{t("doc.addTag")}
+					</DropdownMenuItem>
+					<DropdownMenuItem
+						onClick={() => runDocumentCommand("moveToFolder")}
+						disabled={readOnly || !me}
+					>
+						{t("doc.moveToFolder")}
+					</DropdownMenuItem>
+					<DropdownMenuItem
+						onClick={() => runDocumentCommand("moveToSpace")}
+						disabled={!me}
+					>
+						{t("doc.moveToSpace")}
+					</DropdownMenuItem>
+					<DropdownMenuItem
+						onClick={makeTurnIntoPresentation(
+							editor,
+							isMobile,
+							setRightOpenMobile,
+						)}
+						disabled={readOnly || isPresentation}
+					>
+						{t("doc.turnIntoPresentation")}
+					</DropdownMenuItem>
+					<DropdownMenuItem onClick={makeDownload(doc, content)}>
+						{t("doc.download")}
+					</DropdownMenuItem>
+					{canShare && (
+						<DropdownMenuItem
+							onClick={makeShare(doc, content)}
+							data-testid={testIds.doc.nativeShareButton}
+						>
+							{t("doc.shareCopy")}
+						</DropdownMenuItem>
+					)}
+					<DropdownMenuItem onClick={makeSaveAs(content)}>
+						{t("doc.saveAs")}
+						<DropdownMenuShortcut>
+							{getShortcutLabel("saveAs")}
+						</DropdownMenuShortcut>
+					</DropdownMenuItem>
+					<DropdownMenuItem onClick={handlePrintPdf}>
+						{t("doc.printToPdf")}
+						<DropdownMenuShortcut>
+							{getShortcutLabel("print")}
+						</DropdownMenuShortcut>
+					</DropdownMenuItem>
+					{isPresentation && (
+						<DropdownMenuSub>
+							<DropdownMenuSubTrigger>
+								{t("doc.printSlides")}
+							</DropdownMenuSubTrigger>
+							<DropdownMenuSubContent>
+								{slidePrintOptions.map(option => (
+									<DropdownMenuItem
+										key={`${option.layout}-${option.aspectRatio}`}
+										onClick={makePrintSlides(option)}
+									>
+										{t(
+											option.layout === "notes"
+												? "doc.printSlides.withNotes"
+												: "doc.printSlides.slidesOnly",
+											{ aspectRatio: option.aspectRatio },
+										)}
+									</DropdownMenuItem>
+								))}
+							</DropdownMenuSubContent>
+						</DropdownMenuSub>
+					)}
+					<DropdownMenuItem
+						onClick={makeDuplicate(doc, me, spaceId, navigate)}
+						data-testid={testIds.doc.duplicateButton}
+					>
+						{t("doc.duplicate")}
+					</DropdownMenuItem>
+					<DropdownMenuSeparator />
+					{isAdmin ? (
+						<DropdownMenuItem
+							onClick={() => runDocumentCommand("deleteDocument")}
+							className="text-destructive focus:text-destructive"
+							data-testid={testIds.doc.deleteButton}
+						>
+							{t("doc.delete")}
 							<DropdownMenuShortcut>
-								{getShortcutLabel("focusMode")}
+								{getShortcutLabel("deleteDocument")}
 							</DropdownMenuShortcut>
 						</DropdownMenuItem>
+					) : (
 						<DropdownMenuItem
-							onClick={makeOpenTimeMachine(
-								doc,
-								navigate,
-								setLeftOpen,
-								setRightOpen,
-								setLeftOpenMobile,
-								setRightOpenMobile,
-							)}
-						>
-							{t("doc.timeMachine")}
-						</DropdownMenuItem>
-						<DropdownMenuSeparator />
-						<DropdownMenuItem
-							onClick={makeRename(editor, isMobile, setRightOpenMobile)}
-							disabled={readOnly}
-						>
-							{t("doc.rename")}
-						</DropdownMenuItem>
-						<DropdownMenuItem
-							onClick={makeTogglePin(docWithContent)}
-							disabled={readOnly}
-						>
-							{isPinned ? t("doc.unpin") : t("doc.pin")}
-						</DropdownMenuItem>
-						<DropdownMenuItem
-							onClick={makeAddTag(editor, isMobile, setRightOpenMobile)}
-							disabled={readOnly}
-						>
-							{t("doc.addTag")}
-						</DropdownMenuItem>
-						<DropdownMenuItem
-							onClick={() => setMoveOpen(true)}
-							disabled={readOnly || !me}
-						>
-							{t("doc.moveToFolder")}
-						</DropdownMenuItem>
-						<DropdownMenuItem
-							onClick={() => setMoveSpaceOpen(true)}
+							onClick={() => runDocumentCommand("deleteDocument")}
+							className="text-destructive focus:text-destructive"
 							disabled={!me}
 						>
-							{t("doc.moveToSpace")}
+							{t("doc.leave")}
 						</DropdownMenuItem>
-						<DropdownMenuItem
-							onClick={makeTurnIntoPresentation(
-								editor,
-								isMobile,
-								setRightOpenMobile,
-							)}
-							disabled={readOnly || isPresentation}
-						>
-							{t("doc.turnIntoPresentation")}
-						</DropdownMenuItem>
-						<DropdownMenuItem onClick={makeDownload(doc, content)}>
-							{t("doc.download")}
-						</DropdownMenuItem>
-						{canShare && (
-							<DropdownMenuItem
-								onClick={makeShare(doc, content)}
-								data-testid={testIds.doc.nativeShareButton}
-							>
-								{t("doc.shareCopy")}
-							</DropdownMenuItem>
-						)}
-						<DropdownMenuItem onClick={makeSaveAs(content)}>
-							{t("doc.saveAs")}
-							<DropdownMenuShortcut>
-								{getShortcutLabel("saveAs")}
-							</DropdownMenuShortcut>
-						</DropdownMenuItem>
-						<DropdownMenuItem onClick={handlePrintPdf}>
-							{t("doc.printToPdf")}
-							<DropdownMenuShortcut>
-								{getShortcutLabel("print")}
-							</DropdownMenuShortcut>
-						</DropdownMenuItem>
-						{isPresentation && (
-							<DropdownMenuSub>
-								<DropdownMenuSubTrigger>
-									{t("doc.printSlides")}
-								</DropdownMenuSubTrigger>
-								<DropdownMenuSubContent>
-									{slidePrintOptions.map(option => (
-										<DropdownMenuItem
-											key={`${option.layout}-${option.aspectRatio}`}
-											onClick={makePrintSlides(option)}
-										>
-											{t(
-												option.layout === "notes"
-													? "doc.printSlides.withNotes"
-													: "doc.printSlides.slidesOnly",
-												{ aspectRatio: option.aspectRatio },
-											)}
-										</DropdownMenuItem>
-									))}
-								</DropdownMenuSubContent>
-							</DropdownMenuSub>
-						)}
-						<DropdownMenuItem
-							onClick={makeDuplicate(doc, me, spaceId, navigate)}
-							data-testid={testIds.doc.duplicateButton}
-						>
-							{t("doc.duplicate")}
-						</DropdownMenuItem>
-						<DropdownMenuSeparator />
-						{isAdmin ? (
-							<DropdownMenuItem
-								onClick={() => setDeleteOpen(true)}
-								className="text-destructive focus:text-destructive"
-								data-testid={testIds.doc.deleteButton}
-							>
-								{t("doc.delete")}
-							</DropdownMenuItem>
-						) : (
-							<DropdownMenuItem
-								onClick={() => setLeaveOpen(true)}
-								className="text-destructive focus:text-destructive"
-								disabled={!me}
-							>
-								{t("doc.leave")}
-							</DropdownMenuItem>
-						)}
-					</DropdownMenuContent>
-				</DropdownMenu>
-			</SidebarMenuItem>
-
-			{docWithContent?.$isLoaded && me && (
-				<MoveToFolderDialog
-					doc={docWithContent}
-					existingFolders={getExistingFolders(me)}
-					open={moveOpen}
-					onOpenChange={setMoveOpen}
-				/>
-			)}
-			<ConfirmDialog
-				open={deleteOpen}
-				onOpenChange={setDeleteOpen}
-				title={t("doc.deleteDialog.title")}
-				description={t("doc.deleteDialog.description")}
-				confirmLabel={t("doc.deleteDialog.confirm")}
-				variant="destructive"
-				onConfirm={makeDelete(doc, navigate, spaceId)}
-				confirmTestId={testIds.dialog.deleteConfirm}
-			/>
-			<ConfirmDialog
-				open={leaveOpen}
-				onOpenChange={setLeaveOpen}
-				title={t("doc.leaveDialog.title")}
-				description={t("doc.leaveDialog.description")}
-				confirmLabel={t("doc.leaveDialog.confirm")}
-				variant="destructive"
-				onConfirm={makeLeave(docWithContent, me, doc, navigate)}
-			/>
-
-			{moveSpaceOpen && docWithContent?.$isLoaded && (
-				<MoveToSpaceDialog
-					doc={docWithContent}
-					open={moveSpaceOpen}
-					onOpenChange={setMoveSpaceOpen}
-					currentSpaceId={spaceId}
-					onMove={makeMoveToSpace(navigate, spaceId)}
-				/>
-			)}
-		</>
+					)}
+				</DropdownMenuContent>
+			</DropdownMenu>
+		</SidebarMenuItem>
 	)
 }
 
@@ -330,208 +262,6 @@ function useFocusMode() {
 		})
 		return () => observer.disconnect()
 	}, isFocusMode)
-}
-
-function makeOpenTimeMachine(
-	doc: LoadedDocument,
-	navigate: ReturnType<typeof useNavigate>,
-	setLeftOpen: (open: boolean) => void,
-	setRightOpen: (open: boolean) => void,
-	setLeftOpenMobile: (open: boolean) => void,
-	setRightOpenMobile: (open: boolean) => void,
-) {
-	return function handleOpenTimeMachine() {
-		setLeftOpen(false)
-		setRightOpen(false)
-		setLeftOpenMobile(false)
-		setRightOpenMobile(false)
-		navigate({
-			to: "/doc/$id/timemachine",
-			params: { id: doc.$jazz.id },
-		})
-	}
-}
-
-function makeRename(
-	editor: EditorRef,
-	isMobile: boolean,
-	setRightOpenMobile: (open: boolean, callback?: () => void) => void,
-) {
-	return function handleRename() {
-		runWithMobileClose(isMobile, setRightOpenMobile, () => {
-			let view = editor.current?.getEditor()
-			if (!view) return
-
-			let content = view.state.doc.toString()
-			let { frontmatter, body } = parseFrontmatter(content)
-
-			if (!frontmatter) {
-				let inferredTitle = getInferredTitle(content)
-				let newFrontmatter = `---\ntitle: ${inferredTitle}\n---\n\n`
-				view.dispatch({ changes: { from: 0, to: 0, insert: newFrontmatter } })
-				let titleStart = 4 + 7
-				let titleEnd = titleStart + inferredTitle.length
-				view.dispatch({ selection: { anchor: titleStart, head: titleEnd } })
-				view.focus()
-				return
-			}
-
-			if (!frontmatter.title) {
-				let inferredTitle = getInferredTitle(body)
-				let insertion = getFrontmatterInsertion(content)
-				if (!insertion) return
-				let insertPos = insertion.position
-				let titleLine = `${insertion.indentation}title: ${inferredTitle}\n`
-				view.dispatch({
-					changes: { from: insertPos, to: insertPos, insert: titleLine },
-				})
-				let range = getFrontmatterRange(view.state)
-				if (range)
-					view.dispatch({
-						effects: unfoldEffect.of({ from: range.from, to: range.to }),
-					})
-				let titleStart = insertPos + insertion.indentation.length + 7
-				let titleEnd = titleStart + inferredTitle.length
-				view.dispatch({ selection: { anchor: titleStart, head: titleEnd } })
-				view.focus()
-				return
-			}
-
-			let range = getFrontmatterRange(view.state)
-			if (range)
-				view.dispatch({
-					effects: unfoldEffect.of({ from: range.from, to: range.to }),
-				})
-			let titleRange = getFrontmatterFieldValueRange(content, "title")
-			if (titleRange) {
-				view.dispatch({
-					selection: { anchor: titleRange.from, head: titleRange.to },
-				})
-			}
-			view.focus()
-		})
-	}
-}
-
-function makeTogglePin(docWithContent: LoadedDocument) {
-	return function handleTogglePin() {
-		if (!docWithContent?.$isLoaded || !docWithContent.content) return
-		let content = docWithContent.content.toString()
-		let newContent = togglePinned(content)
-		applyContentDiffWithCommentAnchors(docWithContent, newContent)
-		docWithContent.$jazz.set("updatedAt", new Date())
-		syncDocumentMetadata(docWithContent)
-	}
-}
-
-function makeAddTag(
-	editor: EditorRef,
-	isMobile: boolean,
-	setRightOpenMobile: (open: boolean, callback?: () => void) => void,
-) {
-	return function handleAddTag() {
-		runWithMobileClose(isMobile, setRightOpenMobile, () => {
-			let view = editor.current?.getEditor()
-			if (!view) return
-
-			let content = view.state.doc.toString()
-			let { frontmatter } = parseFrontmatter(content)
-			let tag = "your_tag"
-
-			if (!frontmatter) {
-				let newFrontmatter = `---\ntags: ${tag}\n---\n\n`
-				view.dispatch({ changes: { from: 0, to: 0, insert: newFrontmatter } })
-				let tagStart = 4 + 6
-				let tagEnd = tagStart + tag.length
-				view.dispatch({ selection: { anchor: tagStart, head: tagEnd } })
-				view.focus()
-				return
-			}
-
-			if (!frontmatter.tags) {
-				let insertion = getFrontmatterInsertion(content)
-				if (!insertion) return
-				let insertPos = insertion.position
-				let tagsLine = `${insertion.indentation}tags: ${tag}\n`
-				view.dispatch({
-					changes: { from: insertPos, to: insertPos, insert: tagsLine },
-				})
-				let range = getFrontmatterRange(view.state)
-				if (range)
-					view.dispatch({
-						effects: unfoldEffect.of({ from: range.from, to: range.to }),
-					})
-				let tagStart = insertPos + insertion.indentation.length + 6
-				let tagEnd = tagStart + tag.length
-				view.dispatch({ selection: { anchor: tagStart, head: tagEnd } })
-				view.focus()
-				return
-			}
-
-			let tagsRange = getFrontmatterFieldValueRange(content, "tags")
-			if (tagsRange) {
-				let existingTags = content
-					.slice(tagsRange.from, tagsRange.to)
-					.replace(/[,\s]+$/, "")
-				let newTags = existingTags ? `${existingTags}, ${tag}` : tag
-				view.dispatch({
-					changes: { from: tagsRange.from, to: tagsRange.to, insert: newTags },
-				})
-				let range = getFrontmatterRange(view.state)
-				if (range)
-					view.dispatch({
-						effects: unfoldEffect.of({ from: range.from, to: range.to }),
-					})
-				let tagStart = tagsRange.from + newTags.length - tag.length
-				let tagEnd = tagStart + tag.length
-				view.dispatch({ selection: { anchor: tagStart, head: tagEnd } })
-				view.focus()
-			}
-		})
-	}
-}
-
-function makeTurnIntoPresentation(
-	editor: EditorRef,
-	isMobile: boolean,
-	setRightOpenMobile: (open: boolean, callback?: () => void) => void,
-) {
-	return function handleTurnIntoPresentation() {
-		runWithMobileClose(isMobile, setRightOpenMobile, () => {
-			let view = editor.current?.getEditor()
-			if (!view) return
-
-			let content = view.state.doc.toString()
-			let { frontmatter } = parseFrontmatter(content)
-
-			if (!frontmatter) {
-				let newFrontmatter = `---\nmode: present\n---\n\n`
-				view.dispatch({ changes: { from: 0, to: 0, insert: newFrontmatter } })
-				view.focus()
-				return
-			}
-
-			let insertPos = 4
-			let modeLine = `mode: present\n`
-			view.dispatch({
-				changes: { from: insertPos, to: insertPos, insert: modeLine },
-			})
-			view.focus()
-		})
-	}
-}
-
-function makeDownload(doc: LoadedDocument, content: string) {
-	return async function handleDownload() {
-		let docAssets = await getExportAssets(doc)
-		let title = getDocumentTitle(content)
-		await exportDocument(
-			content,
-			title,
-			docAssets.length > 0 ? docAssets : undefined,
-			getExportComments(doc),
-		)
-	}
 }
 
 function makeSaveAs(content: string) {
@@ -552,19 +282,6 @@ function makeShare(doc: LoadedDocument, content: string) {
 			getExportComments(doc),
 		)
 	}
-}
-
-async function getExportAssets(doc: LoadedDocument) {
-	let docAssets: ExportAsset[] = []
-	if (!doc.assets?.$isLoaded) return docAssets
-
-	for (let asset of Array.from(doc.assets)) {
-		if (!asset?.$isLoaded) continue
-		let blob = await serializeAsset(asset)
-		if (blob) docAssets.push({ id: asset.$jazz.id, name: asset.name, blob })
-	}
-
-	return docAssets
 }
 
 function makePrintPdf(
@@ -626,151 +343,4 @@ function makePrintSlidesFactory(
 			})
 		}
 	}
-}
-
-function makeDelete(
-	doc: LoadedDocument,
-	navigate: ReturnType<typeof useNavigate>,
-	spaceId: string | undefined,
-) {
-	return function handleDelete() {
-		doc.$jazz.set("deletedAt", new Date())
-		if (spaceId) {
-			navigate({ to: "/spaces/$spaceId", params: { spaceId } })
-			return
-		}
-		navigate({ to: "/" })
-	}
-}
-
-function makeLeave(
-	docWithContent: LoadedDocument,
-	me: LoadedMe | undefined,
-	doc: LoadedDocument,
-	navigate: ReturnType<typeof useNavigate>,
-) {
-	return async function handleLeave() {
-		if (!docWithContent?.$isLoaded || !me) return
-		await leavePersonalDocument(docWithContent, me)
-		let idx = me.root?.documents?.findIndex(d => d?.$jazz.id === doc.$jazz.id)
-		if (idx !== undefined && idx !== -1 && me.root?.documents?.$isLoaded) {
-			me.root.documents.$jazz.splice(idx, 1)
-		}
-		navigate({ to: "/" })
-	}
-}
-
-function makeDuplicate(
-	doc: LoadedDocument,
-	me: LoadedMe | undefined,
-	spaceId: string | undefined,
-	navigate: ReturnType<typeof useNavigate>,
-) {
-	return async function handleDuplicate() {
-		if (!me?.root?.documents?.$isLoaded) return
-
-		let content = doc.content?.$isLoaded ? readDocumentText(doc.content) : ""
-		let newContent = addCopyToTitle(content)
-
-		let now = new Date()
-		let group = Group.create()
-		let newDoc = Document.create(
-			{
-				version: 1,
-				content: co.plainText().create(content, group),
-				...createDocumentMetadata(newContent, now),
-				createdAt: now,
-				updatedAt: now,
-			},
-			group,
-		)
-		try {
-			await copyCommentsAndApplyContent(doc, newDoc, newContent)
-		} catch (error) {
-			console.error("Failed to duplicate document:", error)
-			toast.error("Failed to duplicate document")
-			return
-		}
-		me.root.documents.$jazz.push(newDoc)
-
-		if (spaceId) {
-			navigate({
-				to: "/spaces/$spaceId/doc/$id",
-				params: { spaceId, id: newDoc.$jazz.id },
-			})
-		} else {
-			navigate({ to: "/doc/$id", params: { id: newDoc.$jazz.id } })
-		}
-	}
-}
-
-function makeMoveToSpace(
-	navigate: ReturnType<typeof useNavigate>,
-	currentSpaceId?: string,
-) {
-	return function handleMoveToSpace(
-		destination: { id: string; name: string } | null,
-	) {
-		if (destination) {
-			let docId = window.location.pathname.match(
-				/\/(?:app\/)?doc\/([^/]+)/,
-			)?.[1]
-			if (docId) {
-				navigate({
-					to: "/spaces/$spaceId/doc/$id",
-					params: { spaceId: destination.id, id: docId },
-				})
-			}
-		} else if (currentSpaceId) {
-			let docId = window.location.pathname.match(
-				/\/(?:app\/)?doc\/([^/]+)/,
-			)?.[1]
-			if (docId) {
-				navigate({ to: "/doc/$id", params: { id: docId } })
-			}
-		}
-	}
-}
-
-function runWithMobileClose(
-	isMobile: boolean,
-	setRightOpenMobile: (open: boolean, callback?: () => void) => void,
-	fn: () => void,
-) {
-	if (isMobile) {
-		setRightOpenMobile(false, fn)
-	} else {
-		requestAnimationFrame(fn)
-	}
-}
-
-function getInferredTitle(body: string): string {
-	let line = body.split("\n").find(l => l.trim()) ?? ""
-	return (
-		line
-			.replace(/^#{1,6}\s+/, "")
-			.replace(/\*\*([^*]+)\*\*/g, "$1")
-			.replace(/\*([^*]+)\*/g, "$1")
-			.replace(/__([^_]+)__/g, "$1")
-			.replace(/_([^_]+)_/g, "$1")
-			.replace(/`([^`]+)`/g, "$1")
-			.trim()
-			.slice(0, 80) || "Untitled"
-	)
-}
-
-function getExistingFolders(me?: LoadedMe): string[] {
-	if (!me?.root?.documents?.$isLoaded) return []
-
-	let folders = new Set<string>()
-	for (let doc of me.root.documents.values()) {
-		if (!doc?.$isLoaded || !doc.path) continue
-		folders.add(doc.path)
-		let parts = doc.path.split("/")
-		for (let i = 1; i < parts.length; i++) {
-			folders.add(parts.slice(0, i).join("/"))
-		}
-	}
-
-	return [...folders].sort()
 }
