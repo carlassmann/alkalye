@@ -8,7 +8,7 @@
 			"The command palette (Ctrl/⌘+Shift+P) now lists document actions such as duplicate, pin, add tag, move to a folder or space, turn into presentation, download, and Time Machine.",
 			"In local files, Ctrl/⌘+O opens a file from your computer."
 		],
-		"pr": 0
+		"pr": 70
 	},
 	{
 		"id": 163,
