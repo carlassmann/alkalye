@@ -1,5 +1,16 @@
 [
 	{
+		"id": 164,
+		"date": "2026-10-31",
+		"title": "Keyboard shortcuts for documents",
+		"notes": [
+			"Create, open, rename, and delete documents from the keyboard: Ctrl/⌘+Alt+N for a new document (Ctrl/⌘+N in the installed app), Ctrl/⌘+O to jump to a document, F2 to rename, and Ctrl/⌘+Shift+Backspace to delete.",
+			"The command palette (Ctrl/⌘+Shift+P) now lists document actions such as duplicate, pin, add tag, move to a folder or space, turn into presentation, download, and Time Machine.",
+			"In local files, Ctrl/⌘+O opens a file from your computer."
+		],
+		"pr": 70
+	},
+	{
 		"id": 163,
 		"date": "2026-10-28",
 		"title": "PDF export for slides and from the command line",

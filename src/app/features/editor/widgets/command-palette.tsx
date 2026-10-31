@@ -22,8 +22,8 @@ import {
 import { useHasFinePointer } from "@/app/hooks/use-fine-pointer"
 import type { DocumentHeading } from "../lib/document-navigation"
 
-export { CommandPalette, OutlineDialog, ShortcutsDialog }
-export type { CommandId }
+export { CommandPalette, OutlineDialog, QuickJumpDialog, ShortcutsDialog }
+export type { CommandId, DocumentCommandId }
 
 type CommandId =
 	| ShortcutId
@@ -35,6 +35,17 @@ type CommandId =
 	| "insertWikilink"
 	| "renumberLists"
 	| "keyboardShortcuts"
+	| DocumentCommandId
+
+type DocumentCommandId =
+	| "duplicateDocument"
+	| "togglePin"
+	| "addTag"
+	| "moveToFolder"
+	| "moveToSpace"
+	| "turnIntoPresentation"
+	| "downloadDocument"
+	| "timeMachine"
 
 interface CommandOverlayProps {
 	open: boolean
@@ -154,9 +165,25 @@ let paletteCommands = [
 		label: "Keyboard shortcuts",
 		group: "Navigation" as const,
 	},
+	documentCommand("duplicateDocument", "Duplicate document"),
+	documentCommand("togglePin", "Pin or unpin document"),
+	documentCommand("addTag", "Add tag"),
+	documentCommand("moveToFolder", "Move to folder"),
+	documentCommand("moveToSpace", "Move to space"),
+	documentCommand("turnIntoPresentation", "Turn into presentation"),
+	documentCommand("downloadDocument", "Download document"),
+	documentCommand("timeMachine", "Open Time Machine"),
 ]
 
-function CommandPalette({ open, onOpenChange, onRun }: CommandOverlayProps) {
+function CommandPalette({
+	open,
+	onOpenChange,
+	onRun,
+	hiddenCommands = [],
+}: CommandOverlayProps & { hiddenCommands?: CommandId[] }) {
+	let commands = paletteCommands.filter(
+		command => !hiddenCommands.includes(command.id),
+	)
 	return (
 		<CommandDialog
 			open={open}
@@ -164,7 +191,7 @@ function CommandPalette({ open, onOpenChange, onRun }: CommandOverlayProps) {
 			title="Command palette"
 			searchLabel="Search commands"
 			emptyLabel="No matching commands"
-			items={paletteCommands.map(command => ({
+			items={commands.map(command => ({
 				id: command.id,
 				label: command.label,
 				searchText: `${command.label} ${command.group}`,
@@ -473,4 +500,8 @@ function humanize(value: string): string {
 		.replace(/([a-z\d])([A-Z])/g, "$1 $2")
 		.replace(/(\d+)/g, " $1")
 	return words.charAt(0).toUpperCase() + words.slice(1)
+}
+
+function documentCommand(id: DocumentCommandId, label: string) {
+	return { id, label, group: "Document" as const }
 }

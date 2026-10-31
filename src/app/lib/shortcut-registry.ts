@@ -147,6 +147,18 @@ let shortcutDefinitions = [
 		id: "focusMode",
 		default: { key: "f", modifiers: ["Mod", "Shift"] },
 	},
+	// Mod+N is reserved by browsers, but available to an installed PWA.
+	{
+		id: "newDocument",
+		default: { key: "n", modifiers: ["Alt", "Mod"] },
+		standalone: { key: "n", modifiers: ["Mod"] },
+	},
+	{ id: "openDocument", default: { key: "o", modifiers: ["Mod"] } },
+	{ id: "renameDocument", default: { key: "F2" } },
+	{
+		id: "deleteDocument",
+		default: { key: "Backspace", modifiers: ["Mod", "Shift"] },
+	},
 	{ id: "print", default: { key: "p", modifiers: ["Mod"] } },
 	{ id: "save", default: { key: "s", modifiers: ["Mod"] } },
 	{ id: "saveAs", default: { key: "s", modifiers: ["Mod", "Shift"] } },

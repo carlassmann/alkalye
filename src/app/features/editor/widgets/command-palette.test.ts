@@ -63,4 +63,65 @@ describe("CommandPalette", () => {
 
 		flushSync(() => root.unmount())
 	})
+
+	it("lists document commands with their shortcuts", () => {
+		let onRun = vi.fn()
+		let container = document.createElement("div")
+		document.body.append(container)
+		let root = createRoot(container)
+
+		flushSync(() => {
+			root.render(
+				React.createElement(CommandPalette, {
+					open: true,
+					onOpenChange: vi.fn(),
+					onRun,
+				}),
+			)
+		})
+
+		let labels = Array.from(
+			document.querySelectorAll('[role="option"]'),
+			option => option.textContent,
+		)
+		expect(labels).toContainEqual(
+			expect.stringContaining("Rename DocumentDocumentF2"),
+		)
+		expect(labels).toContainEqual(expect.stringContaining("Duplicate document"))
+
+		let duplicate = Array.from(
+			document.querySelectorAll<HTMLButtonElement>('[role="option"]'),
+		).find(option => option.textContent?.includes("Duplicate document"))
+		flushSync(() => duplicate?.click())
+		expect(onRun).toHaveBeenCalledWith("duplicateDocument")
+
+		flushSync(() => root.unmount())
+	})
+	it("hides commands the screen can't run", () => {
+		let container = document.createElement("div")
+		document.body.append(container)
+		let root = createRoot(container)
+
+		flushSync(() => {
+			root.render(
+				React.createElement(CommandPalette, {
+					open: true,
+					onOpenChange: vi.fn(),
+					onRun: vi.fn(),
+					hiddenCommands: ["duplicateDocument"],
+				}),
+			)
+		})
+
+		let labels = Array.from(
+			document.querySelectorAll('[role="option"]'),
+			option => option.textContent,
+		)
+		expect(labels).not.toContainEqual(
+			expect.stringContaining("Duplicate document"),
+		)
+		expect(labels).toContainEqual(expect.stringContaining("Open Document"))
+
+		flushSync(() => root.unmount())
+	})
 })
