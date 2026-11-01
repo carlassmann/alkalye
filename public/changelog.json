@@ -1,5 +1,17 @@
 [
 	{
+		"id": 165,
+		"date": "2026-11-01",
+		"title": "Organize documents faster in the sidebar",
+		"notes": [
+			"Move through the document list with the arrow keys. Press ↓ in Find to jump into the list, ←/→ to close and open folders, Home/End to reach the ends, and Enter to open.",
+			"Select several documents with Cmd/Ctrl-click, Shift-click, or Shift+arrows. Space adds or removes one, Cmd/Ctrl+A selects all, and Esc clears the selection.",
+			"Right-click a selection to move, pin, unpin, or delete all of it at once.",
+			"Drag documents onto a folder to move them there, or onto empty space to move them to the top level. The drag shows which documents you're moving, and a label tells you where they'll land."
+		],
+		"pr": 71
+	},
+	{
 		"id": 164,
 		"date": "2026-10-31",
 		"title": "Keyboard shortcuts for documents",

@@ -13,22 +13,22 @@ import { Button } from "@/app/components/ui/button"
 import { Document } from "@/schema"
 import { cn } from "@/app/lib/cn"
 import { useIntl } from "@/shared/intl/setup"
-import { moveDocumentToFolder } from "../lib/folders"
-import { syncDocumentMetadata } from "../lib/metadata"
+import { moveDocumentsToFolder } from "../lib/folders"
+import { notifySkippedDocuments } from "./sidebar-bulk-actions"
 
 export { MoveToFolderDialog }
 
 type SidebarDoc = co.loaded<typeof Document>
 
 interface MoveToFolderDialogProps {
-	doc: SidebarDoc
+	docs: SidebarDoc[]
 	existingFolders: string[]
 	open?: boolean
 	onOpenChange?: (open: boolean) => void
 }
 
 function MoveToFolderDialog({
-	doc,
+	docs,
 	existingFolders,
 	open: controlledOpen,
 	onOpenChange,
@@ -39,7 +39,9 @@ function MoveToFolderDialog({
 	let setOpen = onOpenChange ?? setInternalOpen
 
 	let [inputValue, setInputValue] = useState("")
-	let currentPath = doc.path ?? null
+	let paths = new Set(docs.map(doc => doc.path ?? null))
+	let currentPath = paths.size === 1 ? ([...paths][0] ?? null) : null
+	let isAnyInFolder = docs.some(doc => doc.path)
 
 	let filteredFolders = existingFolders.filter(folder =>
 		folder.toLowerCase().includes(inputValue.toLowerCase()),
@@ -49,10 +51,7 @@ function MoveToFolderDialog({
 		!existingFolders.some(f => f.toLowerCase() === inputValue.toLowerCase())
 
 	async function handleMoveToFolder(newPath: string | null) {
-		let loaded = await doc.$jazz.ensureLoaded({ resolve: { content: true } })
-		if (!loaded) return
-		await moveDocumentToFolder(loaded, newPath)
-		syncDocumentMetadata(loaded)
+		notifySkippedDocuments(await moveDocumentsToFolder(docs, newPath), t)
 	}
 
 	function handleSelect(value: string | null) {
@@ -75,11 +74,13 @@ function MoveToFolderDialog({
 				<DialogHeader>
 					<DialogTitle>{t("doc.moveToFolderDialog.title")}</DialogTitle>
 					<DialogDescription>
-						{currentPath
-							? t("doc.moveToFolderDialog.currentLocation", {
-									path: currentPath,
-								})
-							: t("doc.moveToFolderDialog.notInFolder")}
+						{paths.size > 1
+							? t("doc.sidebar.selectedCount", { count: String(docs.length) })
+							: currentPath
+								? t("doc.moveToFolderDialog.currentLocation", {
+										path: currentPath,
+									})
+								: t("doc.moveToFolderDialog.notInFolder")}
 					</DialogDescription>
 				</DialogHeader>
 
@@ -104,7 +105,7 @@ function MoveToFolderDialog({
 									</div>
 								)}
 
-								{currentPath && (
+								{isAnyInFolder && (
 									<Combobox.Item
 										value="__root__"
 										className="data-highlighted:bg-accent data-highlighted:text-accent-foreground flex cursor-pointer items-center gap-2 px-3 py-2 text-sm outline-none"

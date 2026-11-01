@@ -58,6 +58,7 @@ let testIds = {
 		importExport: "sidebar-import-export",
 		spaceSelector: "sidebar-space-selector",
 		documentList: "sidebar-document-list",
+		dropHint: "sidebar-drop-hint",
 		assetsSection: "sidebar-assets-section",
 		collaborationSection: "sidebar-collaboration-section",
 	},
