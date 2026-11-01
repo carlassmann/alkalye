@@ -45,7 +45,7 @@ describe("document folders", () => {
 
 		let moved = await moveDocumentsToFolder([first, second], "Projects")
 
-		expect(moved).toBe(2)
+		expect(moved).toEqual({ changed: 2, skipped: 0 })
 		expect(getPath(first.content?.toString() ?? "")).toBe("Projects")
 		expect(getPath(second.content?.toString() ?? "")).toBe("Projects")
 		expect(first.path).toBe("Projects")

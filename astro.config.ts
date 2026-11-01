@@ -17,6 +17,7 @@ export default defineConfig({
 		routing: { prefixDefaultLocale: false },
 	},
 	vite: {
+		server: { allowedHosts: getWorkAllowedHosts() },
 		build: {
 			rollupOptions: {
 				output: {
@@ -133,3 +134,9 @@ export default defineConfig({
 		},
 	},
 })
+
+// `work up --tailscale` serves dev over a tailnet host that Vite rejects by default
+function getWorkAllowedHosts(): string[] {
+	let workUrl = process.env.WORK_WEB_URL
+	return workUrl ? [new URL(workUrl).hostname] : []
+}

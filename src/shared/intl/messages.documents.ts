@@ -29,6 +29,24 @@ let baseDocumentsMessages = messages({
 	"doc.new": "New",
 	"doc.newFolder": "New Folder",
 	"doc.newDocument": "New Document",
+	"doc.sidebar.dragMore": "+{$count} more",
+	"doc.sidebar.dropMoveOneToFolder": "Move to {$folder}",
+	"doc.sidebar.dropMoveManyToFolder": "Move {$count} to {$folder}",
+	"doc.sidebar.dropMoveToRoot":
+		".input {$count :number} .match $count one {{Move to top level}} * {{Move {$count} to top level}}",
+	"doc.sidebar.dropAlreadyInFolder": "Already in {$folder}",
+	"doc.sidebar.dropAlreadyAtRoot": "Already at top level",
+	"doc.sidebar.bulkSkipped":
+		".input {$count :number} .match $count one {{One document could not be changed because it is read-only or unavailable.}} * {{{$count} documents could not be changed because they are read-only or unavailable.}}",
+	"doc.sidebar.selected": "Selected",
+	"doc.sidebar.selectedCount": "{$count} selected",
+	"doc.sidebar.clearSelection": "Clear selection",
+	"doc.sidebar.bulkDeleteDialog.title":
+		".input {$count :number} .match $count one {{Delete document?}} * {{Delete {$count} documents?}}",
+	"doc.sidebar.bulkDeleteDialog.description":
+		"This will move them to trash. You can restore them later.",
+	"doc.sidebar.bulkDeleteDialog.skipped":
+		".input {$count :number} .match $count one {{One shared document you don't own stays.}} * {{{$count} shared documents you don't own stay.}}",
 	"doc.deleteDialog.title": "Delete document?",
 	"doc.deleteDialog.description":
 		"This will move the document to trash. You can restore it later.",
@@ -226,6 +244,24 @@ let deDocumentsMessages = translate(baseDocumentsMessages, {
 	"doc.new": "Neu",
 	"doc.newFolder": "Neuer Ordner",
 	"doc.newDocument": "Neues Dokument",
+	"doc.sidebar.dragMore": "+{$count} weitere",
+	"doc.sidebar.dropMoveOneToFolder": "Nach {$folder} verschieben",
+	"doc.sidebar.dropMoveManyToFolder": "{$count} nach {$folder} verschieben",
+	"doc.sidebar.dropMoveToRoot":
+		".input {$count :number} .match $count one {{Auf oberste Ebene verschieben}} * {{{$count} auf oberste Ebene verschieben}}",
+	"doc.sidebar.dropAlreadyInFolder": "Bereits in {$folder}",
+	"doc.sidebar.dropAlreadyAtRoot": "Bereits auf oberster Ebene",
+	"doc.sidebar.bulkSkipped":
+		".input {$count :number} .match $count one {{Ein Dokument konnte nicht geändert werden, weil es schreibgeschützt oder nicht verfügbar ist.}} * {{{$count} Dokumente konnten nicht geändert werden, weil sie schreibgeschützt oder nicht verfügbar sind.}}",
+	"doc.sidebar.selected": "Ausgewählt",
+	"doc.sidebar.selectedCount": "{$count} ausgewählt",
+	"doc.sidebar.clearSelection": "Auswahl aufheben",
+	"doc.sidebar.bulkDeleteDialog.title":
+		".input {$count :number} .match $count one {{Dokument löschen?}} * {{{$count} Dokumente löschen?}}",
+	"doc.sidebar.bulkDeleteDialog.description":
+		"Dies verschiebt sie in den Papierkorb. Du kannst sie später wiederherstellen.",
+	"doc.sidebar.bulkDeleteDialog.skipped":
+		".input {$count :number} .match $count one {{Ein geteiltes Dokument, das dir nicht gehört, bleibt erhalten.}} * {{{$count} geteilte Dokumente, die dir nicht gehören, bleiben erhalten.}}",
 	"doc.deleteDialog.title": "Dokument löschen?",
 	"doc.deleteDialog.description":
 		"Dies verschiebt das Dokument in den Papierkorb. Du kannst es später wiederherstellen.",

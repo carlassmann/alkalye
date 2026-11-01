@@ -11,7 +11,7 @@ export default {
 			route: true,
 		},
 		web: {
-			run: 'PUBLIC_JAZZ_SYNC_SERVER="wss://sync-${WORK_WORKSPACE}-alkalye.localhost" astro dev --port "$PORT" --host "$HOST"',
+			run: 'PUBLIC_JAZZ_SYNC_SERVER="$WORK_SYNC_WS_URL" astro dev --port "$PORT" --host "$HOST"',
 			autoStart: true,
 			route: true,
 		},

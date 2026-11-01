@@ -1,3 +1,4 @@
+import type { KeyboardEvent, Ref } from "react"
 import { IconTransition } from "@/app/components/ui/icon-transition"
 import { Button } from "@/app/components/ui/button"
 import { Input } from "@/app/components/ui/input"
@@ -35,6 +36,8 @@ type TypeFilter = CommonTypeFilter | "deleted"
 interface SidebarSearchFilterBarProps {
 	search: string
 	onSearchChange: (value: string) => void
+	searchInputRef?: Ref<HTMLInputElement>
+	onSearchKeyDown?: (event: KeyboardEvent<HTMLInputElement>) => void
 	sort: SortMode
 	onSortChange: (value: SortMode) => void
 	typeFilter: TypeFilter
@@ -53,6 +56,8 @@ interface SidebarSearchFilterBarProps {
 function SidebarSearchFilterBar({
 	search,
 	onSearchChange,
+	searchInputRef,
+	onSearchKeyDown,
 	sort,
 	onSortChange,
 	typeFilter,
@@ -85,6 +90,8 @@ function SidebarSearchFilterBar({
 					placeholder={searchPlaceholder ?? t("doc.find")}
 					value={search}
 					onChange={event => onSearchChange(event.target.value)}
+					ref={searchInputRef}
+					onKeyDown={onSearchKeyDown}
 					className="h-10 pl-8 pointer-fine:h-9"
 				/>
 			</div>

@@ -2,14 +2,19 @@ import { co } from "jazz-tools"
 import { Document } from "@/schema"
 import { getPath, parseFrontmatter } from "@/app/features/editor"
 import { applyContentDiffLoadingCommentAnchors } from "@/app/features/comments"
+import { canEdit } from "@/app/features/sharing"
+import { tryCatch } from "@/app/lib/try-catch"
 import { syncDocumentMetadata } from "./metadata"
 
+export type { BatchResult }
 export {
 	makeFolderDocumentContent,
 	applyFolderPathToContent,
 	moveDocumentToFolder,
 	moveDocumentsToFolder,
 }
+
+type BatchResult = { changed: number; skipped: number }
 
 function makeFolderDocumentContent(path: string): string {
 	return `---\ntitle: Untitled\npath: ${path}\n---\n\n`
@@ -59,15 +64,28 @@ async function moveDocumentToFolder(
 	return true
 }
 
+// One unwritable document must not stop the rest of the batch
 async function moveDocumentsToFolder(
 	docs: co.loaded<typeof Document>[],
-	newPath: string,
-): Promise<number> {
-	let moved = 0
+	newPath: string | null,
+): Promise<BatchResult> {
+	let result: BatchResult = { changed: 0, skipped: 0 }
 	for (let doc of docs) {
-		let loaded = await doc.$jazz.ensureLoaded({ resolve: { content: true } })
-		if (!loaded) continue
-		if (await moveDocumentToFolder(loaded, newPath)) moved++
+		if (!canEdit(doc)) {
+			result.skipped++
+			continue
+		}
+		let moved = await tryCatch(moveLoadedDocumentToFolder(doc, newPath))
+		if (!moved.ok) result.skipped++
+		else if (moved.value) result.changed++
 	}
-	return moved
+	return result
+}
+
+async function moveLoadedDocumentToFolder(
+	doc: co.loaded<typeof Document>,
+	newPath: string | null,
+): Promise<boolean> {
+	let loaded = await doc.$jazz.ensureLoaded({ resolve: { content: true } })
+	return moveDocumentToFolder(loaded, newPath)
 }

@@ -127,6 +127,7 @@ interface FolderRowProps {
 	existingFolders: string[]
 	onDeleteDocs?: (docs: LoadedDocument[]) => void
 	onNewDocument?: (path: string) => void
+	isDropTarget?: boolean
 }
 
 function FolderRow({
@@ -139,6 +140,7 @@ function FolderRow({
 	existingFolders,
 	onDeleteDocs,
 	onNewDocument,
+	isDropTarget = false,
 }: FolderRowProps) {
 	let t = useIntl()
 	let { renameFolder, removeFolder } = useFolderStore()
@@ -158,6 +160,8 @@ function FolderRow({
 							count={docCount}
 							isCollapsed={isCollapsed}
 							onClick={onToggle}
+							data-drop-target={isDropTarget || undefined}
+							className={isDropTarget ? "bg-accent" : undefined}
 						/>
 					}
 				/>

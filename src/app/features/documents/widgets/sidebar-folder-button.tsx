@@ -24,7 +24,7 @@ function SidebarFolderButton({
 			aria-expanded={!isCollapsed}
 			title={path}
 			className={cn(
-				"hover:bg-accent flex w-full items-center gap-1.5 px-2 py-2 text-left",
+				"hover:bg-accent ring-sidebar-ring flex w-full items-center gap-1.5 px-2 py-2 text-left outline-none focus-visible:ring-2 focus-visible:ring-inset",
 				className,
 			)}
 			style={{ paddingLeft: `${8 + depth * 8}px`, ...style }}

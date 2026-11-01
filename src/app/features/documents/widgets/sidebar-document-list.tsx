@@ -3,20 +3,45 @@ import {
 	useRef,
 	useEffect,
 	useDeferredValue,
+	useImperativeHandle,
+	type Ref,
 	type ChangeEvent,
 	type FormEvent,
+	type DragEvent,
+	type KeyboardEvent,
+	type MouseEvent,
 	type ReactNode,
 } from "react"
+import { createPortal } from "react-dom"
 import { Link } from "@tanstack/react-router"
 import { useVirtualizer } from "@tanstack/react-virtual"
 import { co } from "jazz-tools"
 import { useAccount, useCoState } from "jazz-tools/react"
 import { UserAccount, Document } from "@/schema"
 import { assetContentResolve, serializeAsset } from "@/app/features/assets"
-import { togglePinned } from "@/app/features/editor"
 import { formatRelativeDate } from "../lib/title"
-import { applyContentDiffLoadingCommentAnchors } from "@/app/features/comments"
-import { needsMetadataBackfill, syncDocumentMetadata } from "../lib/metadata"
+import { toggleDocumentPinned } from "../lib/document-pin"
+import {
+	emptySidebarSelection,
+	extendSidebarSelection,
+	pruneSidebarSelection,
+	toggleSidebarSelection,
+} from "../lib/sidebar-selection"
+import { useHasFinePointer } from "@/app/hooks/use-fine-pointer"
+import { cn } from "@/app/lib/cn"
+import {
+	SidebarBulkDialogs,
+	SidebarBulkMenuItems,
+	notifySkippedDocuments,
+	type SidebarBulkDialog,
+} from "./sidebar-bulk-actions"
+import { setSidebarDragPreview } from "./sidebar-drag-preview"
+import {
+	getSidebarDropAction,
+	type SidebarDropAction,
+} from "../lib/sidebar-drop"
+import { getSidebarKeyboardAction } from "../lib/sidebar-keyboard-navigation"
+import { needsMetadataBackfill } from "../lib/metadata"
 import { useMetadataBackfillQueue } from "../hooks/use-metadata-backfill"
 import { getDaysUntilPermanentDelete } from "../lib/delete-covalue"
 import { permanentlyDeletePersonalDocument } from "../lib/documents"
@@ -70,6 +95,7 @@ import {
 	getSharingStatus,
 	isDocumentPublic,
 	hasIndividualShares,
+	canEdit,
 	getDocumentGroup,
 	leavePersonalDocument,
 } from "@/app/features/sharing"
@@ -138,6 +164,10 @@ interface SidebarDocumentListProps {
 	spaceGroupId?: string
 }
 
+let sidebarDocumentsMimeType = "application/x-alkalye-documents"
+
+type DocumentListHandle = { focusFirstRow: () => boolean }
+
 type ListItem =
 	| { type: "doc"; doc: SidebarDoc; depth: number }
 	| { type: "folder"; path: string; depth: number; docCount: number }
@@ -186,6 +216,14 @@ function SidebarDocumentList({
 	let [sort, setSort] = useState<SortMode>("latest")
 	let [typeFilter, setTypeFilter] = useState<TypeFilter>("all")
 	let { viewMode, setViewMode } = useFolderStore()
+	let searchInputRef = useRef<HTMLInputElement>(null)
+	let listHandleRef = useRef<DocumentListHandle>(null)
+
+	function handleSearchKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+		if (event.key !== "ArrowDown") return
+		if (!listHandleRef.current?.focusFirstRow()) return
+		event.preventDefault()
+	}
 
 	let deferredSearch = useDeferredValue(search)
 	let deferredSort = useDeferredValue(sort)
@@ -236,6 +274,8 @@ function SidebarDocumentList({
 				viewMode={viewMode}
 				onViewModeChange={setViewMode}
 				searchTestId={testIds.doc.searchInput}
+				searchInputRef={searchInputRef}
+				onSearchKeyDown={handleSearchKeyDown}
 			/>
 			<SidebarGroup
 				className="flex-1"
@@ -256,6 +296,8 @@ function SidebarDocumentList({
 						onImport={onImport}
 						spaceId={spaceId}
 						spaceGroupId={spaceGroupId}
+						onLeaveTop={() => searchInputRef.current?.focus()}
+						ref={listHandleRef}
 						t={t}
 					/>
 				</SidebarGroupContent>
@@ -282,6 +324,8 @@ function DocumentListContent({
 	onImport,
 	spaceId,
 	spaceGroupId,
+	onLeaveTop,
+	ref,
 	t,
 }: {
 	docs: SidebarDoc[]
@@ -296,6 +340,8 @@ function DocumentListContent({
 	onImport: (files: ImportedFile[], options?: ImportOptions) => Promise<void>
 	spaceId?: string
 	spaceGroupId?: string
+	onLeaveTop: () => void
+	ref: Ref<DocumentListHandle>
 	t: ReturnType<typeof useIntl>
 }) {
 	let parentRef = useRef<HTMLDivElement>(null)
@@ -308,9 +354,33 @@ function DocumentListContent({
 	let [abortController, setAbortController] = useState<AbortController | null>(
 		null,
 	)
+	let [selection, setSelection] = useState(emptySidebarSelection)
+	// undefined: no drop target, null: the root level
+	let [dropTargetPath, setDropTargetPath] = useState<string | null>()
+	let [draggedDocs, setDraggedDocs] = useState<SidebarDoc[]>([])
+	let [bulkDialog, setBulkDialog] = useState<SidebarBulkDialog>(null)
+	// Kept while a bulk dialog is open, since the selection can change underneath it
+	let [bulkDialogDocs, setBulkDialogDocs] = useState<SidebarDoc[]>([])
+	let dropHintRef = useRef<HTMLDivElement>(null)
+	let lastDragPointRef = useRef({ x: 0, y: 0 })
+	let hasFinePointer = useHasFinePointer()
 
 	let listItems: ListItem[] = buildListItems(docs, viewMode, isCollapsed)
 	let existingFolders = getExistingFolders(docs)
+	let canSelect = typeFilter !== "deleted"
+	let canDrag = canSelect && viewMode === "folders" && hasFinePointer
+	let visibleDocIds = listItems.flatMap(item =>
+		item.type === "doc" ? [item.doc.$jazz.id] : [],
+	)
+	let visibleSelection = pruneSidebarSelection(
+		selection,
+		canSelect ? visibleDocIds : [],
+	)
+	// Hidden documents leave the selection for good, so they can't reappear in a later bulk action
+	if (visibleSelection !== selection) setSelection(visibleSelection)
+	let selectedDocs = docs.filter(doc =>
+		visibleSelection.ids.includes(doc.$jazz.id),
+	)
 
 	let virtualizer = useVirtualizer({
 		count: listItems.length,
@@ -318,6 +388,193 @@ function DocumentListContent({
 		estimateSize: index => (listItems[index]?.type === "folder" ? 36 : 60),
 		overscan: 5,
 	})
+
+	function handleListKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+		let rowElement =
+			event.target instanceof HTMLElement
+				? event.target.closest<HTMLElement>("[data-index]")
+				: null
+		if (!rowElement) return
+		let index = Number(rowElement.dataset.index)
+		let focusedItem = listItems[index]
+		let focusedDocId =
+			focusedItem?.type === "doc" ? focusedItem.doc.$jazz.id : currentDocId
+
+		if (event.key === "Escape" && visibleSelection.ids.length > 0) {
+			event.preventDefault()
+			return setSelection(emptySidebarSelection)
+		}
+		if (canSelect && event.key === "a" && (event.metaKey || event.ctrlKey)) {
+			event.preventDefault()
+			return setSelection({
+				ids: visibleDocIds,
+				anchorId: visibleDocIds[0] ?? null,
+			})
+		}
+		if (canSelect && event.key === " " && focusedItem?.type === "doc") {
+			event.preventDefault()
+			return setSelection(
+				toggleSidebarSelection(
+					visibleSelection,
+					focusedItem.doc.$jazz.id,
+					currentDocId,
+				),
+			)
+		}
+
+		let rows = listItems.map(item =>
+			item.type === "folder"
+				? { ...item, isCollapsed: isCollapsed(item.path) }
+				: item,
+		)
+		let action = getSidebarKeyboardAction(event.key, index, rows)
+		if (!action) return
+		event.preventDefault()
+		if (action.type === "leaveTop") return onLeaveTop()
+		if (action.type === "focus") {
+			let target = listItems[action.index]
+			if (canSelect && event.shiftKey && target?.type === "doc") {
+				setSelection(
+					extendSidebarSelection(
+						visibleSelection,
+						target.doc.$jazz.id,
+						focusedDocId,
+						visibleDocIds,
+					),
+				)
+			}
+			return focusRow(action.index)
+		}
+		let folder = listItems[action.index]
+		if (folder?.type === "folder") toggleFolder(folder.path)
+	}
+
+	useImperativeHandle(ref, () => ({
+		focusFirstRow() {
+			if (listItems.length === 0) return false
+			focusRow(0)
+			return true
+		},
+	}))
+
+	function focusRow(index: number) {
+		virtualizer.scrollToIndex(index)
+		focusRenderedRow(index, 5)
+	}
+
+	function handleDocClick(event: MouseEvent<HTMLAnchorElement>, docId: string) {
+		if (canSelect && (event.metaKey || event.ctrlKey)) {
+			event.preventDefault()
+			return setSelection(
+				toggleSidebarSelection(visibleSelection, docId, currentDocId),
+			)
+		}
+		if (canSelect && event.shiftKey) {
+			event.preventDefault()
+			return setSelection(
+				extendSidebarSelection(
+					visibleSelection,
+					docId,
+					currentDocId,
+					visibleDocIds,
+				),
+			)
+		}
+		setSelection(emptySidebarSelection)
+		onDocClick()
+	}
+
+	function handleDocContextMenu(docId: string) {
+		if (!visibleSelection.ids.includes(docId)) {
+			setSelection(emptySidebarSelection)
+		}
+	}
+
+	function openBulkDialog(dialog: SidebarBulkDialog) {
+		setBulkDialogDocs(selectedDocs)
+		setBulkDialog(dialog)
+	}
+
+	function handleDocDragStart(event: DragEvent<HTMLElement>, doc: SidebarDoc) {
+		let isDraggingSelection = visibleSelection.ids.includes(doc.$jazz.id)
+		let docsToDrag = (isDraggingSelection ? selectedDocs : [doc]).filter(
+			canEdit,
+		)
+		setDraggedDocs(docsToDrag)
+		event.dataTransfer.clearData()
+		event.dataTransfer.setData(
+			sidebarDocumentsMimeType,
+			docsToDrag.map(draggedDoc => draggedDoc.$jazz.id).join(","),
+		)
+		event.dataTransfer.effectAllowed = "move"
+		setSidebarDragPreview(
+			event.nativeEvent,
+			docsToDrag.map(draggedDoc => draggedDoc.title ?? "Untitled"),
+			count => t("doc.sidebar.dragMore", { count: String(count) }),
+		)
+	}
+
+	function handleDocDragEnd() {
+		setDraggedDocs([])
+		setDropTargetPath(undefined)
+	}
+
+	function positionDropHint(hint: HTMLDivElement | null) {
+		dropHintRef.current = hint
+		if (!hint) return
+		let { x, y } = lastDragPointRef.current
+		hint.style.translate = `${x + 16}px ${y - 36}px`
+	}
+
+	function handleListDragOver(event: DragEvent<HTMLDivElement>) {
+		if (!event.dataTransfer.types.includes(sidebarDocumentsMimeType)) return
+		event.preventDefault()
+		event.dataTransfer.dropEffect = "move"
+		lastDragPointRef.current = { x: event.clientX, y: event.clientY }
+		positionDropHint(dropHintRef.current)
+		let path = getDropPath(event.target)
+		if (path !== dropTargetPath) setDropTargetPath(path)
+	}
+
+	function handleListDragLeave(event: DragEvent<HTMLDivElement>) {
+		let isStillInside =
+			event.relatedTarget instanceof Node &&
+			event.currentTarget.contains(event.relatedTarget)
+		if (!isStillInside) setDropTargetPath(undefined)
+	}
+
+	function handleListDrop(event: DragEvent<HTMLDivElement>) {
+		if (!event.dataTransfer.types.includes(sidebarDocumentsMimeType)) return
+		event.preventDefault()
+		let docsToMove = draggedDocs
+		handleDocDragEnd()
+		void moveDocumentsToFolder(docsToMove, getDropPath(event.target)).then(
+			result => notifySkippedDocuments(result, t),
+		)
+	}
+
+	// Dropping on a document moves into that document's folder
+	function getDropPath(target: EventTarget): string | null {
+		let row =
+			target instanceof Element
+				? target.closest<HTMLElement>("[data-index]")
+				: null
+		let item = row ? listItems[Number(row.dataset.index)] : undefined
+		if (item?.type === "folder") return item.path
+		if (item?.type === "doc") return item.doc.path ?? null
+		return null
+	}
+
+	// Rows outside the virtualized window only mount after the scroll above
+	function focusRenderedRow(index: number, framesLeft: number) {
+		let row = parentRef.current?.querySelector<HTMLElement>(
+			`[data-index="${index}"] :is(a, button)`,
+		)
+		if (row) return row.focus()
+		if (framesLeft > 0) {
+			requestAnimationFrame(() => focusRenderedRow(index, framesLeft - 1))
+		}
+	}
 
 	async function handleImportFileChange(event: ChangeEvent<HTMLInputElement>) {
 		let files = event.target.files
@@ -428,7 +685,17 @@ function DocumentListContent({
 				onImport={() => fileInputRef.current?.click()}
 				t={t}
 			>
-				<div ref={parentRef} className="min-h-0 flex-1 overflow-auto">
+				<div
+					ref={parentRef}
+					className={cn(
+						"min-h-0 flex-1 overflow-auto",
+						dropTargetPath === null && "bg-accent/40",
+					)}
+					onKeyDown={handleListKeyDown}
+					onDragOver={canDrag ? handleListDragOver : undefined}
+					onDragLeave={canDrag ? handleListDragLeave : undefined}
+					onDrop={canDrag ? handleListDrop : undefined}
+				>
 					<div
 						className="relative w-full"
 						style={{ height: virtualizer.getTotalSize() }}
@@ -458,6 +725,7 @@ function DocumentListContent({
 												for (let d of deletedDocs) onDelete(d)
 											}}
 											onNewDocument={path => void onCreateFolder(path)}
+											isDropTarget={dropTargetPath === item.path}
 										/>
 									) : typeFilter === "deleted" ? (
 										<DeletedDocumentItem
@@ -468,8 +736,32 @@ function DocumentListContent({
 									) : (
 										<DocumentItem
 											doc={item.doc}
-											isActive={item.doc.$jazz.id === currentDocId}
-											onClick={onDocClick}
+											isActive={
+												visibleSelection.ids.length > 0
+													? visibleSelection.ids.includes(item.doc.$jazz.id)
+													: item.doc.$jazz.id === currentDocId
+											}
+											isSelected={visibleSelection.ids.includes(
+												item.doc.$jazz.id,
+											)}
+											onClick={handleDocClick}
+											onDragStart={
+												canDrag && canEdit(item.doc)
+													? handleDocDragStart
+													: undefined
+											}
+											onDragEnd={handleDocDragEnd}
+											onContextMenu={handleDocContextMenu}
+											bulkMenu={
+												selectedDocs.length > 1 &&
+												visibleSelection.ids.includes(item.doc.$jazz.id) ? (
+													<SidebarBulkMenuItems
+														docs={selectedDocs}
+														onOpenDialog={openBulkDialog}
+														onClear={() => setSelection(emptySidebarSelection)}
+													/>
+												) : null
+											}
 											searchQuery={searchQuery}
 											onDuplicate={onDuplicate}
 											onDelete={onDelete}
@@ -487,6 +779,38 @@ function DocumentListContent({
 					</div>
 				</div>
 			</SidebarEmptyAreaContextMenu>
+			{dropTargetPath !== undefined &&
+				draggedDocs.length > 0 &&
+				createPortal(
+					<div
+						ref={positionDropHint}
+						className="bg-foreground text-background pointer-events-none fixed top-0 left-0 z-50 px-2 py-1 text-xs font-medium whitespace-nowrap shadow-md"
+						data-testid={testIds.sidebar.dropHint}
+					>
+						{describeDropAction(
+							getSidebarDropAction(
+								draggedDocs.map(draggedDoc => draggedDoc.path ?? null),
+								dropTargetPath,
+							),
+							t,
+						)}
+					</div>,
+					document.body,
+				)}
+			<div aria-live="polite" className="sr-only">
+				{visibleSelection.ids.length > 0 &&
+					t("doc.sidebar.selectedCount", {
+						count: String(visibleSelection.ids.length),
+					})}
+			</div>
+			<SidebarBulkDialogs
+				docs={bulkDialogDocs}
+				dialog={bulkDialog}
+				existingFolders={existingFolders}
+				onDialogChange={setBulkDialog}
+				onDelete={onDelete}
+				onClear={() => setSelection(emptySidebarSelection)}
+			/>
 			<NewFolderDialog
 				open={newFolderOpen}
 				onOpenChange={setNewFolderOpen}
@@ -613,7 +937,7 @@ function NewFolderDialog({
 		}
 
 		if (mode === "move") {
-			await moveDocumentsToFolder(selectedDocs, path)
+			notifySkippedDocuments(await moveDocumentsToFolder(selectedDocs, path), t)
 		} else {
 			await onCreate(path)
 		}
@@ -749,7 +1073,12 @@ function NewFolderDialog({
 function DocumentItem({
 	doc,
 	isActive,
+	isSelected,
 	onClick,
+	onDragStart,
+	onDragEnd,
+	onContextMenu,
+	bulkMenu,
 	searchQuery,
 	onDuplicate,
 	onDelete,
@@ -762,7 +1091,12 @@ function DocumentItem({
 }: {
 	doc: SidebarDoc
 	isActive: boolean
-	onClick: () => void
+	isSelected: boolean
+	onClick: (event: MouseEvent<HTMLAnchorElement>, docId: string) => void
+	onDragStart?: (event: DragEvent<HTMLElement>, doc: SidebarDoc) => void
+	onDragEnd: () => void
+	onContextMenu: (docId: string) => void
+	bulkMenu: ReactNode
 	searchQuery: string
 	onDuplicate: (doc: SidebarDoc) => void
 	onDelete: (doc: SidebarDoc) => void
@@ -820,16 +1154,24 @@ function DocumentItem({
 			data-doc-tags={tags.join(",")}
 			data-doc-path={path ?? ""}
 			data-doc-date={doc.updatedAt}
+			data-selected={isSelected || undefined}
 		>
 			<ContextMenu>
 				<ContextMenuTrigger
 					render={
 						<SidebarMenuButton
 							render={
-								<Link {...docLinkProps} onClick={onClick} draggable={false} />
+								<Link
+									{...docLinkProps}
+									onClick={event => onClick(event, docId)}
+									draggable={Boolean(onDragStart)}
+									onDragStart={event => onDragStart?.(event, doc)}
+									onDragEnd={onDragEnd}
+									onContextMenu={() => onContextMenu(docId)}
+								/>
 							}
 							isActive={isActive}
-							className="h-auto py-2"
+							className="h-auto py-2 focus-visible:ring-inset"
 							style={
 								depth > 0 ? { paddingLeft: `${8 + depth * 12}px` } : undefined
 							}
@@ -890,96 +1232,105 @@ function DocumentItem({
 									)
 								}
 							/>
+							{isSelected && (
+								<span className="sr-only">{t("doc.sidebar.selected")}</span>
+							)}
 						</SidebarMenuButton>
 					}
 				/>
 				<ContextMenuContent>
-					<ContextMenuItem
-						render={
-							<Link
-								to="/doc/$id/preview"
-								params={{ id: docId }}
-								search={{ from: "list" }}
-							/>
-						}
-					>
-						<Eye />
-						{t("doc.preview")}
-					</ContextMenuItem>
-					{isPresentation && (
+					{bulkMenu ?? (
 						<>
 							<ContextMenuItem
-								render={<Link to="/doc/$id/slideshow" params={{ id: docId }} />}
-							>
-								<Presentation />
-								{t("doc.sidebar.slideshow")}
-							</ContextMenuItem>
-							<ContextMenuItem
 								render={
-									<Link to="/doc/$id/teleprompter" params={{ id: docId }} />
+									<Link
+										to="/doc/$id/preview"
+										params={{ id: docId }}
+										search={{ from: "list" }}
+									/>
 								}
 							>
-								<ScrollText />
-								{t("doc.sidebar.teleprompter")}
+								<Eye />
+								{t("doc.preview")}
 							</ContextMenuItem>
+							{isPresentation && (
+								<>
+									<ContextMenuItem
+										render={
+											<Link to="/doc/$id/slideshow" params={{ id: docId }} />
+										}
+									>
+										<Presentation />
+										{t("doc.sidebar.slideshow")}
+									</ContextMenuItem>
+									<ContextMenuItem
+										render={
+											<Link to="/doc/$id/teleprompter" params={{ id: docId }} />
+										}
+									>
+										<ScrollText />
+										{t("doc.sidebar.teleprompter")}
+									</ContextMenuItem>
+								</>
+							)}
+							<ContextMenuItem onClick={makeDownloadDocument(doc, title)}>
+								<Download />
+								{t("doc.download")}
+							</ContextMenuItem>
+							{canShare && (
+								<ContextMenuItem
+									onClick={makeShareDocument(doc, title)}
+									data-testid={testIds.doc.shareButton}
+								>
+									<NativeShareIcon />
+									{t("doc.shareCopy")}
+								</ContextMenuItem>
+							)}
+							<ContextMenuItem
+								onClick={() => setCollaborateOpen(true)}
+								data-testid={testIds.doc.collaborateButton}
+							>
+								<Users />
+								{t("doc.collaborate")}
+							</ContextMenuItem>
+							<ContextMenuItem
+								onClick={() => onDuplicate(doc)}
+								data-testid={testIds.doc.duplicateButton}
+							>
+								<Copy />
+								{t("doc.duplicate")}
+							</ContextMenuItem>
+							<ContextMenuItem onClick={makeTogglePin(doc)}>
+								<Pin />
+								{isPinned ? t("doc.unpin") : t("doc.pin")}
+							</ContextMenuItem>
+							<ContextMenuItem onClick={() => setMoveOpen(true)}>
+								<FolderInput />
+								{t("doc.moveToFolder")}
+							</ContextMenuItem>
+							<ContextMenuItem onClick={() => setMoveSpaceOpen(true)}>
+								<ArrowRightLeft />
+								{t("doc.moveToSpace")}
+							</ContextMenuItem>
+							{isAdmin ? (
+								<ContextMenuItem
+									onClick={() => setDeleteOpen(true)}
+									variant="destructive"
+									data-testid={testIds.doc.deleteButton}
+								>
+									<Trash2 />
+									{t("doc.delete")}
+								</ContextMenuItem>
+							) : (
+								<ContextMenuItem
+									onClick={() => setLeaveOpen(true)}
+									variant="destructive"
+								>
+									<LogOut />
+									{t("doc.leave")}
+								</ContextMenuItem>
+							)}
 						</>
-					)}
-					<ContextMenuItem onClick={makeDownloadDocument(doc, title)}>
-						<Download />
-						{t("doc.download")}
-					</ContextMenuItem>
-					{canShare && (
-						<ContextMenuItem
-							onClick={makeShareDocument(doc, title)}
-							data-testid={testIds.doc.shareButton}
-						>
-							<NativeShareIcon />
-							{t("doc.shareCopy")}
-						</ContextMenuItem>
-					)}
-					<ContextMenuItem
-						onClick={() => setCollaborateOpen(true)}
-						data-testid={testIds.doc.collaborateButton}
-					>
-						<Users />
-						{t("doc.collaborate")}
-					</ContextMenuItem>
-					<ContextMenuItem
-						onClick={() => onDuplicate(doc)}
-						data-testid={testIds.doc.duplicateButton}
-					>
-						<Copy />
-						{t("doc.duplicate")}
-					</ContextMenuItem>
-					<ContextMenuItem onClick={makeTogglePin(doc)}>
-						<Pin />
-						{isPinned ? t("doc.unpin") : t("doc.pin")}
-					</ContextMenuItem>
-					<ContextMenuItem onClick={() => setMoveOpen(true)}>
-						<FolderInput />
-						{t("doc.moveToFolder")}
-					</ContextMenuItem>
-					<ContextMenuItem onClick={() => setMoveSpaceOpen(true)}>
-						<ArrowRightLeft />
-						{t("doc.moveToSpace")}
-					</ContextMenuItem>
-					{isAdmin ? (
-						<ContextMenuItem
-							onClick={() => setDeleteOpen(true)}
-							variant="destructive"
-							data-testid={testIds.doc.deleteButton}
-						>
-							<Trash2 />
-							{t("doc.delete")}
-						</ContextMenuItem>
-					) : (
-						<ContextMenuItem
-							onClick={() => setLeaveOpen(true)}
-							variant="destructive"
-						>
-							<LogOut />
-							{t("doc.leave")}
-						</ContextMenuItem>
 					)}
 				</ContextMenuContent>
 			</ContextMenu>
@@ -992,7 +1343,7 @@ function DocumentItem({
 			)}
 			{moveOpen && (
 				<MoveToFolderDialog
-					doc={doc}
+					docs={[doc]}
 					existingFolders={existingFolders}
 					open={moveOpen}
 					onOpenChange={setMoveOpen}
@@ -1096,7 +1447,7 @@ function DeletedDocumentItem({
 			<DropdownMenu>
 				<DropdownMenuTrigger
 					render={
-						<SidebarMenuButton className="h-auto py-2">
+						<SidebarMenuButton className="h-auto py-2 focus-visible:ring-inset">
 							<div className="flex min-w-0 flex-1 flex-col gap-0.5">
 								<div className="flex items-center gap-1.5">
 									<span className="text-destructive text-xs">
@@ -1213,15 +1564,29 @@ function TagsRow({
 	)
 }
 
-function makeTogglePin(doc: SidebarDoc) {
-	return async function handleTogglePin() {
-		let loaded = await doc.$jazz.ensureLoaded({ resolve: { content: true } })
-		let content = loaded.content.toString()
-		let newContent = togglePinned(content)
-		await applyContentDiffLoadingCommentAnchors(loaded, newContent)
-		loaded.$jazz.set("updatedAt", new Date())
-		syncDocumentMetadata(loaded)
+function describeDropAction(
+	action: SidebarDropAction,
+	t: ReturnType<typeof useIntl>,
+): string {
+	switch (action.type) {
+		case "moveToFolder":
+			return action.count === 1
+				? t("doc.sidebar.dropMoveOneToFolder", { folder: action.folder })
+				: t("doc.sidebar.dropMoveManyToFolder", {
+						count: String(action.count),
+						folder: action.folder,
+					})
+		case "moveToRoot":
+			return t("doc.sidebar.dropMoveToRoot", { count: action.count })
+		case "alreadyThere":
+			return action.folder
+				? t("doc.sidebar.dropAlreadyInFolder", { folder: action.folder })
+				: t("doc.sidebar.dropAlreadyAtRoot")
 	}
+}
+
+function makeTogglePin(doc: SidebarDoc) {
+	return () => toggleDocumentPinned(doc)
 }
 
 function makeDownloadDocument(doc: SidebarDoc, title: string) {

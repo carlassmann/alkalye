@@ -19,6 +19,7 @@ function ImportDropZone({ onImport, children }: ImportDropZoneProps) {
 	let [isDragging, setIsDragging] = useState(false)
 
 	async function handleDrop(e: React.DragEvent) {
+		if (!isFileDrag(e)) return
 		e.preventDefault()
 		setIsDragging(false)
 
@@ -44,6 +45,7 @@ function ImportDropZone({ onImport, children }: ImportDropZoneProps) {
 		<div
 			className="relative flex h-full flex-col"
 			onDragOver={e => {
+				if (!isFileDrag(e)) return
 				e.preventDefault()
 				setIsDragging(true)
 			}}
@@ -67,4 +69,9 @@ function ImportDropZone({ onImport, children }: ImportDropZoneProps) {
 			{children}
 		</div>
 	)
+}
+
+// Documents dragged within the sidebar carry no files and must reach the list
+function isFileDrag(e: React.DragEvent): boolean {
+	return e.dataTransfer.types.includes("Files")
 }

@@ -166,7 +166,7 @@ function DocumentCommands({
 			)}
 			{me && (
 				<MoveToFolderDialog
-					doc={doc}
+					docs={[doc]}
 					existingFolders={getExistingFolders(me)}
 					open={moveOpen}
 					onOpenChange={setMoveOpen}
