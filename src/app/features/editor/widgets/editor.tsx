@@ -131,6 +131,7 @@ import { useIsMobile } from "@/app/hooks/use-mobile"
 import { useHasFinePointer } from "@/app/hooks/use-fine-pointer"
 import { useFindPanel } from "../hooks/use-find-panel"
 import { useScreenKeyboardBottomInset } from "../hooks/use-screen-keyboard-bottom-inset"
+import { useTypeToFocus } from "../hooks/use-type-to-focus"
 import {
 	Dialog,
 	DialogContent,
@@ -260,6 +261,8 @@ interface MarkdownEditorProps {
 	tabIndent?: boolean
 	smartPaste?: boolean
 	autocomplete?: boolean
+	// Off when another pane owns plain keystrokes, e.g. an embedded slideshow
+	typeToFocus?: boolean
 }
 
 type VideoUploadState = {
@@ -360,6 +363,7 @@ function MarkdownEditor(
 		tabIndent = true,
 		smartPaste = true,
 		autocomplete = true,
+		typeToFocus = true,
 		ref,
 	} = props
 
@@ -445,6 +449,7 @@ function MarkdownEditor(
 	})
 
 	useScreenKeyboardBottomInset(containerRef)
+	useTypeToFocus(view, typeToFocus)
 
 	// Set CSS variable on parent .markdown-editor for find panel padding
 	useEffect(() => {

@@ -348,6 +348,7 @@ function Workbench({
 								tabIndent={settings.tabIndent}
 								smartPaste={settings.smartPaste}
 								autocomplete={settings.autocomplete}
+								typeToFocus={mode !== "slideshow" || layout === "source"}
 								documents={documents.map(document => ({
 									id: document.$jazz.id,
 									title: document.title || "Untitled document",
