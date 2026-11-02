@@ -1,5 +1,14 @@
 [
 	{
+		"id": 166,
+		"date": "2026-11-02",
+		"title": "Start typing without clicking into the editor",
+		"notes": [
+			"With a document open and nothing else focused, just start typing: your text goes to the end of the document, including the first key you press."
+		],
+		"pr": 72
+	},
+	{
 		"id": 165,
 		"date": "2026-11-01",
 		"title": "Organize documents faster in the sidebar",
