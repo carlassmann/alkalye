@@ -17,6 +17,7 @@ import { useCleanupDeleted } from "@/app/features/documents"
 import { connectLocalJazzPoke } from "@/app/lib/local-jazz-poke"
 import { init } from "@plausible-analytics/tracker"
 import { IntlProvider } from "@/shared/intl/setup"
+import { SyntwinGuide } from "@/components/syntwin-launcher"
 import { messagesDe } from "@/shared/intl/messages"
 import { recordStartupTraceOnce } from "@/app/lib/reload-diagnostics"
 import { finishBrowserStartupInstrumentation } from "@/app/lib/browser-startup-instrumentation"
@@ -137,6 +138,7 @@ function RouterWithJazz() {
 
 	let content = (
 		<>
+			{me.$isLoaded && !isLaserPreview() && <SyntwinGuide locale={locale} />}
 			{!isLaserPreview() && (
 				<>
 					<Toaster />

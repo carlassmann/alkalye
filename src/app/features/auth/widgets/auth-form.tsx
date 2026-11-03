@@ -111,7 +111,7 @@ function AuthForm({ onSuccess }: AuthFormProps) {
 	}
 
 	return (
-		<div>
+		<div data-syntwin-hidden>
 			{step === "initial" && (
 				<>
 					<p className="text-muted-foreground mb-4 text-sm">

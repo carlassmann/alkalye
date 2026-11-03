@@ -1,0 +1,292 @@
+---
+import "#app/index.css"
+import changelogSource from "../../../public/changelog.json"
+import { readChangelog } from "@/shared/changelog"
+import { SyntwinLauncher, syntwinEnabled } from "@/components/syntwin-launcher"
+import { landingContent, type LandingLocale } from "#www/landing-content"
+
+interface Props {
+	locale: LandingLocale
+}
+
+let { locale } = Astro.props
+let content = landingContent[locale]
+let appHref = `/app?lang=${locale}`
+let homePath = `/${locale}/`
+
+let requestUrl = new URL(Astro.request.url)
+let siteBaseUrl = Astro.site ?? new URL(requestUrl.origin)
+let canonicalUrl = new URL(
+	requestUrl.pathname + requestUrl.search,
+	siteBaseUrl,
+).toString()
+let alternateUrls = (["en", "de"] as const).map(alternate => ({
+	locale: alternate,
+	href: new URL(`/${alternate}/`, siteBaseUrl).toString(),
+}))
+let ogImageUrl = new URL("/icons/alkalye-social.png", siteBaseUrl).toString()
+
+let recentEntries = readChangelog(changelogSource).slice(0, 3)
+// Date-only strings parse as UTC midnight; formatting in UTC keeps the day.
+let dateFormat = new Intl.DateTimeFormat(locale, {
+	day: "numeric",
+	month: "long",
+	year: "numeric",
+	timeZone: "UTC",
+})
+
+let sampleDocument = [
+	"---",
+	"mode: present",
+	"---",
+	"",
+	"# Launch plan",
+	"",
+	"\tShip the beta on Friday",
+	"Thank the testers before the demo.",
+	"",
+	"---",
+	"",
+	"# Open questions",
+	"",
+	"\tSee [[Pricing notes]]",
+].join("\n")
+
+let sectionClass =
+	"mx-auto max-w-[960px] px-[calc(1rem+env(safe-area-inset-left))] pr-[calc(1rem+env(safe-area-inset-right))]"
+let sectionTitleClass =
+	"text-[clamp(1.5rem,3vw,2rem)] font-semibold tracking-tight"
+let primaryButtonClass =
+	"inline-flex min-h-12 items-center justify-center bg-primary px-6 text-base font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+---
+
+<!doctype html>
+<html lang={content.htmlLang} class="bg-background text-foreground">
+	<head>
+		<script is:inline>
+			if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+				document.documentElement.classList.add("dark")
+			}
+		</script>
+		<title>{content.pageTitle}</title>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1, viewport-fit=cover"
+		/>
+		<meta name="description" content={content.metaDescription} />
+		<link rel="canonical" href={canonicalUrl} />
+		{alternateUrls.map(alternate => (
+			<link rel="alternate" hreflang={alternate.locale} href={alternate.href} />
+		))}
+		<link rel="icon" type="image/png" href="/icons/alkalye-icon.png" />
+		<link rel="apple-touch-icon" href="/icons/alkalye-icon.png" />
+		<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+		<meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
+		<script is:inline define:vars={{ homePath, appHref }}>
+			let isStandalone = window.matchMedia("(display-mode: standalone)").matches
+			let isIOSStandalone = window.navigator.standalone === true
+			if ((isStandalone || isIOSStandalone) && location.pathname === homePath) {
+				location.replace(appHref)
+			}
+		</script>
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content={content.pageTitle} />
+		<meta property="og:description" content={content.metaDescription} />
+		<meta property="og:url" content={canonicalUrl} />
+		<meta property="og:image" content={ogImageUrl} />
+		<meta property="og:locale" content={locale === "de" ? "de_DE" : "en_US"} />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={content.pageTitle} />
+		<meta name="twitter:description" content={content.metaDescription} />
+		<meta name="twitter:image" content={ogImageUrl} />
+	</head>
+	<body class="bg-background text-foreground font-sans overflow-y-auto overscroll-auto">
+		<header class="sticky top-0 z-50 border-b border-border/60 bg-background/85 pt-[env(safe-area-inset-top)] backdrop-blur-md">
+			<nav class:list={[sectionClass, "flex items-center justify-between gap-3 py-2"]}>
+				<a href={homePath} class="flex items-center gap-2 text-sm font-semibold tracking-tight">
+					<img src="/icons/alkalye-icon.png" alt="" width="24" height="24" class="size-6" />
+					Alkalye
+				</a>
+				<div class="flex items-center gap-4">
+					<a
+						href={`/${content.otherLocale}/`}
+						hreflang={content.otherLocale}
+						lang={content.otherLocale}
+						class="text-sm text-muted-foreground transition-colors hover:text-foreground"
+					>
+						{content.nav.switchLanguage}
+					</a>
+					<a
+						href={appHref}
+						class="inline-flex min-h-11 items-center justify-center bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+					>
+						{content.nav.open}
+					</a>
+				</div>
+			</nav>
+		</header>
+
+		<main class="pb-[env(safe-area-inset-bottom)]">
+			<section class:list={[sectionClass, "grid gap-10 py-14 md:grid-cols-[1.1fr_0.9fr] md:items-center md:py-24"]}>
+				<div class="flex flex-col gap-6">
+					<span class="w-fit border border-brand/30 bg-brand/8 px-2.5 py-1 text-xs font-medium tracking-wide text-brand">
+						{content.hero.badge}
+					</span>
+					<h1 class="text-[clamp(2.25rem,5vw,3.5rem)] leading-[1.05] font-semibold tracking-tight text-balance">
+						{content.hero.title}
+					</h1>
+					<p class="max-w-[52ch] text-lg leading-relaxed text-muted-foreground">
+						{content.hero.lede}
+					</p>
+					<div class="flex flex-wrap items-center gap-x-6 gap-y-3" data-syntwin-avoid="0px">
+						<a href={appHref} class={primaryButtonClass}>{content.hero.primaryAction}</a>
+						<a href="#features" class="text-base font-medium underline-offset-4 hover:underline">
+							{content.hero.secondaryAction} <span aria-hidden="true">↓</span>
+						</a>
+					</div>
+					<ul class="flex flex-wrap gap-x-5 gap-y-1 text-sm text-muted-foreground">
+						{content.hero.facts.map(fact => (
+							<li class="flex items-center gap-2">
+								<span class="size-1.5 bg-brand" aria-hidden="true"></span>
+								{fact}
+							</li>
+						))}
+					</ul>
+				</div>
+				<figure class="flex flex-col gap-3">
+					<div class="border border-border bg-card shadow-xl shadow-black/5 dark:shadow-black/30">
+						<div class="flex items-center justify-between border-b border-border px-4 py-2 font-mono text-xs text-muted-foreground">
+							<span>launch-plan.md</span>
+							<span class="text-brand">mode: present</span>
+						</div>
+						<pre class="overflow-x-auto px-4 py-4 font-mono text-[13px] leading-6 [tab-size:2]"><code>{sampleDocument}</code></pre>
+					</div>
+					<figcaption class="text-sm leading-6 text-muted-foreground">{content.hero.sampleCaption}</figcaption>
+				</figure>
+			</section>
+
+			{syntwinEnabled && (
+			<section aria-labelledby="twin-title" class="border-y border-border/60 bg-muted/30">
+				<div class:list={[sectionClass, "flex flex-col gap-6 py-10 md:flex-row md:items-center md:justify-between"]}>
+					<div class="flex max-w-[56ch] flex-col gap-2">
+						<h2 id="twin-title" class="text-xl font-semibold tracking-tight">{content.twin.title}</h2>
+						<p class="text-[15px] leading-7 text-muted-foreground">{content.twin.body}</p>
+					</div>
+					<div class="shrink-0">
+						<SyntwinLauncher locale={locale} client:load />
+					</div>
+				</div>
+			</section>
+			)}
+
+			<section id="features" aria-labelledby="features-title" class:list={[sectionClass, "scroll-mt-20 py-16 md:py-24"]}>
+				<div class="mb-10 flex flex-col gap-3">
+					<h2 id="features-title" class={sectionTitleClass}>{content.features.title}</h2>
+					<p class="max-w-[60ch] text-muted-foreground">{content.features.lede}</p>
+				</div>
+				<div class="flex flex-col">
+					{content.features.groups.map(group => (
+						<div class="grid gap-4 border-t border-border py-8 md:grid-cols-[10rem_1fr] md:gap-8">
+							<h3 class="text-sm font-semibold tracking-[0.08em] text-brand uppercase">{group.title}</h3>
+							<dl class="grid gap-x-8 gap-y-6 sm:grid-cols-2">
+								{group.items.map(item => (
+									<div class="flex flex-col gap-1">
+										<dt class="font-semibold">{item.name}</dt>
+										<dd class="text-[15px] leading-7 text-muted-foreground">{item.body}</dd>
+									</div>
+								))}
+							</dl>
+						</div>
+					))}
+				</div>
+			</section>
+
+			<section aria-labelledby="story-title" class="border-t border-border/60">
+				<div class:list={[sectionClass, "grid gap-6 py-16 md:grid-cols-[14rem_1fr] md:gap-12 md:py-20"]}>
+					<h2 id="story-title" class={sectionTitleClass}>{content.story.title}</h2>
+					<div class="flex max-w-[62ch] flex-col gap-5 text-[15px] leading-7 text-muted-foreground">
+						{content.story.paragraphs.map(paragraph => <p>{paragraph}</p>)}
+						<p class="text-sm font-medium text-foreground">{content.story.attribution}</p>
+					</div>
+				</div>
+			</section>
+
+			<section aria-labelledby="files-title" class="border-y border-border/60 bg-muted/30">
+				<div class:list={[sectionClass, "py-16 md:py-20"]}>
+					<div class="mb-8 flex flex-col gap-3">
+						<h2 id="files-title" class={sectionTitleClass}>{content.files.title}</h2>
+						<p class="max-w-[60ch] text-muted-foreground">{content.files.lede}</p>
+					</div>
+					<dl class="grid gap-8 md:grid-cols-3">
+						{content.files.items.map(item => (
+							<div class="flex flex-col gap-2">
+								<dt class="font-semibold">{item.name}</dt>
+								<dd class="flex flex-col gap-3 text-[15px] leading-7 text-muted-foreground">
+									<span>{item.body}</span>
+									{item.code && (
+										<code class="w-fit max-w-full overflow-x-auto border border-border bg-background px-2 py-1 font-mono text-xs text-foreground">{item.code}</code>
+									)}
+								</dd>
+							</div>
+						))}
+					</dl>
+				</div>
+			</section>
+
+			<section aria-labelledby="privacy-title" class:list={[sectionClass, "grid gap-6 py-16 md:grid-cols-[10rem_1fr] md:gap-8 md:py-20"]}>
+				<h2 id="privacy-title" class="text-sm font-semibold tracking-[0.08em] text-brand uppercase">{content.privacy.title}</h2>
+				<ul class="flex max-w-[64ch] flex-col gap-4 text-[15px] leading-7">
+					{content.privacy.points.map(point => <li>{point}</li>)}
+				</ul>
+			</section>
+
+			{recentEntries.length > 0 && (
+				<section aria-labelledby="recent-title" class:list={[sectionClass, "border-t border-border py-16 md:py-20"]}>
+					<div class="mb-8 flex flex-wrap items-baseline justify-between gap-3">
+						<h2 id="recent-title" class={sectionTitleClass}>{content.recent.title}</h2>
+						<a href="/changelog" class="text-sm font-medium underline-offset-4 hover:underline">
+							{content.recent.all} <span aria-hidden="true">→</span>
+						</a>
+					</div>
+					{content.recent.note && <p class="mb-6 text-sm text-muted-foreground">{content.recent.note}</p>}
+					<ol class="grid gap-8 md:grid-cols-3">
+						{recentEntries.map(entry => (
+							<li class="flex flex-col gap-2" lang="en">
+								<time datetime={entry.date} class="text-xs text-muted-foreground" lang={locale}>
+									{dateFormat.format(new Date(entry.date))}
+								</time>
+								<h3 class="font-semibold leading-snug">{entry.title}</h3>
+								<p class="text-sm leading-6 text-muted-foreground">{entry.notes[0]}</p>
+							</li>
+						))}
+					</ol>
+				</section>
+			)}
+
+			<section class="border-t border-border bg-muted/30">
+				<div class:list={[sectionClass, "flex flex-col items-start gap-5 py-16 md:flex-row md:items-center md:justify-between"]}>
+					<div class="flex flex-col gap-2">
+						<h2 class={sectionTitleClass}>{content.closing.title}</h2>
+						<p class="max-w-[52ch] text-muted-foreground">{content.closing.body}</p>
+					</div>
+					<a href={appHref} class={primaryButtonClass}>{content.closing.action}</a>
+				</div>
+			</section>
+		</main>
+
+		<footer class="border-t border-border/60 pb-[env(safe-area-inset-bottom)]">
+			<div class:list={[sectionClass, "flex flex-col gap-4 py-8 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between"]}>
+				<div>© 2026 Alkalye · {content.footer.license}</div>
+				<div class="flex flex-wrap gap-x-6 gap-y-2">
+					<a class="transition-colors hover:text-foreground" href="https://github.com/carlassmann/alkalye" target="_blank" rel="noopener">GitHub</a>
+					<a class="transition-colors hover:text-foreground" href="/app/welcome">{content.footer.docs}</a>
+					<a class="transition-colors hover:text-foreground" href="/changelog">{content.footer.changelog}</a>
+					<a class="transition-colors hover:text-foreground" href="/support">{content.footer.support}</a>
+					<a class="transition-colors hover:text-foreground" href="/imprint">{content.footer.imprint}</a>
+					<a class="transition-colors hover:text-foreground" href="/privacy">{content.footer.privacy}</a>
+				</div>
+			</div>
+		</footer>
+	</body>
+</html>
