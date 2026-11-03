@@ -1,5 +1,15 @@
 [
 	{
+		"id": 167,
+		"date": "2026-11-03",
+		"title": "Ask Carl's AI twin about Alkalye",
+		"notes": [
+			"Ask questions on the website, continue the conversation inside Alkalye, and reopen it from Help. The English and German website now explains current features and why Carl built the app.",
+			"Page access is optional. Sign-in and recovery phrases stay hidden from the guide."
+		],
+		"pr": 73
+	},
+	{
 		"id": 166,
 		"date": "2026-11-02",
 		"title": "Start typing without clicking into the editor",
