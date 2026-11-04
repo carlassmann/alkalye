@@ -6,7 +6,11 @@ import {
 	type Editor,
 	type TLShapePartial,
 } from "tldraw"
-import { loadTldrawCanvas } from "@/app/features/assets"
+import {
+	loadTldrawCanvas,
+	type TldrawCanvasHandle,
+	type TldrawSave,
+} from "@/app/features/assets"
 
 export { DemoWhiteboard }
 
@@ -20,11 +24,20 @@ let sketchBounds = new Box(-40, -40, 800, 540)
 function DemoWhiteboard({
 	progress,
 	labels,
+	drawing,
+	isDrawing,
+	onDrawingChange,
 }: {
 	progress: number
 	labels: SketchLabels
+	// What the visitor drew earlier, so it is still there when they return.
+	drawing: TldrawSave | null
+	isDrawing: boolean
+	onDrawingChange: (drawing: TldrawSave) => void
 }) {
 	let [editor, setEditor] = useState<Editor | null>(null)
+	let [canvas, setCanvas] = useState<TldrawCanvasHandle | null>(null)
+	let [initialJson] = useState(() => drawing?.json)
 	let sketch = sketchShapes(labels)
 	let visibleShapes = Math.ceil(progress * sketch.length)
 
@@ -32,29 +45,50 @@ function DemoWhiteboard({
 		if (!editor) return
 		let wanted = sketch.slice(0, visibleShapes)
 		let wantedIds = new Set(wanted.map(shape => shape.id))
+		let sketchIds = new Set(sketch.map(shape => shape.id))
 		// Read-only hides the style panel, which would cover the sketch. It
 		// blocks edits from code too, so it lifts for the scripted ones.
 		editor.updateInstanceState({ isReadonly: false })
 		editor.run(() => {
 			let stale = [...editor.getCurrentPageShapeIds()].filter(
-				id => !wantedIds.has(id),
+				id => sketchIds.has(id) && !wantedIds.has(id),
 			)
 			if (stale.length) editor.deleteShapes(stale)
 			let missing = wanted.filter(shape => !editor.getShape(shape.id))
 			if (missing.length) editor.createShapes(missing)
 		})
-		editor.updateInstanceState({ isReadonly: true })
-	}, [editor, visibleShapes, sketch])
+		editor.updateInstanceState({ isReadonly: !isDrawing })
+		if (isDrawing) editor.setCurrentTool("draw")
+	}, [editor, visibleShapes, sketch, isDrawing])
 
 	useEffect(() => {
 		if (!editor) return
 		editor.zoomToBounds(sketchBounds, { animation: { duration: 0 } })
 	}, [editor])
 
+	useEffect(() => {
+		if (!editor || !canvas) return
+		let timer: ReturnType<typeof setTimeout> | undefined
+		let stopListening = editor.store.listen(
+			() => {
+				clearTimeout(timer)
+				timer = setTimeout(() => {
+					void canvas.save().then(onDrawingChange)
+				}, 400)
+			},
+			{ source: "user", scope: "document" },
+		)
+		return () => {
+			clearTimeout(timer)
+			stopListening()
+		}
+	}, [editor, canvas, onDrawingChange])
+
 	return (
 		<div className="relative min-h-0 flex-1">
 			<TldrawCanvas
-				onReady={() => {}}
+				initialJson={initialJson}
+				onReady={setCanvas}
 				onDirty={() => {}}
 				onEditorMount={setEditor}
 			/>

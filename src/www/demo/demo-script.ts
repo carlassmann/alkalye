@@ -30,6 +30,8 @@ type DemoView = "editor" | "review" | "whiteboard" | "timemachine" | "present"
 interface DemoStageLabels {
 	fileName: string
 	views: Record<DemoView, string>
+	you: string
+	hints: Record<DemoView, string>
 }
 
 type DemoDevice = "phone" | "laptop" | "agent"
@@ -37,7 +39,7 @@ type DemoDevice = "phone" | "laptop" | "agent"
 interface DemoCollaborator {
 	name: string
 	color: string
-	device: DemoDevice
+	device: DemoDevice | "visitor"
 }
 
 interface DemoCursor {

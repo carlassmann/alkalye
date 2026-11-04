@@ -32,7 +32,7 @@ import {
 } from "@/app/features/time-machine"
 import { resolveSyntaxTheme } from "@/app/features/syntax-highlighting"
 import type { ResolvedTheme } from "@/app/features/themes"
-import { CanvasErrorBoundary } from "@/app/features/assets"
+import { CanvasErrorBoundary, type TldrawSave } from "@/app/features/assets"
 import { cn } from "@/app/lib/cn"
 import { SidebarProvider } from "@/app/components/ui/sidebar"
 import { IntlProvider } from "@/shared/intl/setup"
@@ -49,8 +49,14 @@ import {
 	type DemoSceneId,
 	type DemoStageLabels,
 	type DemoVersion,
+	type DemoView,
 } from "./demo-script"
 import { DemoChrome } from "./demo-chrome"
+import {
+	applyVisitorEdit,
+	diffVisitorEdit,
+	type VisitorEdit,
+} from "./visitor-edit"
 
 export { DemoStageRoot }
 
@@ -66,7 +72,6 @@ let builtInDocumentTheme: ResolvedTheme = {
 	isLoading: false,
 }
 let noWikilinks = new Map()
-let noCursors: DemoCursor[] = []
 // Comments are read-only here, so selecting one does nothing.
 let editorExtensions = [remoteCursorsExtension, commentsExtension(() => {})]
 
@@ -118,23 +123,33 @@ function DemoStage({ locale, labels }: DemoStageProps) {
 	let frame = demoFrameAt(scenes, position.sceneIndex, progress)
 	let appearance = useDocumentAppearance()
 	usePrefetchAfterIntro(loadDemoWhiteboard)
-	let people = uniqueCollaborators(
-		scenes
+	let visitor = useVisitor(frame)
+	let people = uniqueCollaborators([
+		...scenes
 			.slice(0, position.sceneIndex + 1)
 			.flatMap(scene => [
 				...(scene.by ? [scene.by] : []),
 				...(scene.watchers ?? []),
 				...(scene.comments ?? []).map(comment => comment.by),
 			]),
-	)
+		...(visitor.hasJoined
+			? [{ name: labels.you, color: visitorColor, device: "visitor" as const }]
+			: []),
+	])
 	let isEditing = frame.view === "editor" || frame.view === "review"
+	let introIsTyping = position.sceneIndex === 0 && introProgress < 1
 
 	return (
 		<DemoChrome
 			labels={labels}
 			view={frame.view}
 			people={people}
-			interactive={isEditing}
+			interactive={visitor.isInteractive}
+			hint={
+				visitor.wantsHint && !introIsTyping ? labels.hints[frame.view] : null
+			}
+			onActivate={visitor.activate}
+			onLeave={visitor.leave}
 		>
 			<div
 				// The editor stays mounted while comments open beside it.
@@ -148,12 +163,113 @@ function DemoStage({ locale, labels }: DemoStageProps) {
 			>
 				<DemoViewContent
 					frame={frame}
+					visitor={visitor}
 					appearance={appearance}
 					locale={locale}
 				/>
 			</div>
 		</DemoChrome>
 	)
+}
+
+let visitorColor = "#d97706"
+
+interface VisitorDrawing {
+	save: TldrawSave
+	lightUrl: string
+	darkUrl: string
+}
+
+// A visitor choice made at one point of the script, dropped once the
+// script moves on.
+interface Pinned<T> {
+	at: string
+	value: T
+}
+
+type Visitor = ReturnType<typeof useVisitor>
+
+// Everything visitors do stays in memory. Their text and sketch carry
+// through the rest of the story; slider and slide clicks last until the
+// next scroll.
+function useVisitor(frame: DemoFrame) {
+	let [edit, setEdit] = useState<VisitorEdit | null>(null)
+	let [drawing, setDrawing] = useState<VisitorDrawing | null>(null)
+	let [drawingScene, setDrawingScene] = useState<DemoSceneId | null>(null)
+	let [historyPin, setHistoryPin] = useState<Pinned<number> | null>(null)
+	let [slidePin, setSlidePin] = useState<Pinned<number> | null>(null)
+	let scriptPoint = `${frame.sceneId}:${frame.history?.index ?? ""}:${frame.viewProgress}`
+	let isDrawing = drawingScene === frame.sceneId
+
+	useEffect(() => {
+		if (!drawing) return
+		return () => {
+			URL.revokeObjectURL(drawing.lightUrl)
+			URL.revokeObjectURL(drawing.darkUrl)
+		}
+	}, [drawing])
+
+	let used: Record<DemoView, boolean> = {
+		editor: edit !== null,
+		review: edit !== null,
+		whiteboard: drawing !== null || isDrawing,
+		timemachine: historyPin !== null,
+		present: slidePin !== null,
+	}
+
+	return {
+		hasJoined: Object.values(used).some(Boolean),
+		wantsHint: !used[frame.view],
+		isInteractive:
+			frame.view === "editor" ||
+			frame.view === "review" ||
+			frame.view === "timemachine" ||
+			isDrawing,
+		isDrawing,
+		drawing,
+		personalize(content: string, appearance?: "light" | "dark") {
+			let personal = edit ? applyVisitorEdit(content, edit).content : content
+			if (!drawing || !appearance) return personal
+			let url = appearance === "dark" ? drawing.darkUrl : drawing.lightUrl
+			return personal.replace(/\/demo\/sketch(-de)?\.svg/, url)
+		},
+		mapPosition(content: string, position: number) {
+			return edit
+				? applyVisitorEdit(content, edit).mapPosition(position)
+				: position
+		},
+		type(edited: string) {
+			setEdit(diffVisitorEdit(frame.content, edited))
+		},
+		draw(save: TldrawSave) {
+			setDrawing({
+				save,
+				lightUrl: URL.createObjectURL(save.lightPreview),
+				darkUrl: URL.createObjectURL(save.darkPreview),
+			})
+		},
+		historyIndex(scripted: number) {
+			return historyPin?.at === scriptPoint ? historyPin.value : scripted
+		},
+		pickVersion(index: number) {
+			setHistoryPin({ at: scriptPoint, value: index })
+		},
+		slideIndex(scripted: number) {
+			return scripted + (slidePin?.at === scriptPoint ? slidePin.value : 0)
+		},
+		activate() {
+			if (frame.view === "whiteboard") setDrawingScene(frame.sceneId)
+			if (frame.view === "present") {
+				setSlidePin(pin => ({
+					at: scriptPoint,
+					value: (pin?.at === scriptPoint ? pin.value : 0) + 1,
+				}))
+			}
+		},
+		leave() {
+			setDrawingScene(null)
+		},
+	}
 }
 
 function uniqueCollaborators(people: DemoCollaborator[]): DemoCollaborator[] {
@@ -200,21 +316,25 @@ function useIntroClock(): number {
 
 function DemoViewContent({
 	frame,
+	visitor,
 	appearance,
 	locale,
 }: {
 	frame: DemoFrame
+	visitor: Visitor
 	appearance: "light" | "dark"
 	locale: LandingLocale
 }) {
 	if (frame.view === "editor" || frame.view === "review") {
-		return <DemoEditor frame={frame} />
+		return <DemoEditor frame={frame} visitor={visitor} />
 	}
 	if (frame.view === "timemachine" && frame.history) {
-		return <DemoTimeMachine history={frame.history} />
+		return <DemoTimeMachine history={frame.history} visitor={visitor} />
 	}
 	if (frame.view === "present") {
-		return <DemoPresent frame={frame} appearance={appearance} />
+		return (
+			<DemoPresent frame={frame} visitor={visitor} appearance={appearance} />
+		)
 	}
 	return (
 		<CanvasErrorBoundary fallback={null}>
@@ -222,25 +342,28 @@ function DemoViewContent({
 				<DemoWhiteboard
 					progress={frame.viewProgress}
 					labels={demoSketch(locale)}
+					drawing={visitor.drawing?.save ?? null}
+					isDrawing={visitor.isDrawing}
+					onDrawingChange={visitor.draw}
 				/>
 			</Suspense>
 		</CanvasErrorBoundary>
 	)
 }
 
-// Visitors can type into the demo. Their draft replaces the scripted text
-// until the next scene, and stays in memory only.
-interface VisitorDraft {
-	sceneId: DemoSceneId
-	text: string
-}
-
-function DemoEditor({ frame }: { frame: DemoFrame }) {
+function DemoEditor({
+	frame,
+	visitor,
+}: {
+	frame: DemoFrame
+	visitor: Visitor
+}) {
 	let editor = useRef<MarkdownEditorRef>(null)
-	let [draft, setDraft] = useState<VisitorDraft | null>(null)
-	let visitorText = draft?.sceneId === frame.sceneId ? draft.text : null
-	let content = visitorText ?? frame.content
-	let cursors = visitorText === null ? frame.cursors : noCursors
+	let content = visitor.personalize(frame.content)
+	let cursors = frame.cursors.map(cursor => ({
+		...cursor,
+		position: visitor.mapPosition(frame.content, cursor.position),
+	}))
 	let comments = frame.comments
 	let typist = cursors.at(-1)
 
@@ -282,7 +405,7 @@ function DemoEditor({ frame }: { frame: DemoFrame }) {
 						onChange={readContent => {
 							// Scripted updates also report a change; only the visitor focuses.
 							if (!editor.current?.getEditor()?.hasFocus) return
-							setDraft({ sceneId: frame.sceneId, text: readContent() })
+							visitor.type(readContent())
 						}}
 						extensions={editorExtensions}
 						typeToFocus={false}
@@ -333,6 +456,14 @@ function commentRanges(comments: DemoComment[], text: string) {
 
 // The app's comment sidebar, filled with the agent's review.
 function DemoComments({ comments }: { comments: DemoComment[] }) {
+	let [collapsed, setCollapsed] = useState<Set<string>>(new Set())
+	function toggle(id: string) {
+		setCollapsed(previous => {
+			let next = new Set(previous)
+			if (!next.delete(id)) next.add(id)
+			return next
+		})
+	}
 	return (
 		<aside className="border-border bg-sidebar animate-in fade-in slide-in-from-right-4 flex max-h-[45%] shrink-0 flex-col border-t duration-500 @2xl:max-h-none @2xl:w-64 @2xl:border-t-0 @2xl:border-l">
 			<CommentsPanel unresolvedCount={comments.length}>
@@ -351,8 +482,8 @@ function DemoComments({ comments }: { comments: DemoComment[] }) {
 							]}
 							resolved={false}
 							selected={false}
-							collapsed={false}
-							onToggleCollapsed={() => {}}
+							collapsed={collapsed.has(comment.id)}
+							onToggleCollapsed={() => toggle(comment.id)}
 							onSelect={() => {}}
 						/>
 					))}
@@ -364,12 +495,15 @@ function DemoComments({ comments }: { comments: DemoComment[] }) {
 
 function DemoTimeMachine({
 	history,
+	visitor,
 }: {
 	history: { versions: DemoVersion[]; index: number }
+	visitor: Visitor
 }) {
 	let editor = useRef<MarkdownEditorRef>(null)
 	let [now] = useState(() => new Date())
-	let version = history.versions[history.index]
+	let index = visitor.historyIndex(history.index)
+	let version = history.versions[index]
 	let editHistory = history.versions.map((entry, index) => ({
 		index,
 		madeAt: editDate(now, entry, index),
@@ -383,7 +517,7 @@ function DemoTimeMachine({
 			<div className="markdown-editor">
 				<MarkdownEditor
 					ref={editor}
-					value={version?.content ?? ""}
+					value={visitor.personalize(version?.content ?? "")}
 					onChange={() => {}}
 					readOnly
 					typeToFocus={false}
@@ -391,7 +525,7 @@ function DemoTimeMachine({
 					autocomplete={false}
 				/>
 				<TimeMachineToolbar
-					editDate={editHistory[history.index]?.madeAt ?? now}
+					editDate={editHistory[index]?.madeAt ?? now}
 					authorName={version?.by.name ?? ""}
 					onExit={() => {}}
 					onCreateCopy={() => {}}
@@ -399,8 +533,8 @@ function DemoTimeMachine({
 				/>
 				<TimeMachineBottomBar
 					editHistory={editHistory}
-					editParam={history.index}
-					onEditChange={() => {}}
+					editParam={index}
+					onEditChange={visitor.pickVersion}
 				/>
 			</div>
 		</div>
@@ -418,17 +552,21 @@ function editDate(now: Date, version: DemoVersion, index: number): Date {
 // The Mac shows the slides, the phone in hand shows the speaker notes.
 function DemoPresent({
 	frame,
+	visitor,
 	appearance,
 }: {
 	frame: DemoFrame
+	visitor: Visitor
 	appearance: "light" | "dark"
 }) {
-	let items = parsePresentation(frame.content)
+	let content = visitor.personalize(frame.content, appearance)
+	let items = parsePresentation(content)
 	let slides = getSlides(items)
-	let slide = slides[stepIndex(frame.viewProgress, slides.length)]
+	let scripted = stepIndex(frame.viewProgress, slides.length)
+	let slide = slides[visitor.slideIndex(scripted) % Math.max(slides.length, 1)]
 	let slideNumber = slide?.slideNumber ?? 1
 	let syntaxTheme = resolveSyntaxTheme({
-		content: frame.content,
+		content,
 		defaultFamilyId: undefined,
 		appearance,
 	})
@@ -437,7 +575,7 @@ function DemoPresent({
 		<div className="bg-muted/40 flex min-h-0 flex-1 flex-col items-center justify-center gap-4 p-4 @lg:flex-row @lg:gap-6 @lg:p-6">
 			<div className="border-border flex aspect-[16/10] max-h-full w-full min-w-0 flex-col overflow-hidden border shadow-lg @lg:w-auto @lg:flex-1">
 				<SlideshowView
-					content={frame.content}
+					content={content}
 					slides={slides}
 					wikilinks={noWikilinks}
 					currentSlideNumber={slideNumber}

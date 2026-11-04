@@ -78,13 +78,21 @@ let en: LandingContent = {
 				timemachine: "Time machine",
 				present: "Present",
 			},
+			you: "You",
+			hints: {
+				editor: "Click and type. Your words stay in the talk.",
+				review: "Click and type. Your words stay in the talk.",
+				whiteboard: "Click to draw. Your sketch goes on the slide.",
+				timemachine: "Drag the slider through the history",
+				present: "Click to change slides",
+			},
 		},
-		lede: "Scroll to follow a blog post about Alkalye becoming a talk: written on Carl's Mac and phone, reviewed by an agent, all the way to the stage. It is the real editor, comments, whiteboard, time machine, slideshow and teleprompter from the app, playing a scripted example. Click into the editor to type yourself. Nothing is saved or sent.",
+		lede: "Scroll to follow a blog post about Alkalye becoming a talk: written on Carl's Mac and phone, reviewed by an agent, all the way to the stage. It is the real editor, comments, whiteboard, time machine, slideshow and teleprompter from the app, playing a scripted example. Click into it to type, draw, rewind or present yourself. Nothing is saved or sent.",
 		scenes: [
 			{
 				id: "devices",
 				title: "Same post, other device",
-				body: "Carl picks up his phone and keeps writing while the Mac is still open. Each device is just another cursor in the same document, synced end-to-end encrypted. No export, no “which version do you want to keep?”.",
+				body: "Carl picks up the phone and keeps writing while the Mac is still open. Each device is just another cursor in the same document, synced end-to-end encrypted. No export, no “which version do you want to keep?”.",
 			},
 			{
 				id: "review",
@@ -104,7 +112,7 @@ let en: LandingContent = {
 			{
 				id: "toomuch",
 				title: "A week later, it is too much",
-				body: "His phone added rockets, the agent added a slide nobody asked for. Undo only knows the last edits on this device. It cannot reach back across devices, people and days.",
+				body: "The phone added rockets, the agent added a slide nobody asked for. Undo only knows the last edits on this device. It cannot reach back across devices, people and days.",
 			},
 			{
 				id: "history",
@@ -114,7 +122,7 @@ let en: LandingContent = {
 			{
 				id: "present",
 				title: "On stage",
-				body: "The Mac shows the slides. His phone is the teleprompter, with the speaker notes for each slide, following along as he clicks through.",
+				body: "The Mac shows the slides. The phone is the teleprompter, with the speaker notes for each slide, following along with every click.",
 			},
 		],
 		tldrawCredit: {
@@ -126,7 +134,7 @@ let en: LandingContent = {
 	},
 	twin: {
 		title: "Questions before you start?",
-		body: "Ask Carl's Syntwin why he built Alkalye, how he uses it, or how to get started. You can ask about his other projects too. Syntwin is an AI, not Carl live.",
+		body: "Ask Carl's Syntwin why Carl built Alkalye, how Carl uses it, or how to get started. You can ask about Carl's other projects too. Syntwin is an AI, not Carl live.",
 	},
 	story: {
 		title: "Even one person needs multiplayer",
@@ -283,13 +291,21 @@ let de: LandingContent = {
 				timemachine: "Zeitmaschine",
 				present: "Präsentieren",
 			},
+			you: "Du",
+			hints: {
+				editor: "Klick und schreib. Deine Worte bleiben im Vortrag.",
+				review: "Klick und schreib. Deine Worte bleiben im Vortrag.",
+				whiteboard: "Klick zum Zeichnen. Deine Skizze kommt auf die Folie.",
+				timemachine: "Zieh den Regler durch die Geschichte",
+				present: "Klick für die nächste Folie",
+			},
 		},
-		lede: "Scroll weiter und sieh zu, wie aus einem Blogpost über Alkalye ein Vortrag wird: geschrieben auf Carls Mac und Handy, geprüft von einem Agenten, bis auf die Bühne. Es sind der echte Editor, Kommentare, Whiteboard, Zeitmaschine, Präsentation und Teleprompter aus der App mit einem vorbereiteten Beispiel. Klick in den Editor und schreib selbst. Nichts wird gespeichert oder gesendet.",
+		lede: "Scroll weiter und sieh zu, wie aus einem Blogpost über Alkalye ein Vortrag wird: geschrieben auf Carls Mac und Handy, geprüft von einem Agenten, bis auf die Bühne. Es sind der echte Editor, Kommentare, Whiteboard, Zeitmaschine, Präsentation und Teleprompter aus der App mit einem vorbereiteten Beispiel. Klick hinein, um selbst zu schreiben, zu zeichnen, zurückzuspulen oder zu präsentieren. Nichts wird gespeichert oder gesendet.",
 		scenes: [
 			{
 				id: "devices",
 				title: "Derselbe Post, anderes Gerät",
-				body: "Carl nimmt sein Handy und schreibt weiter, während der Mac noch offen ist. Jedes Gerät ist nur ein weiterer Cursor im selben Dokument, Ende-zu-Ende-verschlüsselt synchronisiert. Kein Export, kein „Welche Version willst du behalten?“.",
+				body: "Carl nimmt das Handy und schreibt weiter, während der Mac noch offen ist. Jedes Gerät ist nur ein weiterer Cursor im selben Dokument, Ende-zu-Ende-verschlüsselt synchronisiert. Kein Export, kein „Welche Version willst du behalten?“.",
 			},
 			{
 				id: "review",
@@ -319,7 +335,7 @@ let de: LandingContent = {
 			{
 				id: "present",
 				title: "Auf der Bühne",
-				body: "Der Mac zeigt die Folien. Sein Handy ist der Teleprompter mit den Sprechernotizen zu jeder Folie und läuft mit, während er weiterklickt.",
+				body: "Der Mac zeigt die Folien. Das Handy ist der Teleprompter mit den Sprechernotizen zu jeder Folie und läuft bei jedem Klick mit.",
 			},
 		],
 		tldrawCredit: {
@@ -331,7 +347,7 @@ let de: LandingContent = {
 	},
 	twin: {
 		title: "Fragen, bevor du loslegst?",
-		body: "Frag Carls Syntwin, warum er Alkalye gebaut hat, wie er es nutzt oder wie du loslegst. Du kannst auch nach seinen anderen Projekten fragen. Syntwin ist eine KI, nicht Carl live.",
+		body: "Frag Carls Syntwin, warum Carl Alkalye gebaut hat, wie Carl es nutzt oder wie du loslegst. Du kannst auch nach Carls anderen Projekten fragen. Syntwin ist eine KI, nicht Carl live.",
 	},
 	story: {
 		title: "Auch eine Person braucht Multiplayer",

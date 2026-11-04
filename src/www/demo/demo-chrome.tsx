@@ -1,5 +1,6 @@
 import type { ReactNode } from "react"
-import { BotIcon, LaptopIcon, SmartphoneIcon } from "lucide-react"
+import { BotIcon, LaptopIcon, SmartphoneIcon, UserIcon } from "lucide-react"
+import { cn } from "@/app/lib/cn"
 import type { DemoCollaborator, DemoStageLabels, DemoView } from "./demo-script"
 
 export { DemoChrome, CollaboratorIcon }
@@ -9,12 +10,19 @@ function DemoChrome({
 	view,
 	people,
 	interactive,
+	hint,
+	onActivate,
+	onLeave,
 	children,
 }: {
 	labels: DemoStageLabels
 	view: DemoView
 	people: DemoCollaborator[]
 	interactive: boolean
+	hint: string | null
+	// Clicking a locked view hands it to the visitor.
+	onActivate: () => void
+	onLeave: () => void
 	children: ReactNode
 }) {
 	return (
@@ -50,14 +58,46 @@ function DemoChrome({
 				</ul>
 			</div>
 			<div className="relative flex min-h-0 flex-1 flex-col">
-				<div className="isolate flex min-h-0 flex-1 flex-col">{children}</div>
+				<div
+					className="isolate flex min-h-0 flex-1 flex-col"
+					onMouseLeave={onLeave}
+				>
+					{children}
+				</div>
 				{/* The page scroll drives the demo. Touches and wheel on the views
-				    must scroll the page, not the canvas or slides underneath.
-				    The editor stays open for visitors to type in. */}
-				{!interactive && <div className="absolute inset-0" />}
+				    must scroll the page, not the canvas or slides underneath,
+				    until the visitor clicks in. */}
+				{!interactive && (
+					<button
+						type="button"
+						aria-label={hint ?? labels.views[view]}
+						className="absolute inset-0 cursor-pointer"
+						onClick={onActivate}
+					/>
+				)}
+				{hint && (
+					<p
+						key={hint}
+						className={cn(
+							"bg-foreground text-background animate-in fade-in slide-in-from-bottom-2 fill-mode-backwards pointer-events-none absolute left-1/2 z-10 -translate-x-1/2 rounded-full px-3 py-1.5 text-xs font-medium whitespace-nowrap shadow-lg delay-700 duration-500",
+							hintPlacement[view],
+						)}
+					>
+						{hint}
+					</p>
+				)}
 			</div>
 		</div>
 	)
+}
+
+// Clear of the whiteboard tools and the time machine slider.
+let hintPlacement: Record<DemoView, string> = {
+	editor: "bottom-4",
+	review: "bottom-4",
+	whiteboard: "top-4",
+	timemachine: "bottom-24",
+	present: "bottom-4",
 }
 
 function CollaboratorIcon({
@@ -72,6 +112,9 @@ function CollaboratorIcon({
 	}
 	if (collaborator.device === "agent") {
 		return <BotIcon className={className} aria-hidden />
+	}
+	if (collaborator.device === "visitor") {
+		return <UserIcon className={className} aria-hidden />
 	}
 	return <LaptopIcon className={className} aria-hidden />
 }

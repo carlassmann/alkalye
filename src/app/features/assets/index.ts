@@ -79,3 +79,4 @@ export {
 	type LocalAsset,
 } from "./lib/local-assets"
 export { loadTldrawCanvas } from "./widgets/load-tldraw-canvas"
+export type { TldrawCanvasHandle } from "./widgets/tldraw-canvas"
