@@ -1,4 +1,4 @@
-import type { DemoSceneId } from "#www/demo/demo-script"
+import type { DemoSceneId, DemoStageLabels } from "#www/demo/demo-script"
 
 export { landingContent }
 export type { LandingLocale, LandingContent }
@@ -23,11 +23,11 @@ interface LandingContent {
 		primaryAction: string
 		secondaryAction: string
 		facts: string[]
-		sampleCaption: string
 	}
 	demo: {
 		title: string
 		lede: string
+		stage: DemoStageLabels
 		scenes: { id: DemoSceneId; title: string; body: string }[]
 		tldrawCredit: { before: string; link: string; after: string }
 	}
@@ -66,12 +66,20 @@ let en: LandingContent = {
 		primaryAction: "Start writing",
 		secondaryAction: "See what it does",
 		facts: ["No account needed to start", "Works offline", "MIT licensed"],
-		sampleCaption:
-			"A presentation is a document with one line of frontmatter. Each --- starts a slide, and unindented lines are speaker notes.",
 	},
 	demo: {
 		title: "Alkalye in action",
-		lede: "Scroll on and the document beside this text writes, syncs and presents itself. It is the real editor, preview, slideshow and teleprompter from the app, playing a scripted example. Nothing is saved or sent.",
+		stage: {
+			fileName: "alkalye-in-action.md",
+			views: {
+				editor: "Write",
+				preview: "Preview",
+				slideshow: "Slideshow",
+				teleprompter: "Teleprompter",
+				whiteboard: "Whiteboard",
+			},
+		},
+		lede: "Keep scrolling and the document on this page writes, syncs and presents itself. It is the real editor, preview, slideshow, teleprompter and whiteboard from the app, playing a scripted example. Nothing is saved or sent.",
 		scenes: [
 			{
 				id: "write",
@@ -262,12 +270,20 @@ let de: LandingContent = {
 		primaryAction: "Losschreiben",
 		secondaryAction: "Was es kann",
 		facts: ["Kein Konto zum Start nötig", "Funktioniert offline", "MIT-Lizenz"],
-		sampleCaption:
-			"Eine Präsentation ist ein Dokument mit einer Zeile Frontmatter. Jedes --- beginnt eine Folie, nicht eingerückte Zeilen sind Sprechernotizen.",
 	},
 	demo: {
 		title: "Alkalye in Aktion",
-		lede: "Scroll weiter, und das Dokument neben diesem Text schreibt, synchronisiert und präsentiert sich selbst. Es sind der echte Editor, die Vorschau, die Präsentation und der Teleprompter aus der App mit einem vorbereiteten Beispiel. Nichts wird gespeichert oder gesendet.",
+		stage: {
+			fileName: "alkalye-in-aktion.md",
+			views: {
+				editor: "Schreiben",
+				preview: "Vorschau",
+				slideshow: "Präsentation",
+				teleprompter: "Teleprompter",
+				whiteboard: "Whiteboard",
+			},
+		},
+		lede: "Scroll weiter, und das Dokument auf dieser Seite schreibt, synchronisiert und präsentiert sich selbst. Es sind der echte Editor, die Vorschau, die Präsentation, der Teleprompter und das Whiteboard aus der App mit einem vorbereiteten Beispiel. Nichts wird gespeichert oder gesendet.",
 		scenes: [
 			{
 				id: "write",

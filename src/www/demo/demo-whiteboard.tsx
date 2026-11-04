@@ -1,5 +1,6 @@
 import { lazy, useEffect, useState } from "react"
 import {
+	Box,
 	createShapeId,
 	toRichText,
 	type Editor,
@@ -28,6 +29,9 @@ let sketch: TLShapePartial[] = [
 	},
 ]
 
+// A fixed camera keeps the sketch still while shapes appear.
+let sketchBounds = new Box(-40, -40, 920, 460)
+
 function DemoWhiteboard({ progress }: { progress: number }) {
 	let [editor, setEditor] = useState<Editor | null>(null)
 	let visibleShapes = Math.ceil(progress * sketch.length)
@@ -36,6 +40,9 @@ function DemoWhiteboard({ progress }: { progress: number }) {
 		if (!editor) return
 		let wanted = sketch.slice(0, visibleShapes)
 		let wantedIds = new Set(wanted.map(shape => shape.id))
+		// Read-only hides the style panel, which would cover the sketch. It
+		// blocks edits from code too, so it lifts for the scripted ones.
+		editor.updateInstanceState({ isReadonly: false })
 		editor.run(() => {
 			let stale = [...editor.getCurrentPageShapeIds()].filter(
 				id => !wantedIds.has(id),
@@ -44,8 +51,13 @@ function DemoWhiteboard({ progress }: { progress: number }) {
 			let missing = wanted.filter(shape => !editor.getShape(shape.id))
 			if (missing.length) editor.createShapes(missing)
 		})
-		editor.zoomToFit({ animation: { duration: 0 } })
+		editor.updateInstanceState({ isReadonly: true })
 	}, [editor, visibleShapes])
+
+	useEffect(() => {
+		if (!editor) return
+		editor.zoomToBounds(sketchBounds, { animation: { duration: 0 } })
+	}, [editor])
 
 	return (
 		<div className="relative min-h-0 flex-1">

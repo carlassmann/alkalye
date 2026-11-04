@@ -1,9 +1,16 @@
 import type { LandingLocale } from "#www/landing-content"
 
-export { demoScenes, demoFrameAt, demoSceneIds }
-export type { DemoFrame, DemoView, DemoSceneId, DemoCollaborator }
+export { demoScenes, demoFrameAt, demoSceneIds, demoIntroText }
+export type {
+	DemoFrame,
+	DemoView,
+	DemoSceneId,
+	DemoCollaborator,
+	DemoStageLabels,
+}
 
 let demoSceneIds = [
+	"intro",
 	"write",
 	"together",
 	"preview",
@@ -19,6 +26,11 @@ type DemoView =
 	| "slideshow"
 	| "teleprompter"
 	| "whiteboard"
+
+interface DemoStageLabels {
+	fileName: string
+	views: Record<DemoView, string>
+}
 
 interface DemoCollaborator {
 	name: string
@@ -51,10 +63,13 @@ let mia: DemoCollaborator = { name: "Mia", color: "#7c3aed" }
 
 let documents: Record<LandingLocale, Record<DemoSceneId, string>> = {
 	en: {
-		write: [
+		intro: [
 			"# Alkalye in action",
 			"",
 			"\tThis is a real Alkalye editor.",
+			"",
+		].join("\n"),
+		write: [
 			"",
 			"Everything here is plain Markdown. Unindented lines are speaker notes, so only you see them.",
 			"",
@@ -76,10 +91,13 @@ let documents: Record<LandingLocale, Record<DemoSceneId, string>> = {
 		whiteboard: "",
 	},
 	de: {
-		write: [
+		intro: [
 			"# Alkalye in Aktion",
 			"",
 			"\tDas ist ein echter Alkalye-Editor.",
+			"",
+		].join("\n"),
+		write: [
 			"",
 			"Alles hier ist schlichtes Markdown. Nicht eingerückte Zeilen sind Sprechernotizen, die nur du siehst.",
 			"",
@@ -106,6 +124,11 @@ function demoScenes(locale: LandingLocale): DemoScene[] {
 	let text = documents[locale]
 	return [
 		{
+			id: "intro",
+			view: "editor",
+			edit: { at: "end", text: text.intro, by: carl },
+		},
+		{
 			id: "write",
 			view: "editor",
 			edit: { at: "end", text: text.write, by: carl },
@@ -124,6 +147,11 @@ function demoScenes(locale: LandingLocale): DemoScene[] {
 		{ id: "teleprompter", view: "teleprompter" },
 		{ id: "whiteboard", view: "whiteboard" },
 	]
+}
+
+// Shown before the stage loads and without JavaScript.
+function demoIntroText(locale: LandingLocale): string {
+	return documents[locale].intro
 }
 
 // Typing takes the first part of a scene that switches views, so the

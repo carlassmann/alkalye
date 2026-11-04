@@ -11,7 +11,10 @@ export {
 	tldrawNameFromFile,
 } from "./lib/tldraw"
 export type { TldrawSave } from "./lib/tldraw"
-export { TldrawEditorDialog } from "./widgets/tldraw-editor-dialog"
+export {
+	TldrawEditorDialog,
+	CanvasErrorBoundary,
+} from "./widgets/tldraw-editor-dialog"
 export { useTldrawEditor } from "./widgets/use-tldraw-editor"
 export { SidebarAssets } from "./widgets/sidebar-assets"
 export type { SidebarAsset } from "./widgets/sidebar-assets"

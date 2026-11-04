@@ -5,6 +5,7 @@ import { readChangelog } from "@/shared/changelog"
 import { SyntwinLauncher, syntwinEnabled } from "@/components/syntwin-launcher"
 import { landingContent, type LandingLocale } from "#www/landing-content"
 import { AlkalyeInAction } from "#www/demo/alkalye-in-action"
+import { demoIntroText } from "#www/demo/demo-script"
 
 interface Props {
 	locale: LandingLocale
@@ -36,22 +37,7 @@ let dateFormat = new Intl.DateTimeFormat(locale, {
 	timeZone: "UTC",
 })
 
-let sampleDocument = [
-	"---",
-	"mode: present",
-	"---",
-	"",
-	"# Launch plan",
-	"",
-	"\tShip the beta on Friday",
-	"Thank the testers before the demo.",
-	"",
-	"---",
-	"",
-	"# Open questions",
-	"",
-	"\tSee [[Pricing notes]]",
-].join("\n")
+let introDocument = demoIntroText(locale)
 
 let sectionClass =
 	"mx-auto max-w-[960px] px-[calc(1rem+env(safe-area-inset-left))] pr-[calc(1rem+env(safe-area-inset-right))]"
@@ -129,12 +115,12 @@ let primaryButtonClass =
 		</header>
 
 		<main class="pb-[env(safe-area-inset-bottom)]">
-			<section class:list={[sectionClass, "grid gap-10 py-14 md:grid-cols-[1.1fr_0.9fr] md:items-center md:py-24"]}>
-				<div class="flex flex-col gap-6">
+			<section aria-labelledby="hero-title" class="mx-auto grid max-w-[1200px] px-[calc(1rem+env(safe-area-inset-left))] pr-[calc(1rem+env(safe-area-inset-right))] lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-x-14">
+				<div data-demo-scene="intro" class="flex flex-col justify-center gap-6 pt-10 pb-8 lg:min-h-[calc(100svh-3.5rem)] lg:py-16">
 					<span class="w-fit border border-brand/30 bg-brand/8 px-2.5 py-1 text-xs font-medium tracking-wide text-brand">
 						{content.hero.badge}
 					</span>
-					<h1 class="text-[clamp(2.25rem,5vw,3.5rem)] leading-[1.05] font-semibold tracking-tight text-balance">
+					<h1 id="hero-title" class="text-[clamp(2.25rem,5vw,3.5rem)] leading-[1.05] font-semibold tracking-tight text-balance">
 						{content.hero.title}
 					</h1>
 					<p class="max-w-[52ch] text-lg leading-relaxed text-muted-foreground">
@@ -155,31 +141,24 @@ let primaryButtonClass =
 						))}
 					</ul>
 				</div>
-				<figure class="flex flex-col gap-3">
-					<div class="border border-border bg-card shadow-xl shadow-black/5 dark:shadow-black/30">
-						<div class="flex items-center justify-between border-b border-border px-4 py-2 font-mono text-xs text-muted-foreground">
-							<span>launch-plan.md</span>
-							<span class="text-brand">mode: present</span>
-						</div>
-						<pre class="overflow-x-auto px-4 py-4 font-mono text-[13px] leading-6 [tab-size:2]"><code>{sampleDocument}</code></pre>
-					</div>
-					<figcaption class="text-sm leading-6 text-muted-foreground">{content.hero.sampleCaption}</figcaption>
-				</figure>
-			</section>
 
-			<section id="in-action" aria-labelledby="in-action-title" class="scroll-mt-20 border-t border-border/60">
-				<div class:list={[sectionClass, "flex flex-col gap-3 pt-16 md:pt-24"]}>
-					<h2 id="in-action-title" class={sectionTitleClass}>{content.demo.title}</h2>
-					<p class="max-w-[60ch] text-muted-foreground">{content.demo.lede}</p>
+				<div data-demo-stage class="sticky top-14 z-10 h-[min(46svh,440px)] bg-background py-3 lg:top-[5.5rem] lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:my-8 lg:h-[calc(100svh-7.5rem)] lg:self-start lg:py-0">
+					<AlkalyeInAction locale={locale} labels={content.demo.stage} client:only="react">
+						<div slot="fallback" class="h-full w-full overflow-hidden border border-border bg-background shadow-2xl shadow-black/10 dark:shadow-black/40">
+							<div class="h-10 border-b border-border"></div>
+							<pre class="px-6 py-8 font-mono text-[15px] leading-7 whitespace-pre-wrap [tab-size:4]"><code>{introDocument}</code></pre>
+						</div>
+					</AlkalyeInAction>
 				</div>
-				<div class:list={[sectionClass, "relative grid gap-6 pb-16 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] md:gap-10 md:pb-24"]}>
-					<div class="sticky top-14 z-10 order-first h-[min(48svh,420px)] bg-background py-3 md:order-last md:top-24 md:h-[min(70svh,640px)] md:py-0" data-demo-stage>
-						<noscript><style>[data-demo-stage] { display: none; }</style></noscript>
-						<AlkalyeInAction locale={locale} client:only="react" />
+
+				<div id="in-action" class="scroll-mt-20 lg:col-start-1">
+					<div class="flex flex-col gap-3 pt-10 lg:pt-24">
+						<h2 id="in-action-title" class={sectionTitleClass}>{content.demo.title}</h2>
+						<p class="max-w-[52ch] text-muted-foreground">{content.demo.lede}</p>
 					</div>
-					<ol class="flex flex-col">
+					<ol aria-labelledby="in-action-title" class="flex flex-col pb-16 lg:pb-24">
 						{content.demo.scenes.map(scene => (
-							<li id={`in-action-${scene.id}`} data-demo-scene={scene.id} class="flex min-h-[70svh] flex-col justify-center gap-2 py-8 md:min-h-[85svh]">
+							<li id={`in-action-${scene.id}`} data-demo-scene={scene.id} class="flex min-h-[60svh] flex-col justify-center gap-2 py-8 lg:min-h-[85svh]">
 								<h3 class="text-xl font-semibold tracking-tight">{scene.title}</h3>
 								<p class="max-w-[46ch] text-[15px] leading-7 text-muted-foreground">{scene.body}</p>
 								{scene.id === "whiteboard" && (

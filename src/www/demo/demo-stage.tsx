@@ -19,18 +19,24 @@ import {
 } from "@/app/features/sharing"
 import { resolveSyntaxTheme } from "@/app/features/syntax-highlighting"
 import type { ResolvedTheme } from "@/app/features/themes"
+import { CanvasErrorBoundary } from "@/app/features/assets"
 import { SidebarProvider } from "@/app/components/ui/sidebar"
 import { IntlProvider } from "@/shared/intl/setup"
 import { messagesDe } from "@/shared/intl/messages"
 import type { LandingLocale } from "#www/landing-content"
-import { demoFrameAt, demoScenes, type DemoFrame } from "./demo-script"
+import {
+	demoFrameAt,
+	demoScenes,
+	type DemoCollaborator,
+	type DemoFrame,
+	type DemoStageLabels,
+} from "./demo-script"
+import { DemoChrome } from "./demo-chrome"
 
 export { DemoStageRoot }
 
 let DemoWhiteboard = lazy(() =>
-	import("./demo-whiteboard").then(module => ({
-		default: module.DemoWhiteboard,
-	})),
+	loadDemoWhiteboard().then(module => ({ default: module.DemoWhiteboard })),
 )
 
 // The website has no account, so documents render with the built-in theme.
@@ -43,8 +49,14 @@ let builtInDocumentTheme: ResolvedTheme = {
 let noWikilinks = new Map()
 let editorExtensions = [remoteCursorsExtension]
 
-function DemoStageRoot({ locale }: { locale: LandingLocale }) {
-	let [router] = useState(() => createDemoRouter(locale))
+interface DemoStageProps {
+	locale: LandingLocale
+	labels: DemoStageLabels
+}
+
+function DemoStageRoot(props: DemoStageProps) {
+	let { locale } = props
+	let [router] = useState(() => createDemoRouter(props))
 	let stage = <RouterProvider router={router} />
 	return locale === "de" ? (
 		<IntlProvider messages={messagesDe} locale="de">
@@ -57,12 +69,12 @@ function DemoStageRoot({ locale }: { locale: LandingLocale }) {
 
 // The editor keeps find state in the route search and reads sidebar layout.
 // A memory router and sidebar context give it both without touching the page URL.
-function createDemoRouter(locale: LandingLocale) {
+function createDemoRouter(props: DemoStageProps) {
 	return createRouter({
 		routeTree: createRootRoute({
 			component: () => (
 				<SidebarProvider>
-					<DemoStage locale={locale} />
+					<DemoStage {...props} />
 				</SidebarProvider>
 			),
 		}),
@@ -70,20 +82,75 @@ function createDemoRouter(locale: LandingLocale) {
 	})
 }
 
-function DemoStage({ locale }: { locale: LandingLocale }) {
+function DemoStage({ locale, labels }: DemoStageProps) {
 	let scenes = demoScenes(locale)
 	let position = useScrollPosition(scenes.map(scene => scene.id))
-	let frame = demoFrameAt(scenes, position.sceneIndex, position.progress)
+	let introProgress = useIntroClock()
+	let progress =
+		position.sceneIndex === 0
+			? Math.max(position.progress, introProgress)
+			: position.progress
+	let frame = demoFrameAt(scenes, position.sceneIndex, progress)
 	let appearance = useDocumentAppearance()
+	usePrefetchAfterIntro(loadDemoWhiteboard)
+	let people = uniqueCollaborators(
+		scenes
+			.slice(0, position.sceneIndex + 1)
+			.flatMap(scene => scene.edit?.by ?? []),
+	)
 
 	return (
-		<div
-			data-demo-view={frame.view}
-			className="border-border bg-background relative flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden border shadow-xl shadow-black/5 dark:shadow-black/30"
-		>
-			<DemoView frame={frame} appearance={appearance} />
-		</div>
+		<DemoChrome labels={labels} view={frame.view} people={people}>
+			<div
+				key={frame.view}
+				className="animate-in fade-in-30 zoom-in-[0.98] flex min-h-0 flex-1 flex-col duration-500 ease-out motion-reduce:animate-none"
+			>
+				<DemoView frame={frame} appearance={appearance} />
+			</div>
+		</DemoChrome>
 	)
+}
+
+function uniqueCollaborators(people: DemoCollaborator[]): DemoCollaborator[] {
+	return [...new Map(people.map(person => [person.name, person])).values()]
+}
+
+// Loading tldraw at the switch would blank the stage for a moment, so it
+// loads once the intro has finished typing. Safari has no requestIdleCallback.
+function usePrefetchAfterIntro(load: () => Promise<unknown>) {
+	useEffect(() => {
+		let timer = setTimeout(() => void load(), introDelayMs + introDurationMs)
+		return () => clearTimeout(timer)
+	}, [load])
+}
+
+function loadDemoWhiteboard() {
+	return import("./demo-whiteboard")
+}
+
+// The hero types its first lines on its own, so visitors see the editor
+// move before they scroll.
+let introDelayMs = 500
+let introDurationMs = 2600
+
+function useIntroClock(): number {
+	let [progress, setProgress] = useState(0)
+
+	useEffect(() => {
+		if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+			setProgress(1)
+			return
+		}
+		let start = performance.now() + introDelayMs
+		let frame = requestAnimationFrame(function tick(now) {
+			let next = Math.max(0, Math.min((now - start) / introDurationMs, 1))
+			setProgress(next)
+			if (next < 1) frame = requestAnimationFrame(tick)
+		})
+		return () => cancelAnimationFrame(frame)
+	}, [])
+
+	return progress
 }
 
 function DemoView({
@@ -144,9 +211,11 @@ function DemoView({
 		)
 	}
 	return (
-		<Suspense fallback={null}>
-			<DemoWhiteboard progress={frame.viewProgress} />
-		</Suspense>
+		<CanvasErrorBoundary fallback={null}>
+			<Suspense fallback={null}>
+				<DemoWhiteboard progress={frame.viewProgress} />
+			</Suspense>
+		</CanvasErrorBoundary>
 	)
 }
 

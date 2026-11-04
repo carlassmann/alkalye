@@ -24,7 +24,7 @@ import type { TldrawSave } from "../lib/tldraw"
 import type { TldrawCanvasHandle } from "./tldraw-canvas"
 import { WhiteboardPresence } from "./whiteboard-presence"
 
-export { TldrawEditorDialog }
+export { TldrawEditorDialog, CanvasErrorBoundary }
 
 let LazyTldrawCanvas = lazy(() =>
 	import("./tldraw-canvas").then(module => ({
