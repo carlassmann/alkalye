@@ -62,15 +62,15 @@ let en: LandingContent = {
 	hero: {
 		badge: "Free public beta",
 		title: "Write in Markdown. Share it, present it, keep it.",
-		lede: "Alkalye is a Markdown editor that runs in your browser and installs as an app. It works offline and syncs end-to-end encrypted. One document can be a note, a shared draft or a slideshow.",
+		lede: "Alkalye is a Markdown editor for notes, drafts and talks. Write on any device, even offline, edit together with live cursors, and present the same file as slides. Everything syncs end-to-end encrypted.",
 		primaryAction: "Start writing",
 		secondaryAction: "See what it does",
 		facts: ["No account needed to start", "Works offline", "MIT licensed"],
 	},
 	demo: {
-		title: "Alkalye in action",
+		title: "One talk, from first note to stage",
 		stage: {
-			fileName: "alkalye-in-action.md",
+			fileName: "lightning-talk.md",
 			views: {
 				editor: "Write",
 				preview: "Preview",
@@ -78,38 +78,45 @@ let en: LandingContent = {
 				teleprompter: "Teleprompter",
 				whiteboard: "Whiteboard",
 			},
+			offline: "{name} is offline",
+			synced: "{name}'s edits synced",
 		},
-		lede: "Keep scrolling and the document on this page writes, syncs and presents itself. It is the real editor, preview, slideshow, teleprompter and whiteboard from the app, playing a scripted example. Nothing is saved or sent.",
+		lede: "Scroll to follow Carl and Mia preparing a lightning talk in one Alkalye document. It is the real editor, preview, slideshow, teleprompter and whiteboard from the app, playing a scripted example. Nothing is saved or sent.",
 		scenes: [
 			{
 				id: "write",
-				title: "Write in plain Markdown",
-				body: "A heading is a #, a slide line is indented, everything else is your note. The file stays readable in any text editor.",
+				title: "Carl drafts the talk as notes",
+				body: "It is plain Markdown. Indented lines become slides, everything else stays his speaker notes, so the talk and what he wants to say live in one file.",
 			},
 			{
 				id: "together",
-				title: "Write together, live",
-				body: "Share a link and see who is typing where. Each change is encrypted on the writer's device before it syncs, so the server only stores data it cannot read.",
+				title: "Mia fixes a slide from her phone",
+				body: "Carl shares a link and sees her cursor arrive. Every change is encrypted on the writer's device before it syncs, so the server only stores data it cannot read.",
+			},
+			{
+				id: "offline",
+				title: "She keeps going on the train",
+				body: "No signal, no problem. Mia writes offline, and her slide appears for Carl the moment she is back online.",
 			},
 			{
 				id: "preview",
-				title: "Read it as a page",
-				body: "Preview renders the same text as a styled document. Pick a built-in theme or bring your own HTML and CSS.",
+				title: "Anyone can read along",
+				body: "The preview shows the same file as a styled page, handy as a handout. Pick a built-in theme or bring your own HTML and CSS.",
 			},
 			{
 				id: "present",
-				title: "Present the same file",
-				body: "Add mode: present to the frontmatter and the document becomes a slideshow. Every --- starts a new slide, and only indented lines appear on it.",
+				title: "Carl turns it into slides",
+				body: "One line of frontmatter, mode: present, and the document becomes a slideshow. Every --- starts a new slide.",
 			},
 			{
 				id: "teleprompter",
-				title: "Keep your notes on your phone",
-				body: "The teleprompter shows slides and speaker notes together and follows along as you present, on the same device or another one.",
+				title: "And presents from his phone",
+				body: "The teleprompter shows each slide with its speaker notes and follows along as he presents, on the same device or another one.",
 			},
 			{
 				id: "whiteboard",
-				title: "Sketch on a whiteboard",
-				body: "Insert a whiteboard into any document and draw on an infinite canvas. It shows up as an image in the text, the preview and your slides.",
+				title: "A quick sketch for the Q&A",
+				body: "Insert a whiteboard anywhere and draw on an infinite canvas. It shows up as an image in the text, the preview and the slides.",
 			},
 		],
 		tldrawCredit: {
@@ -134,7 +141,7 @@ let en: LandingContent = {
 	},
 	features: {
 		title: "What you can do",
-		lede: "Everything below is in the app today. The changelog has the details.",
+		lede: "Beyond what the talk above shows, this is all in the app today. The changelog has the details.",
 		groups: [
 			{
 				title: "Write",
@@ -148,8 +155,8 @@ let en: LandingContent = {
 						body: "Type [[ to link another document. Backlinks show what points to each note.",
 					},
 					{
-						name: "Images, videos and whiteboards",
-						body: "Drop media into a document, or insert a whiteboard and draw on an infinite canvas.",
+						name: "Images and videos",
+						body: "Drop media into a document. It shows up in the preview and on your slides.",
 					},
 					{
 						name: "Folders, tags and keyboard",
@@ -161,12 +168,8 @@ let en: LandingContent = {
 				title: "Present",
 				items: [
 					{
-						name: "Slides from the same file",
-						body: "Add mode: present to the frontmatter. Separate slides with ---. Indented lines go on the slide, the rest are your notes.",
-					},
-					{
-						name: "Teleprompter and laser pointer",
-						body: "Run the slideshow on one screen and the teleprompter on your phone or laptop. Highlight text or draw fading laser trails on the slide.",
+						name: "Laser pointer",
+						body: "Highlight text or draw fading laser trails on the slide, also from the teleprompter on your phone.",
 					},
 					{
 						name: "Themes and PDF",
@@ -266,15 +269,15 @@ let de: LandingContent = {
 	hero: {
 		badge: "Kostenlose öffentliche Beta",
 		title: "Schreib in Markdown. Teile es, präsentiere es, behalte es.",
-		lede: "Alkalye ist ein Markdown-Editor, der im Browser läuft und sich als App installieren lässt. Er funktioniert offline und synchronisiert Ende-zu-Ende-verschlüsselt. Ein Dokument kann Notiz, gemeinsamer Entwurf oder Präsentation sein.",
+		lede: "Alkalye ist ein Markdown-Editor für Notizen, Entwürfe und Vorträge. Schreib auf jedem Gerät, auch offline, bearbeite gemeinsam mit Live-Cursorn und präsentiere dieselbe Datei als Folien. Alles synchronisiert Ende-zu-Ende-verschlüsselt.",
 		primaryAction: "Losschreiben",
 		secondaryAction: "Was es kann",
 		facts: ["Kein Konto zum Start nötig", "Funktioniert offline", "MIT-Lizenz"],
 	},
 	demo: {
-		title: "Alkalye in Aktion",
+		title: "Ein Vortrag, von der ersten Notiz bis zur Bühne",
 		stage: {
-			fileName: "alkalye-in-aktion.md",
+			fileName: "kurzvortrag.md",
 			views: {
 				editor: "Schreiben",
 				preview: "Vorschau",
@@ -282,38 +285,45 @@ let de: LandingContent = {
 				teleprompter: "Teleprompter",
 				whiteboard: "Whiteboard",
 			},
+			offline: "{name} ist offline",
+			synced: "Änderungen von {name} synchronisiert",
 		},
-		lede: "Scroll weiter, und das Dokument auf dieser Seite schreibt, synchronisiert und präsentiert sich selbst. Es sind der echte Editor, die Vorschau, die Präsentation, der Teleprompter und das Whiteboard aus der App mit einem vorbereiteten Beispiel. Nichts wird gespeichert oder gesendet.",
+		lede: "Scroll weiter und sieh zu, wie Carl und Mia in einem Alkalye-Dokument einen Kurzvortrag vorbereiten. Es sind der echte Editor, die Vorschau, die Präsentation, der Teleprompter und das Whiteboard aus der App mit einem vorbereiteten Beispiel. Nichts wird gespeichert oder gesendet.",
 		scenes: [
 			{
 				id: "write",
-				title: "Schreib in schlichtem Markdown",
-				body: "Eine Überschrift ist ein #, eine Folienzeile ist eingerückt, alles andere ist deine Notiz. Die Datei bleibt in jedem Texteditor lesbar.",
+				title: "Carl schreibt den Vortrag als Notizen",
+				body: "Es ist schlichtes Markdown. Eingerückte Zeilen werden zu Folien, alles andere bleibt seine Sprechernotiz. Vortrag und das, was er sagen will, stehen in einer Datei.",
 			},
 			{
 				id: "together",
-				title: "Gemeinsam schreiben, live",
-				body: "Teile einen Link und sieh, wer wo tippt. Jede Änderung wird auf dem Gerät der schreibenden Person verschlüsselt, bevor sie synchronisiert wird. Der Server speichert nur Daten, die er nicht lesen kann.",
+				title: "Mia korrigiert eine Folie am Handy",
+				body: "Carl teilt einen Link und sieht ihren Cursor auftauchen. Jede Änderung wird auf dem Gerät der schreibenden Person verschlüsselt, bevor sie synchronisiert wird. Der Server speichert nur Daten, die er nicht lesen kann.",
+			},
+			{
+				id: "offline",
+				title: "Im Zug schreibt sie weiter",
+				body: "Kein Netz, kein Problem. Mia schreibt offline, und ihre Folie erscheint bei Carl, sobald sie wieder online ist.",
 			},
 			{
 				id: "preview",
-				title: "Als Seite lesen",
-				body: "Die Vorschau zeigt denselben Text als gestaltetes Dokument. Wähle ein eingebautes Theme oder bring eigenes HTML und CSS mit.",
+				title: "Alle können mitlesen",
+				body: "Die Vorschau zeigt dieselbe Datei als gestaltete Seite, praktisch als Handout. Wähle ein eingebautes Theme oder bring eigenes HTML und CSS mit.",
 			},
 			{
 				id: "present",
-				title: "Dieselbe Datei präsentieren",
-				body: "Füge mode: present im Frontmatter hinzu, und das Dokument wird zur Präsentation. Jedes --- beginnt eine neue Folie, und nur eingerückte Zeilen erscheinen darauf.",
+				title: "Carl macht daraus Folien",
+				body: "Eine Zeile Frontmatter, mode: present, und das Dokument wird zur Präsentation. Jedes --- beginnt eine neue Folie.",
 			},
 			{
 				id: "teleprompter",
-				title: "Notizen auf dem Handy",
-				body: "Der Teleprompter zeigt Folien und Sprechernotizen zusammen und läuft beim Präsentieren mit, auf demselben oder einem anderen Gerät.",
+				title: "Und präsentiert vom Handy",
+				body: "Der Teleprompter zeigt jede Folie mit ihren Sprechernotizen und läuft beim Präsentieren mit, auf demselben oder einem anderen Gerät.",
 			},
 			{
 				id: "whiteboard",
-				title: "Auf dem Whiteboard skizzieren",
-				body: "Füge in jedes Dokument ein Whiteboard ein und zeichne auf einer unendlichen Fläche. Es erscheint als Bild im Text, in der Vorschau und auf deinen Folien.",
+				title: "Eine schnelle Skizze für die Fragerunde",
+				body: "Füge irgendwo ein Whiteboard ein und zeichne auf einer unendlichen Fläche. Es erscheint als Bild im Text, in der Vorschau und auf den Folien.",
 			},
 		],
 		tldrawCredit: {
@@ -338,7 +348,7 @@ let de: LandingContent = {
 	},
 	features: {
 		title: "Was du damit machen kannst",
-		lede: "Alles hier ist heute in der App. Details stehen im Changelog.",
+		lede: "Über den Vortrag oben hinaus ist all das heute in der App. Details stehen im Changelog.",
 		groups: [
 			{
 				title: "Schreiben",
@@ -352,8 +362,8 @@ let de: LandingContent = {
 						body: "Tippe [[, um ein anderes Dokument zu verlinken. Backlinks zeigen, was auf eine Notiz verweist.",
 					},
 					{
-						name: "Bilder, Videos und Whiteboards",
-						body: "Zieh Medien ins Dokument oder füge ein Whiteboard ein und zeichne auf einer unendlichen Fläche.",
+						name: "Bilder und Videos",
+						body: "Zieh Medien ins Dokument. Sie erscheinen in der Vorschau und auf deinen Folien.",
 					},
 					{
 						name: "Ordner, Tags und Tastatur",
@@ -365,12 +375,8 @@ let de: LandingContent = {
 				title: "Präsentieren",
 				items: [
 					{
-						name: "Folien aus derselben Datei",
-						body: "Schreib mode: present ins Frontmatter. Trenne Folien mit ---. Eingerückte Zeilen kommen auf die Folie, der Rest sind deine Notizen.",
-					},
-					{
-						name: "Teleprompter und Laserpointer",
-						body: "Die Präsentation läuft auf einem Bildschirm, der Teleprompter auf Handy oder Laptop. Markiere Text oder zeichne verblassende Laserspuren auf die Folie.",
+						name: "Laserpointer",
+						body: "Markiere Text oder zeichne verblassende Laserspuren auf die Folie, auch vom Teleprompter auf deinem Handy aus.",
 					},
 					{
 						name: "Designs und PDF",

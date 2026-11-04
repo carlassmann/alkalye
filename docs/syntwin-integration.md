@@ -30,7 +30,7 @@ The cbook run verified desktop chat on `/en/`, history continuing into `/app/doc
 
 The follow-up on cshed verified German chat labels and a German answer about Carl's origin story, including permission to ask about Tilly. The provider privacy link returned 404 because Omny uses a relative URL. Alkalye now redirects `/legal/privacy` and `/de/legal/privacy` to Syntwin's corresponding policy pages.
 
-## Alkalye in action demo
+## Landing page demo
 
 The landing page's scroll demo renders the app's editor, preview, slideshow, teleprompter and tldraw canvas with a scripted document. Each scene's heading and explanation are static HTML beside the stage, so page reading works without the demo. Checked against Omny's text reader on 4 November 2026: it skips `contenteditable` and `role="textbox"`, so the demo editor's text is invisible to Syntwin. Preview, slide, teleprompter and whiteboard label text is readable. The reader also returns the text of inline `<style>` elements, so preview and slideshow scenes include theme CSS noise. Don't claim Syntwin can inspect drawings beyond their text labels.
 

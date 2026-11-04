@@ -6,6 +6,7 @@ export type {
 	DemoView,
 	DemoSceneId,
 	DemoCollaborator,
+	DemoConnection,
 	DemoStageLabels,
 }
 
@@ -13,6 +14,7 @@ let demoSceneIds = [
 	"intro",
 	"write",
 	"together",
+	"offline",
 	"preview",
 	"present",
 	"teleprompter",
@@ -30,6 +32,8 @@ type DemoView =
 interface DemoStageLabels {
 	fileName: string
 	views: Record<DemoView, string>
+	offline: string
+	synced: string
 }
 
 interface DemoCollaborator {
@@ -41,6 +45,8 @@ interface DemoEdit {
 	at: "start" | "end"
 	text: string
 	by: DemoCollaborator | null
+	// Written without a connection: the others see it only once it syncs.
+	offline?: boolean
 }
 
 interface DemoScene {
@@ -49,11 +55,17 @@ interface DemoScene {
 	edit?: DemoEdit
 }
 
+interface DemoConnection {
+	collaborator: DemoCollaborator
+	state: "offline" | "synced"
+}
+
 interface DemoFrame {
 	sceneId: DemoSceneId
 	view: DemoView
 	content: string
 	typist: { collaborator: DemoCollaborator; position: number } | null
+	connection: DemoConnection | null
 	// 0..1 within the scene's own animation, after any typing has finished
 	viewProgress: number
 }
@@ -61,28 +73,39 @@ interface DemoFrame {
 let carl: DemoCollaborator = { name: "Carl", color: "#059669" }
 let mia: DemoCollaborator = { name: "Mia", color: "#7c3aed" }
 
+// Carl and Mia prepare a lightning talk. Indented lines are the slides,
+// unindented lines are Carl's speaker notes.
 let documents: Record<LandingLocale, Record<DemoSceneId, string>> = {
 	en: {
 		intro: [
-			"# Alkalye in action",
+			"# Write once, present anywhere",
 			"",
-			"\tThis is a real Alkalye editor.",
+			"\tA lightning talk",
 			"",
 		].join("\n"),
 		write: [
 			"",
-			"Everything here is plain Markdown. Unindented lines are speaker notes, so only you see them.",
+			"I used to keep slides in one app and notes in another. They drifted apart.",
+			"",
+			"\tSlides are just the notes you show.",
 			"",
 		].join("\n"),
 		together: [
 			"",
 			"---",
 			"",
-			"# Write together",
+			"# Write it together",
 			"",
-			"\tMia joined from her phone.",
+			"\tMia fixed this slide from her phone.",
 			"",
-			"Her edits arrive live, encrypted on her device first.",
+		].join("\n"),
+		offline: [
+			"",
+			"---",
+			"",
+			"# No signal? Keep writing",
+			"",
+			"\tEdits wait on your device and sync when you are back.",
 			"",
 		].join("\n"),
 		preview: "",
@@ -92,14 +115,16 @@ let documents: Record<LandingLocale, Record<DemoSceneId, string>> = {
 	},
 	de: {
 		intro: [
-			"# Alkalye in Aktion",
+			"# Einmal schreiben, überall präsentieren",
 			"",
-			"\tDas ist ein echter Alkalye-Editor.",
+			"\tEin Kurzvortrag",
 			"",
 		].join("\n"),
 		write: [
 			"",
-			"Alles hier ist schlichtes Markdown. Nicht eingerückte Zeilen sind Sprechernotizen, die nur du siehst.",
+			"Früher lagen meine Folien in einer App und die Notizen in einer anderen. Sie liefen auseinander.",
+			"",
+			"\tFolien sind nur die Notizen, die man zeigt.",
 			"",
 		].join("\n"),
 		together: [
@@ -108,9 +133,16 @@ let documents: Record<LandingLocale, Record<DemoSceneId, string>> = {
 			"",
 			"# Gemeinsam schreiben",
 			"",
-			"\tMia ist von ihrem Handy aus dabei.",
+			"\tMia hat diese Folie am Handy korrigiert.",
 			"",
-			"Ihre Änderungen kommen live an, vorher auf ihrem Gerät verschlüsselt.",
+		].join("\n"),
+		offline: [
+			"",
+			"---",
+			"",
+			"# Kein Netz? Weiterschreiben",
+			"",
+			"\tÄnderungen warten auf dem Gerät und synchronisieren, sobald du wieder online bist.",
 			"",
 		].join("\n"),
 		preview: "",
@@ -138,6 +170,11 @@ function demoScenes(locale: LandingLocale): DemoScene[] {
 			view: "editor",
 			edit: { at: "end", text: text.together, by: mia },
 		},
+		{
+			id: "offline",
+			view: "editor",
+			edit: { at: "end", text: text.offline, by: mia, offline: true },
+		},
 		{ id: "preview", view: "preview" },
 		{
 			id: "present",
@@ -157,6 +194,8 @@ function demoIntroText(locale: LandingLocale): string {
 // Typing takes the first part of a scene that switches views, so the
 // visitor sees the edit before the result.
 let typingShareBeforeViewSwitch = 0.45
+// An offline edit stays on the writer's device for most of its scene.
+let offlineShare = 0.6
 
 function demoFrameAt(
 	scenes: DemoScene[],
@@ -175,7 +214,29 @@ function demoFrameAt(
 			view: scene.view,
 			content,
 			typist: null,
+			connection: null,
 			viewProgress: clampedProgress,
+		}
+	}
+
+	if (scene.edit.offline) {
+		let isOffline = clampedProgress < offlineShare
+		let synced = applyEdit(content, scene.edit, isOffline ? 0 : 1)
+		return {
+			sceneId: scene.id,
+			view: scene.view,
+			content: synced,
+			typist:
+				scene.edit.by && !isOffline
+					? { collaborator: scene.edit.by, position: synced.length }
+					: null,
+			connection: scene.edit.by
+				? {
+						collaborator: scene.edit.by,
+						state: isOffline ? "offline" : "synced",
+					}
+				: null,
+			viewProgress: 0,
 		}
 	}
 
@@ -194,6 +255,7 @@ function demoFrameAt(
 		typist: scene.edit.by
 			? { collaborator: scene.edit.by, position: typistPosition }
 			: null,
+		connection: null,
 		viewProgress: isTyping
 			? 0
 			: (clampedProgress - typingShare) / (1 - typingShare),

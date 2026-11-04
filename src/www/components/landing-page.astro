@@ -115,7 +115,7 @@ let primaryButtonClass =
 		</header>
 
 		<main class="pb-[env(safe-area-inset-bottom)]">
-			<section aria-labelledby="hero-title" class="mx-auto grid max-w-[1200px] px-[calc(1rem+env(safe-area-inset-left))] pr-[calc(1rem+env(safe-area-inset-right))] lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-x-14">
+			<section aria-labelledby="hero-title" class="mx-auto grid max-w-[1200px] px-[calc(1rem+env(safe-area-inset-left))] pr-[calc(1rem+env(safe-area-inset-right))] grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-x-14">
 				<div data-demo-scene="intro" class="flex flex-col justify-center gap-6 pt-10 pb-8 lg:min-h-[calc(100svh-3.5rem)] lg:py-16">
 					<span class="w-fit border border-brand/30 bg-brand/8 px-2.5 py-1 text-xs font-medium tracking-wide text-brand">
 						{content.hero.badge}
@@ -156,7 +156,7 @@ let primaryButtonClass =
 						<h2 id="in-action-title" class={sectionTitleClass}>{content.demo.title}</h2>
 						<p class="max-w-[52ch] text-muted-foreground">{content.demo.lede}</p>
 					</div>
-					<ol aria-labelledby="in-action-title" class="flex flex-col pb-16 lg:pb-24">
+					<ol aria-labelledby="in-action-title" class="flex flex-col pb-16 lg:pb-24" data-syntwin-avoid="0px">
 						{content.demo.scenes.map(scene => (
 							<li id={`in-action-${scene.id}`} data-demo-scene={scene.id} class="flex min-h-[60svh] flex-col justify-center gap-2 py-8 lg:min-h-[85svh]">
 								<h3 class="text-xl font-semibold tracking-tight">{scene.title}</h3>
@@ -172,19 +172,15 @@ let primaryButtonClass =
 				</div>
 			</section>
 
-			{syntwinEnabled && (
-			<section aria-labelledby="twin-title" class="border-y border-border/60 bg-muted/30">
-				<div class:list={[sectionClass, "flex flex-col gap-6 py-10 md:flex-row md:items-center md:justify-between"]}>
-					<div class="flex max-w-[56ch] flex-col gap-2">
-						<h2 id="twin-title" class="text-xl font-semibold tracking-tight">{content.twin.title}</h2>
-						<p class="text-[15px] leading-7 text-muted-foreground">{content.twin.body}</p>
-					</div>
-					<div class="shrink-0">
-						<SyntwinLauncher locale={locale} client:load />
+			<section aria-labelledby="story-title" class="border-t border-border/60">
+				<div class:list={[sectionClass, "grid gap-6 py-16 md:grid-cols-[14rem_1fr] md:gap-12 md:py-20"]}>
+					<h2 id="story-title" class={sectionTitleClass}>{content.story.title}</h2>
+					<div class="flex max-w-[62ch] flex-col gap-5 text-[15px] leading-7 text-muted-foreground">
+						{content.story.paragraphs.map(paragraph => <p>{paragraph}</p>)}
+						<p class="text-sm font-medium text-foreground">{content.story.attribution}</p>
 					</div>
 				</div>
 			</section>
-			)}
 
 			<section id="features" aria-labelledby="features-title" class:list={[sectionClass, "scroll-mt-20 py-16 md:py-24"]}>
 				<div class="mb-10 flex flex-col gap-3">
@@ -205,16 +201,6 @@ let primaryButtonClass =
 							</dl>
 						</div>
 					))}
-				</div>
-			</section>
-
-			<section aria-labelledby="story-title" class="border-t border-border/60">
-				<div class:list={[sectionClass, "grid gap-6 py-16 md:grid-cols-[14rem_1fr] md:gap-12 md:py-20"]}>
-					<h2 id="story-title" class={sectionTitleClass}>{content.story.title}</h2>
-					<div class="flex max-w-[62ch] flex-col gap-5 text-[15px] leading-7 text-muted-foreground">
-						{content.story.paragraphs.map(paragraph => <p>{paragraph}</p>)}
-						<p class="text-sm font-medium text-foreground">{content.story.attribution}</p>
-					</div>
 				</div>
 			</section>
 
@@ -246,6 +232,20 @@ let primaryButtonClass =
 					{content.privacy.points.map(point => <li>{point}</li>)}
 				</ul>
 			</section>
+
+			{syntwinEnabled && (
+			<section aria-labelledby="twin-title" class="border-y border-border/60 bg-muted/30">
+				<div class:list={[sectionClass, "flex flex-col gap-6 py-10 md:flex-row md:items-center md:justify-between"]}>
+					<div class="flex max-w-[56ch] flex-col gap-2">
+						<h2 id="twin-title" class="text-xl font-semibold tracking-tight">{content.twin.title}</h2>
+						<p class="text-[15px] leading-7 text-muted-foreground">{content.twin.body}</p>
+					</div>
+					<div class="shrink-0">
+						<SyntwinLauncher locale={locale} client:load />
+					</div>
+				</div>
+			</section>
+			)}
 
 			{recentEntries.length > 0 && (
 				<section aria-labelledby="recent-title" class:list={[sectionClass, "border-t border-border py-16 md:py-20"]}>

@@ -104,11 +104,16 @@ function DemoStage({ locale, labels }: DemoStageProps) {
 	)
 
 	return (
-		<DemoChrome labels={labels} view={frame.view} people={people}>
+		<DemoChrome
+			labels={labels}
+			view={frame.view}
+			people={people}
+			connection={frame.connection}
+		>
 			<div
 				key={frame.view}
 				className={cn(
-					"animate-in fade-in-30 zoom-in-[0.98] flex min-h-0 flex-1 flex-col duration-500 ease-out motion-reduce:animate-none",
+					"animate-in fade-in-30 zoom-in-[0.98] flex min-h-0 min-w-0 flex-1 flex-col duration-500 ease-out motion-reduce:animate-none",
 					// Phones see more of each view at a smaller size. tldraw has its
 					// own camera and measures wrong under CSS zoom.
 					frame.view !== "whiteboard" && "max-sm:[zoom:0.8]",
@@ -242,7 +247,7 @@ function DemoPreview({
 	}, [frame.viewProgress])
 
 	return (
-		<div ref={scroller} className="min-h-0 flex-1 overflow-hidden">
+		<div ref={scroller} className="min-h-0 min-w-0 flex-1 overflow-hidden">
 			<PreviewView
 				content={frame.content}
 				wikilinks={noWikilinks}

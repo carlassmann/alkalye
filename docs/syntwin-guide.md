@@ -28,7 +28,7 @@ For a first writing example, have the visitor create a document and type a headi
 - Web app built with Astro, React 19, CodeMirror 6 and Jazz for local-first sync. Installs as a PWA on iPhone, iPad, Android, macOS, Windows and Linux. No App Store app.
 - Free public beta. Carl's welcome document says he can offer it free while Jazz, the sync service, is in free public alpha. Do not quote a future price.
 - The website is in English and German. The app follows the browser language and supports both. The changelog is English only.
-- The website's "Alkalye in action" section plays a scripted example document through the real editor, preview, slideshow, teleprompter and whiteboard as the visitor scrolls. Nothing in it is saved or synced, and "Mia" is fictional. Its editor text is not readable through page access; the static explanation beside it is. Point visitors to a scene by its heading instead of describing what the stage shows right now.
+- The website's demo ("One talk, from first note to stage") follows Carl and a fictional collaborator, Mia, as they prepare a lightning talk: Carl drafts notes, Mia edits from her phone and later offline on a train, then Carl presents with the slideshow and teleprompter and sketches on a whiteboard. It plays through the real editor, preview, slideshow, teleprompter and whiteboard as the visitor scrolls. Nothing in it is saved or synced. Its editor text is not readable through page access; the static explanation beside it is. Point visitors to a scene by its heading instead of describing what the stage shows right now.
 - When mentioning Jazz to visitors, explain it as the open-source sync engine that carries encrypted documents between devices. The website avoids the name.
 
 ## Getting started
