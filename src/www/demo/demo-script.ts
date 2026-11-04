@@ -74,8 +74,7 @@ interface DemoFrame {
 }
 
 // Carl prepares a lightning talk on his own phone and Mac, the situation
-// Alkalye was built for. Indented lines are the slides, unindented lines are
-// his speaker notes.
+// Alkalye was built for.
 let devices: Record<LandingLocale, Record<DemoDevice, DemoCollaborator>> = {
 	en: {
 		phone: { name: "Carl · phone", color: "#059669", device: "phone" },
@@ -87,16 +86,21 @@ let devices: Record<LandingLocale, Record<DemoDevice, DemoCollaborator>> = {
 	},
 }
 
+// Each slide is one heading with an indented line right below it, so it
+// renders as a single centered block. Unindented lines are speaker notes.
 let documents: Record<LandingLocale, Record<DemoSceneId, string>> = {
 	en: {
-		intro: ["# One person, two devices", "", "\tA lightning talk", ""].join(
-			"\n",
-		),
+		intro: ["# One person, two devices", "\tA lightning talk", ""].join("\n"),
 		write: [
 			"",
-			"Story: notes on my phone, then on my Mac, and the app asked which version to keep.",
+			"Why I built Alkalye.",
 			"",
+			"---",
+			"",
+			"# “Which version do you want to keep?”",
 			"\tI was the only one editing.",
+			"",
+			"Notes on my phone, then on my Mac. The app thought we were two people.",
 			"",
 		].join("\n"),
 		desk: [
@@ -104,7 +108,6 @@ let documents: Record<LandingLocale, Record<DemoSceneId, string>> = {
 			"---",
 			"",
 			"# Multiplayer for one",
-			"",
 			"\tEvery device is just another cursor.",
 			"",
 		].join("\n"),
@@ -113,7 +116,6 @@ let documents: Record<LandingLocale, Record<DemoSceneId, string>> = {
 			"---",
 			"",
 			"# No signal? Keep writing",
-			"",
 			"\tIt syncs when you are back.",
 			"",
 		].join("\n"),
@@ -123,14 +125,17 @@ let documents: Record<LandingLocale, Record<DemoSceneId, string>> = {
 		whiteboard: "",
 	},
 	de: {
-		intro: ["# Eine Person, zwei Geräte", "", "\tEin Kurzvortrag", ""].join(
-			"\n",
-		),
+		intro: ["# Eine Person, zwei Geräte", "\tEin Kurzvortrag", ""].join("\n"),
 		write: [
 			"",
-			"Geschichte: Notizen auf dem Handy, dann auf dem Mac, und die App fragte, welche Version ich behalten will.",
+			"Warum ich Alkalye gebaut habe.",
 			"",
+			"---",
+			"",
+			"# „Welche Version willst du behalten?“",
 			"\tIch war der Einzige, der schrieb.",
+			"",
+			"Notizen auf dem Handy, dann auf dem Mac. Die App hielt uns für zwei Personen.",
 			"",
 		].join("\n"),
 		desk: [
@@ -138,7 +143,6 @@ let documents: Record<LandingLocale, Record<DemoSceneId, string>> = {
 			"---",
 			"",
 			"# Multiplayer für eine Person",
-			"",
 			"\tJedes Gerät ist nur ein weiterer Cursor.",
 			"",
 		].join("\n"),
@@ -147,7 +151,6 @@ let documents: Record<LandingLocale, Record<DemoSceneId, string>> = {
 			"---",
 			"",
 			"# Kein Netz? Weiterschreiben",
-			"",
 			"\tEs synchronisiert, sobald du wieder online bist.",
 			"",
 		].join("\n"),

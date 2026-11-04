@@ -86,7 +86,7 @@ let en: LandingContent = {
 			{
 				id: "write",
 				title: "An idea on the go, written on his phone",
-				body: "It is plain Markdown. Indented lines become slides, everything else stays his speaker notes, so the talk and what he wants to say live in one file.",
+				body: "It is plain Markdown. Headings and indented lines go on the slides, everything else stays his speaker notes, so the talk and what he wants to say live in one file.",
 			},
 			{
 				id: "desk",
@@ -293,7 +293,7 @@ let de: LandingContent = {
 			{
 				id: "write",
 				title: "Eine Idee unterwegs, auf dem Handy notiert",
-				body: "Es ist schlichtes Markdown. Eingerückte Zeilen werden zu Folien, alles andere bleibt seine Sprechernotiz. Vortrag und das, was er sagen will, stehen in einer Datei.",
+				body: "Es ist schlichtes Markdown. Überschriften und eingerückte Zeilen kommen auf die Folien, alles andere bleibt seine Sprechernotiz. Vortrag und das, was er sagen will, stehen in einer Datei.",
 			},
 			{
 				id: "desk",
