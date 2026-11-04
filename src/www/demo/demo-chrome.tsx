@@ -10,14 +10,6 @@ import type {
 
 export { DemoChrome }
 
-let views: DemoView[] = [
-	"editor",
-	"preview",
-	"slideshow",
-	"teleprompter",
-	"whiteboard",
-]
-
 function DemoChrome({
 	labels,
 	view,
@@ -36,41 +28,34 @@ function DemoChrome({
 			data-demo-view={view}
 			className="border-border bg-background @container relative flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden border shadow-2xl shadow-black/10 dark:shadow-black/40"
 		>
-			<div className="border-border flex h-10 shrink-0 items-center gap-3 border-b px-3">
-				<span className="text-muted-foreground min-w-0 truncate font-mono text-xs">
-					{labels.fileName}
+			<div className="border-border bg-muted/40 grid h-9 shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-3 border-b px-3">
+				<span className="flex gap-1.5" aria-hidden>
+					<span className="bg-muted-foreground/30 size-2.5 rounded-full" />
+					<span className="bg-muted-foreground/30 size-2.5 rounded-full" />
+					<span className="bg-muted-foreground/30 size-2.5 rounded-full" />
 				</span>
-				<ol className="ml-auto flex items-center gap-1">
-					{views.map(candidate => (
-						<li
-							key={candidate}
-							aria-current={candidate === view ? "step" : undefined}
-							className={cn(
-								"px-2 py-0.5 text-xs whitespace-nowrap transition-[color,background-color,opacity] duration-300",
-								candidate === view
-									? "bg-foreground text-background"
-									: "text-muted-foreground @max-xl:hidden",
-							)}
-						>
-							{labels.views[candidate]}
-						</li>
-					))}
-				</ol>
-				<ul className="flex -space-x-1.5">
+				<p className="text-muted-foreground min-w-0 truncate text-xs">
+					<span className="font-mono">{labels.fileName}</span>
+					<span key={view} className="animate-in fade-in duration-300">
+						{" · "}
+						{labels.views[view]}
+					</span>
+				</p>
+				<ul className="flex -space-x-1.5 justify-self-end">
 					{people.map(person => (
 						<li
 							key={person.name}
 							title={person.name}
 							style={{ backgroundColor: person.color }}
 							className={cn(
-								"animate-in fade-in zoom-in-50 ring-background flex size-7 items-center justify-center rounded-full text-[10px] font-semibold text-white ring-2 transition-[filter,opacity] duration-500",
+								"animate-in fade-in zoom-in-50 ring-background flex size-6 items-center justify-center rounded-full text-white ring-2 transition-[filter,opacity] duration-500",
 								isOffline(connection, person) && "opacity-40 grayscale",
 							)}
 						>
 							{person.device === "phone" ? (
-								<SmartphoneIcon className="size-3.5" aria-hidden />
+								<SmartphoneIcon className="size-3" aria-hidden />
 							) : (
-								<LaptopIcon className="size-3.5" aria-hidden />
+								<LaptopIcon className="size-3" aria-hidden />
 							)}
 							<span className="sr-only">{person.name}</span>
 						</li>
@@ -79,9 +64,10 @@ function DemoChrome({
 			</div>
 			<div className="relative flex min-h-0 flex-1 flex-col">
 				<div className="isolate flex min-h-0 flex-1 flex-col">{children}</div>
-				{/* The page scroll drives the demo. Touches and wheel on the stage
-				    must scroll the page, not the editor or canvas underneath. */}
-				<div className="absolute inset-0" />
+				{/* The page scroll drives the demo. Touches and wheel on the views
+				    must scroll the page, not the preview or canvas underneath.
+				    The editor stays open for visitors to type in. */}
+				{view !== "editor" && <div className="absolute inset-0" />}
 				{connection && (
 					<ConnectionBadge connection={connection} labels={labels} />
 				)}
@@ -104,7 +90,7 @@ function ConnectionBadge({
 			key={state}
 			role="status"
 			className={cn(
-				"animate-in fade-in slide-in-from-top-1 absolute top-3 right-3 flex items-center gap-2 border px-2.5 py-1 text-xs shadow-sm duration-300",
+				"animate-in fade-in slide-in-from-top-1 absolute top-14 right-3 z-20 flex items-center gap-2 border px-2.5 py-1 text-xs shadow-sm duration-300",
 				state === "offline"
 					? "border-border bg-muted text-muted-foreground"
 					: "border-transparent bg-emerald-600 text-white",

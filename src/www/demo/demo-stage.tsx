@@ -5,7 +5,11 @@ import {
 	createRootRoute,
 	createRouter,
 } from "@tanstack/react-router"
-import { MarkdownEditor, type MarkdownEditorRef } from "@/app/features/editor"
+import {
+	EditorToolbar,
+	MarkdownEditor,
+	type MarkdownEditorRef,
+} from "@/app/features/editor"
 import { PreviewView } from "@/app/features/documents"
 import {
 	SlideshowView,
@@ -33,6 +37,7 @@ import {
 	demoScenes,
 	type DemoCollaborator,
 	type DemoFrame,
+	type DemoSceneId,
 	type DemoStageLabels,
 } from "./demo-script"
 import { DemoChrome } from "./demo-chrome"
@@ -77,7 +82,11 @@ function createDemoRouter(props: DemoStageProps) {
 	return createRouter({
 		routeTree: createRootRoute({
 			component: () => (
-				<SidebarProvider>
+				// The app's sidebar state must not shift or change the demo.
+				<SidebarProvider
+					data-left-sidebar-open={false}
+					data-right-sidebar-open={false}
+				>
 					<DemoStage {...props} />
 				</SidebarProvider>
 			),
@@ -260,9 +269,18 @@ function DemoPreview({
 	)
 }
 
+// Visitors can type into the demo. Their draft replaces the scripted text
+// until the next scene, and stays in memory only.
+interface VisitorDraft {
+	sceneId: DemoSceneId
+	text: string
+}
+
 function DemoEditor({ frame }: { frame: DemoFrame }) {
 	let editor = useRef<MarkdownEditorRef>(null)
-	let typist = frame.typist
+	let [draft, setDraft] = useState<VisitorDraft | null>(null)
+	let visitorText = draft?.sceneId === frame.sceneId ? draft.text : null
+	let typist = visitorText === null ? frame.typist : null
 	let typingAt = typist?.position ?? frame.content.length
 
 	useEffect(() => {
@@ -289,6 +307,7 @@ function DemoEditor({ frame }: { frame: DemoFrame }) {
 						: [],
 				),
 			})
+			if (!typist) return
 			// Scroll only the editor; CodeMirror's scrollIntoView would also move the page.
 			let line = view.lineBlockAt(Math.min(typingAt, view.state.doc.length))
 			view.scrollDOM.scrollTop = line.top - view.scrollDOM.clientHeight / 2
@@ -298,20 +317,36 @@ function DemoEditor({ frame }: { frame: DemoFrame }) {
 	}, [typist, typingAt, frame.content])
 
 	return (
-		<div className="min-h-0 flex-1 overflow-hidden [&_.cm-editor]:h-full [&>*]:h-full">
-			<MarkdownEditor
-				ref={editor}
-				value={frame.content}
-				onChange={() => {}}
-				extensions={editorExtensions}
-				readOnly
-				typeToFocus={false}
-				spellcheck={false}
-				autocomplete={false}
-			/>
+		// The app pins its toolbar and editor to the window. The transform makes
+		// this stage their window. The scroller stays hidden so wheel and touch
+		// scroll the page, which drives the demo.
+		<div className="relative min-h-0 flex-1 [transform:translateZ(0)] overflow-hidden [&_.cm-scroller]:overflow-hidden!">
+			<div className="markdown-editor">
+				<MarkdownEditor
+					ref={editor}
+					value={visitorText ?? frame.content}
+					onChange={readContent => {
+						// Scripted updates also report a change; only the visitor focuses.
+						if (!editor.current?.getEditor()?.hasFocus) return
+						setDraft({ sceneId: frame.sceneId, text: readContent() })
+					}}
+					extensions={editorExtensions}
+					typeToFocus={false}
+					spellcheck={false}
+					autocomplete={false}
+				/>
+				<EditorToolbar
+					editor={editor}
+					onToggleLeftSidebar={ignoreSidebarToggle}
+					onToggleRightSidebar={ignoreSidebarToggle}
+				/>
+			</div>
 		</div>
 	)
 }
+
+// The demo has no document list or settings to open.
+function ignoreSidebarToggle() {}
 
 function stepIndex(progress: number, count: number): number {
 	if (count === 0) return 0

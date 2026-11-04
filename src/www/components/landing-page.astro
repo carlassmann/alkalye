@@ -41,6 +41,9 @@ let introDocument = demoIntroText(locale)
 
 let sectionClass =
 	"mx-auto max-w-[960px] px-[calc(1rem+env(safe-area-inset-left))] pr-[calc(1rem+env(safe-area-inset-right))]"
+// The header lines up with the hero, which is wider than the text sections.
+let heroWidthClass =
+	"mx-auto max-w-[1440px] px-[calc(1rem+env(safe-area-inset-left))] pr-[calc(1rem+env(safe-area-inset-right))] lg:px-[calc(2rem+env(safe-area-inset-left))] lg:pr-[calc(2rem+env(safe-area-inset-right))]"
 let sectionTitleClass =
 	"text-[clamp(1.5rem,3vw,2rem)] font-semibold tracking-tight"
 let primaryButtonClass =
@@ -90,7 +93,7 @@ let primaryButtonClass =
 	</head>
 	<body class="bg-background text-foreground font-sans overflow-y-auto overscroll-auto">
 		<header class="sticky top-0 z-50 border-b border-border/60 bg-background/85 pt-[env(safe-area-inset-top)] backdrop-blur-md">
-			<nav class:list={[sectionClass, "flex items-center justify-between gap-3 py-2"]}>
+			<nav class:list={[heroWidthClass, "flex items-center justify-between gap-3 py-2"]}>
 				<a href={homePath} class="flex items-center gap-2 text-sm font-semibold tracking-tight">
 					<img src="/icons/alkalye-icon.png" alt="" width="24" height="24" class="size-6" />
 					Alkalye
@@ -115,12 +118,12 @@ let primaryButtonClass =
 		</header>
 
 		<main class="pb-[env(safe-area-inset-bottom)]">
-			<section aria-labelledby="hero-title" class="mx-auto grid max-w-[1200px] px-[calc(1rem+env(safe-area-inset-left))] pr-[calc(1rem+env(safe-area-inset-right))] grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,0.75fr)_minmax(0,1.25fr)] lg:gap-x-14">
+			<section aria-labelledby="hero-title" class:list={[heroWidthClass, "grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)] lg:gap-x-12"]}>
 				<div data-demo-scene="intro" class="flex flex-col justify-center gap-6 pt-10 pb-8 lg:min-h-[calc(100svh-3.5rem)] lg:py-16">
 					<span class="w-fit border border-brand/30 bg-brand/8 px-2.5 py-1 text-xs font-medium tracking-wide text-brand">
 						{content.hero.badge}
 					</span>
-					<h1 id="hero-title" class="text-[clamp(2.25rem,5vw,3.5rem)] leading-[1.05] font-semibold tracking-tight text-balance">
+					<h1 id="hero-title" class="text-[clamp(2.25rem,3.6vw,3.25rem)] leading-[1.05] font-semibold tracking-tight text-balance">
 						{content.hero.title}
 					</h1>
 					<p class="max-w-[52ch] text-lg leading-relaxed text-muted-foreground">
@@ -142,11 +145,12 @@ let primaryButtonClass =
 					</ul>
 				</div>
 
-				<div data-demo-stage class="sticky top-14 z-10 bg-background py-3 lg:top-[5.5rem] lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:my-8 lg:flex lg:h-[calc(100svh-7.5rem)] lg:items-start lg:self-start lg:py-0 lg:pt-4">
+				<div data-demo-stage class="sticky top-14 z-10 bg-background py-3 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:flex lg:h-[calc(100svh-3.5rem)] lg:items-center lg:self-start lg:bg-transparent lg:py-8">
 					<div class="h-[min(60svh,560px)] w-full sm:aspect-[16/10] sm:h-auto sm:max-h-[60svh] lg:max-h-full">
 						<AlkalyeInAction locale={locale} labels={content.demo.stage} client:only="react">
 							<div slot="fallback" class="h-full w-full overflow-hidden border border-border bg-background shadow-2xl shadow-black/10 dark:shadow-black/40">
-								<div class="h-10 border-b border-border"></div>
+								<div class="h-9 border-b border-border bg-muted/40"></div>
+								<div class="h-12 border-b border-border"></div>
 								<pre class="px-6 py-8 font-mono text-[15px] leading-7 whitespace-pre-wrap [tab-size:4]"><code>{introDocument}</code></pre>
 							</div>
 						</AlkalyeInAction>
