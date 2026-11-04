@@ -18,6 +18,7 @@ export { Slideshow, SlideshowView, getSlides } from "./widgets/slideshow"
 export type { Slide } from "./widgets/slideshow"
 export { Teleprompter, groupBySlide } from "./widgets/teleprompter"
 export type { SlideGroup } from "./widgets/teleprompter"
+export { TeleprompterTopBar } from "./widgets/teleprompter-top-bar"
 export { SidebarPresentationLinks } from "./widgets/sidebar-presentation-links"
 export {
 	SlideshowScreen,

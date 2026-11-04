@@ -145,8 +145,10 @@ let primaryButtonClass =
 					</ul>
 				</div>
 
-				<div data-demo-stage class="sticky top-14 z-10 bg-background py-3 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:flex lg:h-[calc(100svh-3.5rem)] lg:items-center lg:self-start lg:bg-transparent lg:py-8">
-					<div class="h-[min(60svh,560px)] w-full sm:aspect-[16/10] sm:h-auto sm:max-h-[60svh] lg:max-h-full">
+				<!-- The stage starts beside the hero and widens over its column once the
+				     hero has scrolled away; the demo script sets --demo-expand. -->
+				<div data-demo-stage class="sticky top-14 z-10 flex h-[calc(100svh-3.5rem)] flex-col items-center justify-center gap-2 bg-background py-3 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:ml-[calc(var(--demo-expand,0)*-1*(100%*0.7/1.3+3rem))] lg:self-start lg:py-6">
+					<div class="min-h-0 w-full flex-1 sm:aspect-[16/10] sm:max-w-[calc((100svh-9rem)*1.6)] sm:flex-none">
 						<AlkalyeInAction locale={locale} labels={content.demo.stage} client:only="react">
 							<div slot="fallback" class="h-full w-full overflow-hidden border border-border bg-background shadow-2xl shadow-black/10 dark:shadow-black/40">
 								<div class="h-9 border-b border-border bg-muted/40"></div>
@@ -155,23 +157,30 @@ let primaryButtonClass =
 							</div>
 						</AlkalyeInAction>
 					</div>
+					<p class="text-center text-xs text-muted-foreground" data-syntwin-avoid="0px">
+						{content.demo.caption}
+						{" "}{content.demo.tldrawCredit.before}<a href="https://tldraw.dev" target="_blank" rel="noopener" class="font-medium text-foreground underline underline-offset-4">{content.demo.tldrawCredit.link}</a>.
+					</p>
 				</div>
 
 				<div id="in-action" class="scroll-mt-20 lg:col-start-1">
-					<div class="flex flex-col gap-3 pt-10 lg:pt-24">
-						<h2 id="in-action-title" class={sectionTitleClass}>{content.demo.title}</h2>
-						<p class="max-w-[52ch] text-muted-foreground">{content.demo.lede}</p>
+					<!-- The stage tells the story. These notes give screen readers, search
+					     engines and Syntwin the same story, and their height sets how long
+					     each scene stays on stage while scrolling. -->
+					<div class="sr-only">
+						<h2 id="in-action-title">{content.demo.title}</h2>
+						<p>{content.demo.lede}</p>
 					</div>
-					<ol aria-labelledby="in-action-title" class="flex flex-col pb-[30svh] lg:pb-[45svh]" data-syntwin-avoid="0px">
+					<ol aria-labelledby="in-action-title" class="flex flex-col pb-[60svh]">
 						{content.demo.scenes.map(scene => (
-							<li id={`in-action-${scene.id}`} data-demo-scene={scene.id} class="flex min-h-[60svh] flex-col justify-center gap-2 py-8 lg:min-h-[85svh]">
-								<h3 class="text-xl font-semibold tracking-tight">{scene.title}</h3>
-								<p class="max-w-[46ch] text-[15px] leading-7 text-muted-foreground">{scene.body}</p>
-								{scene.id === "sketch" && (
-									<p class="max-w-[46ch] text-[15px] leading-7 text-muted-foreground">
-										{content.demo.tldrawCredit.before}<a href="https://tldraw.dev" target="_blank" rel="noopener" class="font-medium text-foreground underline underline-offset-4">{content.demo.tldrawCredit.link}</a>{content.demo.tldrawCredit.after}
-									</p>
-								)}
+							<li id={`in-action-${scene.id}`} data-demo-scene={scene.id} class="min-h-[90svh] lg:min-h-[100svh]">
+								<div class="sr-only">
+									<h3>{scene.title}</h3>
+									<p>{scene.body}</p>
+									{scene.id === "sketch" && (
+										<p>{content.demo.tldrawCredit.before}<a href="https://tldraw.dev">{content.demo.tldrawCredit.link}</a>{content.demo.tldrawCredit.after}</p>
+									)}
+								</div>
 							</li>
 						))}
 					</ol>

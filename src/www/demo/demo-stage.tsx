@@ -1,31 +1,12 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react"
-import {
-	RouterProvider,
-	createMemoryHistory,
-	createRootRoute,
-	createRouter,
-} from "@tanstack/react-router"
-import {
-	EditorToolbar,
-	MarkdownEditor,
-	type MarkdownEditorRef,
-} from "@/app/features/editor"
+import { MarkdownEditor, type MarkdownEditorRef } from "@/app/features/editor"
 import {
 	SlideshowView,
-	Teleprompter,
 	getSlides,
 	parsePresentation,
+	type PresentationItem,
 } from "@/app/features/presentation"
-import {
-	remoteCursorsExtension,
-	setRemoteCursorsEffect,
-} from "@/app/features/sharing"
-import {
-	CommentThreadCard,
-	CommentsPanel,
-	commentsExtension,
-	setCommentDecorationsEffect,
-} from "@/app/features/comments"
+import { CommentThreadCard, CommentsPanel } from "@/app/features/comments"
 import {
 	TimeMachineBottomBar,
 	TimeMachineToolbar,
@@ -34,9 +15,6 @@ import { resolveSyntaxTheme } from "@/app/features/syntax-highlighting"
 import type { ResolvedTheme } from "@/app/features/themes"
 import { CanvasErrorBoundary, type TldrawSave } from "@/app/features/assets"
 import { cn } from "@/app/lib/cn"
-import { SidebarProvider } from "@/app/components/ui/sidebar"
-import { IntlProvider } from "@/shared/intl/setup"
-import { messagesDe } from "@/shared/intl/messages"
 import type { LandingLocale } from "#www/landing-content"
 import {
 	demoFrameAt,
@@ -44,7 +22,6 @@ import {
 	demoSketch,
 	type DemoCollaborator,
 	type DemoComment,
-	type DemoCursor,
 	type DemoFrame,
 	type DemoSceneId,
 	type DemoStageLabels,
@@ -52,6 +29,10 @@ import {
 	type DemoView,
 } from "./demo-script"
 import { DemoChrome } from "./demo-chrome"
+import { DemoEditorPane } from "./demo-editor-pane"
+import { DemoPhone } from "./demo-phone"
+import type { DemoPhoneScreen, PhoneMessage } from "./demo-phone-protocol"
+import { DemoProviders } from "./demo-providers"
 import {
 	applyVisitorEdit,
 	diffVisitorEdit,
@@ -72,8 +53,6 @@ let builtInDocumentTheme: ResolvedTheme = {
 	isLoading: false,
 }
 let noWikilinks = new Map()
-// Comments are read-only here, so selecting one does nothing.
-let editorExtensions = [remoteCursorsExtension, commentsExtension(() => {})]
 
 interface DemoStageProps {
 	locale: LandingLocale
@@ -81,35 +60,11 @@ interface DemoStageProps {
 }
 
 function DemoStageRoot(props: DemoStageProps) {
-	let { locale } = props
-	let [router] = useState(() => createDemoRouter(props))
-	let stage = <RouterProvider router={router} />
-	return locale === "de" ? (
-		<IntlProvider messages={messagesDe} locale="de">
-			{stage}
-		</IntlProvider>
-	) : (
-		<IntlProvider>{stage}</IntlProvider>
+	return (
+		<DemoProviders locale={props.locale}>
+			<DemoStage {...props} />
+		</DemoProviders>
 	)
-}
-
-// The editor keeps find state in the route search and reads sidebar layout.
-// A memory router and sidebar context give it both without touching the page URL.
-function createDemoRouter(props: DemoStageProps) {
-	return createRouter({
-		routeTree: createRootRoute({
-			component: () => (
-				// The app's sidebar state must not shift or change the demo.
-				<SidebarProvider
-					data-left-sidebar-open={false}
-					data-right-sidebar-open={false}
-				>
-					<DemoStage {...props} />
-				</SidebarProvider>
-			),
-		}),
-		history: createMemoryHistory(),
-	})
 }
 
 function DemoStage({ locale, labels }: DemoStageProps) {
@@ -138,38 +93,138 @@ function DemoStage({ locale, labels }: DemoStageProps) {
 	])
 	let isEditing = frame.view === "editor" || frame.view === "review"
 	let introIsTyping = position.sceneIndex === 0 && introProgress < 1
+	let talk = talkAt(frame, visitor, appearance)
+	// The phone loads once the intro has typed, so it never delays the hero.
+	let phoneIsLoaded = !introIsTyping || position.sceneIndex > 0
+	let phoneIsShown = phoneScenes.has(frame.sceneId)
+
+	function handlePhone(message: PhoneMessage) {
+		if (message.type === "typed") visitor.type(message.content)
+		if (message.type === "index") visitor.pickTalkIndex(message.index)
+	}
 
 	return (
-		<DemoChrome
-			labels={labels}
-			view={frame.view}
-			people={people}
-			interactive={visitor.isInteractive}
-			hint={
-				visitor.wantsHint && !introIsTyping ? labels.hints[frame.view] : null
-			}
-			onActivate={visitor.activate}
-			onLeave={visitor.leave}
-		>
+		<div className="@container relative flex h-full w-full">
 			<div
-				// The editor stays mounted while comments open beside it.
-				key={isEditing ? "editor" : frame.view}
 				className={cn(
-					"animate-in fade-in-30 zoom-in-[0.98] flex min-h-0 min-w-0 flex-1 flex-col duration-500 ease-out motion-reduce:animate-none",
-					// Phones see more of each view at a smaller size. tldraw has its
-					// own camera and measures wrong under CSS zoom.
-					frame.view !== "whiteboard" && "max-sm:[zoom:0.8]",
+					"flex min-w-0 flex-1 transition-[margin] duration-700 ease-out",
+					phoneIsShown && "@3xl:mr-[27%]",
 				)}
 			>
-				<DemoViewContent
-					frame={frame}
-					visitor={visitor}
-					appearance={appearance}
-					locale={locale}
-				/>
+				<DemoChrome
+					labels={labels}
+					view={frame.view}
+					people={people}
+					interactive={visitor.isInteractive}
+					hint={
+						visitor.wantsHint && !introIsTyping
+							? labels.hints[frame.view]
+							: null
+					}
+					onActivate={() => {
+						if (frame.view === "present") {
+							visitor.pickTalkIndex(nextSlideStart(talk.items, talk.index))
+						}
+						visitor.activate()
+					}}
+					onLeave={visitor.leave}
+				>
+					<div
+						// The editor stays mounted while comments open beside it.
+						key={isEditing ? "editor" : frame.view}
+						className={cn(
+							"animate-in fade-in-30 zoom-in-[0.98] flex min-h-0 min-w-0 flex-1 flex-col duration-500 ease-out motion-reduce:animate-none",
+							// Phones see more of each view at a smaller size. tldraw has its
+							// own camera and measures wrong under CSS zoom.
+							frame.view !== "whiteboard" && "max-sm:[zoom:0.8]",
+						)}
+					>
+						<DemoViewContent
+							frame={frame}
+							visitor={visitor}
+							talk={talk}
+							appearance={appearance}
+							locale={locale}
+						/>
+					</div>
+				</DemoChrome>
 			</div>
-		</DemoChrome>
+			{phoneIsLoaded && (
+				<div
+					// Beside the Mac when there is room, in front of its corner when not.
+					className={cn(
+						"absolute right-1 bottom-1 h-[62%] transition duration-700 ease-out motion-reduce:transition-none @3xl:top-[2%] @3xl:right-0 @3xl:bottom-auto @3xl:h-[96%]",
+						phoneIsShown
+							? "translate-x-0 opacity-100"
+							: "pointer-events-none translate-x-12 opacity-0",
+					)}
+					aria-hidden={!phoneIsShown}
+				>
+					<DemoPhone
+						locale={locale}
+						screen={phoneScreen(frame, visitor, talk)}
+						onMessage={handlePhone}
+					/>
+				</div>
+			)}
+		</div>
 	)
+}
+
+// Scenes where Carl has the phone in hand.
+let phoneScenes = new Set<DemoSceneId>(["devices", "toomuch", "present"])
+
+function phoneScreen(
+	frame: DemoFrame,
+	visitor: Visitor,
+	talk: Talk,
+): DemoPhoneScreen {
+	if (frame.view === "present") {
+		return {
+			kind: "teleprompter",
+			content: talk.content,
+			presentationIndex: talk.index,
+		}
+	}
+	return {
+		kind: "editor",
+		content: visitor.personalize(frame.content),
+		// The phone shows everyone else; its own caret is the screen itself.
+		cursors: frame.cursors
+			.filter(cursor => cursor.collaborator.device !== "phone")
+			.map(cursor => ({
+				...cursor,
+				position: visitor.mapPosition(frame.content, cursor.position),
+			})),
+	}
+}
+
+interface Talk {
+	content: string
+	items: PresentationItem[]
+	// The teleprompter paragraph the speaker is on; the slide follows it.
+	index: number
+}
+
+function talkAt(
+	frame: DemoFrame,
+	visitor: Visitor,
+	appearance: "light" | "dark",
+): Talk {
+	let content = visitor.personalize(frame.content, appearance)
+	let items = frame.view === "present" ? parsePresentation(content) : []
+	let scripted = stepIndex(frame.viewProgress, items.length)
+	let index = Math.min(
+		visitor.talkIndex(scripted),
+		Math.max(items.length - 1, 0),
+	)
+	return { content, items, index }
+}
+
+function nextSlideStart(items: PresentationItem[], index: number): number {
+	let slideNumber = items[index]?.slideNumber ?? 0
+	let next = items.findIndex(item => item.slideNumber > slideNumber)
+	return next === -1 ? 0 : next
 }
 
 let visitorColor = "#d97706"
@@ -197,7 +252,7 @@ function useVisitor(frame: DemoFrame) {
 	let [drawing, setDrawing] = useState<VisitorDrawing | null>(null)
 	let [drawingScene, setDrawingScene] = useState<DemoSceneId | null>(null)
 	let [historyPin, setHistoryPin] = useState<Pinned<number> | null>(null)
-	let [slidePin, setSlidePin] = useState<Pinned<number> | null>(null)
+	let [talkPin, setTalkPin] = useState<Pinned<number> | null>(null)
 	let scriptPoint = `${frame.sceneId}:${frame.history?.index ?? ""}:${frame.viewProgress}`
 	let isDrawing = drawingScene === frame.sceneId
 
@@ -214,7 +269,7 @@ function useVisitor(frame: DemoFrame) {
 		review: edit !== null,
 		whiteboard: drawing !== null || isDrawing,
 		timemachine: historyPin !== null,
-		present: slidePin !== null,
+		present: talkPin !== null,
 	}
 
 	return {
@@ -254,17 +309,14 @@ function useVisitor(frame: DemoFrame) {
 		pickVersion(index: number) {
 			setHistoryPin({ at: scriptPoint, value: index })
 		},
-		slideIndex(scripted: number) {
-			return scripted + (slidePin?.at === scriptPoint ? slidePin.value : 0)
+		talkIndex(scripted: number) {
+			return talkPin?.at === scriptPoint ? talkPin.value : scripted
+		},
+		pickTalkIndex(index: number) {
+			setTalkPin({ at: scriptPoint, value: index })
 		},
 		activate() {
 			if (frame.view === "whiteboard") setDrawingScene(frame.sceneId)
-			if (frame.view === "present") {
-				setSlidePin(pin => ({
-					at: scriptPoint,
-					value: (pin?.at === scriptPoint ? pin.value : 0) + 1,
-				}))
-			}
 		},
 		leave() {
 			setDrawingScene(null)
@@ -317,11 +369,13 @@ function useIntroClock(): number {
 function DemoViewContent({
 	frame,
 	visitor,
+	talk,
 	appearance,
 	locale,
 }: {
 	frame: DemoFrame
 	visitor: Visitor
+	talk: Talk
 	appearance: "light" | "dark"
 	locale: LandingLocale
 }) {
@@ -332,9 +386,7 @@ function DemoViewContent({
 		return <DemoTimeMachine history={frame.history} visitor={visitor} />
 	}
 	if (frame.view === "present") {
-		return (
-			<DemoPresent frame={frame} visitor={visitor} appearance={appearance} />
-		)
+		return <DemoPresent talk={talk} appearance={appearance} />
 	}
 	return (
 		<CanvasErrorBoundary fallback={null}>
@@ -358,100 +410,20 @@ function DemoEditor({
 	frame: DemoFrame
 	visitor: Visitor
 }) {
-	let editor = useRef<MarkdownEditorRef>(null)
-	let content = visitor.personalize(frame.content)
-	let cursors = frame.cursors.map(cursor => ({
-		...cursor,
-		position: visitor.mapPosition(frame.content, cursor.position),
-	}))
-	let comments = frame.comments
-	let typist = cursors.at(-1)
-
-	useEffect(() => {
-		let retry = 0
-		function showCollaborators() {
-			// The editor creates its view after its first render.
-			let view = editor.current?.getEditor()
-			if (!view) {
-				retry = requestAnimationFrame(showCollaborators)
-				return
-			}
-			let text = view.state.doc.toString()
-			view.dispatch({
-				effects: [
-					setRemoteCursorsEffect.of(cursors.map(remoteCursor)),
-					setCommentDecorationsEffect.of(commentRanges(comments, text)),
-				],
-			})
-			if (!typist) return
-			// Scroll only the editor; CodeMirror's scrollIntoView would also move the page.
-			let line = view.lineBlockAt(Math.min(typist.position, text.length))
-			view.scrollDOM.scrollTop = line.top - view.scrollDOM.clientHeight / 2
-		}
-		showCollaborators()
-		return () => cancelAnimationFrame(retry)
-	}, [cursors, comments, typist, content])
-
 	return (
 		<div className="flex min-h-0 flex-1 flex-col @2xl:flex-row">
-			{/* The app pins its toolbar and editor to the window. The transform
-			    makes this stage their window. The scroller stays hidden so wheel
-			    and touch scroll the page, which drives the demo. */}
-			<div className="relative min-h-0 flex-1 [transform:translateZ(0)] overflow-hidden [&_.cm-scroller]:overflow-hidden!">
-				<div className="markdown-editor">
-					<MarkdownEditor
-						ref={editor}
-						value={content}
-						onChange={readContent => {
-							// Scripted updates also report a change; only the visitor focuses.
-							if (!editor.current?.getEditor()?.hasFocus) return
-							visitor.type(readContent())
-						}}
-						extensions={editorExtensions}
-						typeToFocus={false}
-						spellcheck={false}
-						autocomplete={false}
-					/>
-					<EditorToolbar
-						editor={editor}
-						onToggleLeftSidebar={ignoreSidebarToggle}
-						onToggleRightSidebar={ignoreSidebarToggle}
-					/>
-				</div>
-			</div>
-			{frame.view === "review" && <DemoComments comments={comments} />}
+			<DemoEditorPane
+				content={visitor.personalize(frame.content)}
+				cursors={frame.cursors.map(cursor => ({
+					...cursor,
+					position: visitor.mapPosition(frame.content, cursor.position),
+				}))}
+				comments={frame.comments}
+				onType={visitor.type}
+			/>
+			{frame.view === "review" && <DemoComments comments={frame.comments} />}
 		</div>
 	)
-}
-
-// The demo has no document list or settings to open.
-function ignoreSidebarToggle() {}
-
-function remoteCursor({ collaborator, position }: DemoCursor) {
-	return {
-		id: collaborator.name,
-		sessionId: collaborator.name,
-		name: collaborator.name,
-		color: collaborator.color,
-		position,
-	}
-}
-
-function commentRanges(comments: DemoComment[], text: string) {
-	return comments.flatMap(comment => {
-		let from = text.indexOf(comment.quote)
-		if (from === -1) return []
-		return [
-			{
-				id: comment.id,
-				from,
-				to: from + comment.quote.length,
-				resolved: false,
-				selected: false,
-				orphaned: false,
-			},
-		]
-	})
 }
 
 // The app's comment sidebar, filled with the agent's review.
@@ -549,56 +521,33 @@ function editDate(now: Date, version: DemoVersion, index: number): Date {
 	return date
 }
 
-// The Mac shows the slides, the phone in hand shows the speaker notes.
+// The Mac shows the slides; the phone beside it is the teleprompter.
 function DemoPresent({
-	frame,
-	visitor,
+	talk,
 	appearance,
 }: {
-	frame: DemoFrame
-	visitor: Visitor
+	talk: Talk
 	appearance: "light" | "dark"
 }) {
-	let content = visitor.personalize(frame.content, appearance)
-	let items = parsePresentation(content)
-	let slides = getSlides(items)
-	let scripted = stepIndex(frame.viewProgress, slides.length)
-	let slide = slides[visitor.slideIndex(scripted) % Math.max(slides.length, 1)]
-	let slideNumber = slide?.slideNumber ?? 1
+	let slides = getSlides(talk.items)
 	let syntaxTheme = resolveSyntaxTheme({
-		content,
+		content: talk.content,
 		defaultFamilyId: undefined,
 		appearance,
 	})
 
 	return (
-		<div className="bg-muted/40 flex min-h-0 flex-1 flex-col items-center justify-center gap-4 p-4 @lg:flex-row @lg:gap-6 @lg:p-6">
-			<div className="border-border flex aspect-[16/10] max-h-full w-full min-w-0 flex-col overflow-hidden border shadow-lg @lg:w-auto @lg:flex-1">
-				<SlideshowView
-					content={content}
-					slides={slides}
-					wikilinks={noWikilinks}
-					currentSlideNumber={slideNumber}
-					appearance={appearance}
-					documentTheme={builtInDocumentTheme}
-					syntaxTheme={syntaxTheme}
-					embedded
-				/>
-			</div>
-			<div className="border-foreground/80 bg-background flex aspect-[9/16] h-[45%] shrink-0 flex-col overflow-hidden rounded-[1.25rem] border-[5px] shadow-lg @lg:h-[85%]">
-				<div className="flex min-h-0 flex-1 flex-col [zoom:0.6]">
-					<Teleprompter
-						inactive
-						items={items}
-						wikilinks={noWikilinks}
-						presentationIndex={Math.max(
-							items.findIndex(item => item.slideNumber === slideNumber),
-							0,
-						)}
-						onIndexChange={() => {}}
-					/>
-				</div>
-			</div>
+		<div className="flex min-h-0 flex-1 flex-col">
+			<SlideshowView
+				content={talk.content}
+				slides={slides}
+				wikilinks={noWikilinks}
+				currentSlideNumber={talk.items[talk.index]?.slideNumber ?? 1}
+				appearance={appearance}
+				documentTheme={builtInDocumentTheme}
+				syntaxTheme={syntaxTheme}
+				embedded
+			/>
 		</div>
 	)
 }
@@ -637,9 +586,14 @@ function useScrollPosition(sceneIds: string[]) {
 
 		function measure() {
 			frame = 0
-			let focusLine = sceneFocusLine(
-				document.querySelector("[data-demo-stage]"),
-			)
+			let focusLine = window.innerHeight * 0.5
+			let stage = document.querySelector("[data-demo-stage]")
+			if (stage instanceof HTMLElement && elements[0]) {
+				stage.style.setProperty(
+					"--demo-expand",
+					String(stageExpansion(elements[0].getBoundingClientRect())),
+				)
+			}
 			let sceneIndex = 0
 			for (let [index, element] of elements.entries()) {
 				if (element.getBoundingClientRect().top <= focusLine) sceneIndex = index
@@ -679,12 +633,9 @@ function useScrollPosition(sceneIds: string[]) {
 	return position
 }
 
-// On phones the stage sits above the text, so scenes count from the space below it.
-function sceneFocusLine(stage: Element | null): number {
-	let viewportMiddle = window.innerHeight * 0.5
-	if (!stage) return viewportMiddle
-	let stageRect = stage.getBoundingClientRect()
-	let stageIsBesideText = stageRect.width < window.innerWidth * 0.7
-	if (stageIsBesideText) return viewportMiddle
-	return stageRect.bottom + (window.innerHeight - stageRect.bottom) * 0.4
+// The stage widens over the hero's column while the hero scrolls away.
+function stageExpansion(hero: DOMRect): number {
+	let viewport = window.innerHeight
+	let expansion = (viewport * 0.9 - hero.bottom) / (viewport * 0.6)
+	return Math.max(0, Math.min(expansion, 1))
 }

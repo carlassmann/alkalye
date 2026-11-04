@@ -28,6 +28,7 @@ interface LandingContent {
 		title: string
 		lede: string
 		stage: DemoStageLabels
+		caption: string
 		scenes: { id: DemoSceneId; title: string; body: string }[]
 		tldrawCredit: { before: string; link: string; after: string }
 	}
@@ -87,6 +88,7 @@ let en: LandingContent = {
 				present: "Click to change slides",
 			},
 		},
+		caption: "Scroll to play. Click in to join. Nothing is saved or sent.",
 		lede: "Scroll to follow a blog post about Alkalye becoming a talk: written on Carl's Mac and phone, reviewed by an agent, all the way to the stage. It is the real editor, comments, whiteboard, time machine, slideshow and teleprompter from the app, playing a scripted example. Click into it to type, draw, rewind or present yourself. Nothing is saved or sent.",
 		scenes: [
 			{
@@ -300,6 +302,8 @@ let de: LandingContent = {
 				present: "Klick für die nächste Folie",
 			},
 		},
+		caption:
+			"Scroll zum Abspielen. Klick hinein, um mitzumachen. Nichts wird gespeichert oder gesendet.",
 		lede: "Scroll weiter und sieh zu, wie aus einem Blogpost über Alkalye ein Vortrag wird: geschrieben auf Carls Mac und Handy, geprüft von einem Agenten, bis auf die Bühne. Es sind der echte Editor, Kommentare, Whiteboard, Zeitmaschine, Präsentation und Teleprompter aus der App mit einem vorbereiteten Beispiel. Klick hinein, um selbst zu schreiben, zu zeichnen, zurückzuspulen oder zu präsentieren. Nichts wird gespeichert oder gesendet.",
 		scenes: [
 			{

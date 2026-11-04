@@ -32,7 +32,9 @@ The follow-up on cshed verified German chat labels and a German answer about Car
 
 ## Landing page demo
 
-The landing page's scroll demo renders the app's editor and toolbar, comments, tldraw canvas, time machine, slideshow and teleprompter with a scripted document. Each scene's heading and explanation are static HTML beside the stage, so page reading works without the demo. Checked against Omny's text reader on 4 November 2026: it skips `contenteditable` and `role="textbox"`, so the demo editor's text is invisible to Syntwin. Comment, time machine, slide, teleprompter and whiteboard label text is readable. The reader also returns the text of inline `<style>` elements, so the slideshow scene includes theme CSS noise. Don't claim Syntwin can inspect drawings beyond their text labels.
+The landing page's scroll demo renders the app's editor and toolbar, comments, tldraw canvas, time machine, slideshow and teleprompter with a scripted document. Only the stage is visible. Each scene's heading and explanation are visually hidden (`sr-only`) static HTML, so screen readers, search engines and page reading get the story without the demo. Omny's reader filters with `checkVisibility()`, which keeps `sr-only` text; this was not rechecked against a live room. Checked against Omny's text reader on 4 November 2026: it skips `contenteditable` and `role="textbox"`, so the demo editor's text is invisible to Syntwin. Comment, time machine, slide, teleprompter and whiteboard label text is readable. The reader also returns the text of inline `<style>` elements, so the slideshow scene includes theme CSS noise. Don't claim Syntwin can inspect drawings beyond their text labels.
+
+The phone in the demo is an iframe of `/demo/phone` (noindex, no Syntwin script) at real iPhone size, so the app's mobile editor and teleprompter render there; the landing page drives it with `postMessage`. Page reading does not reach into that frame.
 
 Syntwin can scroll the page, which drives the demo. The demo only reads scroll position and never scrolls the page itself.
 
