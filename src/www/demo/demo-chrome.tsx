@@ -1,26 +1,20 @@
 import type { ReactNode } from "react"
-import { LaptopIcon, SmartphoneIcon } from "lucide-react"
-import { cn } from "@/app/lib/cn"
-import type {
-	DemoCollaborator,
-	DemoConnection,
-	DemoStageLabels,
-	DemoView,
-} from "./demo-script"
+import { BotIcon, LaptopIcon, SmartphoneIcon } from "lucide-react"
+import type { DemoCollaborator, DemoStageLabels, DemoView } from "./demo-script"
 
-export { DemoChrome }
+export { DemoChrome, CollaboratorIcon }
 
 function DemoChrome({
 	labels,
 	view,
 	people,
-	connection,
+	interactive,
 	children,
 }: {
 	labels: DemoStageLabels
 	view: DemoView
 	people: DemoCollaborator[]
-	connection: DemoConnection | null
+	interactive: boolean
 	children: ReactNode
 }) {
 	return (
@@ -47,16 +41,9 @@ function DemoChrome({
 							key={person.name}
 							title={person.name}
 							style={{ backgroundColor: person.color }}
-							className={cn(
-								"animate-in fade-in zoom-in-50 ring-background flex size-6 items-center justify-center rounded-full text-white ring-2 transition-[filter,opacity] duration-500",
-								isOffline(connection, person) && "opacity-40 grayscale",
-							)}
+							className="animate-in fade-in zoom-in-50 ring-background flex size-6 items-center justify-center rounded-full text-white ring-2 duration-500"
 						>
-							{person.device === "phone" ? (
-								<SmartphoneIcon className="size-3" aria-hidden />
-							) : (
-								<LaptopIcon className="size-3" aria-hidden />
-							)}
+							<CollaboratorIcon collaborator={person} className="size-3" />
 							<span className="sr-only">{person.name}</span>
 						</li>
 					))}
@@ -65,54 +52,26 @@ function DemoChrome({
 			<div className="relative flex min-h-0 flex-1 flex-col">
 				<div className="isolate flex min-h-0 flex-1 flex-col">{children}</div>
 				{/* The page scroll drives the demo. Touches and wheel on the views
-				    must scroll the page, not the preview or canvas underneath.
+				    must scroll the page, not the canvas or slides underneath.
 				    The editor stays open for visitors to type in. */}
-				{view !== "editor" && <div className="absolute inset-0" />}
-				{connection && (
-					<ConnectionBadge connection={connection} labels={labels} />
-				)}
+				{!interactive && <div className="absolute inset-0" />}
 			</div>
 		</div>
 	)
 }
 
-function ConnectionBadge({
-	connection,
-	labels,
+function CollaboratorIcon({
+	collaborator,
+	className,
 }: {
-	connection: DemoConnection
-	labels: DemoStageLabels
+	collaborator: DemoCollaborator
+	className?: string
 }) {
-	let { collaborator, state } = connection
-	let label = state === "offline" ? labels.offline : labels.synced
-	return (
-		<p
-			key={state}
-			role="status"
-			className={cn(
-				"animate-in fade-in slide-in-from-top-1 absolute top-14 right-3 z-20 flex items-center gap-2 border px-2.5 py-1 text-xs shadow-sm duration-300",
-				state === "offline"
-					? "border-border bg-muted text-muted-foreground"
-					: "border-transparent bg-emerald-600 text-white",
-			)}
-		>
-			<span
-				className={cn(
-					"size-2 rounded-full",
-					state === "offline" ? "border-[1.5px] border-current" : "bg-white",
-				)}
-			/>
-			{label.replace("{name}", collaborator.name)}
-		</p>
-	)
-}
-
-function isOffline(
-	connection: DemoConnection | null,
-	person: DemoCollaborator,
-): boolean {
-	return (
-		connection?.state === "offline" &&
-		connection.collaborator.name === person.name
-	)
+	if (collaborator.device === "phone") {
+		return <SmartphoneIcon className={className} aria-hidden />
+	}
+	if (collaborator.device === "agent") {
+		return <BotIcon className={className} aria-hidden />
+	}
+	return <LaptopIcon className={className} aria-hidden />
 }

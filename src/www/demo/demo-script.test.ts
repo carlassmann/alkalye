@@ -1,63 +1,64 @@
 import { describe, expect, it } from "vitest"
-import { demoFrameAt, demoScenes } from "./demo-script"
+import { demoFrameAt, demoSceneIds, demoScenes } from "./demo-script"
 
 describe("demoFrameAt", () => {
 	let scenes = demoScenes("en")
+	let at = (id: (typeof demoSceneIds)[number], progress: number) =>
+		demoFrameAt(scenes, demoSceneIds.indexOf(id), progress)
 
-	it("starts empty and types the intro scene", () => {
-		expect(demoFrameAt(scenes, 0, 0).content).toBe("")
-		let halfway = demoFrameAt(scenes, 0, 0.5).content
-		let done = demoFrameAt(scenes, 0, 1).content
+	it("starts empty and types the blog post", () => {
+		expect(at("intro", 0).content).toBe("")
+		let halfway = at("intro", 0.5).content
+		let done = at("intro", 1).content
 		expect(done.startsWith(halfway)).toBe(true)
 		expect(halfway.length).toBeGreaterThan(0)
 		expect(halfway.length).toBeLessThan(done.length)
 	})
 
 	it("gives the same frame for the same position, whichever way the visitor scrolled", () => {
-		let forward = demoFrameAt(scenes, 5, 0.2)
-		demoFrameAt(scenes, 7, 1)
-		expect(demoFrameAt(scenes, 5, 0.2)).toEqual(forward)
+		let forward = at("slides", 0.3)
+		at("present", 1)
+		expect(at("slides", 0.3)).toEqual(forward)
 	})
 
-	it("shows the second device typing at the end of the document", () => {
-		let frame = demoFrameAt(scenes, 2, 0.5)
-		expect(frame.typist?.collaborator.device).toBe("laptop")
-		expect(frame.typist?.position).toBe(frame.content.length)
+	it("shows the Mac resting while the phone types", () => {
+		let frame = at("devices", 0.5)
+		let devices = frame.cursors.map(cursor => cursor.collaborator.device)
+		expect(devices).toEqual(["laptop", "phone"])
 	})
 
-	it("types frontmatter at the start before switching to the slideshow", () => {
-		let typing = demoFrameAt(scenes, 5, 0.2)
-		expect(typing.view).toBe("editor")
-		expect(typing.typist?.position).toBeLessThan(typing.content.length)
-
-		let presenting = demoFrameAt(scenes, 5, 0.9)
-		expect(presenting.view).toBe("slideshow")
-		expect(presenting.content.startsWith("---\nmode: present\n---")).toBe(true)
-		expect(presenting.viewProgress).toBeGreaterThan(0.5)
+	it("lets the agent fix the typo and leave comments", () => {
+		expect(at("review", 0).content).toContain("teh same")
+		let reviewed = at("review", 1)
+		expect(reviewed.content).not.toContain("teh same")
+		expect(reviewed.comments).toHaveLength(2)
+		expect(reviewed.comments.every(c => c.by.device === "agent")).toBe(true)
 	})
 
-	it("keeps finished edits in later scenes", () => {
-		let whiteboard = demoFrameAt(scenes, 7, 0)
-		expect(whiteboard.content).toContain("# Multiplayer for one")
-		expect(whiteboard.content).toContain("# No signal? Keep writing")
-		expect(whiteboard.content).toContain("mode: present")
-		expect(whiteboard.typist).toBeNull()
+	it("turns the post into slides", () => {
+		let talk = at("slides", 1).content
+		expect(talk.startsWith("---\nmode: present\n---")).toBe(true)
+		expect(talk).toContain("\n---\n\n# Every device is just another cursor")
 	})
 
-	it("shows an offline edit only once it syncs", () => {
-		let before = demoFrameAt(scenes, 3, 0).content
-		let offline = demoFrameAt(scenes, 3, 0.3)
-		expect(offline.connection?.state).toBe("offline")
-		expect(offline.content).toBe(before)
-		expect(offline.typist).toBeNull()
+	it("rewinds the mess from other devices and keeps that version for the talk", () => {
+		let messy = at("history", 0)
+		expect(messy.content).toContain("🚀")
+		expect(messy.content).toContain("10 reasons")
 
-		let synced = demoFrameAt(scenes, 3, 0.8)
-		expect(synced.connection?.state).toBe("synced")
-		expect(synced.content).toContain("# No signal? Keep writing")
+		let rewound = at("history", 1)
+		expect(rewound.history?.index).toBeLessThan(messy.history?.index ?? 0)
+		expect(rewound.content).not.toContain("🚀")
+		expect(rewound.content).not.toContain("10 reasons")
+		expect(rewound.content).toContain("/demo/sketch.svg")
+
+		expect(at("present", 0.5).content).toBe(rewound.content)
 	})
 
-	it("clamps positions outside the script", () => {
-		expect(demoFrameAt(scenes, 99, 2)).toEqual(demoFrameAt(scenes, 7, 1))
-		expect(demoFrameAt(scenes, -1, -1)).toEqual(demoFrameAt(scenes, 0, 0))
+	it("types the same story in German", () => {
+		let german = demoScenes("de")
+		let talk = demoFrameAt(german, demoSceneIds.indexOf("present"), 0)
+		expect(talk.content).toContain("# Warum ich Alkalye gebaut habe")
+		expect(talk.content).not.toContain("🚀")
 	})
 })

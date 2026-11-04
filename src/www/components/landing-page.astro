@@ -162,12 +162,12 @@ let primaryButtonClass =
 						<h2 id="in-action-title" class={sectionTitleClass}>{content.demo.title}</h2>
 						<p class="max-w-[52ch] text-muted-foreground">{content.demo.lede}</p>
 					</div>
-					<ol aria-labelledby="in-action-title" class="flex flex-col pb-16 lg:pb-24" data-syntwin-avoid="0px">
+					<ol aria-labelledby="in-action-title" class="flex flex-col pb-[30svh] lg:pb-[45svh]" data-syntwin-avoid="0px">
 						{content.demo.scenes.map(scene => (
 							<li id={`in-action-${scene.id}`} data-demo-scene={scene.id} class="flex min-h-[60svh] flex-col justify-center gap-2 py-8 lg:min-h-[85svh]">
 								<h3 class="text-xl font-semibold tracking-tight">{scene.title}</h3>
 								<p class="max-w-[46ch] text-[15px] leading-7 text-muted-foreground">{scene.body}</p>
-								{scene.id === "whiteboard" && (
+								{scene.id === "sketch" && (
 									<p class="max-w-[46ch] text-[15px] leading-7 text-muted-foreground">
 										{content.demo.tldrawCredit.before}<a href="https://tldraw.dev" target="_blank" rel="noopener" class="font-medium text-foreground underline underline-offset-4">{content.demo.tldrawCredit.link}</a>{content.demo.tldrawCredit.after}
 									</p>

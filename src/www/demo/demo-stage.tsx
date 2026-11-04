@@ -10,7 +10,6 @@ import {
 	MarkdownEditor,
 	type MarkdownEditorRef,
 } from "@/app/features/editor"
-import { PreviewView } from "@/app/features/documents"
 import {
 	SlideshowView,
 	Teleprompter,
@@ -22,9 +21,16 @@ import {
 	setRemoteCursorsEffect,
 } from "@/app/features/sharing"
 import {
-	resolveSyntaxTheme,
-	type SyntaxTheme,
-} from "@/app/features/syntax-highlighting"
+	CommentThreadCard,
+	CommentsPanel,
+	commentsExtension,
+	setCommentDecorationsEffect,
+} from "@/app/features/comments"
+import {
+	TimeMachineBottomBar,
+	TimeMachineToolbar,
+} from "@/app/features/time-machine"
+import { resolveSyntaxTheme } from "@/app/features/syntax-highlighting"
 import type { ResolvedTheme } from "@/app/features/themes"
 import { CanvasErrorBoundary } from "@/app/features/assets"
 import { cn } from "@/app/lib/cn"
@@ -35,10 +41,14 @@ import type { LandingLocale } from "#www/landing-content"
 import {
 	demoFrameAt,
 	demoScenes,
+	demoSketch,
 	type DemoCollaborator,
+	type DemoComment,
+	type DemoCursor,
 	type DemoFrame,
 	type DemoSceneId,
 	type DemoStageLabels,
+	type DemoVersion,
 } from "./demo-script"
 import { DemoChrome } from "./demo-chrome"
 
@@ -56,7 +66,9 @@ let builtInDocumentTheme: ResolvedTheme = {
 	isLoading: false,
 }
 let noWikilinks = new Map()
-let editorExtensions = [remoteCursorsExtension]
+let noCursors: DemoCursor[] = []
+// Comments are read-only here, so selecting one does nothing.
+let editorExtensions = [remoteCursorsExtension, commentsExtension(() => {})]
 
 interface DemoStageProps {
 	locale: LandingLocale
@@ -109,18 +121,24 @@ function DemoStage({ locale, labels }: DemoStageProps) {
 	let people = uniqueCollaborators(
 		scenes
 			.slice(0, position.sceneIndex + 1)
-			.flatMap(scene => scene.edit?.by ?? []),
+			.flatMap(scene => [
+				...(scene.by ? [scene.by] : []),
+				...(scene.watchers ?? []),
+				...(scene.comments ?? []).map(comment => comment.by),
+			]),
 	)
+	let isEditing = frame.view === "editor" || frame.view === "review"
 
 	return (
 		<DemoChrome
 			labels={labels}
 			view={frame.view}
 			people={people}
-			connection={frame.connection}
+			interactive={isEditing}
 		>
 			<div
-				key={frame.view}
+				// The editor stays mounted while comments open beside it.
+				key={isEditing ? "editor" : frame.view}
 				className={cn(
 					"animate-in fade-in-30 zoom-in-[0.98] flex min-h-0 min-w-0 flex-1 flex-col duration-500 ease-out motion-reduce:animate-none",
 					// Phones see more of each view at a smaller size. tldraw has its
@@ -128,7 +146,11 @@ function DemoStage({ locale, labels }: DemoStageProps) {
 					frame.view !== "whiteboard" && "max-sm:[zoom:0.8]",
 				)}
 			>
-				<DemoView frame={frame} appearance={appearance} />
+				<DemoViewContent
+					frame={frame}
+					appearance={appearance}
+					locale={locale}
+				/>
 			</div>
 		</DemoChrome>
 	)
@@ -154,7 +176,7 @@ function loadDemoWhiteboard() {
 // The hero types its first lines on its own, so visitors see the editor
 // move before they scroll.
 let introDelayMs = 500
-let introDurationMs = 2600
+let introDurationMs = 3200
 
 function useIntroClock(): number {
 	let [progress, setProgress] = useState(0)
@@ -176,96 +198,33 @@ function useIntroClock(): number {
 	return progress
 }
 
-function DemoView({
+function DemoViewContent({
 	frame,
 	appearance,
+	locale,
 }: {
 	frame: DemoFrame
 	appearance: "light" | "dark"
+	locale: LandingLocale
 }) {
-	let syntaxTheme = resolveSyntaxTheme({
-		content: frame.content,
-		defaultFamilyId: undefined,
-		appearance,
-	})
-	if (frame.view === "editor") return <DemoEditor frame={frame} />
-	if (frame.view === "preview") {
-		return (
-			<DemoPreview
-				frame={frame}
-				appearance={appearance}
-				syntaxTheme={syntaxTheme}
-			/>
-		)
+	if (frame.view === "editor" || frame.view === "review") {
+		return <DemoEditor frame={frame} />
 	}
-	if (frame.view === "slideshow") {
-		let slides = getSlides(parsePresentation(frame.content))
-		let slide = slides[stepIndex(frame.viewProgress, slides.length)]
-		return (
-			<SlideshowView
-				content={frame.content}
-				slides={slides}
-				wikilinks={noWikilinks}
-				currentSlideNumber={slide?.slideNumber ?? 1}
-				appearance={appearance}
-				documentTheme={builtInDocumentTheme}
-				syntaxTheme={syntaxTheme}
-				embedded
-			/>
-		)
+	if (frame.view === "timemachine" && frame.history) {
+		return <DemoTimeMachine history={frame.history} />
 	}
-	if (frame.view === "teleprompter") {
-		let items = parsePresentation(frame.content)
-		return (
-			<div className="flex min-h-0 flex-1 flex-col">
-				<Teleprompter
-					inactive
-					items={items}
-					wikilinks={noWikilinks}
-					presentationIndex={stepIndex(frame.viewProgress, items.length)}
-					onIndexChange={() => {}}
-				/>
-			</div>
-		)
+	if (frame.view === "present") {
+		return <DemoPresent frame={frame} appearance={appearance} />
 	}
 	return (
 		<CanvasErrorBoundary fallback={null}>
 			<Suspense fallback={null}>
-				<DemoWhiteboard progress={frame.viewProgress} />
+				<DemoWhiteboard
+					progress={frame.viewProgress}
+					labels={demoSketch(locale)}
+				/>
 			</Suspense>
 		</CanvasErrorBoundary>
-	)
-}
-
-function DemoPreview({
-	frame,
-	appearance,
-	syntaxTheme,
-}: {
-	frame: DemoFrame
-	appearance: "light" | "dark"
-	syntaxTheme: SyntaxTheme
-}) {
-	let scroller = useRef<HTMLDivElement>(null)
-
-	useEffect(() => {
-		let element = scroller.current
-		if (!element) return
-		let scrollable = element.scrollHeight - element.clientHeight
-		element.scrollTop = frame.viewProgress * Math.max(scrollable, 0)
-	}, [frame.viewProgress])
-
-	return (
-		<div ref={scroller} className="min-h-0 min-w-0 flex-1 overflow-hidden">
-			<PreviewView
-				content={frame.content}
-				wikilinks={noWikilinks}
-				appearance={appearance}
-				documentTheme={builtInDocumentTheme}
-				syntaxTheme={syntaxTheme}
-				embedded
-			/>
-		</div>
 	)
 }
 
@@ -280,73 +239,231 @@ function DemoEditor({ frame }: { frame: DemoFrame }) {
 	let editor = useRef<MarkdownEditorRef>(null)
 	let [draft, setDraft] = useState<VisitorDraft | null>(null)
 	let visitorText = draft?.sceneId === frame.sceneId ? draft.text : null
-	let typist = visitorText === null ? frame.typist : null
-	let typingAt = typist?.position ?? frame.content.length
+	let content = visitorText ?? frame.content
+	let cursors = visitorText === null ? frame.cursors : noCursors
+	let comments = frame.comments
+	let typist = cursors.at(-1)
 
 	useEffect(() => {
 		let retry = 0
-		function showTypist() {
+		function showCollaborators() {
 			// The editor creates its view after its first render.
 			let view = editor.current?.getEditor()
 			if (!view) {
-				retry = requestAnimationFrame(showTypist)
+				retry = requestAnimationFrame(showCollaborators)
 				return
 			}
+			let text = view.state.doc.toString()
 			view.dispatch({
-				effects: setRemoteCursorsEffect.of(
-					typist
-						? [
-								{
-									id: typist.collaborator.name,
-									sessionId: typist.collaborator.name,
-									name: typist.collaborator.name,
-									color: typist.collaborator.color,
-									position: typist.position,
-								},
-							]
-						: [],
-				),
+				effects: [
+					setRemoteCursorsEffect.of(cursors.map(remoteCursor)),
+					setCommentDecorationsEffect.of(commentRanges(comments, text)),
+				],
 			})
 			if (!typist) return
 			// Scroll only the editor; CodeMirror's scrollIntoView would also move the page.
-			let line = view.lineBlockAt(Math.min(typingAt, view.state.doc.length))
+			let line = view.lineBlockAt(Math.min(typist.position, text.length))
 			view.scrollDOM.scrollTop = line.top - view.scrollDOM.clientHeight / 2
 		}
-		showTypist()
+		showCollaborators()
 		return () => cancelAnimationFrame(retry)
-	}, [typist, typingAt, frame.content])
+	}, [cursors, comments, typist, content])
 
 	return (
-		// The app pins its toolbar and editor to the window. The transform makes
-		// this stage their window. The scroller stays hidden so wheel and touch
-		// scroll the page, which drives the demo.
-		<div className="relative min-h-0 flex-1 [transform:translateZ(0)] overflow-hidden [&_.cm-scroller]:overflow-hidden!">
-			<div className="markdown-editor">
-				<MarkdownEditor
-					ref={editor}
-					value={visitorText ?? frame.content}
-					onChange={readContent => {
-						// Scripted updates also report a change; only the visitor focuses.
-						if (!editor.current?.getEditor()?.hasFocus) return
-						setDraft({ sceneId: frame.sceneId, text: readContent() })
-					}}
-					extensions={editorExtensions}
-					typeToFocus={false}
-					spellcheck={false}
-					autocomplete={false}
-				/>
-				<EditorToolbar
-					editor={editor}
-					onToggleLeftSidebar={ignoreSidebarToggle}
-					onToggleRightSidebar={ignoreSidebarToggle}
-				/>
+		<div className="flex min-h-0 flex-1 flex-col @2xl:flex-row">
+			{/* The app pins its toolbar and editor to the window. The transform
+			    makes this stage their window. The scroller stays hidden so wheel
+			    and touch scroll the page, which drives the demo. */}
+			<div className="relative min-h-0 flex-1 [transform:translateZ(0)] overflow-hidden [&_.cm-scroller]:overflow-hidden!">
+				<div className="markdown-editor">
+					<MarkdownEditor
+						ref={editor}
+						value={content}
+						onChange={readContent => {
+							// Scripted updates also report a change; only the visitor focuses.
+							if (!editor.current?.getEditor()?.hasFocus) return
+							setDraft({ sceneId: frame.sceneId, text: readContent() })
+						}}
+						extensions={editorExtensions}
+						typeToFocus={false}
+						spellcheck={false}
+						autocomplete={false}
+					/>
+					<EditorToolbar
+						editor={editor}
+						onToggleLeftSidebar={ignoreSidebarToggle}
+						onToggleRightSidebar={ignoreSidebarToggle}
+					/>
+				</div>
 			</div>
+			{frame.view === "review" && <DemoComments comments={comments} />}
 		</div>
 	)
 }
 
 // The demo has no document list or settings to open.
 function ignoreSidebarToggle() {}
+
+function remoteCursor({ collaborator, position }: DemoCursor) {
+	return {
+		id: collaborator.name,
+		sessionId: collaborator.name,
+		name: collaborator.name,
+		color: collaborator.color,
+		position,
+	}
+}
+
+function commentRanges(comments: DemoComment[], text: string) {
+	return comments.flatMap(comment => {
+		let from = text.indexOf(comment.quote)
+		if (from === -1) return []
+		return [
+			{
+				id: comment.id,
+				from,
+				to: from + comment.quote.length,
+				resolved: false,
+				selected: false,
+				orphaned: false,
+			},
+		]
+	})
+}
+
+// The app's comment sidebar, filled with the agent's review.
+function DemoComments({ comments }: { comments: DemoComment[] }) {
+	return (
+		<aside className="border-border bg-sidebar animate-in fade-in slide-in-from-right-4 flex max-h-[45%] shrink-0 flex-col border-t duration-500 @2xl:max-h-none @2xl:w-64 @2xl:border-t-0 @2xl:border-l">
+			<CommentsPanel unresolvedCount={comments.length}>
+				<div className="space-y-1 p-2">
+					{comments.map(comment => (
+						<CommentThreadCard
+							key={comment.id}
+							className="animate-in fade-in slide-in-from-top-1 duration-500"
+							quote={comment.quote}
+							replies={[
+								{
+									id: comment.id,
+									authorName: comment.by.name,
+									body: comment.body,
+								},
+							]}
+							resolved={false}
+							selected={false}
+							collapsed={false}
+							onToggleCollapsed={() => {}}
+							onSelect={() => {}}
+						/>
+					))}
+				</div>
+			</CommentsPanel>
+		</aside>
+	)
+}
+
+function DemoTimeMachine({
+	history,
+}: {
+	history: { versions: DemoVersion[]; index: number }
+}) {
+	let editor = useRef<MarkdownEditorRef>(null)
+	let [now] = useState(() => new Date())
+	let version = history.versions[history.index]
+	let editHistory = history.versions.map((entry, index) => ({
+		index,
+		madeAt: editDate(now, entry, index),
+		accountId: entry.by.name,
+		contentId: `demo-${index}`,
+		generationIndex: index,
+	}))
+
+	return (
+		<div className="relative min-h-0 flex-1 [transform:translateZ(0)] overflow-hidden [&_.cm-scroller]:overflow-hidden!">
+			<div className="markdown-editor">
+				<MarkdownEditor
+					ref={editor}
+					value={version?.content ?? ""}
+					onChange={() => {}}
+					readOnly
+					typeToFocus={false}
+					spellcheck={false}
+					autocomplete={false}
+				/>
+				<TimeMachineToolbar
+					editDate={editHistory[history.index]?.madeAt ?? now}
+					authorName={version?.by.name ?? ""}
+					onExit={() => {}}
+					onCreateCopy={() => {}}
+					onRestore={() => {}}
+				/>
+				<TimeMachineBottomBar
+					editHistory={editHistory}
+					editParam={history.index}
+					onEditChange={() => {}}
+				/>
+			</div>
+		</div>
+	)
+}
+
+// Versions spread over the days they were made, minutes apart within a day.
+function editDate(now: Date, version: DemoVersion, index: number): Date {
+	let date = new Date(now)
+	date.setDate(date.getDate() - version.daysAgo)
+	date.setHours(9, index * 7, 0, 0)
+	return date
+}
+
+// The Mac shows the slides, the phone in hand shows the speaker notes.
+function DemoPresent({
+	frame,
+	appearance,
+}: {
+	frame: DemoFrame
+	appearance: "light" | "dark"
+}) {
+	let items = parsePresentation(frame.content)
+	let slides = getSlides(items)
+	let slide = slides[stepIndex(frame.viewProgress, slides.length)]
+	let slideNumber = slide?.slideNumber ?? 1
+	let syntaxTheme = resolveSyntaxTheme({
+		content: frame.content,
+		defaultFamilyId: undefined,
+		appearance,
+	})
+
+	return (
+		<div className="bg-muted/40 flex min-h-0 flex-1 flex-col items-center justify-center gap-4 p-4 @lg:flex-row @lg:gap-6 @lg:p-6">
+			<div className="border-border flex aspect-[16/10] max-h-full w-full min-w-0 flex-col overflow-hidden border shadow-lg @lg:w-auto @lg:flex-1">
+				<SlideshowView
+					content={frame.content}
+					slides={slides}
+					wikilinks={noWikilinks}
+					currentSlideNumber={slideNumber}
+					appearance={appearance}
+					documentTheme={builtInDocumentTheme}
+					syntaxTheme={syntaxTheme}
+					embedded
+				/>
+			</div>
+			<div className="border-foreground/80 bg-background flex aspect-[9/16] h-[45%] shrink-0 flex-col overflow-hidden rounded-[1.25rem] border-[5px] shadow-lg @lg:h-[85%]">
+				<div className="flex min-h-0 flex-1 flex-col [zoom:0.6]">
+					<Teleprompter
+						inactive
+						items={items}
+						wikilinks={noWikilinks}
+						presentationIndex={Math.max(
+							items.findIndex(item => item.slideNumber === slideNumber),
+							0,
+						)}
+						onIndexChange={() => {}}
+					/>
+				</div>
+			</div>
+		</div>
+	)
+}
 
 function stepIndex(progress: number, count: number): number {
 	if (count === 0) return 0

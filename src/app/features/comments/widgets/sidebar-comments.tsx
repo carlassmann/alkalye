@@ -1,4 +1,10 @@
-import { useState, type FormEvent, type KeyboardEvent } from "react"
+import {
+	useState,
+	type ComponentProps,
+	type FormEvent,
+	type KeyboardEvent,
+	type ReactNode,
+} from "react"
 import {
 	Check,
 	ChevronDown,
@@ -41,7 +47,7 @@ import {
 	type LoadedCommentDocument,
 } from "../lib/comments"
 
-export { SidebarComments }
+export { SidebarComments, CommentsPanel, CommentThreadCard }
 
 type SidebarCommentsProps = {
 	doc: LoadedCommentDocument
@@ -64,45 +70,147 @@ function SidebarComments({
 	let resolved = threads.filter(thread => thread.resolvedAt)
 
 	return (
+		<CommentsPanel unresolvedCount={unresolved.length}>
+			{threads.length === 0 ? (
+				<div className="text-muted-foreground flex h-full flex-col items-center justify-center gap-2 p-6 text-center text-sm">
+					<MessageSquarePlus className="size-6 opacity-60" />
+					<p>{t("comments.empty")}</p>
+				</div>
+			) : (
+				<div className="space-y-3 p-2">
+					<CommentSection
+						title={t("comments.unresolved")}
+						threads={unresolved}
+						doc={doc}
+						selectedThreadId={selectedThreadId}
+						onSelectThread={onSelectThread}
+						readOnly={readOnly}
+						authorName={authorName}
+					/>
+					<CommentSection
+						title={t("comments.resolved")}
+						threads={resolved}
+						doc={doc}
+						selectedThreadId={selectedThreadId}
+						onSelectThread={onSelectThread}
+						readOnly={readOnly}
+						authorName={authorName}
+					/>
+				</div>
+			)}
+		</CommentsPanel>
+	)
+}
+
+function CommentsPanel({
+	unresolvedCount,
+	children,
+}: {
+	unresolvedCount: number
+	children: ReactNode
+}) {
+	let t = useIntl()
+	return (
 		<div className="flex min-h-0 flex-1 flex-col">
 			<div className="border-border border-b px-3 py-2">
 				<div className="flex items-center justify-between gap-2">
 					<div className="text-sm font-medium">{t("comments.title")}</div>
 					<Badge variant="outline" className="h-5 gap-1 px-1.5 text-[11px]">
-						{unresolved.length}
+						{unresolvedCount}
 					</Badge>
 				</div>
 			</div>
-			<div className="min-h-0 flex-1 overflow-auto">
-				{threads.length === 0 ? (
-					<div className="text-muted-foreground flex h-full flex-col items-center justify-center gap-2 p-6 text-center text-sm">
-						<MessageSquarePlus className="size-6 opacity-60" />
-						<p>{t("comments.empty")}</p>
-					</div>
-				) : (
-					<div className="space-y-3 p-2">
-						<CommentSection
-							title={t("comments.unresolved")}
-							threads={unresolved}
-							doc={doc}
-							selectedThreadId={selectedThreadId}
-							onSelectThread={onSelectThread}
-							readOnly={readOnly}
-							authorName={authorName}
-						/>
-						<CommentSection
-							title={t("comments.resolved")}
-							threads={resolved}
-							doc={doc}
-							selectedThreadId={selectedThreadId}
-							onSelectThread={onSelectThread}
-							readOnly={readOnly}
-							authorName={authorName}
-						/>
-					</div>
-				)}
-			</div>
+			<div className="min-h-0 flex-1 overflow-auto">{children}</div>
 		</div>
+	)
+}
+
+type CommentThreadCardProps = Omit<ComponentProps<"article">, "onSelect"> & {
+	quote: string
+	replies: { id: string; authorName?: string; body: string }[]
+	resolved: boolean
+	selected: boolean
+	collapsed: boolean
+	onToggleCollapsed: () => void
+	onSelect: () => void
+	actions?: ReactNode
+}
+
+function CommentThreadCard({
+	quote,
+	replies,
+	resolved,
+	selected,
+	collapsed,
+	onToggleCollapsed,
+	onSelect,
+	actions,
+	children,
+	className,
+	...props
+}: CommentThreadCardProps) {
+	let t = useIntl()
+	return (
+		<article
+			{...props}
+			className={cn(
+				"group rounded-sm px-2 py-2 text-sm",
+				"pointer-fine:hover:bg-sidebar-accent/60",
+				selected && "bg-sidebar-accent shadow-[inset_2px_0_0_var(--brand)]",
+				resolved && "text-muted-foreground",
+				className,
+			)}
+		>
+			<div className="flex items-start gap-1.5">
+				<Button
+					size="icon-xs"
+					variant="ghost"
+					aria-label={collapsed ? t("comments.expand") : t("comments.collapse")}
+					className="mt-0.5 shrink-0"
+					onClick={onToggleCollapsed}
+					nativeButton
+				>
+					{collapsed ? <ChevronRight /> : <ChevronDown />}
+				</Button>
+				<button
+					type="button"
+					className="min-h-8 min-w-0 flex-1 text-left"
+					onClick={onSelect}
+				>
+					<blockquote
+						className={cn(
+							"line-clamp-2 text-xs leading-5",
+							selected ? "text-foreground" : "text-muted-foreground",
+						)}
+					>
+						{quote}
+					</blockquote>
+				</button>
+				<div className="flex shrink-0 items-center gap-0.5">
+					{resolved && (
+						<Badge variant="secondary" className="h-5 px-1.5 text-[10px]">
+							{t("comments.resolvedBadge")}
+						</Badge>
+					)}
+					{actions}
+				</div>
+			</div>
+			{!collapsed && (
+				<div className="mt-1.5 space-y-1.5 pl-6">
+					{replies.map(item => (
+						<div key={item.id} className="bg-muted/45 rounded-sm px-2 py-1.5">
+							<div className="text-muted-foreground mb-0.5 truncate text-[11px]">
+								{item.authorName ?? t("comments.unknownAuthor")}
+							</div>
+							<p className="text-foreground/90 text-xs leading-5 whitespace-pre-wrap">
+								{item.body}
+							</p>
+						</div>
+					))}
+					{children}
+				</div>
+			)}
+		</article>
 	)
 }
 
@@ -201,107 +309,61 @@ function CommentThreadItem({
 			<ContextMenuTrigger
 				onTouchStart={event => event.preventBaseUIHandler()}
 				render={
-					<article
-						className={cn(
-							"group rounded-sm px-2 py-2 text-sm",
-							"pointer-fine:hover:bg-sidebar-accent/60",
-							selected &&
-								"bg-sidebar-accent shadow-[inset_2px_0_0_var(--brand)]",
-							thread.resolvedAt && "text-muted-foreground",
-						)}
+					<CommentThreadCard
+						quote={
+							range.orphaned ? t("comments.orphaned") : thread.anchor.quote
+						}
+						replies={replies.map(item => ({
+							id: item.$jazz.id,
+							authorName: item.authorName,
+							body: item.body,
+						}))}
+						resolved={Boolean(thread.resolvedAt)}
+						selected={selected}
+						collapsed={collapsed}
+						onToggleCollapsed={() => setCollapsed(value => !value)}
+						onSelect={onSelect}
+						actions={
+							!readOnly && (
+								<ThreadActionsMenu thread={thread} onReply={openReply} />
+							)
+						}
 					>
-						<div className="flex items-start gap-1.5">
-							<Button
-								size="icon-xs"
-								variant="ghost"
-								aria-label={
-									collapsed ? t("comments.expand") : t("comments.collapse")
-								}
-								className="mt-0.5 shrink-0"
-								onClick={() => setCollapsed(value => !value)}
-								nativeButton
+						{replyOpen && (
+							<form
+								className="bg-background rounded-sm p-2 shadow-[0_0_0_1px_var(--border)]"
+								onSubmit={handleReply}
 							>
-								{collapsed ? <ChevronRight /> : <ChevronDown />}
-							</Button>
-							<button
-								type="button"
-								className="min-h-8 min-w-0 flex-1 text-left"
-								onClick={onSelect}
-							>
-								<blockquote
-									className={cn(
-										"line-clamp-2 text-xs leading-5",
-										selected ? "text-foreground" : "text-muted-foreground",
-									)}
-								>
-									{range.orphaned
-										? t("comments.orphaned")
-										: thread.anchor.quote}
-								</blockquote>
-							</button>
-							<div className="flex shrink-0 items-center gap-0.5">
-								{thread.resolvedAt && (
-									<Badge variant="secondary" className="h-5 px-1.5 text-[10px]">
-										{t("comments.resolvedBadge")}
-									</Badge>
-								)}
-								{!readOnly && (
-									<ThreadActionsMenu thread={thread} onReply={openReply} />
-								)}
-							</div>
-						</div>
-						{!collapsed && (
-							<div className="mt-1.5 space-y-1.5 pl-6">
-								{replies.map(item => (
-									<div
-										key={item.$jazz.id}
-										className="bg-muted/45 rounded-sm px-2 py-1.5"
+								<Textarea
+									value={reply}
+									onChange={event => setReply(event.target.value)}
+									onKeyDown={handleReplyKeyDown}
+									aria-keyshortcuts="Meta+Enter Control+Enter"
+									placeholder={t("comments.replyPlaceholder")}
+									minRows={2}
+								/>
+								<div className="mt-2 flex justify-end gap-1">
+									<Button
+										type="button"
+										variant="ghost"
+										size="sm"
+										onClick={cancelReply}
 									>
-										<div className="text-muted-foreground mb-0.5 truncate text-[11px]">
-											{item.authorName ?? t("comments.unknownAuthor")}
-										</div>
-										<p className="text-foreground/90 text-xs leading-5 whitespace-pre-wrap">
-											{item.body}
-										</p>
-									</div>
-								))}
-								{replyOpen && (
-									<form
-										className="bg-background rounded-sm p-2 shadow-[0_0_0_1px_var(--border)]"
-										onSubmit={handleReply}
-									>
-										<Textarea
-											value={reply}
-											onChange={event => setReply(event.target.value)}
-											onKeyDown={handleReplyKeyDown}
-											aria-keyshortcuts="Meta+Enter Control+Enter"
-											placeholder={t("comments.replyPlaceholder")}
-											minRows={2}
-										/>
-										<div className="mt-2 flex justify-end gap-1">
-											<Button
-												type="button"
-												variant="ghost"
-												size="sm"
-												onClick={cancelReply}
-											>
-												{t("editor.dialog.cancel")}
-											</Button>
-											<Button type="submit" size="sm" disabled={!reply.trim()}>
-												<MessageSquarePlus />
-												{t("comments.reply")}
-												<Kbd>
-													{getActiveShortcutPlatform() === "mac"
-														? "⌘↵"
-														: "Ctrl+Enter"}
-												</Kbd>
-											</Button>
-										</div>
-									</form>
-								)}
-							</div>
+										{t("editor.dialog.cancel")}
+									</Button>
+									<Button type="submit" size="sm" disabled={!reply.trim()}>
+										<MessageSquarePlus />
+										{t("comments.reply")}
+										<Kbd>
+											{getActiveShortcutPlatform() === "mac"
+												? "⌘↵"
+												: "Ctrl+Enter"}
+										</Kbd>
+									</Button>
+								</div>
+							</form>
 						)}
-					</article>
+					</CommentThreadCard>
 				}
 			/>
 			<ContextMenuContent>

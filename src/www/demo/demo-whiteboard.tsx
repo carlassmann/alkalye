@@ -14,26 +14,18 @@ let TldrawCanvas = lazy(() =>
 	loadTldrawCanvas().then(module => ({ default: module.TldrawCanvas })),
 )
 
-let sketch: TLShapePartial[] = [
-	geo("write", 0, 0, "Write", "light-blue"),
-	geo("share", 320, 0, "Share", "light-violet"),
-	geo("present", 640, 0, "Present", "light-green"),
-	arrow("write-share", 200, 60, 310, 60),
-	arrow("share-present", 520, 60, 630, 60),
-	{
-		id: createShapeId("note"),
-		type: "note",
-		x: 330,
-		y: 180,
-		props: { richText: toRichText("tldraw ♥"), color: "yellow" },
-	},
-]
-
 // A fixed camera keeps the sketch still while shapes appear.
-let sketchBounds = new Box(-40, -40, 920, 460)
+let sketchBounds = new Box(-40, -40, 800, 540)
 
-function DemoWhiteboard({ progress }: { progress: number }) {
+function DemoWhiteboard({
+	progress,
+	labels,
+}: {
+	progress: number
+	labels: SketchLabels
+}) {
 	let [editor, setEditor] = useState<Editor | null>(null)
+	let sketch = sketchShapes(labels)
 	let visibleShapes = Math.ceil(progress * sketch.length)
 
 	useEffect(() => {
@@ -52,7 +44,7 @@ function DemoWhiteboard({ progress }: { progress: number }) {
 			if (missing.length) editor.createShapes(missing)
 		})
 		editor.updateInstanceState({ isReadonly: true })
-	}, [editor, visibleShapes])
+	}, [editor, visibleShapes, sketch])
 
 	useEffect(() => {
 		if (!editor) return
@@ -68,6 +60,32 @@ function DemoWhiteboard({ progress }: { progress: number }) {
 			/>
 		</div>
 	)
+}
+
+interface SketchLabels {
+	phone: string
+	laptop: string
+	agent: string
+	document: string
+}
+
+// Three hands on one document: the phone, the Mac and the agent.
+function sketchShapes(labels: SketchLabels): TLShapePartial[] {
+	return [
+		geo("phone", 0, 0, labels.phone, "light-green"),
+		geo("laptop", 0, 170, labels.laptop, "light-blue"),
+		geo("agent", 0, 340, labels.agent, "light-violet"),
+		arrow("phone-doc", 210, 60, 470, 200),
+		arrow("laptop-doc", 210, 230, 470, 230),
+		arrow("agent-doc", 210, 400, 470, 260),
+		{
+			id: createShapeId("document"),
+			type: "note",
+			x: 480,
+			y: 130,
+			props: { richText: toRichText(labels.document), color: "yellow" },
+		},
+	]
 }
 
 function geo(
