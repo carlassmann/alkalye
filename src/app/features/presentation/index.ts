@@ -14,7 +14,7 @@ export type {
 } from "./lib/presentation"
 export { useScreenWakeLock } from "./lib/screen-wake-lock"
 export { presentationExtensions } from "./lib/editor-extension"
-export { Slideshow } from "./widgets/slideshow"
+export { Slideshow, SlideshowView, getSlides } from "./widgets/slideshow"
 export type { Slide } from "./widgets/slideshow"
 export { Teleprompter, groupBySlide } from "./widgets/teleprompter"
 export type { SlideGroup } from "./widgets/teleprompter"

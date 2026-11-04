@@ -4,6 +4,7 @@ import changelogSource from "../../../public/changelog.json"
 import { readChangelog } from "@/shared/changelog"
 import { SyntwinLauncher, syntwinEnabled } from "@/components/syntwin-launcher"
 import { landingContent, type LandingLocale } from "#www/landing-content"
+import { AlkalyeInAction } from "#www/demo/alkalye-in-action"
 
 interface Props {
 	locale: LandingLocale
@@ -141,7 +142,7 @@ let primaryButtonClass =
 					</p>
 					<div class="flex flex-wrap items-center gap-x-6 gap-y-3" data-syntwin-avoid="0px">
 						<a href={appHref} class={primaryButtonClass}>{content.hero.primaryAction}</a>
-						<a href="#features" class="text-base font-medium underline-offset-4 hover:underline">
+						<a href="#in-action" class="text-base font-medium underline-offset-4 hover:underline">
 							{content.hero.secondaryAction} <span aria-hidden="true">↓</span>
 						</a>
 					</div>
@@ -164,6 +165,32 @@ let primaryButtonClass =
 					</div>
 					<figcaption class="text-sm leading-6 text-muted-foreground">{content.hero.sampleCaption}</figcaption>
 				</figure>
+			</section>
+
+			<section id="in-action" aria-labelledby="in-action-title" class="scroll-mt-20 border-t border-border/60">
+				<div class:list={[sectionClass, "flex flex-col gap-3 pt-16 md:pt-24"]}>
+					<h2 id="in-action-title" class={sectionTitleClass}>{content.demo.title}</h2>
+					<p class="max-w-[60ch] text-muted-foreground">{content.demo.lede}</p>
+				</div>
+				<div class:list={[sectionClass, "relative grid gap-6 pb-16 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] md:gap-10 md:pb-24"]}>
+					<div class="sticky top-14 z-10 order-first h-[min(48svh,420px)] bg-background py-3 md:order-last md:top-24 md:h-[min(70svh,640px)] md:py-0" data-demo-stage>
+						<noscript><style>[data-demo-stage] { display: none; }</style></noscript>
+						<AlkalyeInAction locale={locale} client:only="react" />
+					</div>
+					<ol class="flex flex-col">
+						{content.demo.scenes.map(scene => (
+							<li id={`in-action-${scene.id}`} data-demo-scene={scene.id} class="flex min-h-[70svh] flex-col justify-center gap-2 py-8 md:min-h-[85svh]">
+								<h3 class="text-xl font-semibold tracking-tight">{scene.title}</h3>
+								<p class="max-w-[46ch] text-[15px] leading-7 text-muted-foreground">{scene.body}</p>
+								{scene.id === "whiteboard" && (
+									<p class="max-w-[46ch] text-[15px] leading-7 text-muted-foreground">
+										{content.demo.tldrawCredit.before}<a href="https://tldraw.dev" target="_blank" rel="noopener" class="font-medium text-foreground underline underline-offset-4">{content.demo.tldrawCredit.link}</a>{content.demo.tldrawCredit.after}
+									</p>
+								)}
+							</li>
+						))}
+					</ol>
+				</div>
 			</section>
 
 			{syntwinEnabled && (

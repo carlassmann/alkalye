@@ -85,7 +85,7 @@ let baseCommonMessages = messages({
 	"error.generic.reloadPage": "Reload Page",
 
 	"help.label": "Help",
-	"help.syntwin": "Ask Carl’s AI twin",
+	"help.syntwin": "Ask Carl’s Syntwin",
 	"help.welcome": "Welcome",
 	"help.shortcuts": "Keyboard shortcuts",
 	"help.tutorAlkalye": "Alkalye Tutor",
@@ -256,7 +256,7 @@ let deCommonMessages = translate(baseCommonMessages, {
 	"error.generic.reloadPage": "Seite neu laden",
 
 	"help.label": "Hilfe",
-	"help.syntwin": "Frag Carls KI-Twin",
+	"help.syntwin": "Frag Carls Syntwin",
 	"help.welcome": "Willkommen",
 	"help.shortcuts": "Tastaturkürzel",
 	"help.tutorAlkalye": "Alkalye Tutor",

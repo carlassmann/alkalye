@@ -26,6 +26,7 @@ interface TldrawCanvasProps {
 	initialJson?: string
 	onReady: (handle: TldrawCanvasHandle) => void
 	onDirty: () => void
+	onEditorMount?: (editor: Editor) => void
 }
 
 let components = {
@@ -61,7 +62,12 @@ let overrides: TLUiOverrides = {
 	},
 }
 
-function TldrawCanvas({ initialJson, onReady, onDirty }: TldrawCanvasProps) {
+function TldrawCanvas({
+	initialJson,
+	onReady,
+	onDirty,
+	onEditorMount,
+}: TldrawCanvasProps) {
 	let [store] = useState(() => createTldrawStore(initialJson))
 	let locale = useLocale()
 	let colorScheme = useResolvedTheme()
@@ -91,6 +97,7 @@ function TldrawCanvas({ initialJson, onReady, onDirty }: TldrawCanvasProps) {
 			save: () => saveEditor(editor),
 			hasShapes: () => editor.getCurrentPageShapeIds().size > 0,
 		})
+		onEditorMount?.(editor)
 		return () => {
 			if (editorRef.current === editor) editorRef.current = null
 			stopListening()

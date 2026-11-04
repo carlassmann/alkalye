@@ -20,7 +20,7 @@ Page access is Click and type with Ask visitors first. The Card launcher says Ca
 
 ## Privacy
 
-The script loads from https://my.syntwin.ai/omny.js. Alkalye supplies only a general website/app context, without account IDs, document text or credentials. Reading or acting on the page requires the visitor's separate permission. Authentication forms and displayed recovery phrases carry `data-syntwin-hidden`. The twin has no direct Jazz or MCP access through this integration and needs internet even when Alkalye works offline.
+The script loads from https://my.syntwin.ai/omny.js. Alkalye supplies only a general website/app context, without account IDs, document text or credentials. Reading or acting on the page requires the visitor's separate permission. Authentication forms and displayed recovery phrases carry `data-syntwin-hidden`. Syntwin has no direct Jazz or MCP access through this integration and needs internet even when Alkalye works offline.
 
 Use fictional documents for testing. Never clear site storage to reset the chat, because that can erase anonymous documents.
 
@@ -29,6 +29,12 @@ Use fictional documents for testing. Never clear site storage to reset the chat,
 The cbook run verified desktop chat on `/en/`, history continuing into `/app/doc` and `/app/settings`, and Help reopening that history. Denial prevented actions. Allow permitted a page scroll; revocation prevented a subsequent scroll. It checked hidden markers on the sign-in form and recovery textarea. At 390 by 844, the website panel opened as a sheet and app Help reopened it. The settings privacy checker reported Sees nothing for `/app/settings/account` after saving and reloading the room settings.
 
 The follow-up on cshed verified German chat labels and a German answer about Carl's origin story, including permission to ask about Tilly. The provider privacy link returned 404 because Omny uses a relative URL. Alkalye now redirects `/legal/privacy` and `/de/legal/privacy` to Syntwin's corresponding policy pages.
+
+## Alkalye in action demo
+
+The landing page's scroll demo renders the app's editor, preview, slideshow, teleprompter and tldraw canvas with a scripted document. Each scene's heading and explanation are static HTML beside the stage, so page reading works without the demo. Checked against Omny's text reader on 4 November 2026: it skips `contenteditable` and `role="textbox"`, so the demo editor's text is invisible to Syntwin. Preview, slide, teleprompter and whiteboard label text is readable. The reader also returns the text of inline `<style>` elements, so preview and slideshow scenes include theme CSS noise. Don't claim Syntwin can inspect drawings beyond their text labels.
+
+Syntwin can scroll the page, which drives the demo. The demo only reads scroll position and never scrolls the page itself.
 
 ## Known Omny limitations
 

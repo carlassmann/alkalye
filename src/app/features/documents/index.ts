@@ -93,7 +93,7 @@ export type {
 } from "./widgets/duplicate-doc-dialog"
 export { DocumentSidebar } from "./widgets/document-sidebar"
 export { ListSidebar } from "./widgets/list-sidebar"
-export { Preview } from "./widgets/preview"
+export { Preview, PreviewView } from "./widgets/preview"
 export { persistDocumentContentSynchronously } from "./lib/background-document-save"
 export { SidebarDocumentList } from "./widgets/sidebar-document-list"
 export type { SidebarDoc } from "./widgets/sidebar-document-list"

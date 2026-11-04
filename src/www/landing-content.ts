@@ -1,3 +1,5 @@
+import type { DemoSceneId } from "#www/demo/demo-script"
+
 export { landingContent }
 export type { LandingLocale, LandingContent }
 
@@ -22,6 +24,12 @@ interface LandingContent {
 		secondaryAction: string
 		facts: string[]
 		sampleCaption: string
+	}
+	demo: {
+		title: string
+		lede: string
+		scenes: { id: DemoSceneId; title: string; body: string }[]
+		tldrawCredit: { before: string; link: string; after: string }
 	}
 	twin: { title: string; body: string }
 	story: { title: string; paragraphs: string[]; attribution: string }
@@ -61,9 +69,51 @@ let en: LandingContent = {
 		sampleCaption:
 			"A presentation is a document with one line of frontmatter. Each --- starts a slide, and unindented lines are speaker notes.",
 	},
+	demo: {
+		title: "Alkalye in action",
+		lede: "Scroll on and the document beside this text writes, syncs and presents itself. It is the real editor, preview, slideshow and teleprompter from the app, playing a scripted example. Nothing is saved or sent.",
+		scenes: [
+			{
+				id: "write",
+				title: "Write in plain Markdown",
+				body: "A heading is a #, a slide line is indented, everything else is your note. The file stays readable in any text editor.",
+			},
+			{
+				id: "together",
+				title: "Write together, live",
+				body: "Share a link and see who is typing where. Each change is encrypted on the writer's device before it syncs, so the server only stores data it cannot read.",
+			},
+			{
+				id: "preview",
+				title: "Read it as a page",
+				body: "Preview renders the same text as a styled document. Pick a built-in theme or bring your own HTML and CSS.",
+			},
+			{
+				id: "present",
+				title: "Present the same file",
+				body: "Add mode: present to the frontmatter and the document becomes a slideshow. Every --- starts a new slide, and only indented lines appear on it.",
+			},
+			{
+				id: "teleprompter",
+				title: "Keep your notes on your phone",
+				body: "The teleprompter shows slides and speaker notes together and follows along as you present, on the same device or another one.",
+			},
+			{
+				id: "whiteboard",
+				title: "Sketch on a whiteboard",
+				body: "Insert a whiteboard into any document and draw on an infinite canvas. It shows up as an image in the text, the preview and your slides.",
+			},
+		],
+		tldrawCredit: {
+			before: "Whiteboards are powered by ",
+			link: "tldraw",
+			after:
+				". Alkalye uses it under a free hobby license, and it is simply a joy to draw with.",
+		},
+	},
 	twin: {
 		title: "Questions before you start?",
-		body: "Ask Carl's AI twin why he built Alkalye, how he uses it, or how to get started. You can ask about his other projects too. It is an AI, not Carl live.",
+		body: "Ask Carl's Syntwin why he built Alkalye, how he uses it, or how to get started. You can ask about his other projects too. Syntwin is an AI, not Carl live.",
 	},
 	story: {
 		title: "Even one person needs multiplayer",
@@ -175,7 +225,7 @@ let en: LandingContent = {
 	privacy: {
 		title: "Privacy, plainly",
 		points: [
-			"Documents are encrypted on your device before they sync through Jazz. The sync server stores data it cannot read.",
+			"Documents are encrypted on your device before they sync. The sync server stores data it cannot read.",
 			"You can start without an account. Sign in with a passphrase to sync across devices. It stays on your device.",
 			"Connecting an MCP client is the exception: the hosted server then holds your account key and can decrypt what that client asks for.",
 			"Open source under the MIT license. You can run it with your own sync server.",
@@ -215,9 +265,51 @@ let de: LandingContent = {
 		sampleCaption:
 			"Eine Präsentation ist ein Dokument mit einer Zeile Frontmatter. Jedes --- beginnt eine Folie, nicht eingerückte Zeilen sind Sprechernotizen.",
 	},
+	demo: {
+		title: "Alkalye in Aktion",
+		lede: "Scroll weiter, und das Dokument neben diesem Text schreibt, synchronisiert und präsentiert sich selbst. Es sind der echte Editor, die Vorschau, die Präsentation und der Teleprompter aus der App mit einem vorbereiteten Beispiel. Nichts wird gespeichert oder gesendet.",
+		scenes: [
+			{
+				id: "write",
+				title: "Schreib in schlichtem Markdown",
+				body: "Eine Überschrift ist ein #, eine Folienzeile ist eingerückt, alles andere ist deine Notiz. Die Datei bleibt in jedem Texteditor lesbar.",
+			},
+			{
+				id: "together",
+				title: "Gemeinsam schreiben, live",
+				body: "Teile einen Link und sieh, wer wo tippt. Jede Änderung wird auf dem Gerät der schreibenden Person verschlüsselt, bevor sie synchronisiert wird. Der Server speichert nur Daten, die er nicht lesen kann.",
+			},
+			{
+				id: "preview",
+				title: "Als Seite lesen",
+				body: "Die Vorschau zeigt denselben Text als gestaltetes Dokument. Wähle ein eingebautes Theme oder bring eigenes HTML und CSS mit.",
+			},
+			{
+				id: "present",
+				title: "Dieselbe Datei präsentieren",
+				body: "Füge mode: present im Frontmatter hinzu, und das Dokument wird zur Präsentation. Jedes --- beginnt eine neue Folie, und nur eingerückte Zeilen erscheinen darauf.",
+			},
+			{
+				id: "teleprompter",
+				title: "Notizen auf dem Handy",
+				body: "Der Teleprompter zeigt Folien und Sprechernotizen zusammen und läuft beim Präsentieren mit, auf demselben oder einem anderen Gerät.",
+			},
+			{
+				id: "whiteboard",
+				title: "Auf dem Whiteboard skizzieren",
+				body: "Füge in jedes Dokument ein Whiteboard ein und zeichne auf einer unendlichen Fläche. Es erscheint als Bild im Text, in der Vorschau und auf deinen Folien.",
+			},
+		],
+		tldrawCredit: {
+			before: "Whiteboards laufen mit ",
+			link: "tldraw",
+			after:
+				". Alkalye nutzt es mit einer kostenlosen Hobby-Lizenz, und es macht einfach Freude, damit zu zeichnen.",
+		},
+	},
 	twin: {
 		title: "Fragen, bevor du loslegst?",
-		body: "Frag Carls KI-Twin, warum er Alkalye gebaut hat, wie er es nutzt oder wie du loslegst. Du kannst auch nach seinen anderen Projekten fragen. Es ist eine KI, nicht Carl live.",
+		body: "Frag Carls Syntwin, warum er Alkalye gebaut hat, wie er es nutzt oder wie du loslegst. Du kannst auch nach seinen anderen Projekten fragen. Syntwin ist eine KI, nicht Carl live.",
 	},
 	story: {
 		title: "Auch eine Person braucht Multiplayer",
@@ -329,7 +421,7 @@ let de: LandingContent = {
 	privacy: {
 		title: "Datenschutz, klar gesagt",
 		points: [
-			"Dokumente werden auf deinem Gerät verschlüsselt, bevor sie über Jazz synchronisiert werden. Der Sync-Server speichert Daten, die er nicht lesen kann.",
+			"Dokumente werden auf deinem Gerät verschlüsselt, bevor sie synchronisiert werden. Der Sync-Server speichert Daten, die er nicht lesen kann.",
 			"Du kannst ohne Konto anfangen. Mit einer Passphrase meldest du dich an und synchronisierst zwischen Geräten. Sie bleibt auf deinem Gerät.",
 			"Ausnahme ist ein verbundener MCP-Client: Dann hält der gehostete Server deinen Kontoschlüssel und kann entschlüsseln, was dieser Client abfragt.",
 			"Open Source unter MIT-Lizenz. Du kannst es mit deinem eigenen Sync-Server betreiben.",

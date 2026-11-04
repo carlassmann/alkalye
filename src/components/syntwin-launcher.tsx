@@ -19,7 +19,7 @@ function SyntwinLauncher({ locale }: { locale: string }) {
 					data-syntwin-open
 					className="border-border hover:bg-muted focus-visible:ring-ring inline-flex min-h-12 cursor-pointer items-center justify-center border px-6 text-sm font-medium focus-visible:ring-2"
 				>
-					{locale === "de" ? "Frag Carls KI-Twin" : "Ask Carl’s AI twin"}
+					{locale === "de" ? "Frag Carls Syntwin" : "Ask Carl’s Syntwin"}
 				</button>
 			)}
 		</>
