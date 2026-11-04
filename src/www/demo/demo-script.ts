@@ -121,7 +121,7 @@ let texts: Record<LandingLocale, DemoText> = {
 		post: [
 			"# Why I built Alkalye",
 			"",
-			"I write on my phone and on my Mac. Every notes app I tried asked teh same question: which version do you want to keep?",
+			"I write on my phone and on my Mac. My favorite notes app had the minimalism I admired. Then I used it heavily on both at once, and it kept asking teh same question: which version do you want to keep?",
 			"",
 		].join("\n"),
 		devices: [
@@ -136,8 +136,8 @@ let texts: Record<LandingLocale, DemoText> = {
 				body: "Strong line. Make it the title of a slide?",
 			},
 			{
-				quote: "Every notes app I tried",
-				body: "Name one? Readers will ask.",
+				quote: "My favorite notes app",
+				body: "Name it? Readers will ask.",
 			},
 		],
 		frontmatter: ["---", "mode: present", "---", "", ""].join("\n"),
@@ -146,8 +146,8 @@ let texts: Record<LandingLocale, DemoText> = {
 			"# Why I built Alkalye\n\t“Which version do you want to keep?”\n",
 		],
 		intro: [
-			"I write on my phone and on my Mac. Every notes app I tried asked the same question: which version do you want to keep?",
-			"I write on my phone and on my Mac. Every notes app I tried asked me that.",
+			"I write on my phone and on my Mac. My favorite notes app had the minimalism I admired. Then I used it heavily on both at once, and it kept asking the same question: which version do you want to keep?",
+			"I write on my phone and on my Mac. My favorite notes app had the minimalism I admired, until I used it on both at once.",
 		],
 		secondSlide: [
 			"\nI was the only one",
@@ -176,7 +176,7 @@ let texts: Record<LandingLocale, DemoText> = {
 		post: [
 			"# Warum ich Alkalye gebaut habe",
 			"",
-			"Ich schreibe auf dem Handy und auf dem Mac. Jede Notiz-App fragte mich dieselbe Frage: Welche Version willst du behalten?",
+			"Ich schreibe auf dem Handy und auf dem Mac. Meine liebste Notiz-App hatte den Minimalismus, den ich bewundere. Dann nutzte ich sie intensiv auf beiden gleichzeitig, und sie fragte mich dieselbe Frage: Welche Version willst du behalten?",
 			"",
 		].join("\n"),
 		devices: [
@@ -191,8 +191,8 @@ let texts: Record<LandingLocale, DemoText> = {
 				body: "Starker Satz. Mach daraus eine Folie?",
 			},
 			{
-				quote: "Jede Notiz-App",
-				body: "Nenn eine? Leser werden fragen.",
+				quote: "Meine liebste Notiz-App",
+				body: "Nenn sie? Leser werden fragen.",
 			},
 		],
 		frontmatter: ["---", "mode: present", "---", "", ""].join("\n"),
@@ -201,8 +201,8 @@ let texts: Record<LandingLocale, DemoText> = {
 			"# Warum ich Alkalye gebaut habe\n\t„Welche Version willst du behalten?“\n",
 		],
 		intro: [
-			"Ich schreibe auf dem Handy und auf dem Mac. Jede Notiz-App stellte mir dieselbe Frage: Welche Version willst du behalten?",
-			"Ich schreibe auf dem Handy und auf dem Mac. Jede Notiz-App fragte mich das.",
+			"Ich schreibe auf dem Handy und auf dem Mac. Meine liebste Notiz-App hatte den Minimalismus, den ich bewundere. Dann nutzte ich sie intensiv auf beiden gleichzeitig, und sie stellte mir dieselbe Frage: Welche Version willst du behalten?",
+			"Ich schreibe auf dem Handy und auf dem Mac. Meine liebste Notiz-App hatte den Minimalismus, den ich bewundere, bis ich sie auf beiden gleichzeitig nutzte.",
 		],
 		secondSlide: [
 			"\nIch war der Einzige",
