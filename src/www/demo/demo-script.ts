@@ -13,7 +13,7 @@ export type {
 let demoSceneIds = [
 	"intro",
 	"write",
-	"together",
+	"desk",
 	"offline",
 	"preview",
 	"present",
@@ -36,9 +36,12 @@ interface DemoStageLabels {
 	synced: string
 }
 
+type DemoDevice = "phone" | "laptop"
+
 interface DemoCollaborator {
 	name: string
 	color: string
+	device: DemoDevice
 }
 
 interface DemoEdit {
@@ -70,33 +73,39 @@ interface DemoFrame {
 	viewProgress: number
 }
 
-let carl: DemoCollaborator = { name: "Carl", color: "#059669" }
-let mia: DemoCollaborator = { name: "Mia", color: "#7c3aed" }
+// Carl prepares a lightning talk on his own phone and Mac, the situation
+// Alkalye was built for. Indented lines are the slides, unindented lines are
+// his speaker notes.
+let devices: Record<LandingLocale, Record<DemoDevice, DemoCollaborator>> = {
+	en: {
+		phone: { name: "Carl · phone", color: "#059669", device: "phone" },
+		laptop: { name: "Carl · Mac", color: "#2563eb", device: "laptop" },
+	},
+	de: {
+		phone: { name: "Carl · Handy", color: "#059669", device: "phone" },
+		laptop: { name: "Carl · Mac", color: "#2563eb", device: "laptop" },
+	},
+}
 
-// Carl and Mia prepare a lightning talk. Indented lines are the slides,
-// unindented lines are Carl's speaker notes.
 let documents: Record<LandingLocale, Record<DemoSceneId, string>> = {
 	en: {
-		intro: [
-			"# Write once, present anywhere",
-			"",
-			"\tA lightning talk",
-			"",
-		].join("\n"),
+		intro: ["# One person, two devices", "", "\tA lightning talk", ""].join(
+			"\n",
+		),
 		write: [
 			"",
-			"I used to keep slides in one app and notes in another. They drifted apart.",
+			"Story: notes on my phone, then on my Mac, and the app asked which version to keep.",
 			"",
-			"\tSlides are just the notes you show.",
+			"\tI was the only one editing.",
 			"",
 		].join("\n"),
-		together: [
+		desk: [
 			"",
 			"---",
 			"",
-			"# Write it together",
+			"# Multiplayer for one",
 			"",
-			"\tMia fixed this slide from her phone.",
+			"\tEvery device is just another cursor.",
 			"",
 		].join("\n"),
 		offline: [
@@ -105,7 +114,7 @@ let documents: Record<LandingLocale, Record<DemoSceneId, string>> = {
 			"",
 			"# No signal? Keep writing",
 			"",
-			"\tEdits wait on your device and sync when you are back.",
+			"\tIt syncs when you are back.",
 			"",
 		].join("\n"),
 		preview: "",
@@ -114,26 +123,23 @@ let documents: Record<LandingLocale, Record<DemoSceneId, string>> = {
 		whiteboard: "",
 	},
 	de: {
-		intro: [
-			"# Einmal schreiben, überall präsentieren",
-			"",
-			"\tEin Kurzvortrag",
-			"",
-		].join("\n"),
+		intro: ["# Eine Person, zwei Geräte", "", "\tEin Kurzvortrag", ""].join(
+			"\n",
+		),
 		write: [
 			"",
-			"Früher lagen meine Folien in einer App und die Notizen in einer anderen. Sie liefen auseinander.",
+			"Geschichte: Notizen auf dem Handy, dann auf dem Mac, und die App fragte, welche Version ich behalten will.",
 			"",
-			"\tFolien sind nur die Notizen, die man zeigt.",
+			"\tIch war der Einzige, der schrieb.",
 			"",
 		].join("\n"),
-		together: [
+		desk: [
 			"",
 			"---",
 			"",
-			"# Gemeinsam schreiben",
+			"# Multiplayer für eine Person",
 			"",
-			"\tMia hat diese Folie am Handy korrigiert.",
+			"\tJedes Gerät ist nur ein weiterer Cursor.",
 			"",
 		].join("\n"),
 		offline: [
@@ -142,7 +148,7 @@ let documents: Record<LandingLocale, Record<DemoSceneId, string>> = {
 			"",
 			"# Kein Netz? Weiterschreiben",
 			"",
-			"\tÄnderungen warten auf dem Gerät und synchronisieren, sobald du wieder online bist.",
+			"\tEs synchronisiert, sobald du wieder online bist.",
 			"",
 		].join("\n"),
 		preview: "",
@@ -154,32 +160,33 @@ let documents: Record<LandingLocale, Record<DemoSceneId, string>> = {
 
 function demoScenes(locale: LandingLocale): DemoScene[] {
 	let text = documents[locale]
+	let { phone, laptop } = devices[locale]
 	return [
 		{
 			id: "intro",
 			view: "editor",
-			edit: { at: "end", text: text.intro, by: carl },
+			edit: { at: "end", text: text.intro, by: phone },
 		},
 		{
 			id: "write",
 			view: "editor",
-			edit: { at: "end", text: text.write, by: carl },
+			edit: { at: "end", text: text.write, by: phone },
 		},
 		{
-			id: "together",
+			id: "desk",
 			view: "editor",
-			edit: { at: "end", text: text.together, by: mia },
+			edit: { at: "end", text: text.desk, by: laptop },
 		},
 		{
 			id: "offline",
 			view: "editor",
-			edit: { at: "end", text: text.offline, by: mia, offline: true },
+			edit: { at: "end", text: text.offline, by: phone, offline: true },
 		},
 		{ id: "preview", view: "preview" },
 		{
 			id: "present",
 			view: "slideshow",
-			edit: { at: "start", text: text.present, by: carl },
+			edit: { at: "start", text: text.present, by: laptop },
 		},
 		{ id: "teleprompter", view: "teleprompter" },
 		{ id: "whiteboard", view: "whiteboard" },

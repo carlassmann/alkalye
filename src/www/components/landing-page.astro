@@ -115,7 +115,7 @@ let primaryButtonClass =
 		</header>
 
 		<main class="pb-[env(safe-area-inset-bottom)]">
-			<section aria-labelledby="hero-title" class="mx-auto grid max-w-[1200px] px-[calc(1rem+env(safe-area-inset-left))] pr-[calc(1rem+env(safe-area-inset-right))] grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-x-14">
+			<section aria-labelledby="hero-title" class="mx-auto grid max-w-[1200px] px-[calc(1rem+env(safe-area-inset-left))] pr-[calc(1rem+env(safe-area-inset-right))] grid-cols-[minmax(0,1fr)] lg:grid-cols-[minmax(0,0.75fr)_minmax(0,1.25fr)] lg:gap-x-14">
 				<div data-demo-scene="intro" class="flex flex-col justify-center gap-6 pt-10 pb-8 lg:min-h-[calc(100svh-3.5rem)] lg:py-16">
 					<span class="w-fit border border-brand/30 bg-brand/8 px-2.5 py-1 text-xs font-medium tracking-wide text-brand">
 						{content.hero.badge}
@@ -142,13 +142,15 @@ let primaryButtonClass =
 					</ul>
 				</div>
 
-				<div data-demo-stage class="sticky top-14 z-10 h-[min(60svh,560px)] bg-background py-3 lg:top-[5.5rem] lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:my-8 lg:h-[calc(100svh-7.5rem)] lg:self-start lg:py-0">
-					<AlkalyeInAction locale={locale} labels={content.demo.stage} client:only="react">
-						<div slot="fallback" class="h-full w-full overflow-hidden border border-border bg-background shadow-2xl shadow-black/10 dark:shadow-black/40">
-							<div class="h-10 border-b border-border"></div>
-							<pre class="px-6 py-8 font-mono text-[15px] leading-7 whitespace-pre-wrap [tab-size:4]"><code>{introDocument}</code></pre>
-						</div>
-					</AlkalyeInAction>
+				<div data-demo-stage class="sticky top-14 z-10 bg-background py-3 lg:top-[5.5rem] lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:my-8 lg:flex lg:h-[calc(100svh-7.5rem)] lg:items-start lg:self-start lg:py-0 lg:pt-4">
+					<div class="h-[min(60svh,560px)] w-full sm:aspect-[16/10] sm:h-auto sm:max-h-[60svh] lg:max-h-full">
+						<AlkalyeInAction locale={locale} labels={content.demo.stage} client:only="react">
+							<div slot="fallback" class="h-full w-full overflow-hidden border border-border bg-background shadow-2xl shadow-black/10 dark:shadow-black/40">
+								<div class="h-10 border-b border-border"></div>
+								<pre class="px-6 py-8 font-mono text-[15px] leading-7 whitespace-pre-wrap [tab-size:4]"><code>{introDocument}</code></pre>
+							</div>
+						</AlkalyeInAction>
+					</div>
 				</div>
 
 				<div id="in-action" class="scroll-mt-20 lg:col-start-1">

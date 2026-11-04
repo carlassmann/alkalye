@@ -1,4 +1,5 @@
 import type { ReactNode } from "react"
+import { LaptopIcon, SmartphoneIcon } from "lucide-react"
 import { cn } from "@/app/lib/cn"
 import type {
 	DemoCollaborator,
@@ -62,11 +63,16 @@ function DemoChrome({
 							title={person.name}
 							style={{ backgroundColor: person.color }}
 							className={cn(
-								"animate-in fade-in zoom-in-50 ring-background flex size-6 items-center justify-center rounded-full text-[10px] font-semibold text-white ring-2 transition-[filter,opacity] duration-500",
+								"animate-in fade-in zoom-in-50 ring-background flex size-7 items-center justify-center rounded-full text-[10px] font-semibold text-white ring-2 transition-[filter,opacity] duration-500",
 								isOffline(connection, person) && "opacity-40 grayscale",
 							)}
 						>
-							{person.name.slice(0, 1)}
+							{person.device === "phone" ? (
+								<SmartphoneIcon className="size-3.5" aria-hidden />
+							) : (
+								<LaptopIcon className="size-3.5" aria-hidden />
+							)}
+							<span className="sr-only">{person.name}</span>
 						</li>
 					))}
 				</ul>

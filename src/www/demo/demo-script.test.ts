@@ -19,9 +19,9 @@ describe("demoFrameAt", () => {
 		expect(demoFrameAt(scenes, 5, 0.2)).toEqual(forward)
 	})
 
-	it("shows the collaborator typing at the end of the document", () => {
+	it("shows the second device typing at the end of the document", () => {
 		let frame = demoFrameAt(scenes, 2, 0.5)
-		expect(frame.typist?.collaborator.name).toBe("Mia")
+		expect(frame.typist?.collaborator.device).toBe("laptop")
 		expect(frame.typist?.position).toBe(frame.content.length)
 	})
 
@@ -38,7 +38,7 @@ describe("demoFrameAt", () => {
 
 	it("keeps finished edits in later scenes", () => {
 		let whiteboard = demoFrameAt(scenes, 7, 0)
-		expect(whiteboard.content).toContain("# Write it together")
+		expect(whiteboard.content).toContain("# Multiplayer for one")
 		expect(whiteboard.content).toContain("# No signal? Keep writing")
 		expect(whiteboard.content).toContain("mode: present")
 		expect(whiteboard.typist).toBeNull()
