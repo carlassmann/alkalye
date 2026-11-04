@@ -80,8 +80,8 @@ let en: LandingContent = {
 			},
 			you: "You",
 			hints: {
-				editor: "Click and type. Your words stay in the talk.",
-				review: "Click and type. Your words stay in the talk.",
+				editor: "Click and type. Your words stay in the document.",
+				review: "Click and type. Your words stay in the document.",
 				whiteboard: "Click to draw. Your sketch goes on the slide.",
 				timemachine: "Drag the slider through the history",
 				present: "Click to change slides",
@@ -293,8 +293,8 @@ let de: LandingContent = {
 			},
 			you: "Du",
 			hints: {
-				editor: "Klick und schreib. Deine Worte bleiben im Vortrag.",
-				review: "Klick und schreib. Deine Worte bleiben im Vortrag.",
+				editor: "Klick und schreib. Deine Worte bleiben im Dokument.",
+				review: "Klick und schreib. Deine Worte bleiben im Dokument.",
 				whiteboard: "Klick zum Zeichnen. Deine Skizze kommt auf die Folie.",
 				timemachine: "Zieh den Regler durch die Geschichte",
 				present: "Klick für die nächste Folie",
