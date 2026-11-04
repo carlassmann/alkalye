@@ -17,9 +17,13 @@ import {
 	remoteCursorsExtension,
 	setRemoteCursorsEffect,
 } from "@/app/features/sharing"
-import { resolveSyntaxTheme } from "@/app/features/syntax-highlighting"
+import {
+	resolveSyntaxTheme,
+	type SyntaxTheme,
+} from "@/app/features/syntax-highlighting"
 import type { ResolvedTheme } from "@/app/features/themes"
 import { CanvasErrorBoundary } from "@/app/features/assets"
+import { cn } from "@/app/lib/cn"
 import { SidebarProvider } from "@/app/components/ui/sidebar"
 import { IntlProvider } from "@/shared/intl/setup"
 import { messagesDe } from "@/shared/intl/messages"
@@ -103,7 +107,12 @@ function DemoStage({ locale, labels }: DemoStageProps) {
 		<DemoChrome labels={labels} view={frame.view} people={people}>
 			<div
 				key={frame.view}
-				className="animate-in fade-in-30 zoom-in-[0.98] flex min-h-0 flex-1 flex-col duration-500 ease-out motion-reduce:animate-none"
+				className={cn(
+					"animate-in fade-in-30 zoom-in-[0.98] flex min-h-0 flex-1 flex-col duration-500 ease-out motion-reduce:animate-none",
+					// Phones see more of each view at a smaller size. tldraw has its
+					// own camera and measures wrong under CSS zoom.
+					frame.view !== "whiteboard" && "max-sm:[zoom:0.8]",
+				)}
 			>
 				<DemoView frame={frame} appearance={appearance} />
 			</div>
@@ -168,16 +177,11 @@ function DemoView({
 	if (frame.view === "editor") return <DemoEditor frame={frame} />
 	if (frame.view === "preview") {
 		return (
-			<div className="min-h-0 flex-1 overflow-auto">
-				<PreviewView
-					content={frame.content}
-					wikilinks={noWikilinks}
-					appearance={appearance}
-					documentTheme={builtInDocumentTheme}
-					syntaxTheme={syntaxTheme}
-					embedded
-				/>
-			</div>
+			<DemoPreview
+				frame={frame}
+				appearance={appearance}
+				syntaxTheme={syntaxTheme}
+			/>
 		)
 	}
 	if (frame.view === "slideshow") {
@@ -216,6 +220,38 @@ function DemoView({
 				<DemoWhiteboard progress={frame.viewProgress} />
 			</Suspense>
 		</CanvasErrorBoundary>
+	)
+}
+
+function DemoPreview({
+	frame,
+	appearance,
+	syntaxTheme,
+}: {
+	frame: DemoFrame
+	appearance: "light" | "dark"
+	syntaxTheme: SyntaxTheme
+}) {
+	let scroller = useRef<HTMLDivElement>(null)
+
+	useEffect(() => {
+		let element = scroller.current
+		if (!element) return
+		let scrollable = element.scrollHeight - element.clientHeight
+		element.scrollTop = frame.viewProgress * Math.max(scrollable, 0)
+	}, [frame.viewProgress])
+
+	return (
+		<div ref={scroller} className="min-h-0 flex-1 overflow-hidden">
+			<PreviewView
+				content={frame.content}
+				wikilinks={noWikilinks}
+				appearance={appearance}
+				documentTheme={builtInDocumentTheme}
+				syntaxTheme={syntaxTheme}
+				embedded
+			/>
+		</div>
 	)
 }
 

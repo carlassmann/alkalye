@@ -61,7 +61,12 @@ function DemoChrome({
 					))}
 				</ul>
 			</div>
-			<div className="relative flex min-h-0 flex-1 flex-col">{children}</div>
+			<div className="relative flex min-h-0 flex-1 flex-col">
+				<div className="isolate flex min-h-0 flex-1 flex-col">{children}</div>
+				{/* The page scroll drives the demo. Touches and wheel on the stage
+				    must scroll the page, not the editor or canvas underneath. */}
+				<div className="absolute inset-0" />
+			</div>
 		</div>
 	)
 }
