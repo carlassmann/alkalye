@@ -33,4 +33,8 @@ export {
 	type CommentDecoration,
 } from "./lib/editor-extension"
 
-export { SidebarComments } from "./widgets/sidebar-comments"
+export {
+	SidebarComments,
+	CommentsPanel,
+	CommentThreadCard,
+} from "./widgets/sidebar-comments"

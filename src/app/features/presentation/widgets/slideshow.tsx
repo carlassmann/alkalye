@@ -16,6 +16,7 @@ import {
 	type SlideContent,
 	type VisualBlock,
 	type PresentationSize,
+	type PresentationItem,
 	type PresentationTheme,
 	type TextSegment,
 } from "../lib/presentation"
@@ -51,8 +52,8 @@ import {
 	type SyntaxTheme,
 } from "@/app/features/syntax-highlighting"
 
-export { Slideshow }
-export type { Slide }
+export { Slideshow, SlideshowView, getSlides }
+export type { Slide, SlideshowProps }
 
 type ResolvedWikilink = {
 	title: string
@@ -96,7 +97,45 @@ interface SlideshowProps {
 	appearanceOverride?: "light" | "dark"
 }
 
-function Slideshow({
+function getSlides(items: PresentationItem[]): Slide[] {
+	let slideMap = new Map<number, Slide["blocks"]>()
+	for (let item of items) {
+		if (item.type === "block") {
+			let blocks = slideMap.get(item.slideNumber) ?? []
+			blocks.push(item.block)
+			slideMap.set(item.slideNumber, blocks)
+		}
+	}
+	return Array.from(slideMap.entries())
+		.sort((a, b) => a[0] - b[0])
+		.map(([slideNumber, blocks]) => ({ slideNumber, blocks }))
+}
+
+function Slideshow(props: SlideshowProps) {
+	let systemTheme = useResolvedTheme()
+	let appearance =
+		props.appearanceOverride ??
+		parsePresentationTheme(props.content) ??
+		systemTheme
+	let syntaxTheme = useSyntaxTheme(props.content, appearance)
+	let documentTheme = useDocumentTheme(
+		props.content,
+		"slideshow",
+		appearance,
+		props.themeOverrideId,
+	)
+	return (
+		<SlideshowView
+			{...props}
+			appearance={appearance}
+			documentTheme={documentTheme}
+			syntaxTheme={syntaxTheme}
+		/>
+	)
+}
+
+// Renders without an account, so pages outside the app can show real slides.
+function SlideshowView({
 	content,
 	slides,
 	assets,
@@ -106,22 +145,15 @@ function Slideshow({
 	onExit,
 	onGoToTeleprompter,
 	embedded = false,
-	themeOverrideId,
-	appearanceOverride,
-}: SlideshowProps) {
+	appearance: effectiveAppearance,
+	documentTheme,
+	syntaxTheme,
+}: Omit<SlideshowProps, "themeOverrideId" | "appearanceOverride"> & {
+	appearance: PresentationTheme
+	documentTheme: ResolvedTheme
+	syntaxTheme: SyntaxTheme
+}) {
 	let size = parsePresentationSize(content)
-	let appearanceTheme = parsePresentationTheme(content)
-	let systemTheme = useResolvedTheme()
-
-	let effectiveAppearance = appearanceOverride ?? appearanceTheme ?? systemTheme
-	let syntaxTheme = useSyntaxTheme(content, effectiveAppearance)
-
-	let documentTheme = useDocumentTheme(
-		content,
-		"slideshow",
-		effectiveAppearance,
-		themeOverrideId,
-	)
 	let themeStylesResult = useThemeStyles(documentTheme)
 	let themeStyles = themeStylesResult.styles
 	let themeScopeId = useId()

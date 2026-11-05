@@ -10,6 +10,7 @@ import {
 } from "@/app/components/ui/dropdown-menu"
 import { ExternalLink, Keyboard } from "lucide-react"
 import { T } from "@/shared/intl/setup"
+import { syntwinEnabled } from "@/components/syntwin-launcher"
 
 export { HelpMenu }
 
@@ -34,6 +35,11 @@ function HelpMenu({
 					<DropdownMenuLabel>
 						<T k="help.label" />
 					</DropdownMenuLabel>
+					{syntwinEnabled && (
+						<DropdownMenuItem data-syntwin-open onClick={onNavigate}>
+							<T k="help.syntwin" />
+						</DropdownMenuItem>
+					)}
 					<DropdownMenuItem
 						render={<Link to="/welcome" onClick={onNavigate} />}
 					>

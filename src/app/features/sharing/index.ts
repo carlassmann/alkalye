@@ -1,4 +1,8 @@
 export { usePresence } from "./lib/presence"
+export {
+	remoteCursorsExtension,
+	setRemoteCursorsEffect,
+} from "./lib/remote-cursors"
 
 export {
 	createDocumentInvite,

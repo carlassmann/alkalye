@@ -1495,6 +1495,7 @@ function SignedInView() {
 							<Textarea
 								readOnly
 								value={auth.passphrase}
+								data-syntwin-hidden
 								className="bg-background border-border w-full resize-none border p-3 font-mono text-base/6 sm:text-sm/5"
 								minRows={3}
 							/>
