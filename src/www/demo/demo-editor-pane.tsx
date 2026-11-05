@@ -24,13 +24,36 @@ function DemoEditorPane({
 	cursors,
 	comments,
 	onType,
+	onWheel,
 }: {
 	content: string
 	cursors: DemoCursor[]
 	comments: DemoComment[]
 	onType: (content: string) => void
+	onWheel: (deltaY: number) => void
 }) {
 	let editor = useRef<MarkdownEditorRef>(null)
+	let pane = useRef<HTMLDivElement>(null)
+
+	// Some browsers send the wheel over the editor's pinned layers nowhere,
+	// so the page scroll that drives the demo is passed on by hand.
+	useEffect(() => {
+		let element = pane.current
+		if (!element) return
+		function handleWheel(event: WheelEvent) {
+			if (event.ctrlKey || Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
+				return
+			}
+			event.preventDefault()
+			onWheel(
+				event.deltaMode === WheelEvent.DOM_DELTA_LINE
+					? event.deltaY * 16
+					: event.deltaY,
+			)
+		}
+		element.addEventListener("wheel", handleWheel, { passive: false })
+		return () => element.removeEventListener("wheel", handleWheel)
+	}, [onWheel])
 	let typist = cursors.at(-1)
 
 	useEffect(() => {
@@ -62,7 +85,10 @@ function DemoEditorPane({
 		// The app pins its toolbar and editor to the window. The transform
 		// makes this pane their window. The scroller stays hidden so wheel and
 		// touch scroll the page, which drives the demo.
-		<div className="relative min-h-0 flex-1 [transform:translateZ(0)] overflow-hidden [&_.cm-scroller]:overflow-hidden!">
+		<div
+			ref={pane}
+			className="relative min-h-0 flex-1 [transform:translateZ(0)] overflow-hidden [&_.cm-scroller]:overflow-hidden!"
+		>
 			<div className="markdown-editor">
 				<MarkdownEditor
 					ref={editor}

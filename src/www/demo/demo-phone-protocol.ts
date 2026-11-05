@@ -41,6 +41,7 @@ let phoneMessageSchema = z.object({
 		z.object({ type: z.literal("ready") }),
 		z.object({ type: z.literal("typed"), content: z.string() }),
 		z.object({ type: z.literal("index"), index: z.number() }),
+		z.object({ type: z.literal("wheel"), deltaY: z.number() }),
 	]),
 })
 

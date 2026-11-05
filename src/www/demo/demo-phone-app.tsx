@@ -54,6 +54,7 @@ function PhoneScreen({ screen }: { screen: DemoPhoneScreen }) {
 					cursors={screen.cursors}
 					comments={[]}
 					onType={content => tellStage({ type: "typed", content })}
+					onWheel={deltaY => tellStage({ type: "wheel", deltaY })}
 				/>
 			</div>
 		)

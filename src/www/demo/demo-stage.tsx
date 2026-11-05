@@ -101,6 +101,7 @@ function DemoStage({ locale, labels }: DemoStageProps) {
 	function handlePhone(message: PhoneMessage) {
 		if (message.type === "typed") visitor.type(message.content)
 		if (message.type === "index") visitor.pickTalkIndex(message.index)
+		if (message.type === "wheel") scrollPage(message.deltaY)
 	}
 
 	return (
@@ -420,6 +421,7 @@ function DemoEditor({
 				}))}
 				comments={frame.comments}
 				onType={visitor.type}
+				onWheel={scrollPage}
 			/>
 			{frame.view === "review" && <DemoComments comments={frame.comments} />}
 		</div>
@@ -550,6 +552,21 @@ function DemoPresent({
 			/>
 		</div>
 	)
+}
+
+// The landing page scrolls its body; the stage sits inside it.
+function scrollPage(deltaY: number) {
+	let stage = document.querySelector("[data-demo-stage]")
+	scrollableAncestor(stage)?.scrollBy(0, deltaY)
+}
+
+function scrollableAncestor(element: Element | null): Element | null {
+	for (let current = element; current; current = current.parentElement) {
+		let { overflowY } = getComputedStyle(current)
+		let canScroll = overflowY === "auto" || overflowY === "scroll"
+		if (canScroll && current.scrollHeight > current.clientHeight) return current
+	}
+	return document.scrollingElement
 }
 
 function stepIndex(progress: number, count: number): number {
