@@ -620,9 +620,10 @@ function useScrollPosition(sceneIds: string[]) {
 			for (let [index, element] of elements.entries()) {
 				if (element.getBoundingClientRect().top <= focusLine) sceneIndex = index
 			}
-			let rect = elements[sceneIndex]?.getBoundingClientRect()
-			let progress = rect
-				? (focusLine - rect.top) / Math.max(rect.height, 1)
+			let scene = elements[sceneIndex]
+			let progress = scene
+				? (focusLine - scene.getBoundingClientRect().top) /
+					Math.max(sceneLength(scene), 1)
 				: 0
 			setPosition({
 				sceneIndex,
@@ -656,6 +657,11 @@ function useScrollPosition(sceneIds: string[]) {
 }
 
 // The stage widens over the hero's column while the hero scrolls away.
+// A scene lasts for its note plus the margin below it.
+function sceneLength(scene: HTMLElement): number {
+	return scene.offsetHeight + parseFloat(getComputedStyle(scene).marginBottom)
+}
+
 function stageExpansion(hero: DOMRect): number {
 	let viewport = window.innerHeight
 	let expansion = (viewport * 0.9 - hero.bottom) / (viewport * 0.6)

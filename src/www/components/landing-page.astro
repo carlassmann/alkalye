@@ -165,20 +165,22 @@ let primaryButtonClass =
 
 				<div id="in-action" class="scroll-mt-20 lg:col-start-1">
 					<!-- The stage tells the story. These notes give screen readers, search
-					     engines and Syntwin the same story, and their height sets how long
-					     each scene stays on stage while scrolling. -->
+					     engines and Syntwin the same story, and their margins set how long
+					     each scene stays on stage while scrolling. Each item is sized so that
+					     Syntwin highlighting it lands mid-scene, wherever the chat
+					     sheet leaves room. -->
 					<div class="sr-only">
 						<h2 id="in-action-title">{content.demo.title}</h2>
 						<p>{content.demo.lede}</p>
 					</div>
 					<ol aria-labelledby="in-action-title" class="flex flex-col pb-[60svh]">
 						{content.demo.scenes.map(scene => (
-							<li id={`in-action-${scene.id}`} data-demo-scene={scene.id} class="min-h-[90svh] lg:min-h-[100svh]">
+							<li id={`in-action-${scene.id}`} data-demo-scene={scene.id} class="h-[45svh] mb-[45svh] lg:h-[90svh] lg:mb-[10svh]">
 								<div class="sr-only">
 									<h3>{scene.title}</h3>
 									<p>{scene.body}</p>
 									{scene.id === "sketch" && (
-										<p>{content.demo.tldrawCredit.before}<a href="https://tldraw.dev">{content.demo.tldrawCredit.link}</a>{content.demo.tldrawCredit.after}</p>
+										<p>{content.demo.tldrawCredit.before}{content.demo.tldrawCredit.link}{content.demo.tldrawCredit.after}</p>
 									)}
 								</div>
 							</li>
