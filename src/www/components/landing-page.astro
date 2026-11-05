@@ -157,7 +157,7 @@ let primaryButtonClass =
 							</div>
 						</AlkalyeInAction>
 					</div>
-					<p class="text-center text-xs text-muted-foreground" data-syntwin-avoid="0px">
+					<p class="text-center text-xs text-muted-foreground">
 						{content.demo.caption}
 						{" "}{content.demo.tldrawCredit.before}<a href="https://tldraw.dev" target="_blank" rel="noopener" class="font-medium text-foreground underline underline-offset-4">{content.demo.tldrawCredit.link}</a>.
 					</p>
@@ -291,7 +291,7 @@ let primaryButtonClass =
 						<h2 class={sectionTitleClass}>{content.closing.title}</h2>
 						<p class="max-w-[52ch] text-muted-foreground">{content.closing.body}</p>
 					</div>
-					<a href={appHref} class={primaryButtonClass}>{content.closing.action}</a>
+					<a href={`/app/new?lang=${locale}`} class={primaryButtonClass}>{content.closing.action}</a>
 				</div>
 			</section>
 		</main>
