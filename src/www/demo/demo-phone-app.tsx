@@ -7,6 +7,7 @@ import {
 } from "@/app/features/presentation"
 import { DemoProviders } from "./demo-providers"
 import { DemoEditorPane } from "./demo-editor-pane"
+import { forwardWheel } from "./forward-wheel"
 import {
 	parseStageMessage,
 	phoneMessage,
@@ -33,8 +34,14 @@ function DemoPhoneApp() {
 			if (message) setState({ locale: message.locale, screen: message.screen })
 		}
 		window.addEventListener("message", receive)
+		let stopForwarding = forwardWheel(window, deltaY =>
+			tellStage({ type: "wheel", deltaY }),
+		)
 		tellStage({ type: "ready" })
-		return () => window.removeEventListener("message", receive)
+		return () => {
+			window.removeEventListener("message", receive)
+			stopForwarding()
+		}
 	}, [])
 
 	if (!state) return null
@@ -54,7 +61,6 @@ function PhoneScreen({ screen }: { screen: DemoPhoneScreen }) {
 					cursors={screen.cursors}
 					comments={[]}
 					onType={content => tellStage({ type: "typed", content })}
-					onWheel={deltaY => tellStage({ type: "wheel", deltaY })}
 				/>
 			</div>
 		)

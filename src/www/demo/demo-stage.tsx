@@ -33,6 +33,7 @@ import { DemoEditorPane } from "./demo-editor-pane"
 import { DemoPhone } from "./demo-phone"
 import type { DemoPhoneScreen, PhoneMessage } from "./demo-phone-protocol"
 import { DemoProviders } from "./demo-providers"
+import { forwardWheel } from "./forward-wheel"
 import {
 	applyVisitorEdit,
 	diffVisitorEdit,
@@ -104,8 +105,13 @@ function DemoStage({ locale, labels }: DemoStageProps) {
 		if (message.type === "wheel") scrollPage(message.deltaY)
 	}
 
+	let root = useRef<HTMLDivElement>(null)
+	useEffect(() => {
+		if (root.current) return forwardWheel(root.current, scrollPage)
+	}, [])
+
 	return (
-		<div className="@container relative flex h-full w-full">
+		<div ref={root} className="@container relative flex h-full w-full">
 			<div
 				className={cn(
 					"flex min-w-0 flex-1 transition-[margin] duration-700 ease-out",
@@ -421,7 +427,6 @@ function DemoEditor({
 				}))}
 				comments={frame.comments}
 				onType={visitor.type}
-				onWheel={scrollPage}
 			/>
 			{frame.view === "review" && <DemoComments comments={frame.comments} />}
 		</div>
