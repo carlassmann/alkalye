@@ -88,3 +88,37 @@ for (let entryPoint of ["sidebar", "settings"]) {
 		}
 	})
 }
+
+test("signing in from a private document link keeps the requested document", async ({
+	page,
+	browser,
+}) => {
+	await waitForEditorBoot(page)
+	let account = await createAccount(page)
+	await create(page, { title: "Requested private document" })
+	let requestedUrl = page.url()
+	await create(page, { title: "Newer account document" })
+
+	let freshContext = await browser.newContext()
+	try {
+		let freshPage = await freshContext.newPage()
+		await freshPage.goto(requestedUrl)
+		await expect(
+			freshPage.getByText("Sign in to access this document."),
+		).toBeVisible()
+		await freshPage
+			.getByRole("button", { name: "Sign in", exact: true })
+			.click()
+		await freshPage.getByTestId(testIds.auth.initialSignIn).click()
+		await freshPage
+			.getByTestId(testIds.auth.loginPassphrase)
+			.fill(account.passphrase)
+		await freshPage.getByTestId(testIds.auth.loginSubmit).click()
+		await expect(freshPage.getByTestId(testIds.doc.editor)).toContainText(
+			"Requested private document",
+		)
+		await expect(freshPage).toHaveURL(requestedUrl)
+	} finally {
+		await freshContext.close()
+	}
+})

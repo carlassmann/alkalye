@@ -110,8 +110,18 @@ function RouterWithJazz() {
 			if (!me.$isLoaded) return
 			router.update({ context: { me } })
 			if (routerAccountId) {
+				let retryRequestedDocument = router.state.matches.some(
+					({ loaderData }) =>
+						typeof loaderData === "object" &&
+						loaderData !== null &&
+						"doc" in loaderData &&
+						loaderData.doc === null,
+				)
 				router.clearCache()
-				if (router.state.location.pathname.includes("/doc/")) {
+				if (
+					router.state.location.pathname.includes("/doc/") &&
+					!retryRequestedDocument
+				) {
 					await router.navigate({
 						to: "/",
 						search: { personal: true },
