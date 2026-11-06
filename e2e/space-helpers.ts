@@ -64,7 +64,9 @@ async function createSpace(page: Page, args: CreateSpaceArgs) {
 	await page.getByTestId(testIds.space.createNameInput).fill(args.name)
 	await page.getByTestId(testIds.space.createSubmit).click()
 
-	await expect.poll(() => page.url()).toContain("/app/spaces/")
+	await expect
+		.poll(() => page.url())
+		.toMatch(/\/app\/spaces\/[^/]+\/doc\/[^/?#]+/)
 
 	let spaceId = getSpaceIdFromUrl(page.url())
 	if (!spaceId) throw new Error(`Could not parse space id from ${page.url()}`)

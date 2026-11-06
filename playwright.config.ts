@@ -4,7 +4,7 @@ let appUrl = process.env.PLAYWRIGHT_BASE_URL ?? "https://alkalye.localhost"
 
 export default defineConfig({
 	testDir: "./e2e",
-	timeout: 60_000,
+	timeout: process.env.CI ? 240_000 : 60_000,
 	expect: {
 		timeout: 10_000,
 	},
