@@ -1,5 +1,14 @@
 [
 	{
+		"id": 167,
+		"date": "2026-11-06",
+		"title": "Sign in straight to your documents",
+		"notes": [
+			"Signing in on a new browser opens a document from your account without showing an access-denied screen for the temporary welcome document."
+		],
+		"pr": 74
+	},
+	{
 		"id": 166,
 		"date": "2026-11-02",
 		"title": "Start typing without clicking into the editor",
