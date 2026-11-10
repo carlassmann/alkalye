@@ -36,12 +36,11 @@ The landing page's scroll demo renders the app's editor and toolbar, comments, t
 
 The phone in the demo is an iframe of `/demo/phone` (noindex, no Syntwin script) at real iPhone size, so the app's mobile editor and teleprompter render there; the landing page drives it with `postMessage`. Page reading does not reach into that frame.
 
-Omny's page tools are readPage, highlight, click, fill and select; there is no scroll tool. Highlighting scrolls its target into view, so the twin moves through the demo by highlighting a scene's list item, which `find` returns for a scene heading. The sticky stage covers the items, so highlight then refuses with "target is obscured" after it has scrolled, and the widget shows "Didn't work". The room instructions tell the twin to carry on. Each item is sized so the highlight lands mid-scene both when the twin centers it (desktop) and when it aligns it above the phone's chat sheet. The demo itself only reads scroll position.
+The twin moves through the demo with Omny's `scrollTo` page tool on a scene's heading; `find` returns the scene's list item. `highlight` also scrolls, but the sticky stage covers the items, so it reports "not marked" and draws no ring. Each item is sized so the scene's middle lands at the focus line both when its target is centered (desktop) and when it is aligned above the phone's chat sheet. The demo itself only reads scroll position.
 
 ## Known Omny limitations
 
 - Test conversations on 5 November 2026: on the German page the widget UI is German, but the conversation language shows EN and the twin answers German messages in English. The room has no default-language setting through MCP.
-- The twin sometimes retracts true statements from its own source or from earlier page reads ("I didn't read that in any source"). The source is attached, processed and searchable; the trigger is unknown.
 
 - The configured launcher prompt is one string across languages. The chat UI and replies follow English/German; room instructions contain both greeting variants.
 - With `data-launcher="none"`, an active conversation can still show a Continue the chat card after minimizing. Hiding it did not work in the cbook run.
