@@ -37,7 +37,8 @@ import {
 	type SyntaxTheme,
 } from "@/app/features/syntax-highlighting"
 
-export { Preview }
+export { Preview, PreviewView }
+export type { PreviewProps }
 
 type Asset = {
 	$jazz: { id: string }
@@ -119,6 +120,43 @@ function Preview({
 	)
 	let syntaxTheme = useSyntaxTheme(content, previewAppearance)
 
+	return (
+		<PreviewView
+			content={content}
+			assets={assets}
+			localAssets={localAssets}
+			wikilinks={wikilinks}
+			onExit={onExit}
+			comments={comments}
+			onCommentSelect={onCommentSelect}
+			onTextSelectionChange={onTextSelectionChange}
+			appearance={previewAppearance}
+			documentTheme={documentTheme}
+			syntaxTheme={syntaxTheme}
+			embedded={embedded}
+		/>
+	)
+}
+
+// Renders without an account, so pages outside the app can show real previews.
+function PreviewView({
+	content,
+	assets,
+	localAssets,
+	wikilinks,
+	onExit,
+	comments = [],
+	onCommentSelect,
+	onTextSelectionChange,
+	appearance,
+	documentTheme,
+	syntaxTheme,
+	embedded = false,
+}: Omit<PreviewProps, "themeOverrideId" | "appearanceOverride"> & {
+	appearance: "light" | "dark"
+	documentTheme: ResolvedTheme
+	syntaxTheme: SyntaxTheme
+}) {
 	let wikilinkResolver: WikilinkTitleResolver = docId => {
 		return wikilinks.get(docId) ?? { title: docId, exists: false }
 	}
@@ -131,7 +169,7 @@ function Preview({
 			assets={assets}
 			localAssets={localAssets}
 			marked={marked}
-			colorScheme={previewAppearance}
+			colorScheme={appearance}
 			cacheVersion={wikilinks.size}
 			onExit={onExit}
 			documentTheme={documentTheme}

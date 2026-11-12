@@ -25,7 +25,8 @@ jobs:
       - run: bun run check
 
   e2e:
-    runs-on: ubuntu-latest
+    # Playwright 1.58 can't install Chromium on ubuntu-latest (26.04).
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 

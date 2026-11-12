@@ -5,7 +5,7 @@ import LegalDoc from "@/layouts/LegalDoc.astro"
 <LegalDoc 
 	title="Privacy Policy" 
 	description="Privacy policy and data handling practices for Alkalye."
-	subtitle="Last updated: October 2026"
+	subtitle="Last updated: November 2026"
 >
 	<h2>Data Storage</h2>
 	<p>Your documents are stored:</p>
@@ -34,6 +34,11 @@ import LegalDoc from "@/layouts/LegalDoc.astro"
 	</ul>
 	<p>The hosted server decrypts your account credential and processes content in memory to answer tool calls, even while your app is closed. Credentials stored in your private Jazz root and OAuth tokens are encrypted with a server-held key. The server operator can decrypt these credentials; encryption does not hide them from the server.</p>
 	<p>Depending on the tool, shared data may include document and space names and identifiers, Markdown content, revisions, timestamps, comments, comment status, and collaborator display names. OAuth access and refresh tokens contain the encrypted account credential and expire. The connector temporarily keeps short-lived replay-prevention identifiers in server memory, not document content.</p>
+
+	<h2>Optional AI guide</h2>
+	<p>When enabled, Carl's Syntwin, an AI guide, is provided through Syntwin. The guide connects to Syntwin's service and processes conversation messages there. AI conversations are separate from Alkalye's encrypted document sync and require an internet connection.</p>
+	<p>The guide receives a general note identifying the website or app, without account details or document contents. If you grant page access through the guide, visible page content can be sent to Syntwin and its AI providers to answer questions or guide you. Alkalye marks sign-in forms and recovery phrases as hidden from that access. Share only content you want the guide to see. Page access can be declined or revoked in the guide.</p>
+	<p>See <a href="https://my.syntwin.ai/legal/privacy" target="_blank" rel="noopener" class="text-brand hover:underline">Syntwin's privacy policy</a> for its data handling practices.</p>
 
 	<h2>Analytics</h2>
 	<p>We use privacy-preserving, aggregate product analytics. We do not use document contents for analytics.</p>

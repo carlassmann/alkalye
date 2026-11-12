@@ -11,6 +11,17 @@ export default defineConfig({
 	adapter: vercel(),
 	security: { checkOrigin: false },
 	devToolbar: { enabled: false },
+	// Omny currently renders its provider privacy links relative to the host site.
+	redirects: {
+		"/legal/privacy": {
+			destination: "https://my.syntwin.ai/legal/privacy",
+			status: 302,
+		},
+		"/de/legal/privacy": {
+			destination: "https://my.syntwin.ai/de/legal/privacy",
+			status: 302,
+		},
+	},
 	i18n: {
 		locales: ["en", "de"],
 		defaultLocale: "en",
@@ -109,6 +120,16 @@ export default defineConfig({
 	],
 	env: {
 		schema: {
+			PUBLIC_SYNTWIN_ENABLED: envField.boolean({
+				context: "client",
+				access: "public",
+				default: true,
+			}),
+			PUBLIC_SYNTWIN_ROOM_ID: envField.string({
+				context: "client",
+				access: "public",
+				optional: true,
+			}),
 			PUBLIC_JAZZ_SYNC_SERVER: envField.string({
 				context: "client",
 				access: "public",

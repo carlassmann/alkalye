@@ -15,7 +15,7 @@ import {
 } from "@/app/features/documents"
 import { canEdit } from "@/app/features/sharing"
 import { LaserReceiver } from "../widgets/laser-pointer"
-import { Slideshow, type Slide } from "../widgets/slideshow"
+import { Slideshow, getSlides } from "../widgets/slideshow"
 import { parsePresentation, type PresentationItem } from "../lib/presentation"
 import { useScreenWakeLock } from "../lib/screen-wake-lock"
 import { assetPreviewResolve } from "@/app/features/assets"
@@ -138,18 +138,4 @@ function makeSlideChange(doc: LoadedDoc, items: PresentationItem[]) {
 			doc.$jazz.set("presentationLine", idx)
 		}
 	}
-}
-
-function getSlides(items: PresentationItem[]): Slide[] {
-	let slideMap = new Map<number, Slide["blocks"]>()
-	for (let item of items) {
-		if (item.type === "block") {
-			let blocks = slideMap.get(item.slideNumber) ?? []
-			blocks.push(item.block)
-			slideMap.set(item.slideNumber, blocks)
-		}
-	}
-	return Array.from(slideMap.entries())
-		.sort((a, b) => a[0] - b[0])
-		.map(([slideNumber, blocks]) => ({ slideNumber, blocks }))
 }

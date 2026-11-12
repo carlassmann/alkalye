@@ -17,6 +17,7 @@ import { useCleanupDeleted } from "@/app/features/documents"
 import { connectLocalJazzPoke } from "@/app/lib/local-jazz-poke"
 import { init } from "@plausible-analytics/tracker"
 import { IntlProvider } from "@/shared/intl/setup"
+import { SyntwinGuide } from "@/components/syntwin-launcher"
 import { messagesDe } from "@/shared/intl/messages"
 import { recordStartupTraceOnce } from "@/app/lib/reload-diagnostics"
 import { finishBrowserStartupInstrumentation } from "@/app/lib/browser-startup-instrumentation"
@@ -101,6 +102,7 @@ function RouterWithJazz() {
 	let requestedLocale = getRequestedLocale()
 
 	useCleanupDeleted()
+	useHideSyntwinCardInFullScreenViews()
 
 	useEffect(() => {
 		if (!me.$isLoaded || routerAccountId === me.$jazz.id) return
@@ -177,6 +179,7 @@ function RouterWithJazz() {
 
 	let content = (
 		<>
+			{me.$isLoaded && !isLaserPreview() && <SyntwinGuide locale={locale} />}
 			{!isLaserPreview() && (
 				<>
 					<Toaster />
@@ -200,6 +203,22 @@ function RouterWithJazz() {
 	) : (
 		<IntlProvider>{intlWrapped}</IntlProvider>
 	)
+}
+
+// The minimized Syntwin card covers the bottom controls of these views; Help still opens the chat.
+function useHideSyntwinCardInFullScreenViews() {
+	let fullScreenView = useRouterState({
+		router,
+		select: state =>
+			/\/(timemachine|slideshow|teleprompter)$/.test(state.location.pathname),
+	})
+	useEffect(() => {
+		if (!fullScreenView) return
+		document.documentElement.dataset.hideSyntwinCard = ""
+		return () => {
+			delete document.documentElement.dataset.hideSyntwinCard
+		}
+	}, [fullScreenView])
 }
 
 function TracedRouterProvider({
