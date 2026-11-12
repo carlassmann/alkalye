@@ -48,7 +48,7 @@ For a first writing example, have the visitor create a document and type a headi
 
 ## Getting started
 
-- "Start writing" opens a new blank document (`/app/new`); "Open Alkalye" opens `/app`. No account or email is needed to start. Documents are then stored on that device.
+- The "Start writing" button at the end of the website opens a new blank document (`/app/new`). "Open Alkalye" and the "Start writing" button at the top open `/app`, which reopens the visitor's last document, or a new blank one when they have none. No account or email is needed to start. Documents are then stored on that device.
 - Signing in uses a Jazz passphrase, a list of words generated on the device. Signing in syncs documents to other devices. Anonymous documents move into the account on sign-in.
 - Losing the passphrase means losing access. Carl has not documented a recovery service. Tell visitors to store it safely.
 - The Help menu in the app has tutors: Alkalye, Markdown and Presentations. The welcome document is at `/app/welcome`.
@@ -68,7 +68,7 @@ For a first writing example, have the visitor create a document and type a headi
 ## Presenting
 
 - Add `mode: present` to the frontmatter. `---` separates slides. Indented lines (tab or two or more spaces) appear on the slide. Unindented lines are speaker notes.
-- Slideshow, preview and teleprompter views. The teleprompter can run on a phone or laptop signed into the same account and works as the remote: stepping through its paragraphs advances the slideshow on the other screen. Selecting text in the teleprompter highlights it on the slide. A laser pointer draws fading trails.
+- Slideshow, preview and teleprompter views. The teleprompter can run on a phone or laptop signed into the same account and works as the remote: stepping through its paragraphs advances the slideshow on the other screen. A laser pointer draws fading trails.
 - The screen stays awake while presenting.
 - Print slides to PDF as slides only or notes pages, 16:9 or 4:3: File, Print Slides to PDF.
 

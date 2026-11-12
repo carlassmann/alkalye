@@ -102,6 +102,7 @@ function RouterWithJazz() {
 	let requestedLocale = getRequestedLocale()
 
 	useCleanupDeleted()
+	useHideSyntwinCardInFullScreenViews()
 
 	useEffect(() => {
 		if (!me.$isLoaded || routerAccountId === me.$jazz.id) return
@@ -202,6 +203,22 @@ function RouterWithJazz() {
 	) : (
 		<IntlProvider>{intlWrapped}</IntlProvider>
 	)
+}
+
+// The minimized Syntwin card covers the bottom controls of these views; Help still opens the chat.
+function useHideSyntwinCardInFullScreenViews() {
+	let fullScreenView = useRouterState({
+		router,
+		select: state =>
+			/\/(timemachine|slideshow|teleprompter)$/.test(state.location.pathname),
+	})
+	useEffect(() => {
+		if (!fullScreenView) return
+		document.documentElement.dataset.hideSyntwinCard = ""
+		return () => {
+			delete document.documentElement.dataset.hideSyntwinCard
+		}
+	}, [fullScreenView])
 }
 
 function TracedRouterProvider({
