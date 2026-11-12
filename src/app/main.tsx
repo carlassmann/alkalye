@@ -1,5 +1,5 @@
 import { isLaserPreview } from "@/app/features/presentation"
-import { StrictMode, useEffect } from "react"
+import { StrictMode, useEffect, useState } from "react"
 import { JazzReactProvider, useAccount } from "jazz-tools/react"
 import { co } from "jazz-tools"
 import {
@@ -92,14 +92,54 @@ function ContextPWAProvider({ children }: { children: React.ReactNode }) {
 
 function RouterWithJazz() {
 	let me = useAccount(UserAccount, { resolve: { root: true } })
+	let [routerAccountId, setRouterAccountId] = useState<string | null>(null)
 	let initialRouteResolved = useRouterState({
 		router,
 		select: state => Boolean(state.resolvedLocation),
 	})
-	let showSplash = !me.$isLoaded || !initialRouteResolved
+	let accountReady = me.$isLoaded && routerAccountId === me.$jazz.id
+	let showSplash = !accountReady || !initialRouteResolved
 	let requestedLocale = getRequestedLocale()
 
 	useCleanupDeleted()
+
+	useEffect(() => {
+		if (!me.$isLoaded || routerAccountId === me.$jazz.id) return
+		let cancelled = false
+
+		async function updateRouterAccount() {
+			if (!me.$isLoaded) return
+			router.update({ context: { me } })
+			if (routerAccountId) {
+				let retryRequestedDocument = router.state.matches.some(
+					({ loaderData }) =>
+						typeof loaderData === "object" &&
+						loaderData !== null &&
+						"doc" in loaderData &&
+						loaderData.doc === null,
+				)
+				router.clearCache()
+				if (
+					router.state.location.pathname.includes("/doc/") &&
+					!retryRequestedDocument
+				) {
+					await router.navigate({
+						to: "/",
+						search: { personal: true },
+						replace: true,
+					})
+				} else {
+					await router.invalidate()
+				}
+			}
+			if (!cancelled) setRouterAccountId(me.$jazz.id)
+		}
+
+		void updateRouterAccount()
+		return () => {
+			cancelled = true
+		}
+	}, [me, routerAccountId])
 
 	useEffect(() => {
 		recordStartupTraceOnce("react-mounted")
@@ -147,11 +187,9 @@ function RouterWithJazz() {
 			)}
 			<LocalJazzPoke />
 			<SplashScreen show={showSplash} />
-			{/* Mount the router only once the account root is resolved: loaders
-			    read context.me at navigation time and never re-run when it
-			    changes, so an early navigation with me=null would render an
-			    empty screen forever. */}
-			{me.$isLoaded && <TracedRouterProvider me={me} />}
+			{/* Loaders keep their account context until navigation or invalidation.
+			    Keep the old document unmounted until the new account is routed. */}
+			{accountReady && me.$isLoaded && <TracedRouterProvider me={me} />}
 		</>
 	)
 

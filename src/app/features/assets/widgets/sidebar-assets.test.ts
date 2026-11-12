@@ -2,6 +2,7 @@ import React, { type MouseEventHandler, type ReactNode } from "react"
 import { createRoot } from "react-dom/client"
 import { flushSync } from "react-dom"
 import { afterEach, describe, expect, it, vi } from "vitest"
+import { SidebarAssets } from "./sidebar-assets"
 
 interface MockProps {
 	children?: ReactNode
@@ -58,12 +59,11 @@ afterEach(() => {
 })
 
 describe("SidebarAssets", () => {
-	it("does not pass the menu click event to the whiteboard callback", async () => {
+	it("does not pass the menu click event to the whiteboard callback", () => {
 		let onCreateTldraw = vi.fn()
 		let container = document.createElement("div")
 		document.body.append(container)
 		let root = createRoot(container)
-		let { SidebarAssets } = await import("./sidebar-assets")
 
 		flushSync(() => {
 			root.render(

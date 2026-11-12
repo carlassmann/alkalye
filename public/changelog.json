@@ -1,6 +1,6 @@
 [
 	{
-		"id": 167,
+		"id": 168,
 		"date": "2026-11-04",
 		"title": "See Alkalye in action and ask Carl's Syntwin",
 		"notes": [
@@ -10,6 +10,15 @@
 			"Whiteboards are powered by tldraw, now credited on the website."
 		],
 		"pr": 73
+	},
+	{
+		"id": 167,
+		"date": "2026-11-06",
+		"title": "Sign in straight to your documents",
+		"notes": [
+			"Signing in on a new browser opens a document from your account without showing an access-denied screen for the temporary welcome document."
+		],
+		"pr": 74
 	},
 	{
 		"id": 166,
