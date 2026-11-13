@@ -5,7 +5,8 @@
 		"title": "Open documents faster with new sync",
 		"notes": [
 			"Documents open faster and edits sync immediately through our new sync system. Existing users do not need to do anything: documents and settings move automatically, and your existing recovery words still work.",
-			"Synced data is no longer end-to-end encrypted. Alkalye's backend and Jazz Cloud can read it."
+			"Synced data is no longer end-to-end encrypted. Alkalye's backend and Jazz Cloud can read it.",
+			"Old sharing links no longer work. Create new invite links to share your documents and spaces, and reconnect your MCP clients and agents in Settings."
 		],
 		"pr": 0,
 		"commit": "f1e6c13"

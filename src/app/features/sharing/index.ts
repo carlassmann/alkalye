@@ -7,3 +7,8 @@ export { SidebarCollaboration } from "./widgets/sidebar-collaboration"
 export { sharingRequest } from "./lib/backend"
 export { usePresence } from "./lib/presence"
 export { InviteScreen } from "./screens/invite-screen"
+
+export {
+	remoteCursorsExtension,
+	setRemoteCursorsEffect,
+} from "./lib/remote-cursors"

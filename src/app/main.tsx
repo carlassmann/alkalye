@@ -1,7 +1,14 @@
+import type { JazzClient } from "jazz-tools/client"
+import { restoreGuestTransfer } from "./features/auth/lib/guest-transfer"
 import { ClassicMigration } from "./features/classic-import/migration-notice"
 import { AccountRoutingContext } from "./lib/account-routing"
 import { useEffect, useState } from "react"
-import { JazzProvider, useSession, useSyncStatus } from "jazz-tools/react"
+import {
+	JazzProvider,
+	useSession,
+	useSyncStatus,
+	useJazzSession,
+} from "jazz-tools/react"
 import { createRouter, RouterProvider } from "@tanstack/react-router"
 import { AuthForm, markAccountBackedUp } from "@/app/features/auth"
 import { LibraryProvider, useLibrary, app } from "@/app/features/documents"
@@ -77,6 +84,7 @@ let routedOwnerId: string | null = null
 function AppRouter({ ownerId }: { ownerId: string }) {
 	let pwa = usePWAProvider()
 	let { db } = useLibrary()
+	let { exportDeviceKey } = useJazzSession<JazzClient>()
 	let sync = useSyncStatus()
 	let [ready, setReady] = useState(false)
 	useEffect(() => {
@@ -84,6 +92,7 @@ function AppRouter({ ownerId }: { ownerId: string }) {
 		if (ready || (restoring && sync.link.state !== "connected")) return
 		let cancelled = false
 		async function routeAccount() {
+			await restoreGuestTransfer(db, ownerId, exportDeviceKey())
 			let documents = restoring
 				? await db.all(app.documents.where({ ownerId }), { tier: "remote" })
 				: []
@@ -129,7 +138,7 @@ function AppRouter({ ownerId }: { ownerId: string }) {
 		return () => {
 			cancelled = true
 		}
-	}, [db, ownerId, sync.link.state, ready])
+	}, [db, ownerId, sync.link.state, ready, exportDeviceKey])
 
 	return (
 		<PWAContext.Provider value={pwa}>

@@ -1,3 +1,4 @@
+import { exportComments } from "@/app/features/import-export"
 import { loadThemesForPdf } from "@/app/features/themes"
 import { printToPdf, printSlidesToPdf } from "@/app/features/import-export"
 import { app, type Database } from "../lib/library"
@@ -52,7 +53,7 @@ import {
 } from "../lib/document-file-actions"
 import { runDocumentCommand } from "./document-commands"
 
-export { SidebarFileMenu }
+export { SidebarFileMenu, makeShare, makePrintSlidesFactory }
 
 interface SidebarFileMenuProps {
 	doc: LoadedDocument & { content: string }
@@ -89,7 +90,12 @@ function SidebarFileMenu({ doc, editor }: SidebarFileMenuProps) {
 	let isPinned = doc.pinned
 	let isPresentation = getPresentationMode(content)
 	let handlePrintPdf = makePrintPdf(db, content, doc)
-	let makePrintSlides = makePrintSlidesFactory(db, content, doc)
+	let makePrintSlides = makePrintSlidesFactory(
+		db,
+		content,
+		doc,
+		new Map(libraryDocuments.map(doc => [doc.id, doc.title])),
+	)
 	let canShare = canShareDocument()
 
 	return (
@@ -293,7 +299,7 @@ function makeShare(
 			content,
 			title,
 			docAssets.length > 0 ? docAssets : undefined,
-			undefined,
+			await exportComments(db, doc.id),
 		)
 	}
 }
@@ -325,6 +331,7 @@ function makePrintSlidesFactory(
 	db: Database,
 	content: string,
 	doc: LoadedDocument & { content: string },
+	wikilinkTitles: Map<string, string>,
 ) {
 	return (option: {
 			layout: SlidePrintLayout
@@ -336,6 +343,7 @@ function makePrintSlidesFactory(
 				...themes,
 				...option,
 				content,
+				wikilinkTitles,
 				assets: await printableAssets(db, doc),
 			})
 		}

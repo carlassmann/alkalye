@@ -1,3 +1,4 @@
+import { useCleanupDeleted } from "../hooks/use-cleanup-deleted"
 import { getExportAssets } from "../lib/document-file-actions"
 import { exportComments } from "@/app/features/import-export"
 import type { Database } from "../lib/library"
@@ -211,7 +212,7 @@ function SidebarDocumentList({
 	spaceId,
 	spaceGroupId,
 }: SidebarDocumentListProps) {
-	useLibrary()
+	useCleanupDeleted(docs)
 	let t = useIntl()
 	let [search, setSearch] = useState("")
 	let [sort, setSort] = useState<SortMode>("latest")

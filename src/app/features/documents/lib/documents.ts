@@ -1,5 +1,4 @@
 import { app, setPinned, type Database, type LibraryDocument } from "./library"
-import { watchWrite } from "./writes"
 
 export {
 	permanentlyDeletePersonalDocument,
@@ -11,7 +10,8 @@ async function permanentlyDeletePersonalDocument(
 	db: Database,
 	doc: LibraryDocument,
 ) {
-	watchWrite(db.delete(app.documents, doc.id))
+	if (!doc.canAdmin) return
+	await db.delete(app.documents, doc.id).wait({ tier: "local" })
 }
 function getDaysUntilPermanentDelete(date: Date) {
 	return Math.max(0, 30 - Math.floor((Date.now() - date.getTime()) / 86400000))

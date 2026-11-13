@@ -1,9 +1,7 @@
 # Jazz Classic vs v2
 
 Production comparison on 2026-11-13. Five alternating runs per implementation,
-200 trace edits in each of three document sizes. Raw results are
-`bench/results/classic.json` and `v2.json`; the superseded development baseline is
-`classic-dev.json`. Each production JSON embeds its individual runs.
+200 trace edits in each of three document sizes. Committed summaries are `bench/results/classic.json` and `v2.json`, with optimized load, typing and 5,000-edit results beside them. They retain aggregate metrics, sample counts, environment and validation failures. Raw samples, exploratory runs and CPU profiles stay local under ignored `bench/results/raw/`, `exploratory/` and `profiles/` directories.
 
 ## Final comparison after optimization
 
@@ -117,7 +115,7 @@ versus 5.78 MB uncompressed Classic is not a CDN-to-CDN comparison.
   ineffective startup warmup; `1ec31d7` guards proxy disconnects.
 - `v2-opt-before-profile.json`, `v2-opt-metadata-profile.json`, `v2-opt-after-profile.json` and
   `profiles/optimization-*.cpuprofile.gz`: separate diagnostic runs, excluded
-  from the five-run distributions. Fresh paired profiles reduce sampled main-page Wasm from 12.76 to 8.21 seconds. The metadata-only intermediate profile is also retained.
+  from the five-run distributions. Fresh paired profiles reduce sampled main-page Wasm from 12.76 to 8.21 seconds. The metadata-only intermediate profile was recorded in the same local campaign. These diagnostic files are not committed.
 - `v2-text-repro.json`: hardened local-only TEXT repro, with terminal subscription
   errors made fatal. Whole TEXT and splices both deliver 201 updates and take
   50/67 ms; no subscription and single-writer partial writes take 33/50 ms.
@@ -356,8 +354,7 @@ inference. Profiling adds overhead.
 The 25 unprofiled production markers top out at 359 ms on Classic and 141 ms on
 v2. No comparable 20-second tail appears in either production set.
 
-Raw main-page CPU profiles are compressed under `bench/results/profiles/`;
-`summary.json` records sampled self time and frame locations. Decompress a
+Local main-page CPU profiles can be recorded under `bench/results/raw/profiles/`. Decompress a
 `.cpuprofile.gz` file and open it in Chromium DevTools. The paired 200-edit
 profiles are separate diagnostic runs, outside the five unprofiled summaries.
 
@@ -387,9 +384,7 @@ protocol costs. v2's zero received WS count excludes its HTTP-stream downloads.
 An earlier extended replay exposed nonliteral contenteditable line breaks:
 15 extra newlines and 20 extra characters. The corrected mode prepares the
 clipboard before timing and pastes literal newlines; printable text remains
-keyboard input. A 1,000-edit check and both final 5,000-edit runs pass. Initial
-invalid-input/interrupted attempts are kept under `bench/results/exploratory/`
-and excluded from conclusions.
+keyboard input. A 1,000-edit check and both final 5,000-edit runs pass. Initial invalid-input/interrupted attempts are excluded from conclusions and are not committed.
 
 ## Reproduce
 
@@ -398,6 +393,7 @@ Measurement preview processes were stopped after the runs.
 ```sh
 bun scripts/bench/production.ts
 bun scripts/bench/interleaved.ts
+bun scripts/bench/summarize.ts
 ```
 
 The provisioner uses temporary directories under `/tmp` and Work setup/start
@@ -414,11 +410,10 @@ The 5,000-edit slice includes 26,401 Arrow movements, versus one in the
 200-edit cases. Input latency excludes cursor positioning; whole-window long
 tasks and profiles include it. A 5,000-edit,
 large-document-only slice per side therefore supplies the longer stress case.
-Its raw JSON is separate from the five-run summaries; compressed CPU profiles
-are committed under `bench/results/profiles/`. Replay commands add
+Its raw JSON is separate from the five-run summaries; CPU profiles stay local under `bench/results/raw/profiles/`. Replay commands add
 `--runs 1 --edits 5000 --large-only --literal-newlines --skip-sw
 --replay-timeout-ms 2500000`;
-`BENCH_PROFILE_DIR` enables main-page CPU profiling.
+`BENCH_PROFILE_DIR=bench/results/raw/profiles` enables main-page CPU profiling. Pass `--out bench/results/raw/classic-5000.json` or `v2-5000.json` to retain the stress results. To regenerate optimized typing, run `bun run bench:compare --target <v2-url> --label v2 --runs 5 --edits 200 --skip-sw --out bench/results/raw/v2-optimized.json`. Add `--load-only` for the load and Brotli variants, using each preview URL and its corresponding `--out` filename. Then run the summarizer. Fetch missing datasets with `bun run bench:fetch`.
 
 ## Caveats
 

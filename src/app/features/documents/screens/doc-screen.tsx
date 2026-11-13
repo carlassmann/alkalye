@@ -1,3 +1,4 @@
+import { makeDuplicate } from "../lib/document-file-actions"
 import {
 	SidebarComments,
 	useComments,
@@ -26,7 +27,6 @@ import {
 	createTldrawAsset,
 	updateTldrawAsset,
 	readAssetBlob,
-	copyDocumentAssets,
 } from "@/app/features/assets"
 import { useSpaces, createSpaceDocument } from "@/app/features/spaces"
 import { usePresence } from "@/app/features/sharing"
@@ -35,8 +35,6 @@ import { SidebarCollaboration } from "@/app/features/sharing"
 import {
 	SidebarImportExport,
 	handleImportFiles,
-	exportComments,
-	importComments,
 } from "@/app/features/import-export"
 import { MessageSquareOff, MessageSquare } from "lucide-react"
 import { SidebarMenuItem, SidebarMenuButton } from "@/app/components/ui/sidebar"
@@ -50,10 +48,8 @@ import {
 	useLibrary,
 	createDocument,
 	updateContent,
-	readDocument,
 	type LibraryDocument,
 } from "../lib/library"
-import { addCopyToTitle } from "../lib/title"
 import { makeFolderDocumentContent } from "../lib/folders"
 import { codeMirrorSync } from "../lib/codemirror-sync"
 import { DocumentCommands } from "../widgets/document-commands"
@@ -536,22 +532,8 @@ function PersonalDocumentSidebar({ docId }: { docId: string }) {
 		if (isMobile) setLeftOpenMobile(false)
 	}
 	async function duplicate(doc: LibraryDocument) {
-		let loaded = await readDocument(db, doc.id)
-		let copy = await createDocument(db, ownerId, addCopyToTitle(loaded.content))
-		await updateContent(
-			db,
-			copy,
-			await copyDocumentAssets(db, doc.id, copy.id, copy.content),
-		)
-		await importComments(
-			db,
-			copy.id,
-			ownerId,
-			await exportComments(db, doc.id),
-			loaded.content,
-		)
+		await makeDuplicate(db, doc, ownerId, undefined, navigate)()
 		closeSidebar()
-		void navigate({ to: "/doc/$id", params: { id: copy.id } })
 	}
 	async function createFolder(path: string) {
 		let doc = await createDocument(db, ownerId, makeFolderDocumentContent(path))
@@ -640,7 +622,12 @@ function SpaceDocumentSidebar({
 		<ListSidebar
 			header={
 				<>
-					<SidebarImportExport />
+					<SidebarImportExport
+						docs={documents.filter(doc => doc.spaceId === spaceId)}
+						onImport={(files, options) =>
+							handleImportFiles(files, db, ownerId, { ...options, spaceId })
+						}
+					/>
 					<Button
 						size="sm"
 						data-testid={testIds.doc.newButton}
@@ -665,8 +652,8 @@ function SpaceDocumentSidebar({
 				isLoading={isLoading}
 				onDocClick={closeSidebar}
 				onDuplicate={async doc => {
-					let loaded = await readDocument(db, doc.id)
-					await newDocument(addCopyToTitle(loaded.content))
+					await makeDuplicate(db, doc, ownerId, spaceId, navigate)()
+					closeSidebar()
 				}}
 				onDelete={async doc => {
 					await db
@@ -676,7 +663,7 @@ function SpaceDocumentSidebar({
 						void navigate({ to: "/spaces/$spaceId", params: { spaceId } })
 				}}
 				onCreateFolder={path => newDocument(makeFolderDocumentContent(path))}
-				onImport={async () => {}}
+				onImport={files => handleImportFiles(files, db, ownerId, { spaceId })}
 			/>
 		</ListSidebar>
 	)
