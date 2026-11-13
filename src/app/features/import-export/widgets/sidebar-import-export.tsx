@@ -4,6 +4,7 @@ import {
 	app,
 	useLibrary,
 	createDocument,
+	readDocument,
 	updateContent,
 	type Database,
 	type LibraryDocument as SidebarDoc,
@@ -241,7 +242,11 @@ async function handleExportAll(db: Database, docs: SidebarDoc[]) {
 			title: doc.title,
 			path: doc.path,
 			content: stripBacklinksFrontmatter(
-				transformWikilinksForExport(doc.content, doc.path, titles),
+				transformWikilinksForExport(
+					(await readDocument(db, doc.id)).content,
+					doc.path,
+					titles,
+				),
 			),
 			assets: binary,
 			comments: await exportComments(db, doc.id),

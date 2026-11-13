@@ -55,7 +55,7 @@ import { runDocumentCommand } from "./document-commands"
 export { SidebarFileMenu }
 
 interface SidebarFileMenuProps {
-	doc: LoadedDocument
+	doc: LoadedDocument & { content: string }
 	editor: EditorRef
 	spaceId?: string
 }
@@ -283,7 +283,7 @@ function makeSaveAs(content: string) {
 
 function makeShare(
 	db: import("../lib/library").Database,
-	doc: LoadedDocument,
+	doc: LoadedDocument & { content: string },
 	content: string,
 ) {
 	return async function handleShare() {
@@ -298,7 +298,11 @@ function makeShare(
 	}
 }
 
-function makePrintPdf(db: Database, content: string, doc: LoadedDocument) {
+function makePrintPdf(
+	db: Database,
+	content: string,
+	doc: LoadedDocument & { content: string },
+) {
 	return async () => {
 		let themes = await loadThemesForPdf(db)
 		await printToPdf({
@@ -320,7 +324,7 @@ let slidePrintOptions: {
 function makePrintSlidesFactory(
 	db: Database,
 	content: string,
-	doc: LoadedDocument,
+	doc: LoadedDocument & { content: string },
 ) {
 	return (option: {
 			layout: SlidePrintLayout
@@ -336,7 +340,10 @@ function makePrintSlidesFactory(
 			})
 		}
 }
-async function printableAssets(db: Database, doc: LoadedDocument) {
+async function printableAssets(
+	db: Database,
+	doc: LoadedDocument & { content: string },
+) {
 	let rows = await db.all(
 		app.assets
 			.where({ documentId: doc.id })

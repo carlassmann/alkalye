@@ -33,6 +33,11 @@ export default defineConfig({
 		routing: { prefixDefaultLocale: false },
 	},
 	vite: {
+		worker: {
+			rollupOptions: {
+				output: { assetFileNames: "_astro/[name].[hash][extname]" },
+			},
+		},
 		optimizeDeps: { exclude: ["jazz-tools", "jazz-wasm"] },
 		ssr: { external: ["jazz-napi", "jazz-tools"] },
 		server: { allowedHosts: getWorkAllowedHosts() },
@@ -120,7 +125,11 @@ export default defineConfig({
 				// the reader is already running.
 				// Passing globIgnores replaces workbox's default, which must be
 				// kept or every node_modules file is swept into the precache.
-				globIgnores: ["**/node_modules/**/*", "**/changelog/index.html"],
+				globIgnores: [
+					"**/node_modules/**/*",
+					"**/changelog/index.html",
+					"**/jazz-broker-worker.*.js",
+				],
 				navigateFallback: "app",
 				navigateFallbackAllowlist: [/^\/app(?:\/.*)?(?:\?.*)?$/],
 				maximumFileSizeToCacheInBytes: 15 * 1024 * 1024,

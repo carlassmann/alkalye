@@ -565,7 +565,8 @@ async function handleRenameFolder(
 			continue
 		}
 
-		let loaded = doc
+		let loaded = await db.one(app.documents.where({ id: doc.id }))
+		if (!loaded) continue
 		let newContent = updatePathInContent(loaded.content.toString(), updatedPath)
 		await updateContent(db, loaded, newContent)
 	}
@@ -607,7 +608,8 @@ async function handleDeleteFolder(
 		if (deleteDocuments) {
 			db.update(app.documents, doc.id, { deletedAt: new Date() })
 		} else {
-			let loaded = doc
+			let loaded = await db.one(app.documents.where({ id: doc.id }))
+			if (!loaded) continue
 			let newContent = removePathFromContent(loaded.content.toString())
 			await updateContent(db, loaded, newContent)
 		}

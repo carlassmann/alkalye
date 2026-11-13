@@ -43,13 +43,14 @@ import { SidebarMenuItem, SidebarMenuButton } from "@/app/components/ui/sidebar"
 import { useTrackLastOpened } from "../hooks/use-track-last-opened"
 import { useEffect, useState } from "react"
 import { Link, useLocation, useNavigate } from "@tanstack/react-router"
-import { useOne } from "jazz-tools/react"
+import { useDocumentContent } from "../hooks/use-document-content"
 import { Plus, Settings, HelpCircle } from "lucide-react"
 import {
 	app,
 	useLibrary,
 	createDocument,
 	updateContent,
+	readDocument,
 	type LibraryDocument,
 } from "../lib/library"
 import { addCopyToTitle } from "../lib/title"
@@ -93,11 +94,11 @@ import { testIds } from "@/app/lib/test-ids"
 export { DocScreen, PersonalDocumentSidebar }
 
 function DocScreen({ id, spaceId }: { id: string; spaceId?: string }) {
-	let { data: row, isLoading } = useOne(app.documents.where({ id }))
-	let { documents } = useLibrary()
+	let incoming = useDocumentContent(id)
+	let { documents, isLoading } = useLibrary()
 	let doc = documents.find(doc => doc.id === id)
-	if (isLoading) return <p role="status">Opening document…</p>
-	if (!row || !doc) return <DocumentUnauthorized />
+	if (!incoming || isLoading) return <p role="status">Opening document…</p>
+	if (incoming.content === null || !doc) return <DocumentUnauthorized />
 	if (doc.deletedAt) return <DocumentNotFound />
 	return (
 		<SidebarProvider>
@@ -106,12 +107,22 @@ function DocScreen({ id, spaceId }: { id: string; spaceId?: string }) {
 			) : (
 				<PersonalDocumentSidebar docId={id} />
 			)}
-			<DocumentEditor key={id + ":" + (doc.spaceId ?? "")} doc={doc} />
+			<DocumentEditor
+				key={id + ":" + (doc.spaceId ?? "")}
+				doc={{ ...doc, content: incoming.content }}
+				incoming={incoming.update}
+			/>
 		</SidebarProvider>
 	)
 }
 
-function DocumentEditor({ doc }: { doc: LibraryDocument }) {
+function DocumentEditor({
+	doc,
+	incoming,
+}: {
+	doc: LibraryDocument & { content: string }
+	incoming?: import("../lib/codemirror-sync").TextUpdate
+}) {
 	let { db, ownerId, documents, entries, settings, profile } = useLibrary()
 	useTrackLastOpened(ownerId, doc.id, doc.spaceId ?? undefined)
 	let t = useIntl()
@@ -296,6 +307,7 @@ function DocumentEditor({ doc }: { doc: LibraryDocument }) {
 					readOnly={readOnly}
 					documents={wikiDocs}
 					sync={binding}
+					syncUpdate={incoming}
 					onAddComment={
 						!readOnly && commentsEnabled
 							? handleCreateCommentFromSelection
@@ -524,7 +536,8 @@ function PersonalDocumentSidebar({ docId }: { docId: string }) {
 		if (isMobile) setLeftOpenMobile(false)
 	}
 	async function duplicate(doc: LibraryDocument) {
-		let copy = await createDocument(db, ownerId, addCopyToTitle(doc.content))
+		let loaded = await readDocument(db, doc.id)
+		let copy = await createDocument(db, ownerId, addCopyToTitle(loaded.content))
 		await updateContent(
 			db,
 			copy,
@@ -535,7 +548,7 @@ function PersonalDocumentSidebar({ docId }: { docId: string }) {
 			copy.id,
 			ownerId,
 			await exportComments(db, doc.id),
-			doc.content,
+			loaded.content,
 		)
 		closeSidebar()
 		void navigate({ to: "/doc/$id", params: { id: copy.id } })
@@ -651,7 +664,10 @@ function SpaceDocumentSidebar({
 				spaceId={spaceId}
 				isLoading={isLoading}
 				onDocClick={closeSidebar}
-				onDuplicate={doc => void newDocument(addCopyToTitle(doc.content))}
+				onDuplicate={async doc => {
+					let loaded = await readDocument(db, doc.id)
+					await newDocument(addCopyToTitle(loaded.content))
+				}}
 				onDelete={async doc => {
 					await db
 						.update(app.documents, doc.id, { deletedAt: new Date() })

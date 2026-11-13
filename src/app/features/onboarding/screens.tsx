@@ -1,7 +1,7 @@
 import { replaceShortcutTokens } from "@/app/lib/shortcut-registry"
 import { useEffect, useRef } from "react"
 import { useNavigate } from "@tanstack/react-router"
-import { createDocument, useLibrary } from "@/app/features/documents"
+import { app, createDocument, useLibrary } from "@/app/features/documents"
 import { fetchWelcomeContent } from "./lib/welcome-content"
 export { OnboardingScreen }
 let tutors: Record<string, string> = {
@@ -28,7 +28,8 @@ function OnboardingScreen({ slug }: { slug?: string }) {
 						return response.text().then(replaceShortcutTokens)
 					})
 				: await fetchWelcomeContent()
-			let existing = documents.find(
+			let bodies = await db.all(app.documents.select("content", "deletedAt"))
+			let existing = bodies.find(
 				doc => !doc.deletedAt && doc.content === content,
 			)
 			let doc = existing ?? (await createDocument(db, ownerId, content))

@@ -47,7 +47,7 @@ let documentShortcuts: DocumentShortcutId[] = [
 ]
 
 interface DocumentCommandsProps {
-	doc: LoadedDocument
+	doc: LoadedDocument & { content: string }
 	editor: EditorRef
 	spaceId?: string
 	documents: { id: string; title: string }[]

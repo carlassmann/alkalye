@@ -11,7 +11,7 @@ import { Link, useNavigate } from "@tanstack/react-router"
 import type { ThemeRow } from "../lib/schema"
 import type { LibraryDocument } from "@/app/features/documents"
 import { app, useLibrary, updateContent } from "@/app/features/documents"
-import { useOne } from "jazz-tools/react"
+import { useOne, useAll } from "jazz-tools/react"
 import {
 	AlertCircle,
 	ArrowLeft,
@@ -58,11 +58,7 @@ import {
 	type PresentationItem,
 	type Slide,
 } from "@/app/features/presentation"
-import {
-	getThemeSourceId,
-	parseThemeSource,
-	createDefaultTheme,
-} from "@/app/features/themes"
+import { parseThemeSource, createDefaultTheme } from "@/app/features/themes"
 
 import { bindThemeSource } from "../lib/source"
 
@@ -113,8 +109,14 @@ Design the opening moment.
 function ThemeWorkbenchScreen({ id }: { id: string }) {
 	let { data: theme, isLoading } = useOne(app.themes.where({ id }))
 	let { documents } = useLibrary()
-	let source = documents.find(doc => doc.id === theme?.sourceDocId)
-	if (isLoading) return <LoadingWorkbench />
+	let summary = documents.find(doc => doc.id === theme?.sourceDocId)
+	let { data: body, isLoading: bodyLoading } = useOne(
+		theme?.sourceDocId
+			? app.documents.where({ id: theme.sourceDocId }).select("content")
+			: undefined,
+	)
+	let source = summary && body ? { ...summary, content: body.content } : null
+	if (isLoading || bodyLoading) return <LoadingWorkbench />
 	if (!theme) return <ThemeUnavailable />
 	if (!source) return <MissingSource themeName={theme.name} />
 	return <Workbench key={id} theme={theme} source={source} />
@@ -167,7 +169,7 @@ function MissingSource({ themeName }: { themeName: string }) {
 }
 
 type LoadedTheme = ThemeRow
-type LoadedSource = LibraryDocument
+type LoadedSource = LibraryDocument & { content: string }
 function Workbench({
 	theme,
 	source,
@@ -204,10 +206,21 @@ function Workbench({
 	)
 	useEffect(() => () => binding.destroy(), [binding])
 	let navigate = useNavigate()
-	let documents = getTargetDocuments(account, source.id)
+	let { data: themes = [] } = useAll(app.themes.select("sourceDocId"))
+	let documents = account.documents.filter(
+		doc =>
+			!doc.deletedAt &&
+			doc.id !== source.id &&
+			!themes.some(theme => theme.sourceDocId === doc.id),
+	)
 	let targetDocument = documents.find(document => document.id === target)
+	let { data: targetBody } = useOne(
+		targetDocument
+			? app.documents.where({ id: targetDocument.id }).select("content")
+			: undefined,
+	)
 	let targetContent =
-		targetDocument?.content.toString() ??
+		targetBody?.content ??
 		(mode === "slideshow" ? presentationSampleContent : sampleContent)
 	let previewContent = targetContent
 	let editorSettings = account.settings
@@ -432,7 +445,7 @@ function Workbench({
 
 function getTargetLabel(
 	target: PreviewTarget,
-	document: ReturnType<typeof getTargetDocuments>[number] | undefined,
+	document: LibraryDocument | undefined,
 ) {
 	if (target === "sample") return "Sample content"
 	return document?.title || "Untitled document"
@@ -757,17 +770,6 @@ function getSlides(items: PresentationItem[]): Slide[] {
 		.map(([slideNumber, blocks]) => ({ slideNumber, blocks }))
 }
 
-function getTargetDocuments(
-	account: ReturnType<typeof useLibrary>,
-	sourceId: string,
-) {
-	return account.documents.filter(
-		doc =>
-			!doc.deletedAt &&
-			doc.id !== sourceId &&
-			getThemeSourceId(doc.content) === null,
-	)
-}
 function getSourceSyncError(error: unknown) {
 	return error instanceof Error
 		? error.message
