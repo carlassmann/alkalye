@@ -1,4 +1,5 @@
 import { schema as s } from "jazz-tools"
+import { EditorSettings } from "./value-types"
 
 export { app }
 export type { DocumentRow, UserDocumentRow }
@@ -202,7 +203,7 @@ let schema = {
 	settings: s.table(
 		{
 			ownerId: s.uuid(),
-			editor: s.json(),
+			editor: s.json(EditorSettings),
 			defaultPreviewTheme: s.uuid().optional(),
 			defaultSlideshowTheme: s.uuid().optional(),
 			syntaxTheme: s.string().optional(),

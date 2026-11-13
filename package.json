@@ -9,7 +9,6 @@
 	"scripts": {
 		"ci": "bun scripts/ci.ts",
 		"dev": "portless run astro dev",
-		"dev:sync": "portless alkalye-sync sh -c 'bunx jazz-run sync --port \"$PORT\" --host \"$HOST\"'",
 		"build": "astro check && astro build",
 		"check": "bun x concurrently \"bun run check:lint\" \"bun run check:types\" \"bun run check:format\" \"bun run check:test\"",
 		"check:lint": "eslint .",
@@ -56,6 +55,7 @@
 		"@modelcontextprotocol/core": "2.0.0",
 		"@modelcontextprotocol/server": "2.0.0",
 		"@plausible-analytics/tracker": "^0.4.4",
+		"@scure/bip39": "2.0.1",
 		"@tailwindcss/typography": "^0.5.19",
 		"@tailwindcss/vite": "^4.1.18",
 		"@tanstack/react-form": "^1.27.7",
@@ -109,6 +109,7 @@
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.6",
+		"@astrojs/node": "^9",
 		"@astrojs/react": "^4.4.2",
 		"@astrojs/ts-plugin": "^1.10.6",
 		"@astrojs/vercel": "^9.0.4",

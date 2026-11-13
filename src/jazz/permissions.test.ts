@@ -160,3 +160,207 @@ test("public reads grant no writes; credentials, laser and imports stay private"
 		}),
 	)
 })
+
+test.each(["reader", "writer", "manager", "admin"])(
+	"only writing members can create documents in their space (%s)",
+	async role => {
+		let space = await fixture.seed(db =>
+			db.insert(app.spaces, {
+				ownerId: aliceId,
+				name: "Team",
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			}),
+		)
+		let unrelated = await fixture.seed(db =>
+			db.insert(app.spaces, {
+				ownerId: aliceId,
+				name: "Other",
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			}),
+		)
+		await fixture.seed(db =>
+			db.insert(app.spaceMembers, {
+				spaceId: space.id,
+				accountId: bobId,
+				role,
+			}),
+		)
+		let bob = actor(bobId)
+		let data = { ...note(bobId), spaceId: space.id }
+		if (role === "reader")
+			await bob.expectDenied(db => db.insert(app.documents, data))
+		else await bob.insert(app.documents, data).wait({ tier: "global" })
+		await bob.expectDenied(db =>
+			db.insert(app.documents, { ...data, spaceId: unrelated.id }),
+		)
+	},
+)
+
+test("a document writer cannot move it, delete it or grant access", async () => {
+	let doc = await fixture.seed(db => db.insert(app.documents, note()))
+	let space = await fixture.seed(db =>
+		db.insert(app.spaces, {
+			ownerId: bobId,
+			name: "Mine",
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		}),
+	)
+	await fixture.seed(db =>
+		db.insert(app.documentGrants, {
+			documentId: doc.id,
+			accountId: bobId,
+			role: "writer",
+		}),
+	)
+	let bob = actor(bobId)
+	await bob.expectDenied(db =>
+		db.update(app.documents, doc.id, { spaceId: space.id }),
+	)
+	await bob.expectDenied(db =>
+		db.update(app.documents, doc.id, { deletedAt: new Date() }),
+	)
+	await bob.expectDenied(db => db.delete(app.documents, doc.id))
+})
+
+test("document blobs inherit access; public access exposes no private account data", async () => {
+	let doc = await fixture.seed(db =>
+		db.insert(app.documents, { ...note(), publicRead: true }),
+	)
+	let alice = actor(aliceId),
+		bob = actor(bobId)
+	let asset = await alice
+		.insert(app.assets, {
+			documentId: doc.id,
+			name: "Image",
+			type: "image",
+			data: new Uint8Array([1, 2, 3]),
+			createdAt: new Date(),
+		})
+		.wait({ tier: "global" })
+	expect((await bob.all(app.assets.where({ id: asset.id })))[0]?.data).toEqual(
+		new Uint8Array([1, 2, 3]),
+	)
+	await bob.expectDenied(db =>
+		db.update(app.assets, asset.id, { name: "Changed" }),
+	)
+	await fixture.seed(db =>
+		db.insert(app.mcpConnections, {
+			ownerId: aliceId,
+			clientId: "test",
+			clientName: "Test",
+			credential: "test credential",
+			createdAt: new Date(),
+		}),
+	)
+	await fixture.seed(db =>
+		db.insert(app.laser, {
+			ownerId: aliceId,
+			documentId: doc.id,
+			senderId: "test",
+			sequence: 1,
+			message: {},
+			updatedAt: new Date(),
+		}),
+	)
+	expect(await bob.all(app.mcpConnections.where({}))).toEqual([])
+	expect(await bob.all(app.laser.where({}))).toEqual([])
+})
+
+test("presence is readable with the document but only the publishing account can update it", async () => {
+	let doc = await fixture.seed(db =>
+		db.insert(app.documents, { ...note(), publicRead: true }),
+	)
+	let alice = actor(aliceId),
+		bob = actor(bobId)
+	let presence = await alice
+		.insert(app.presence, {
+			documentId: doc.id,
+			accountId: aliceId,
+			deviceId: "laptop",
+			updatedAt: new Date(),
+		})
+		.wait({ tier: "global" })
+	expect(await bob.all(app.presence.where({ id: presence.id }))).toHaveLength(1)
+	await bob.expectDenied(db =>
+		db.update(app.presence, presence.id, { deviceId: "stolen" }),
+	)
+	await bob.expectDenied(db =>
+		db.insert(app.presence, {
+			documentId: doc.id,
+			accountId: aliceId,
+			deviceId: "forged",
+			updatedAt: new Date(),
+		}),
+	)
+})
+
+test("personal library entries cannot grant access to unreadable documents", async () => {
+	let doc = await fixture.seed(db => db.insert(app.documents, note()))
+	let bob = actor(bobId)
+	await bob.expectDenied(db =>
+		db.insert(app.userDocuments, {
+			ownerId: bobId,
+			documentId: doc.id,
+			rank: 0,
+		}),
+	)
+	await bob.expectDenied(db =>
+		db.insert(app.folders, { ownerId: aliceId, name: "forged", rank: 0 }),
+	)
+})
+
+test("individual document grants work without space membership", async () => {
+	let space = await fixture.seed(db =>
+		db.insert(app.spaces, {
+			ownerId: aliceId,
+			name: "Private team",
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		}),
+	)
+	let doc = await fixture.seed(db =>
+		db.insert(app.documents, { ...note(), spaceId: space.id }),
+	)
+	await fixture.seed(db =>
+		db.insert(app.documentGrants, {
+			documentId: doc.id,
+			accountId: bobId,
+			role: "writer",
+		}),
+	)
+	await actor(bobId)
+		.update(app.documents, doc.id, { content: "Shared directly" })
+		.wait({ tier: "global" })
+})
+
+test("comments inherit document permissions and honor the disabled flag", async () => {
+	let doc = await fixture.seed(db => db.insert(app.documents, note()))
+	let alice = actor(aliceId),
+		bob = actor(bobId)
+	let comment = {
+		documentId: doc.id,
+		authorId: aliceId,
+		anchor: { matched: "First line" },
+		createdAt: new Date(),
+		updatedAt: new Date(),
+	}
+	let thread = await alice
+		.insert(app.commentThreads, comment)
+		.wait({ tier: "global" })
+	expect(await bob.all(app.commentThreads.where({ id: thread.id }))).toEqual([])
+	await alice
+		.update(app.documents, doc.id, { commentsDisabled: true })
+		.wait({ tier: "global" })
+	await alice.expectDenied(db => db.insert(app.commentThreads, comment))
+	await alice.expectDenied(db =>
+		db.insert(app.commentReplies, {
+			threadId: thread.id,
+			authorId: aliceId,
+			body: "Disabled",
+			createdAt: new Date(),
+		}),
+	)
+})

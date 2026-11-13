@@ -101,19 +101,11 @@ export let permissions = s.definePermissions(
 		policy.documents.allowUpdate.where(doc =>
 			allOf([
 				documentWriter(doc),
-				policy.documents.exists.where({ id: doc.id, ownerId: doc.ownerId }),
-				anyOf([
-					{ spaceId: null },
-					policy.spaces.exists.where({
-						id: doc.spaceId,
-						ownerId: session.user,
-					}),
-					policy.spaceMembers.exists.where({
-						spaceId: doc.spaceId,
-						accountId: session.user,
-						role: { in: ["writer", "manager", "admin"] },
-					}),
-				]),
+				policy.documents.exists.where({
+					id: doc.id,
+					ownerId: doc.ownerId,
+					spaceId: doc.spaceId,
+				}),
 				anyOf([
 					documentAdmin(doc),
 					policy.documents.exists.where({
@@ -181,10 +173,29 @@ export let permissions = s.definePermissions(
 		policy.tldrawRevisions.allowUpdate.where(allowedTo.update("document"))
 		policy.tldrawRevisions.allowDelete.where(allowedTo.update("document"))
 		policy.commentThreads.allowRead.where(allowedTo.read("document"))
-		policy.commentThreads.allowInsert.where(
-			allOf([allowedTo.update("document"), { authorId: session.user }]),
+		policy.commentThreads.allowInsert.where(thread =>
+			allOf([
+				allowedTo.update("document"),
+				{ authorId: session.user },
+				policy.documents.exists.where({
+					id: thread.documentId,
+					commentsDisabled: false,
+				}),
+			]),
 		)
-		policy.commentThreads.allowUpdate.where(allowedTo.update("document"))
+		policy.commentThreads.allowUpdate.where(thread =>
+			allOf([
+				allowedTo.update("document"),
+				policy.documents.exists.where({
+					id: thread.documentId,
+					commentsDisabled: false,
+				}),
+				policy.commentThreads.exists.where({
+					id: thread.id,
+					authorId: thread.authorId,
+				}),
+			]),
+		)
 		policy.commentThreads.allowDelete.where(allowedTo.update("document"))
 		policy.commentReplies.allowRead.where(allowedTo.read("thread"))
 		policy.commentReplies.allowInsert.where(
@@ -208,9 +219,18 @@ export let permissions = s.definePermissions(
 		policy.laser.allowUpdate.where(owned)
 		policy.laser.allowDelete.where(owned)
 		policy.documentVersions.allowRead.where(allowedTo.read("document"))
+		policy.documentVersions.allowInsert.never()
+		policy.documentVersions.allowUpdate.never()
+		policy.documentVersions.allowDelete.never()
 		// v2-todo(importer): only trusted backend code writes versions and the verified Classic identity map.
 		policy.classicImports.allowRead.where(owned)
+		policy.classicImports.allowInsert.never()
+		policy.classicImports.allowUpdate.never()
+		policy.classicImports.allowDelete.never()
 		// v2-todo(sharing): invite creation/redemption goes through the backend, never a client-supplied membership claim.
 		policy.invites.allowRead.where(owned)
+		policy.invites.allowInsert.never()
+		policy.invites.allowUpdate.never()
+		policy.invites.allowDelete.never()
 	},
 )
