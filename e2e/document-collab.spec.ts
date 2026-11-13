@@ -156,9 +156,14 @@ async function observeLocalRollback(page: Page, marker: string) {
 		document.documentElement.dataset.localTextRolledBack = "false"
 		let seen = false
 		function inspectEditor() {
-			let content = document.querySelector(
-				".markdown-editor .cm-content",
-			)?.textContent
+			let editor = document.querySelector(".markdown-editor .cm-content")
+			let text = editor?.cloneNode(true)
+			if (text instanceof Element) {
+				// Cursor labels are decorations, not the document's text.
+				for (let cursor of text.querySelectorAll(".cm-remote-cursor"))
+					cursor.remove()
+			}
+			let content = text?.textContent
 			if (content?.includes(localMarker)) {
 				seen = true
 			} else if (seen) {
