@@ -1,3 +1,4 @@
+import { ClassicImportPending } from "./migration-state"
 import { app } from "@/jazz/schema"
 import { messagesEn, messagesDe } from "@/shared/intl/messages"
 import { useEffect, useState } from "react"
@@ -29,6 +30,12 @@ function MigrationController({ children }: { children: React.ReactNode }) {
 	let accountId = user?.accountId
 	let t = useIntl()
 	let [restoring, setRestoring] = useState(true)
+	let [probing, setProbing] = useState(
+		() =>
+			localStorage.getItem("jazz-logged-in-secret") !== null ||
+			sessionStorage.getItem("alkalye-classic-phrase-login") !== null ||
+			localStorage.getItem(`alkalye-classic-user:${accountId}`) !== null,
+	)
 	let [progress, setProgress] = useState<ImportProgress>()
 	let [error, setError] = useState("")
 	let [attempt, setAttempt] = useState(0)
@@ -77,6 +84,16 @@ function MigrationController({ children }: { children: React.ReactNode }) {
 		let key = exportDeviceKey()
 		async function migrate() {
 			try {
+				let stored = readClassicCredentials()
+				let matchesClassic =
+					stored &&
+					deviceSecretFromSeed(new Uint8Array(stored.secretSeed)) === key
+				if (
+					!matchesClassic &&
+					!sessionStorage.getItem("alkalye-classic-phrase-login") &&
+					!localStorage.getItem(`alkalye-classic-user:${accountId}`)
+				)
+					return
 				let { runClassicImport } = await import("./client")
 				await runClassicImport(
 					key,
@@ -91,13 +108,18 @@ function MigrationController({ children }: { children: React.ReactNode }) {
 					setError(
 						error instanceof Error ? error.message : "Classic import failed",
 					)
+			} finally {
+				if (!controller.signal.aborted) {
+					setProbing(false)
+					sessionStorage.removeItem("alkalye-classic-phrase-login")
+				}
 			}
 		}
 		void migrate()
 		return () => controller.abort()
 	}, [exportDeviceKey, accountId, restoring, attempt])
 	return (
-		<>
+		<ClassicImportPending.Provider value={restoring || probing}>
 			{!dismissed && (progress || error) && (
 				<div
 					role="status"
@@ -144,6 +166,6 @@ function MigrationController({ children }: { children: React.ReactNode }) {
 				</div>
 			)}
 			{restoring ? <p role="status">{t("migration.opening")}</p> : children}
-		</>
+		</ClassicImportPending.Provider>
 	)
 }

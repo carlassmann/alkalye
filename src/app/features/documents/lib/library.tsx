@@ -110,7 +110,10 @@ function useLibraryData() {
 		.filter(
 			row =>
 				!row.spaceId &&
-				!entries.some(entry => entry.documentId === row.id && entry.archived),
+				!entries.some(
+					entry =>
+						entry.documentId === row.id && entry.archived && !row.deletedAt,
+				),
 		)
 		.map(row => ({
 			...row,
@@ -125,7 +128,7 @@ function useLibraryData() {
 					grant => grant.documentId === row.id && grant.role === "admin",
 				),
 			deletedAt: row.deletedAt ?? undefined,
-			path: folderPath(row.id) ?? getPath(row.content),
+			path: getPath(row.content) ?? folderPath(row.id),
 			pinned:
 				entries.find(entry => entry.documentId === row.id)?.pinned ??
 				parseFrontmatter(row.content).frontmatter?.pinned === true,

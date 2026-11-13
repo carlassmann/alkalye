@@ -51,7 +51,7 @@ async function importClassicAccount(
 		let state: ImportProgress = {
 			completed: 0,
 			total: 0,
-			errors: [],
+			errors: [...source.rootErrors],
 			done: false,
 		}
 		let challenge = z
@@ -71,6 +71,7 @@ async function importClassicAccount(
 			),
 		}
 		await request("claim", key, proof)
+		localStorage.setItem(`alkalye-classic-user:${challenge.accountId}`, "true")
 		await source.sync()
 		let tasks: { id: string; read: () => Promise<ImportItem> }[] = []
 		let seen = new Set<string>()
@@ -80,20 +81,26 @@ async function importClassicAccount(
 				tasks.push({ id, read })
 			}
 		}
-		for (let theme of source.account.root.themes ?? [])
-			add(theme.$jazz.id, () => readTheme(theme))
-		for (let space of source.account.root.spaces ?? []) {
-			add(space.$jazz.id, () => readSpace(space))
-			let loaded = await space.$jazz.ensureLoaded({
-				resolve: { documents: { $each: true } },
-			})
-			for (let doc of loaded.documents)
-				add(doc.$jazz.id, () => readDocument(doc, false))
+
+		for (let root of source.roots) {
+			for (let theme of root.themes ?? [])
+				add(theme.$jazz.id, () => readTheme(theme))
+			for (let space of root.spaces ?? []) {
+				add(space.$jazz.id, () => readSpace(space))
+				let loaded = await space.$jazz.ensureLoaded({
+					resolve: { documents: { $each: true } },
+				})
+				loaded.documents.forEach(doc =>
+					add(doc.$jazz.id, () => readDocument(doc, false)),
+				)
+			}
+			root.documents.forEach(doc =>
+				add(doc.$jazz.id, () => readDocument(doc, false)),
+			)
+			for (let doc of root.inactiveDocuments ?? [])
+				add(doc.$jazz.id, () => readDocument(doc, true))
 		}
-		for (let doc of source.account.root.documents)
-			add(doc.$jazz.id, () => readDocument(doc, false))
-		for (let doc of source.account.root.inactiveDocuments ?? [])
-			add(doc.$jazz.id, () => readDocument(doc, true))
+
 		add(source.account.$jazz.id, async () => source.accountItem())
 		state.total = tasks.length
 		progress({ ...state })
@@ -128,15 +135,15 @@ async function importClassicAccount(
 			progress({ ...state, errors: [...state.errors] })
 		}
 		progress({ ...state, done: true })
-		let legacy = window.location.pathname.match(
-			/^(\/app\/(?:doc|preview|space)\/)(co_z[1-9A-HJ-NP-Za-km-z]+)/,
-		)
-		if (legacy && !state.errors.length)
+		let originalPath = window.location.pathname
+		let path = originalPath
+		for (let match of originalPath.matchAll(
+			/\/(?:doc|spaces|themes)\/(co_z[1-9A-HJ-NP-Za-km-z]+)/g,
+		))
+			path = path.replaceAll(match[1]!, await stableId(match[1]!))
+		if (path !== originalPath)
 			window.location.replace(
-				window.location.pathname.replace(
-					legacy[2]!,
-					await stableId(legacy[2]!),
-				),
+				path + window.location.search + window.location.hash,
 			)
 	} finally {
 		source.close()

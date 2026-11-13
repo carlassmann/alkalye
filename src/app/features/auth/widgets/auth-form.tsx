@@ -119,6 +119,7 @@ function AuthForm({ onSuccess }: AuthFormProps) {
 			setError("")
 			let secret = RecoveryPhrase.toSecret(loginPassphrase)
 			sessionStorage.setItem("alkalye-restoring-account", "true")
+			sessionStorage.setItem("alkalye-classic-phrase-login", "true")
 			await auth.restoreDeviceAccount(secret)
 		} catch (e) {
 			setError(

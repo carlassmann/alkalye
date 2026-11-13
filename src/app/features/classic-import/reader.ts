@@ -4,7 +4,7 @@ import {
 	createJazzContextFromExistingCredentials,
 	MockSessionProvider,
 } from "jazz-tools-classic"
-import { RawAccount, cojsonInternals } from "cojson"
+import { RawAccount, cojsonInternals, type LocalNode } from "cojson"
 import { getIndexedDBStorage } from "cojson-storage-indexeddb"
 import {
 	UserAccount,
@@ -12,6 +12,7 @@ import {
 	Space,
 	Theme,
 	TldrawRevision,
+	UserRoot,
 } from "./classic-schema"
 import { connectClassic, classicPeers } from "./transport"
 import { groupHistory, packBytes, resolveClassicAnchor } from "./conversion"
@@ -23,6 +24,7 @@ import {
 import { getDocumentTitle } from "@/app/features/documents/lib/title"
 import type { ImportItem } from "./contract"
 export { openClassicAccount, readDocument, readSpace, readTheme }
+type ShallowResolve = Record<never, never>
 
 async function openClassicAccount(seed: Uint8Array, storedAccountId?: string) {
 	let connection = await connectClassic()
@@ -59,6 +61,8 @@ async function openClassicAccount(seed: Uint8Array, storedAccountId?: string) {
 		})
 		connection.peer.disable()
 		live.attach(context.node)
+		await flushClassic(context.node)
+		await context.account.$jazz.waitForSync({ timeout: 60_000 })
 		let account = await context.account.$jazz.ensureLoaded({
 			resolve: {
 				profile: true,
@@ -71,23 +75,52 @@ async function openClassicAccount(seed: Uint8Array, storedAccountId?: string) {
 				},
 			},
 		})
+		let roots: co.loaded<
+			typeof UserRoot,
+			{
+				documents: { $each: true }
+				inactiveDocuments: { $each: true }
+				spaces: { $each: true }
+				themes: { $each: true }
+				settings: true
+			}
+		>[] = [account.root]
+		let rootErrors: { id: string; message: string }[] = []
+		let seenRoots = new Set([account.root.$jazz.id])
+		for (let edit of account.$jazz.raw.editsAt("root")) {
+			if (
+				typeof edit.value !== "string" ||
+				!edit.value.startsWith("co_z") ||
+				seenRoots.has(edit.value)
+			)
+				continue
+			seenRoots.add(edit.value)
+			let root = await UserRoot.load(edit.value, {
+				loadAs: account,
+				resolve: {
+					documents: { $each: true },
+					inactiveDocuments: { $each: true },
+					spaces: { $each: true },
+					themes: { $each: true },
+					settings: true,
+				},
+			})
+			if (root.$isLoaded) roots.push(root)
+			else
+				rootErrors.push({
+					id: edit.value,
+					message: "Classic account archive unavailable",
+				})
+		}
 		return {
+			roots,
+			rootErrors,
 			account,
 			crypto: connection.crypto,
 			secret,
 			async sync() {
 				await live.peer.waitUntilConnected()
-				let storage = context.node.storage
-				if (storage) {
-					let ids = await new Promise<
-						Parameters<typeof context.node.loadCoValueCore>[0][]
-					>(resolve => storage.getUnsyncedCoValueIDs(resolve))
-					for (let id of ids) {
-						let core = await context.node.loadCoValueCore(id)
-						await core.waitForSync({ timeout: 60_000 })
-					}
-				}
-				await account.$jazz.waitForAllCoValuesSync({ timeout: 60_000 })
+				await flushClassic(context.node)
 			},
 			close() {
 				live.peer.disable()
@@ -120,7 +153,7 @@ async function openClassicAccount(seed: Uint8Array, storedAccountId?: string) {
 	}
 }
 async function readDocument(
-	document: co.loaded<typeof Document>,
+	document: co.loaded<typeof Document, ShallowResolve>,
 	archived: boolean,
 ): Promise<ImportItem> {
 	let doc = await document.$jazz.ensureLoaded({
@@ -297,7 +330,9 @@ async function readDocument(
 		assets,
 	}
 }
-async function readSpace(space: co.loaded<typeof Space>): Promise<ImportItem> {
+async function readSpace(
+	space: co.loaded<typeof Space, ShallowResolve>,
+): Promise<ImportItem> {
 	let loaded = await space.$jazz.ensureLoaded({
 		resolve: { avatar: { original: true } },
 	})
@@ -310,7 +345,9 @@ async function readSpace(space: co.loaded<typeof Space>): Promise<ImportItem> {
 		updatedAt: space.updatedAt,
 	}
 }
-async function readTheme(theme: co.loaded<typeof Theme>): Promise<ImportItem> {
+async function readTheme(
+	theme: co.loaded<typeof Theme, ShallowResolve>,
+): Promise<ImportItem> {
 	let loaded = await theme.$jazz.ensureLoaded({
 		resolve: {
 			css: true,
@@ -381,4 +418,16 @@ async function fileBytes(stream: co.loaded<ReturnType<typeof co.fileStream>>) {
 			if (settled) unsubscribe()
 		}))
 	return packBytes(new Uint8Array(await blob.arrayBuffer()))
+}
+
+async function flushClassic(node: LocalNode) {
+	let storage = node.storage
+	if (!storage) return
+	let ids = await new Promise<Parameters<typeof node.loadCoValueCore>[0][]>(
+		resolve => storage.getUnsyncedCoValueIDs(resolve),
+	)
+	for (let id of ids) {
+		let core = await node.loadCoValueCore(id)
+		await core.waitForSync({ timeout: 60_000 })
+	}
 }

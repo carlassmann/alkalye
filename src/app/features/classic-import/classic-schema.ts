@@ -1,5 +1,5 @@
 import { co, z } from "jazz-tools-classic"
-export { UserAccount, Document, Space, Theme, TldrawRevision }
+export { UserAccount, Document, Space, Theme, TldrawRevision, UserRoot }
 
 let ImageAsset = co.map({
 	type: z.literal("image"),
