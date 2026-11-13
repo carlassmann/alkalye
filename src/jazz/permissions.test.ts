@@ -188,10 +188,24 @@ test.each(["reader", "writer", "manager", "admin"] as const)(
 			}),
 		)
 		let bob = actor(bobId)
-		let data = { ...note(bobId), spaceId: space.id }
+		let data = { ...note(aliceId), spaceId: space.id }
+		await bob.expectDenied(db =>
+			db.insert(app.documents, { ...data, ownerId: bobId }),
+		)
 		if (role === "reader")
 			await bob.expectDenied(db => db.insert(app.documents, data))
-		else await bob.insert(app.documents, data).wait({ tier: "global" })
+		else {
+			let doc = await bob.insert(app.documents, data).wait({ tier: "global" })
+			if (role !== "admin") {
+				await bob.expectDenied(db =>
+					db.insert(app.documents, { ...data, publicRead: true }),
+				)
+				await bob.expectDenied(db =>
+					db.update(app.documents, doc.id, { publicRead: true }),
+				)
+				await bob.expectDenied(db => db.delete(app.documents, doc.id))
+			}
+		}
 		await bob.expectDenied(db =>
 			db.insert(app.documents, { ...data, spaceId: unrelated.id }),
 		)
@@ -266,7 +280,7 @@ test("document blobs inherit access; public access exposes no private account da
 		}),
 	)
 	expect(await bob.all(app.mcpConnections.where({}))).toEqual([])
-	expect(await bob.all(app.laser.where({ documentId: doc.id }))).toHaveLength(1)
+	expect(await bob.all(app.laser.where({ documentId: doc.id }))).toHaveLength(0)
 })
 
 test("presence is readable with the document but only the publishing account can update it", async () => {
@@ -416,6 +430,24 @@ test("documents created for a space owner stop being readable when membership en
 		.wait({ tier: "global" })
 	await fixture.seed(db => db.delete(app.spaceMembers, membership.id))
 	expect(await bob.all(app.documents.where({ id: doc.id }))).toHaveLength(0)
+})
+
+test("public readers cannot publish laser controls or forge the sender account", async () => {
+	let doc = await fixture.seed(db =>
+		db.insert(app.documents, { ...note(), publicRead: true }),
+	)
+	let values = {
+		ownerId: bobId,
+		senderId: bobId,
+		documentId: doc.id,
+		sequence: 1,
+		message: { type: "closed", id: "presenter" },
+		updatedAt: new Date(),
+	}
+	await actor(bobId).expectDenied(db => db.insert(app.laser, values))
+	await actor(bobId).expectDenied(db =>
+		db.insert(app.laser, { ...values, ownerId: aliceId }),
+	)
 })
 
 test("membership administration requires backend operations even for admins", async () => {

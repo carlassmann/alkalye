@@ -43,7 +43,9 @@ function SlideshowScreen({ id }: { id: string }) {
 		: null
 	return (
 		<>
-			<LaserReceiver docId={id} slideNumber={currentSlideNumber} />
+			{canEditDoc && (
+				<LaserReceiver docId={id} slideNumber={currentSlideNumber} />
+			)}
 			<Slideshow
 				appearanceOverride={
 					previewAppearance === "dark" || previewAppearance === "light"

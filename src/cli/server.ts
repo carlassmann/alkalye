@@ -116,9 +116,11 @@ async function executeServerCommand(
 		let spaceId = args.scope?.startsWith("space:")
 			? args.scope.slice(6)
 			: undefined
+		let space = spaceId ? await db.one(app.spaces.where({ id: spaceId })) : null
+		if (spaceId && !space) throw new Error("Space not found")
 		let write = await db.transaction(tx => {
 			let doc = tx.insert(app.documents, {
-				ownerId: accountId,
+				ownerId: space?.ownerId ?? accountId,
 				spaceId,
 				content,
 				title: getDocumentTitle(content),

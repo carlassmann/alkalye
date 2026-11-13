@@ -84,7 +84,7 @@ export let permissions = s.definePermissions(
 		policy.documents.allowInsert.where(doc =>
 			allOf([
 				anyOf([
-					owned,
+					allOf([owned, { spaceId: null }]),
 					policy.spaces.exists.where({ id: doc.spaceId, ownerId: doc.ownerId }),
 				]),
 				anyOf([
@@ -98,6 +98,10 @@ export let permissions = s.definePermissions(
 						accountId: session.user,
 						role: { in: ["writer", "manager", "admin"] },
 					}),
+				]),
+				anyOf([
+					documentAdmin(doc),
+					{ publicRead: false, commentsDisabled: false, deletedAt: null },
 				]),
 			]),
 		)
@@ -225,12 +229,12 @@ export let permissions = s.definePermissions(
 				}),
 			]),
 		)
-		policy.laser.allowRead.where(allowedTo.read("document"))
-		policy.laser.allowInsert.where(allOf([owned, allowedTo.read("document")]))
+		policy.laser.allowRead.where(allOf([owned, allowedTo.read("document")]))
+		policy.laser.allowInsert.where(allOf([owned, allowedTo.update("document")]))
 		policy.laser.allowUpdate.where(laser =>
 			allOf([
 				owned,
-				allowedTo.read("document"),
+				allowedTo.update("document"),
 				policy.laser.exists.where({
 					id: laser.id,
 					ownerId: session.user,

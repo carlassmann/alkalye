@@ -293,6 +293,38 @@ test("outsiders cannot read docs, writers edit, readers cannot edit/archive, for
 	}
 })
 
+test("MCP space writers create space-owned documents and lose inherited access on removal", async () => {
+	let jazz = state.jazz!
+	let bobDb = await jazz.forReqUser(bobRequest)
+	let bobId = bobDb.getAuthState().session!.user!
+	let space = await jazz.db
+		.insert(app.spaces, {
+			ownerId: bobId,
+			name: "Bob's team",
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		})
+		.wait({ tier: "global" })
+	let member = await jazz.db
+		.insert(app.spaceMembers, { spaceId: space.id, accountId, role: "writer" })
+		.wait({ tier: "global" })
+	let result = await call("create_document", {
+		spaceId: space.id,
+		content: "# Team draft",
+	})
+	expect(result.isError).toBeFalsy()
+	let { documentId } = z
+		.object({ documentId: z.string() })
+		.parse(result.structuredContent)
+	expect(
+		await jazz.db.one(app.documents.where({ id: documentId })),
+	).toMatchObject({ ownerId: bobId })
+	let db = await jazz.forReqUser(aliceRequest)
+	expect(await db.canDelete(app.documents, documentId)).toBe("denied")
+	await jazz.db.delete(app.spaceMembers, member.id).wait({ tier: "global" })
+	expect(await db.one(app.documents.where({ id: documentId }))).toBeNull()
+})
+
 test("revocation checked per tool call and cannot revoke someone else's connection", async () => {
 	let { revokeUserConnection, validateCredentials } = await import("./jazz")
 	let credentials = await validateCredentials(credential, tokens)

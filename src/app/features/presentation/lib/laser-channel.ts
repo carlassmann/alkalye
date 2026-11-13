@@ -14,7 +14,7 @@ function createLaserChannel(
 	docId: string,
 	onMessage: (message: LaserMessage) => void,
 ) {
-	let ownerId = db.getAuthState().session?.user
+	let ownerId = db.getAuthState().session?.user ?? undefined
 	let source = crypto.randomUUID(),
 		id = crypto.randomUUID()
 	let sequence = 0,
@@ -23,11 +23,12 @@ function createLaserChannel(
 		inserted = false
 	let seen = new Map<string, number>()
 	let unsubscribe = db.subscribe(
-		app.laser.where({ documentId: docId }),
+		app.laser.where({ documentId: docId, ownerId }),
 		rows => {
 			if (closed || suspended) return
 			for (let row of rows) {
 				if (
+					row.ownerId !== ownerId ||
 					row.senderId === source ||
 					(seen.get(row.senderId) ?? 0) >= row.sequence
 				)
@@ -47,23 +48,24 @@ function createLaserChannel(
 	}
 	window.addEventListener("pagehide", suspend)
 	window.addEventListener("pageshow", resume)
+	function postMessage(message: LaserMessage) {
+		if (closed || suspended || !ownerId) return
+		let values = {
+			ownerId,
+			documentId: docId,
+			senderId: source,
+			sequence: ++sequence,
+			message: packLaserMessage(message),
+			updatedAt: new Date(),
+		}
+		if (inserted) void db.update(app.laser, id, values)
+		else {
+			inserted = true
+			void db.insert(app.laser, values, { id })
+		}
+	}
 	return {
-		postMessage(message: LaserMessage) {
-			if (closed || suspended || !ownerId) return
-			let values = {
-				ownerId,
-				documentId: docId,
-				senderId: source,
-				sequence: ++sequence,
-				message: packLaserMessage(message),
-				updatedAt: new Date(),
-			}
-			if (inserted) void db.update(app.laser, id, values)
-			else {
-				inserted = true
-				void db.insert(app.laser, values, { id })
-			}
-		},
+		postMessage,
 		close() {
 			closed = true
 			unsubscribe()

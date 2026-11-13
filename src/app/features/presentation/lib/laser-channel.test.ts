@@ -42,21 +42,23 @@ async function document() {
 		})
 		.wait({ tier: "global" })
 }
-test("cross-author channels receive latest samples once, scoped to their document", async () => {
+test("same-account channels receive latest samples once, scoped to their document", async () => {
 	let doc = await document(),
-		alice = actor(aliceId),
-		bob = actor(bobId)
+		alice = actor(aliceId)
 	let received: LaserMessage[] = [],
 		other: LaserMessage[] = []
 	let otherDoc = await document()
-	let receiver = createLaserChannel(bob, doc.id, message =>
+	let receiver = createLaserChannel(alice, doc.id, message =>
 			received.push(message),
 		),
-		unrelated = createLaserChannel(bob, otherDoc.id, message =>
+		unrelated = createLaserChannel(alice, otherDoc.id, message =>
 			other.push(message),
 		),
 		sender = createLaserChannel(alice, doc.id, () => {})
 	channels.push(receiver, unrelated, sender)
+	await expect
+		.poll(() => alice.canUpdate(app.documents, doc.id, {}))
+		.toBe("allowed")
 	sender.postMessage({ type: "discover", request: "one" })
 	await expect.poll(() => received.length).toBe(1)
 	expect(received[0]).toEqual({ type: "discover", request: "one" })
@@ -64,7 +66,9 @@ test("cross-author channels receive latest samples once, scoped to their documen
 	await expect.poll(() => received.length).toBe(2)
 	expect(other).toEqual([])
 	await alice.waitForSync()
-	expect(await bob.all(app.laser.where({ documentId: doc.id }))).toHaveLength(1)
+	expect(await alice.all(app.laser.where({ documentId: doc.id }))).toHaveLength(
+		1,
+	)
 })
 test("stale rows are ignored; pagehide suspends writes and pageshow resumes", async () => {
 	let doc = await document(),
@@ -81,7 +85,7 @@ test("stale rows are ignored; pagehide suspends writes and pageshow resumes", as
 		})
 		.wait({ tier: "global" })
 	let received: LaserMessage[] = []
-	let receiver = createLaserChannel(bob, doc.id, message =>
+	let receiver = createLaserChannel(alice, doc.id, message =>
 			received.push(message),
 		),
 		sender = createLaserChannel(alice, doc.id, () => {})
@@ -93,8 +97,40 @@ test("stale rows are ignored; pagehide suspends writes and pageshow resumes", as
 	await expect
 		.poll(() => received)
 		.toEqual([{ type: "discover", request: "visible" }])
-	let rows = await bob.all(app.laser.where({ documentId: doc.id }))
+	let rows = await alice.all(app.laser.where({ documentId: doc.id }))
 	let row = rows.find(row => row.senderId !== "stale")
 	if (!row) throw new Error("Sender missing")
 	await bob.expectDenied(db => db.update(app.laser, row.id, { ownerId: bobId }))
+})
+
+test("a public reader's rows cannot hijack the presenter's sender or sequence", async () => {
+	let doc = await document()
+	let received: LaserMessage[] = []
+	let receiver = createLaserChannel(actor(aliceId), doc.id, message =>
+		received.push(message),
+	)
+	channels.push(receiver)
+	await fixture.seed(db =>
+		db.insert(app.laser, {
+			ownerId: bobId,
+			documentId: doc.id,
+			senderId: "presenter",
+			sequence: 999,
+			message: { type: "closed", id: "display" },
+			updatedAt: new Date(),
+		}),
+	)
+	await fixture.seed(db =>
+		db.insert(app.laser, {
+			ownerId: aliceId,
+			documentId: doc.id,
+			senderId: "presenter",
+			sequence: 1,
+			message: { type: "discover", request: "real" },
+			updatedAt: new Date(),
+		}),
+	)
+	await expect
+		.poll(() => received)
+		.toEqual([{ type: "discover", request: "real" }])
 })
