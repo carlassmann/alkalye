@@ -69,7 +69,7 @@ test("CLI account, document CRUD, archive/restore, space movement preserve conte
 	expect(await run("doc.list", {})).toMatchObject([{ documentId }])
 })
 
-test("one-use invites, writer edit, reader rejection and revoke remove just that grant", async () => {
+test("reusable invites, writer edit, reader rejection and revoke remove just that grant", async () => {
 	let invite = await run("doc.share.create", {
 		docId: documentId,
 		role: "writer",
@@ -78,7 +78,10 @@ test("one-use invites, writer edit, reader rejection and revoke remove just that
 	expect(await run("invite.accept", { link }, bob)).toMatchObject({
 		accepted: true,
 	})
-	await expect(run("invite.accept", { link }, bob)).rejects.toThrow()
+	expect(await run("invite.accept", { link }, bob)).toMatchObject({
+		accepted: true,
+	})
+	await run("invite.accept", { link }, "00000000-0000-4000-8000-000000000003")
 	await run(
 		"doc.update",
 		{ docId: documentId, content: "# Shared writer" },
@@ -196,4 +199,58 @@ test("CLI invitations open in the browser and browser revocation removes CLI red
 	await expect(
 		run("doc.content", { docId: documentId }, carol),
 	).rejects.toThrow()
+})
+
+test("CLI space writers create space-owned documents and lose them after removal", async () => {
+	let id = field(await run("space.create", { name: "Owned team" }), "spaceId")
+	let member = await state
+		.jazz!.db.insert(app.spaceMembers, {
+			spaceId: id,
+			accountId: bob,
+			role: "writer",
+		})
+		.wait({ tier: "global" })
+	let doc = field(
+		await run("doc.create", { content: "# Team", scope: `space:${id}` }, bob),
+		"documentId",
+	)
+	expect(
+		await state.jazz!.db.one(app.documents.where({ id: doc })),
+	).toMatchObject({ ownerId: alice })
+	await expect(run("doc.delete", { docId: doc }, bob)).rejects.toThrow()
+	await state
+		.jazz!.db.delete(app.spaceMembers, member.id)
+		.wait({ tier: "global" })
+	await expect(run("doc.content", { docId: doc }, bob)).rejects.toThrow()
+})
+test("CLI moves from another owner's space transfer ownership and clean all old library entries", async () => {
+	let id = field(await run("space.create", { name: "Move team" }), "spaceId")
+	await state
+		.jazz!.db.insert(app.spaceMembers, {
+			spaceId: id,
+			accountId: bob,
+			role: "admin",
+		})
+		.wait({ tier: "global" })
+	let doc = field(
+		await run("doc.create", { content: "# Move", scope: `space:${id}` }),
+		"documentId",
+	)
+	await state
+		.jazz!.db.insert(app.userDocuments, {
+			ownerId: alice,
+			documentId: doc,
+			rank: 1,
+		})
+		.wait({ tier: "global" })
+	await run("doc.move", { docId: doc, scope: "personal" }, bob)
+	expect(
+		await state.jazz!.db.one(app.documents.where({ id: doc })),
+	).toMatchObject({ ownerId: bob, spaceId: null })
+	expect(
+		await state.jazz!.db.all(app.userDocuments.where({ documentId: doc })),
+	).toMatchObject([{ ownerId: bob }])
+	expect(await run("doc.list", {}, bob)).toEqual(
+		expect.arrayContaining([expect.objectContaining({ documentId: doc })]),
+	)
 })

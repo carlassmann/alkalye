@@ -1,3 +1,5 @@
+import { sharingOperation } from "@/jazz/sharing/operations"
+import { jazz } from "@/jazz/server"
 import { summarizeComment } from "@/mcp/comments"
 import { stripAssetReference } from "./asset-references"
 import {
@@ -114,9 +116,11 @@ async function executeServerCommand(
 		let spaceId = args.scope?.startsWith("space:")
 			? args.scope.slice(6)
 			: undefined
+		let space = spaceId ? await db.one(app.spaces.where({ id: spaceId })) : null
+		if (spaceId && !space) throw new Error("Space not found")
 		let write = await db.transaction(tx => {
 			let doc = tx.insert(app.documents, {
-				ownerId: accountId,
+				ownerId: space?.ownerId ?? accountId,
 				spaceId,
 				content,
 				title: getDocumentTitle(content),
@@ -397,11 +401,13 @@ async function spaceCommand(
 			}),
 		)
 		if (!member) throw new Error("Collaborator not found")
-		await db
-			.update(app.spaceMembers, member.id, {
-				role: required(args.role, "role"),
-			})
-			.wait({ tier: "global" })
+		await sharingOperation(
+			jazz,
+			accountId,
+			"member-role",
+			{ spaceId: id, memberId: member.id, role: required(args.role, "role") },
+			"",
+		)
 		return { spaceId: id, accountId: member.accountId, role: args.role }
 	}
 	throw new Error(`Unknown command: ${command}`)
@@ -424,9 +430,13 @@ async function documentSharing(
 		)
 		if (!grant) throw new Error("Collaborator not found")
 		let role = z.enum(["reader", "writer"]).parse(args.role)
-		await db
-			.update(app.documentGrants, grant.id, { role })
-			.wait({ tier: "global" })
+		await sharingOperation(
+			jazz,
+			db.getAuthState().session?.user ?? "",
+			"grant-role",
+			{ documentId: doc.id, memberId: grant.id, role },
+			"",
+		)
 		return { documentId: doc.id, accountId: grant.accountId, role }
 	}
 	throw new Error(`Unknown command: ${command}`)

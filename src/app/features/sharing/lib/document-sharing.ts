@@ -95,7 +95,10 @@ async function revokeDocumentInvite(
 	if (grant?.inviteId)
 		await sharingRequest(db, "revoke", { inviteId: grant.inviteId })
 	else if (grant)
-		await db.delete(app.documentGrants, id).wait({ tier: "global" })
+		await sharingRequest(db, "remove-grant", {
+			documentId: doc.id,
+			memberId: id,
+		})
 	else await sharingRequest(db, "revoke", { inviteId: id })
 }
 async function leavePersonalDocument(db: Database, doc: LibraryDocument) {

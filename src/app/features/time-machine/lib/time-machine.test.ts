@@ -38,13 +38,13 @@ test("accepted history merges imported dates and authors; restore is another acc
 			updatedAt: new Date(),
 		})
 		.wait({ tier: "global" })
-	await alice
-		.insert(app.documentGrants, {
+	await fixture.seed(db =>
+		db.insert(app.documentGrants, {
 			documentId: doc.id,
 			accountId: bobId,
 			role: "writer",
-		})
-		.wait({ tier: "global" })
+		}),
+	)
 	await bob
 		.update(app.documents, doc.id, { content: "Bob's edit" })
 		.wait({ tier: "global" })

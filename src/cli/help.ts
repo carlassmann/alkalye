@@ -364,8 +364,8 @@ let leaves: Record<string, LeafDef> = {
 		summary: "Show document metadata.",
 		usage: "alkalye doc get <doc-id>",
 		options: [
-			"--offline      Use cached local data without remote freshness checks",
-			"--local        Alias for --offline",
+			"--offline      Unavailable: Node/Bun replicas do not persist on Jazz v2 alpha.61",
+			"--local        Alias for --offline; unavailable on Jazz v2 alpha.61",
 			"--stale-ok     Allow cached data if remote sync is incomplete",
 		],
 		examples: ["alkalye doc get co_xyz --json"],
@@ -374,8 +374,8 @@ let leaves: Record<string, LeafDef> = {
 		summary: "Print raw document content (pipe-friendly).",
 		usage: "alkalye doc content <doc-id>",
 		options: [
-			"--offline      Use cached local data without remote freshness checks",
-			"--local        Alias for --offline",
+			"--offline      Unavailable: Node/Bun replicas do not persist on Jazz v2 alpha.61",
+			"--local        Alias for --offline; unavailable on Jazz v2 alpha.61",
 			"--stale-ok     Allow cached data if remote sync is incomplete",
 		],
 		examples: [
@@ -395,7 +395,7 @@ let leaves: Record<string, LeafDef> = {
 			"--theme <ref>         Theme name, ID, or local .theme.md path",
 			"--layout <layout>     document, slides, or notes (slides with speaker notes)",
 			"--aspect <ratio>      Slide aspect ratio: 16:9 (default) or 4:3",
-			"--offline             Use cached local data without remote freshness checks",
+			"--offline             Unavailable: Node/Bun replicas do not persist on Jazz v2 alpha.61",
 			"--stale-ok            Allow cached data if remote sync is incomplete",
 		],
 		examples: [

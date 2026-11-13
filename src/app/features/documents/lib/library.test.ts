@@ -79,3 +79,32 @@ test("adds and removes visible frontmatter backlinks without replacing target te
 	expect(removed?.content).not.toContain(source.id)
 	expect(removed?.content).toContain("Keep this text")
 })
+
+test("browser creation in another owner's space preserves space ownership and inherited access", async () => {
+	let spaceOwner = "00000000-0000-4000-8000-000000000002"
+	let space = await fixture.seed(db =>
+		db.insert(app.spaces, {
+			ownerId: spaceOwner,
+			name: "Team",
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		}),
+	)
+	let member = await fixture.seed(db =>
+		db.insert(app.spaceMembers, {
+			spaceId: space.id,
+			accountId: ownerId,
+			role: "writer",
+		}),
+	)
+	let db = actor()
+	let doc = await createDocument(db, ownerId, "# Team draft", space.id)
+	await db.waitForSync()
+	expect(doc.ownerId).toBe(spaceOwner)
+	expect(await db.all(app.userDocuments.where({ documentId: doc.id }))).toEqual(
+		[],
+	)
+	await db.expectDenied(db => db.delete(app.documents, doc.id))
+	await fixture.seed(db => db.delete(app.spaceMembers, member.id))
+	expect(await db.all(app.documents.where({ id: doc.id }))).toEqual([])
+})

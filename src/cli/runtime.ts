@@ -73,6 +73,12 @@ async function executeCommand(
 			Option.isOption(value) ? Option.getOrUndefined(value) : value,
 		]),
 	)
+	if (args.offline || args.local)
+		throw new CliUsageError({
+			message:
+				"--offline/--local are unavailable: Jazz v2 alpha.61 does not persist Node/Bun client replicas. Use the online CLI or the browser for offline edits. See docs/mcp-server.md.",
+		})
+
 	if (command === "auth.logout") {
 		await rm(config.authFile, { force: true })
 		return { loggedOut: true }
@@ -139,10 +145,6 @@ async function executeCommand(
 		})
 	if (command === "auth.passphrase")
 		return { passphrase: RecoveryPhrase.fromSecret(secret) }
-	if (args.offline || args.local)
-		throw new CliUsageError({
-			message: "Jazz v2 CLI requires an online backend.",
-		})
 	let content = await input(args, "content", "contentFile", "stdin")
 	if (content !== undefined)
 		args.content =

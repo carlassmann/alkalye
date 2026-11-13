@@ -248,24 +248,29 @@ async function createDocument(
 	content = "",
 	spaceId?: string,
 ) {
-	let folderId = await ensureFolder(db, ownerId, getPath(content))
+	let space = spaceId ? await db.one(app.spaces.where({ id: spaceId })) : null
+	if (spaceId && !space) throw new Error("Space not found")
+	let folderId = spaceId
+		? undefined
+		: await ensureFolder(db, ownerId, getPath(content))
 	let write = await db.transaction(tx => {
 		let now = new Date()
 		let doc = tx.insert(app.documents, {
-			ownerId,
+			ownerId: space?.ownerId ?? ownerId,
 			spaceId,
 			content,
 			...documentMetadata(content),
 			createdAt: now,
 			updatedAt: now,
 		})
-		tx.insert(app.userDocuments, {
-			ownerId,
-			documentId: doc.id,
-			folderId,
-			pinned: parseFrontmatter(content).frontmatter?.pinned === true,
-			rank: now.getTime(),
-		})
+		if (!spaceId)
+			tx.insert(app.userDocuments, {
+				ownerId,
+				documentId: doc.id,
+				folderId,
+				pinned: parseFrontmatter(content).frontmatter?.pinned === true,
+				rank: now.getTime(),
+			})
 		return doc
 	})
 	await write.wait({ tier: "local" })

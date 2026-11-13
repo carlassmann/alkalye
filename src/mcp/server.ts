@@ -213,12 +213,14 @@ function createAlkalyeServer(credential: string | undefined) {
 		},
 		async ({ spaceId, content }) =>
 			withUser(credential, async (db, accountId) => {
-				if (spaceId && !(await db.one(app.spaces.where({ id: spaceId }))))
-					throw new Error("Space not found")
+				let space = spaceId
+					? await db.one(app.spaces.where({ id: spaceId }))
+					: null
+				if (spaceId && !space) throw new Error("Space not found")
 				let write = await db.transaction(tx => {
 					let now = new Date()
 					let doc = tx.insert(app.documents, {
-						ownerId: accountId,
+						ownerId: space?.ownerId ?? accountId,
 						spaceId,
 						content,
 						title: getDocumentTitle(content),

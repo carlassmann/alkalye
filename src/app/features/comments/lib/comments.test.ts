@@ -65,13 +65,13 @@ async function reload(
 test("comments and replies sync to a second author; ranges survive surrounding edits", async () => {
 	let doc = await document(),
 		bob = actor(bobId)
-	await doc.db
-		.insert(app.documentGrants, {
+	await fixture.seed(db =>
+		db.insert(app.documentGrants, {
 			documentId: doc.id,
 			accountId: bobId,
 			role: "writer",
-		})
-		.wait({ tier: "global" })
+		}),
+	)
 	let created = createCommentThreadFromQuote(
 		doc,
 		"Selected words",
