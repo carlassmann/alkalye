@@ -2,24 +2,34 @@ import { WasmCrypto } from "cojson/crypto/WasmCrypto"
 import { app } from "@/jazz/schema"
 import { jazz } from "@/jazz/server"
 import { documentMetadata } from "@/app/features/documents/lib/metadata"
-import { importItemSchema, proofSchema, type ImportItem } from "./contract"
-import { verifyClassicProof, readClassicAccess } from "./verification"
 import {
-	stableId,
-	unpackBytes,
-	rewriteReferences,
-	resolveClassicAnchor,
-} from "./conversion"
+	importItemSchema,
+	proofSchema,
+	classicIdSchema,
+	type ImportItem,
+} from "./contract"
+import { verifyClassicProof, readClassicAccess } from "./verification"
+import { stableId, rewriteReferences, resolveClassicAnchor } from "./conversion"
 import { z } from "zod"
+import { verifiedIdentity, authorizeSnapshot } from "./authorization"
+import {
+	uploadChunk,
+	readBytes,
+	cleanupUploads,
+	discardChunks,
+} from "./uploads"
 export {
 	challenge,
 	importClassicItem,
 	claimClassicAccount,
 	uploadChunk,
 	importStagedItem,
+	prepareClassicItem,
+	lookupClassicItem,
 }
 
 async function challenge(accountId: string) {
+	await cleanupUploads()
 	let nonce = crypto.randomUUID()
 	let challengeId = crypto.randomUUID()
 	let write = jazz.db.insert(
@@ -76,7 +86,7 @@ async function claimClassicAccount(accountId: string, input: unknown) {
 			let role = z
 				.enum(["reader", "writer", "manager", "admin"])
 				.parse(verified.role)
-			await grantAccess(accountId, access.resourceId, access.kind, role)
+			await activateVerifiedAccess(accountId, imported.classicId, access)
 			if (verified.ownerClassicId === proof.classicId && role === "admin") {
 				if (
 					imported.kind === "document" &&
@@ -123,16 +133,8 @@ async function importClassicItem(accountId: string, input: unknown) {
 	let { challengeId, item: rawItem } = z
 		.object({ challengeId: z.uuid(), item: z.unknown() })
 		.parse(input)
-	let identity = await jazz.db.one(
-		app.classicChallenges.where({ id: challengeId }),
-	)
-	if (
-		!identity ||
-		identity.ownerId !== accountId ||
-		!identity.classicId ||
-		identity.expiresAt.getTime() < Date.now()
-	)
-		throw new Error("Classic identity proof required")
+	let identity = await verifiedIdentity(accountId, challengeId)
+	await cleanupUploads()
 	let item = importItemSchema.parse(rawItem)
 	let id = await stableId(item.classicId)
 	let mapId = await stableId(`map:${item.classicId}`)
@@ -141,10 +143,20 @@ async function importClassicItem(accountId: string, input: unknown) {
 		item.kind === "account"
 			? null
 			: await readClassicAccess(item.classicId, identity.classicId)
+	if (access?.role === "reader") {
+		let prepared = await prepareClassicItem(accountId, {
+			challengeId,
+			classicId: item.classicId,
+			kind: item.kind,
+		})
+		if (!prepared.id) throw new Error("Classic import not ready")
+		return { id: prepared.id }
+	}
 	if (item.kind === "account" && item.classicId !== identity.classicId)
 		throw new Error("Account mismatch")
 	if (item.kind === "theme" && access?.role !== "admin")
 		throw new Error("Only Classic theme admins can import themes")
+	await authorizeSnapshot(identity.classicId, item)
 	if (previous && previous.kind !== item.kind)
 		throw new Error("Classic value already mapped to another kind")
 	if (!previous) {
@@ -189,6 +201,13 @@ async function importClassicItem(accountId: string, input: unknown) {
 				? []
 				: access.directMembers
 			: access.members
+		for (let stale of await jazz.db.all(
+			app.classicAccess.where({ resourceId: id }),
+		))
+			if (!members.some(member => member.id === stale.classicId))
+				await jazz.db
+					.delete(app.classicAccess, stale.id)
+					.wait({ tier: "global" })
 		for (let member of members) {
 			let role = z
 				.enum(["reader", "writer", "manager", "admin"])
@@ -197,9 +216,18 @@ async function importClassicItem(accountId: string, input: unknown) {
 				item.kind === "space" ? "space" : "document"
 			if (item.kind === "theme") continue
 			let grantId = await stableId(`pending:${item.classicId}:${member.id}`)
-			let existing = await jazz.db.one(app.classicAccess.where({ id: grantId }))
+			let existing = await jazz.db.one(
+				app.classicAccess
+					.where({ id: grantId })
+					.includeDeleted()
+					.select("*", "$deletedAt"),
+			)
 			let values = { classicId: member.id, resourceId: id, kind, role }
-			if (existing)
+			if (existing?.$deletedAt)
+				await jazz.db
+					.restore(app.classicAccess, grantId, values)
+					.wait({ tier: "global" })
+			else if (existing)
 				await jazz.db
 					.update(app.classicAccess, grantId, values)
 					.wait({ tier: "global" })
@@ -225,17 +253,27 @@ async function importClassicItem(accountId: string, input: unknown) {
 			)
 			.wait({ tier: "global" })
 	let writesSnapshot =
-		!previous ||
-		previous.status !== "complete" ||
-		(item.kind !== "account" && (!access || access.role !== "reader"))
+		!previous || previous.status !== "complete" || item.kind !== "account"
 	try {
-		if (writesSnapshot && item.kind === "document" && previous?.importedAt) {
+		if (writesSnapshot && item.kind === "document" && previous) {
+			if (!previous.importedAt) {
+				let pending = await jazz.db.one(
+					app.classicAccess.where({
+						classicId: identity.classicId,
+						resourceId: id,
+					}),
+				)
+				if (pending)
+					await activateVerifiedAccess(accountId, item.classicId, pending)
+			}
 			let scoped = await jazz.forUser(accountId)
 			let visible = await scoped.one(app.documents.where({ id }))
-			if (!visible) throw new Error("V2 document access was revoked")
-			await scoped
-				.update(app.documents, id, { updatedAt: visible.updatedAt })
-				.wait({ tier: "global" })
+			if (!visible && (await jazz.db.one(app.documents.where({ id }))))
+				throw new Error("V2 document access was revoked")
+			if (visible)
+				await scoped
+					.update(app.documents, id, { updatedAt: visible.updatedAt })
+					.wait({ tier: "global" })
 		}
 		if (writesSnapshot)
 			await writeItem(
@@ -255,7 +293,7 @@ async function importClassicItem(accountId: string, input: unknown) {
 					app.classicAccounts.where({ classicId: pending.classicId }),
 				)
 				if (owner)
-					await grantAccess(owner.ownerId, id, pending.kind, pending.role)
+					await activateVerifiedAccess(owner.ownerId, item.classicId, pending)
 			}
 		}
 		await jazz.db
@@ -273,6 +311,7 @@ async function importClassicItem(accountId: string, input: unknown) {
 		if (item.kind === "document" && !item.spaceId)
 			await libraryEntry(item, id, accountId)
 		await discardChunks(accountId, item)
+		await importStatus(accountId, item, "complete")
 		return { id }
 	} catch (error) {
 		await jazz.db
@@ -281,90 +320,163 @@ async function importClassicItem(accountId: string, input: unknown) {
 				error: error instanceof Error ? error.message : "Import failed",
 			})
 			.wait({ tier: "global" })
+		await importStatus(accountId, item, "failed")
 		throw error
 	}
 }
-async function uploadChunk(accountId: string, input: unknown) {
-	let chunk = z
-		.object({
-			challengeId: z.uuid(),
-			uploadId: z.string().regex(/^[0-9a-f]{64}$/),
-			part: z.number().int().min(0).max(8191),
-			base64: z.string().max(524288),
-		})
-		.parse(input)
-	let identity = await jazz.db.one(
-		app.classicChallenges.where({ id: chunk.challengeId }),
-	)
-	if (
-		!identity ||
-		identity.ownerId !== accountId ||
-		!identity.classicId ||
-		identity.expiresAt.getTime() < Date.now()
-	)
-		throw new Error("Classic identity proof required")
-	let id = await stableId(`chunk:${accountId}:${chunk.uploadId}:${chunk.part}`)
-	let existing = await jazz.db.one(
-		app.classicImportChunks
-			.where({ id })
-			.includeDeleted()
-			.select("*", "$deletedAt"),
-	)
-	let values = {
-		ownerId: accountId,
-		uploadId: chunk.uploadId,
-		part: chunk.part,
-		data: Uint8Array.from(atob(chunk.base64), char => char.charCodeAt(0)),
-		createdAt: new Date(),
-	}
-	if (existing?.$deletedAt)
-		await jazz.db
-			.restore(app.classicImportChunks, id, values)
-			.wait({ tier: "global" })
-	else if (!existing)
-		await jazz.db
-			.insert(app.classicImportChunks, values, { id })
-			.wait({ tier: "global" })
-	return { id }
-}
 async function importStagedItem(accountId: string, input: unknown) {
 	let staged = z
-		.object({ uploadId: z.string(), sha256: z.string() })
+		.object({
+			challengeId: z.uuid(),
+			classicId: classicIdSchema,
+			kind: z.enum(["account", "document", "space", "theme"]),
+			uploadId: z.string().regex(/^[0-9a-f]{64}$/),
+			sha256: z.string(),
+		})
 		.parse(input)
+	let identity = await verifiedIdentity(accountId, staged.challengeId)
+	await authorizeSnapshot(identity.classicId, staged)
+	await cleanupUploads()
 	let bytes = await readBytes(accountId, staged)
 	let value: unknown = JSON.parse(new TextDecoder().decode(bytes))
+	let envelope = z
+		.object({
+			challengeId: z.literal(staged.challengeId),
+			item: z.object({
+				classicId: z.literal(staged.classicId),
+				kind: z.literal(staged.kind),
+			}),
+		})
+		.parse(value)
+	if (!envelope) throw new Error("Classic upload scope mismatch")
 	let result = await importClassicItem(accountId, value)
 	await discardChunks(accountId, staged)
 	return result
 }
-
-async function readBytes(
-	accountId: string,
-	value: { base64?: string; uploadId?: string; sha256: string },
-) {
-	if (value.base64 !== undefined)
-		return unpackBytes({ base64: value.base64, sha256: value.sha256 })
-	if (value.uploadId !== value.sha256)
-		throw new Error("Invalid Classic upload reference")
-	let chunks = await jazz.db.all(
-		app.classicImportChunks.where({
-			ownerId: accountId,
-			uploadId: value.uploadId,
+async function prepareClassicItem(accountId: string, input: unknown) {
+	let item = z
+		.object({
+			challengeId: z.uuid(),
+			classicId: classicIdSchema,
+			kind: z.enum(["account", "document", "space", "theme"]),
+		})
+		.parse(input)
+	let identity = await verifiedIdentity(accountId, item.challengeId)
+	if (item.kind === "account") {
+		await authorizeSnapshot(identity.classicId, item)
+		return { canWrite: true }
+	}
+	let access = await readClassicAccess(item.classicId, identity.classicId)
+	if (["writer", "admin"].includes(access.role)) return { canWrite: true }
+	let previous = await jazz.db.one(
+		app.classicImports.where({ classicId: item.classicId, kind: item.kind }),
+	)
+	if (!previous || previous.status !== "complete") {
+		await importStatus(accountId, item, "waiting")
+		throw new Error("Waiting for a Classic owner or editor to open Alkalye")
+	}
+	if (item.kind === "document" || item.kind === "space") {
+		let pending = await jazz.db.one(
+			app.classicAccess.where({
+				classicId: identity.classicId,
+				resourceId: previous.v2Id,
+				kind: item.kind,
+			}),
+		)
+		if (pending)
+			await activateVerifiedAccess(accountId, item.classicId, pending)
+	}
+	let mapping = await lookupClassicItem(accountId, item)
+	if (!mapping.id)
+		throw new Error(
+			"V2 access was revoked or the Classic item has not migrated yet",
+		)
+	if (item.kind === "document") {
+		let doc = await jazz.db.one(app.documents.where({ id: mapping.id }))
+		if (doc && !doc.spaceId)
+			await libraryEntry(
+				{
+					classicId: item.classicId,
+					path: doc.path ?? undefined,
+					pinned: false,
+					archived: false,
+				},
+				doc.id,
+				accountId,
+			)
+	}
+	await importStatus(accountId, item, "complete")
+	return { canWrite: false, id: mapping.id }
+}
+async function lookupClassicItem(accountId: string, input: unknown) {
+	let item = z
+		.object({
+			classicId: classicIdSchema,
+			kind: z.enum(["document", "space", "theme"]),
+		})
+		.parse(input)
+	let previous = await jazz.db.one(
+		app.classicImports.where({
+			classicId: item.classicId,
+			kind: item.kind,
+			status: "complete",
 		}),
 	)
-	chunks.sort((a, b) => a.part - b.part)
-	if (!chunks.length || chunks.some((chunk, index) => chunk.part !== index))
-		throw new Error("Classic upload incomplete")
-	let base64 = ""
-	for (let chunk of chunks) {
-		let chars = ""
-		for (let offset = 0; offset < chunk.data.length; offset += 32768)
-			chars += String.fromCharCode(
-				...chunk.data.subarray(offset, offset + 32768),
-			)
-		base64 += btoa(chars)
+	if (!previous) return { id: null }
+	let scoped = await jazz.forUser(accountId)
+	let visible =
+		item.kind === "document"
+			? await scoped.one(app.documents.where({ id: previous.v2Id }))
+			: item.kind === "space"
+				? await scoped.one(app.spaces.where({ id: previous.v2Id }))
+				: await scoped.one(app.themes.where({ id: previous.v2Id }))
+	return { id: visible ? previous.v2Id : null }
+}
+async function activateVerifiedAccess(
+	accountId: string,
+	classicId: string,
+	pending: {
+		classicId: string
+		resourceId: string
+		kind: "document" | "space"
+	},
+) {
+	try {
+		let access = await readClassicAccess(classicId, pending.classicId)
+		if (!access.members.some(member => member.id === pending.classicId)) return
+		let role = z
+			.enum(["reader", "writer", "manager", "admin"])
+			.parse(access.role)
+		await grantAccess(accountId, pending.resourceId, pending.kind, role)
+	} catch (error) {
+		if (
+			!(error instanceof Error) ||
+			error.message !== "Classic read access denied"
+		)
+			throw error
 	}
-	return unpackBytes({ base64, sha256: value.sha256 })
+}
+async function importStatus(
+	accountId: string,
+	item: { classicId: string; kind: string },
+	status: "waiting" | "complete" | "failed",
+) {
+	let id = await stableId(`status:${accountId}:${item.classicId}`)
+	let values = {
+		ownerId: accountId,
+		classicId: item.classicId,
+		v2Id: await stableId(item.classicId),
+		kind: item.kind,
+		status,
+	}
+	if (await jazz.db.one(app.classicImportStatus.where({ id })))
+		await jazz.db
+			.update(app.classicImportStatus, id, values)
+			.wait({ tier: "global" })
+	else
+		await jazz.db
+			.insert(app.classicImportStatus, values, { id })
+			.wait({ tier: "global" })
 }
 async function grantAccess(
 	accountId: string,
@@ -497,6 +609,8 @@ async function writeItem(
 						app.documentVersions,
 						{
 							...version,
+							authorId: accountId,
+							authorName: `Imported by ${accountId}`,
 							documentId: id,
 							content: await rewriteReferences(version.content),
 						},
@@ -826,7 +940,12 @@ async function authorAccount(classicId: string, fallback: string) {
 	)
 }
 async function libraryEntry(
-	item: Extract<ImportItem, { kind: "document" }>,
+	item: {
+		classicId: string
+		path?: string
+		pinned: boolean
+		archived: boolean
+	},
 	documentId: string,
 	ownerId: string,
 ) {
@@ -861,23 +980,6 @@ async function libraryEntry(
 				{ id },
 			)
 			.wait({ tier: "global" })
-}
-
-async function discardChunks(accountId: string, value: unknown): Promise<void> {
-	if (!value || typeof value !== "object") return
-	if ("uploadId" in value && typeof value.uploadId === "string") {
-		for (let chunk of await jazz.db.all(
-			app.classicImportChunks.where({
-				ownerId: accountId,
-				uploadId: value.uploadId,
-			}),
-		))
-			await jazz.db
-				.delete(app.classicImportChunks, chunk.id)
-				.wait({ tier: "global" })
-		return
-	}
-	for (let child of Object.values(value)) await discardChunks(accountId, child)
 }
 
 async function verifyChild(

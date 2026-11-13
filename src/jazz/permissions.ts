@@ -271,6 +271,9 @@ export let permissions = s.definePermissions(
 		policy.documentVersions.allowUpdate.never()
 		policy.documentVersions.allowDelete.never()
 		for (let table of [
+			policy.classicImports,
+			policy.classicUploads,
+			policy.classicUploadSlots,
 			policy.classicImportChunks,
 			policy.classicChallenges,
 			policy.classicAccounts,
@@ -281,10 +284,10 @@ export let permissions = s.definePermissions(
 			table.allowUpdate.never()
 			table.allowDelete.never()
 		}
-		policy.classicImports.allowRead.where(owned)
-		policy.classicImports.allowInsert.never()
-		policy.classicImports.allowUpdate.never()
-		policy.classicImports.allowDelete.never()
+		policy.classicImportStatus.allowRead.where(owned)
+		policy.classicImportStatus.allowInsert.never()
+		policy.classicImportStatus.allowUpdate.never()
+		policy.classicImportStatus.allowDelete.never()
 		// Only backend transactions create, redeem and revoke hashed invites.
 		policy.invites.allowRead.where(
 			anyOf([owned, allowedTo.delete("document"), allowedTo.update("space")]),

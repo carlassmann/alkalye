@@ -13,7 +13,9 @@ import { permissions } from "@/jazz/permissions"
 import { stableId, packBytes } from "./conversion"
 let state: {
 	jazz?: Jazz
-	role: "reader" | "admin"
+	role: "reader" | "writer" | "admin"
+	removed?: string
+	extraMember?: string
 	authors: Record<string, string>
 	foreignGroupFor?: string
 } = vi.hoisted(() => ({
@@ -29,16 +31,25 @@ vi.mock("./verification", async importOriginal => {
 	let original = await importOriginal<typeof import("./verification")>()
 	return {
 		...original,
-		readClassicAccess: async (id: string, accountId: string) => ({
-			groupId: id === state.foreignGroupFor ? "foreign" : "source",
-			groupIds: [id === state.foreignGroupFor ? "foreign" : "source"],
-			createdBy: state.authors[id] ?? accountId,
-			role: state.role,
-			ownerClassicId: accountId,
-			publicRead: false,
-			members: [{ id: accountId, role: state.role }],
-			directMembers: [{ id: accountId, role: state.role }],
-		}),
+		readClassicAccess: async (id: string, accountId: string) => {
+			if (accountId === state.removed)
+				throw new Error("Classic read access denied")
+			return {
+				groupId: id === state.foreignGroupFor ? "foreign" : "source",
+				groupIds: [id === state.foreignGroupFor ? "foreign" : "source"],
+				createdBy: state.authors[id] ?? accountId,
+				role: state.role,
+				ownerClassicId: accountId,
+				publicRead: false,
+				members: [
+					{ id: accountId, role: state.role },
+					...(state.extraMember
+						? [{ id: state.extraMember, role: "reader" }]
+						: []),
+				],
+				directMembers: [{ id: accountId, role: state.role }],
+			}
+		},
 	}
 })
 let accountId = "00000000-0000-4000-8000-000000000001"
@@ -242,13 +253,16 @@ test("large binary chunks resume without duplication and are removed after a ver
 	for (
 		let offset = 0, part = 0;
 		offset < packed.base64.length;
-		offset += 524288, part++
+		offset += 65536, part++
 	) {
 		let chunk = {
 			challengeId,
+			classicId: "co_z126",
+			kind: "document",
+			byteLength: bytes.length,
 			uploadId: packed.sha256,
 			part,
-			base64: packed.base64.slice(offset, offset + 524288),
+			base64: packed.base64.slice(offset, offset + 65536),
 		}
 		await uploadChunk(accountId, chunk)
 		await uploadChunk(accountId, chunk)
@@ -289,9 +303,12 @@ test("large binary chunks resume without duplication and are removed after a ver
 	expect(await state.jazz!.db.all(app.classicImportChunks)).toHaveLength(0)
 	await uploadChunk(accountId, {
 		challengeId,
+		classicId: "co_z126",
+		kind: "document",
+		byteLength: bytes.length,
 		uploadId: packed.sha256,
 		part: 0,
-		base64: packed.base64.slice(0, 524288),
+		base64: packed.base64.slice(0, 65536),
 	})
 	expect(await state.jazz!.db.all(app.classicImportChunks)).toHaveLength(1)
 })
@@ -617,6 +634,257 @@ test("imported memberships have no invite provenance and survive v2 invite revoc
 		),
 	).toBeNull()
 })
+test("readers cannot submit first imports or incomplete retries", async () => {
+	let { importClassicItem } = await import("./server")
+	let item = documentFixture("co_z13A")
+	state.role = "reader"
+	try {
+		await expect(
+			importClassicItem(accountId, { challengeId, item }),
+		).rejects.toThrow("Waiting for a Classic owner or editor")
+		expect(
+			await state.jazz!.db.one(
+				app.documents.where({ id: await stableId(item.classicId) }),
+			),
+		).toBeNull()
+		await state
+			.jazz!.db.insert(
+				app.classicImports,
+				{
+					ownerId: accountId,
+					classicId: item.classicId,
+					v2Id: await stableId(item.classicId),
+					kind: "document",
+					status: "failed",
+				},
+				{ id: await stableId(`map:${item.classicId}`) },
+			)
+			.wait({ tier: "global" })
+		await expect(
+			importClassicItem(accountId, { challengeId, item }),
+		).rejects.toThrow("Waiting for a Classic owner or editor")
+	} finally {
+		state.role = "admin"
+	}
+})
+test("writer-supplied history cannot impersonate another author", async () => {
+	let { importClassicItem } = await import("./server")
+	let item = {
+		...documentFixture("co_z13B"),
+		versions: [
+			{
+				classicId: "forged-history",
+				content: "forged",
+				authorId: "co_zVictim",
+				authorName: "Victim",
+				createdAt: new Date(0),
+			},
+		],
+	}
+	await importClassicItem(accountId, { challengeId, item })
+	let version = await state.jazz!.db.one(
+		app.documentVersions.where({ documentId: await stableId(item.classicId) }),
+	)
+	expect(version?.authorId).toBe(accountId)
+	expect(version?.authorName).toBe(`Imported by ${accountId}`)
+})
+test("stale pending Classic access is reconciled before activation", async () => {
+	let { importClassicItem } = await import("./server")
+	let item = documentFixture("co_z13C")
+	let removed = "co_zRemoved"
+	state.extraMember = removed
+	await importClassicItem(accountId, { challengeId, item })
+	state.extraMember = undefined
+	state.removed = removed
+	await state
+		.jazz!.db.insert(app.classicAccounts, {
+			ownerId: "00000000-0000-4000-8000-000000000007",
+			classicId: removed,
+		})
+		.wait({ tier: "global" })
+	try {
+		await importClassicItem(accountId, { challengeId, item })
+		expect(
+			await state.jazz!.db.all(
+				app.classicAccess.where({
+					resourceId: await stableId(item.classicId),
+					classicId: removed,
+				}),
+			),
+		).toHaveLength(0)
+		expect(
+			await state.jazz!.db.all(
+				app.documentGrants.where({
+					documentId: await stableId(item.classicId),
+					accountId: "00000000-0000-4000-8000-000000000007",
+				}),
+			),
+		).toHaveLength(0)
+	} finally {
+		state.removed = undefined
+	}
+})
+function documentFixture(classicId: string) {
+	return {
+		kind: "document",
+		classicId,
+		content: "# Original",
+		title: "Original",
+		tags: [],
+		pinned: false,
+		archived: false,
+		isPresentation: false,
+		commentsDisabled: false,
+		createdAt: new Date(),
+		updatedAt: new Date(),
+		versions: [],
+		comments: [],
+		assets: [],
+	}
+}
+test("chunk bounds, account quota, reader authority and expiry are enforced", async () => {
+	let { uploadChunk, challenge } = await import("./server")
+	let base = {
+		challengeId,
+		classicId: "co_z13D",
+		kind: "document",
+		byteLength: 512 * 1024 * 1024,
+		uploadId: "1".repeat(64),
+		part: 0,
+		base64: btoa("x".repeat(49152)),
+	}
+	await expect(
+		uploadChunk(accountId, { ...base, byteLength: base.byteLength + 1 }),
+	).rejects.toThrow()
+	await expect(
+		uploadChunk(accountId, {
+			...base,
+			byteLength: 1,
+			part: 1,
+			base64: btoa("x"),
+		}),
+	).rejects.toThrow()
+	state.role = "reader"
+	try {
+		await expect(uploadChunk(accountId, base)).rejects.toThrow(
+			"Waiting for a Classic owner or editor",
+		)
+	} finally {
+		state.role = "admin"
+	}
+	await uploadChunk(accountId, base)
+	await expect(
+		uploadChunk(accountId, { ...base, uploadId: "2".repeat(64) }),
+	).rejects.toThrow("quota")
+	// The existing resumable 900KB upload plus one 512MiB reservation exceed the quota with another 512MiB reservation.
+	for (let upload of await state.jazz!.db.all(app.classicUploads))
+		await state
+			.jazz!.db.update(app.classicUploads, upload.id, {
+				expiresAt: new Date(0),
+			})
+			.wait({ tier: "global" })
+	await challenge(accountId)
+	expect(await state.jazz!.db.all(app.classicImportChunks)).toHaveLength(0)
+	expect(await state.jazz!.db.all(app.classicUploads)).toHaveLength(0)
+})
+test("staged assembly checks identity before reading chunks", async () => {
+	let { importStagedItem } = await import("./server")
+	let spy = vi.spyOn(state.jazz!.db, "all")
+	try {
+		await expect(
+			importStagedItem(accountId, {
+				challengeId: crypto.randomUUID(),
+				classicId: "co_z13D",
+				kind: "document",
+				uploadId: "1".repeat(64),
+				sha256: "1".repeat(64),
+			}),
+		).rejects.toThrow("proof required")
+		expect(spy).not.toHaveBeenCalled()
+	} finally {
+		spy.mockRestore()
+	}
+})
+test("legacy lookups reveal only currently readable imported targets", async () => {
+	let { importClassicItem, lookupClassicItem } = await import("./server")
+	let item = documentFixture("co_z13E")
+	let { id } = await importClassicItem(accountId, { challengeId, item })
+	let visitor = "00000000-0000-4000-8000-000000000008"
+	expect(
+		await lookupClassicItem(visitor, {
+			classicId: item.classicId,
+			kind: "document",
+		}),
+	).toEqual({ id: null })
+	expect(
+		await lookupClassicItem(visitor, {
+			classicId: "co_zMissing",
+			kind: "document",
+		}),
+	).toEqual({ id: null })
+	await state
+		.jazz!.db.update(app.documents, id, { publicRead: true })
+		.wait({ tier: "global" })
+	expect(
+		await lookupClassicItem(visitor, {
+			classicId: item.classicId,
+			kind: "document",
+		}),
+	).toEqual({ id })
+	await state
+		.jazz!.db.update(app.documents, id, { publicRead: false })
+		.wait({ tier: "global" })
+	expect(
+		await lookupClassicItem(visitor, {
+			classicId: item.classicId,
+			kind: "document",
+		}),
+	).toEqual({ id: null })
+})
+test("staged history keeps more than 200 versions and a nine MiB snapshot", async () => {
+	let { uploadChunk, importStagedItem } = await import("./server")
+	let item = {
+		...documentFixture("co_z13F"),
+		versions: Array.from({ length: 250 }, (_, index) => ({
+			classicId: `full-history:${index}`,
+			authorId: classicId,
+			content: index === 249 ? "x".repeat(9 * 1024 * 1024) : `version ${index}`,
+			createdAt: new Date(index * 60000),
+		})),
+	}
+	let bytes = new TextEncoder().encode(JSON.stringify({ challengeId, item }))
+	let packed = await packBytes(bytes)
+	for (
+		let offset = 0, part = 0;
+		offset < packed.base64.length;
+		offset += 65536, part++
+	)
+		await uploadChunk(accountId, {
+			challengeId,
+			classicId: item.classicId,
+			kind: item.kind,
+			byteLength: bytes.length,
+			uploadId: packed.sha256,
+			part,
+			base64: packed.base64.slice(offset, offset + 65536),
+		})
+	await importStagedItem(accountId, {
+		challengeId,
+		classicId: item.classicId,
+		kind: item.kind,
+		uploadId: packed.sha256,
+		sha256: packed.sha256,
+	})
+	let versions = await state.jazz!.db.all(
+		app.documentVersions.where({ documentId: await stableId(item.classicId) }),
+	)
+	expect(versions).toHaveLength(250)
+	expect(
+		versions.find(version => version.classicId === "full-history:249")?.content
+			.length,
+	).toBe(9 * 1024 * 1024)
+	expect(await state.jazz!.db.all(app.classicImportChunks)).toHaveLength(0)
+}, 30000)
 test("rejects expired and unverified sessions", async () => {
 	let { challenge, importClassicItem } = await import("./server")
 	let issued = await challenge(accountId)

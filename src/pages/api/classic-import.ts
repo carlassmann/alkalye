@@ -6,6 +6,8 @@ import {
 	importClassicItem,
 	uploadChunk,
 	importStagedItem,
+	prepareClassicItem,
+	lookupClassicItem,
 } from "@/app/features/classic-import/server"
 export const prerender = false
 export let POST: APIRoute = async ({ request }) => {
@@ -17,13 +19,29 @@ export let POST: APIRoute = async ({ request }) => {
 		let result =
 			action === "challenge"
 				? await challenge(accountId)
-				: action === "claim"
-					? await claimClassicAccount(accountId, await request.json())
-					: action === "chunk"
-						? await uploadChunk(accountId, await request.json())
-						: action === "staged-item"
-							? await importStagedItem(accountId, await request.json())
-							: await importClassicItem(accountId, await request.json())
+				: action === "lookup"
+					? await lookupClassicItem(accountId, await readImportRequest(request))
+					: action === "prepare"
+						? await prepareClassicItem(
+								accountId,
+								await readImportRequest(request),
+							)
+						: action === "claim"
+							? await claimClassicAccount(
+									accountId,
+									await readImportRequest(request),
+								)
+							: action === "chunk"
+								? await uploadChunk(accountId, await readImportRequest(request))
+								: action === "staged-item"
+									? await importStagedItem(
+											accountId,
+											await readImportRequest(request),
+										)
+									: await importClassicItem(
+											accountId,
+											await readImportRequest(request),
+										)
 		return Response.json(result)
 	} catch (error) {
 		return Response.json(
@@ -33,4 +51,28 @@ export let POST: APIRoute = async ({ request }) => {
 			{ status: 400 },
 		)
 	}
+}
+
+async function readImportRequest(request: Request): Promise<unknown> {
+	let reader = request.body?.getReader()
+	if (!reader) throw new Error("Classic import body required")
+	let chunks = []
+	let length = 0
+	while (true) {
+		let part = await reader.read()
+		if (part.done) break
+		length += part.value.length
+		if (length > 3 * 1024 * 1024) {
+			await reader.cancel()
+			throw new Error("Classic request too large; use chunks")
+		}
+		chunks.push(part.value)
+	}
+	let bytes = new Uint8Array(length)
+	let offset = 0
+	for (let chunk of chunks) {
+		bytes.set(chunk, offset)
+		offset += chunk.length
+	}
+	return JSON.parse(new TextDecoder().decode(bytes))
 }

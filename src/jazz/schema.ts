@@ -245,16 +245,40 @@ let schema = {
 		},
 		{},
 	),
-	classicImportChunks: s.table(
+	classicImportStatus: s.table(
 		{
 			ownerId: s.uuid(),
-			uploadId: s.string(),
-			part: s.int(),
-			data: s.bytes(),
-			createdAt: s.timestamp(),
+			classicId: s.string(),
+			v2Id: s.uuid(),
+			kind: s.string(),
+			status: s.enum("waiting", "complete", "failed"),
 		},
 		{},
 	),
+	classicUploadSlots: s.table({ ownerId: s.uuid(), uploadId: s.string() }, {}),
+	classicUploads: s.table(
+		{
+			ownerId: s.uuid(),
+			uploadId: s.string(),
+			classicId: s.string(),
+			kind: s.enum("document", "space", "theme", "account"),
+			byteLength: s.int(),
+			expiresAt: s.timestamp(),
+		},
+		{},
+	),
+	classicImportChunks: s
+		.table(
+			{
+				ownerId: s.uuid(),
+				uploadId: s.string(),
+				part: s.int(),
+				data: s.bytes(),
+				createdAt: s.timestamp(),
+			},
+			{},
+		)
+		.history("latest"),
 	classicChallenges: s.table(
 		{
 			ownerId: s.uuid(),

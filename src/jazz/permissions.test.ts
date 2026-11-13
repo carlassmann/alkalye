@@ -417,3 +417,52 @@ test("documents created for a space owner stop being readable when membership en
 	await fixture.seed(db => db.delete(app.spaceMembers, membership.id))
 	expect(await bob.all(app.documents.where({ id: doc.id }))).toHaveLength(0)
 })
+
+test("Classic merge bases stay hidden from the importer after document revocation", async () => {
+	let doc = await fixture.seed(db => db.insert(app.documents, note(bobId)))
+	let grant = await fixture.seed(db =>
+		db.insert(app.documentGrants, {
+			documentId: doc.id,
+			accountId: aliceId,
+			role: "writer",
+		}),
+	)
+	let mapping = await fixture.seed(db =>
+		db.insert(app.classicImports, {
+			ownerId: aliceId,
+			classicId: "co_zPrivate",
+			v2Id: doc.id,
+			kind: "document",
+			baseContent: "first snapshot",
+			status: "complete",
+		}),
+	)
+	expect(await actor(aliceId).all(app.documents)).toHaveLength(1)
+	await fixture.seed(db => db.delete(app.documentGrants, grant.id))
+	await fixture.seed(db =>
+		db.update(app.classicImports, mapping.id, {
+			baseContent: "later private snapshot",
+		}),
+	)
+	expect(await actor(aliceId).all(app.documents)).toHaveLength(0)
+	expect(await actor(aliceId).all(app.classicImports)).toEqual([])
+})
+
+test("import status rows contain no content and belong only to the requesting account", async () => {
+	await fixture.seed(db =>
+		db.insert(app.classicImportStatus, {
+			ownerId: aliceId,
+			classicId: "co_z123",
+			v2Id: crypto.randomUUID(),
+			kind: "document",
+			status: "waiting",
+		}),
+	)
+	let rows = await actor(aliceId).all(app.classicImportStatus)
+	expect(rows).toHaveLength(1)
+	expect(rows[0]).not.toHaveProperty("baseContent")
+	expect(await actor(bobId).all(app.classicImportStatus)).toHaveLength(0)
+	await actor(aliceId).expectDenied(db =>
+		db.update(app.classicImportStatus, rows[0]!.id, { status: "complete" }),
+	)
+})
