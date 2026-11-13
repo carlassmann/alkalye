@@ -1,3 +1,5 @@
+import { useContext } from "react"
+import { AccountRoutingContext } from "@/app/lib/account-routing"
 import {
 	Outlet,
 	createRootRouteWithContext,
@@ -16,14 +18,12 @@ import {
 	EmptyContent,
 } from "@/app/components/ui/empty"
 import { FileQuestion } from "lucide-react"
-import type { UserAccount } from "@/schema"
-import type { co } from "jazz-tools"
 import { T, useIntl } from "@/shared/intl/setup"
 
 export { Route }
 
 export type RouterContext = {
-	me: co.loaded<typeof UserAccount> | null
+	ownerId: string | null
 }
 
 let Route = createRootRouteWithContext<RouterContext>()({
@@ -44,10 +44,11 @@ let Route = createRootRouteWithContext<RouterContext>()({
 })
 
 function RootComponent() {
+	let ready = useContext(AccountRoutingContext)
 	return (
 		<TooltipProvider>
 			<main className="flex h-full flex-col">
-				<Outlet />
+				{ready ? <Outlet /> : <p role="status">Opening documents…</p>}
 			</main>
 		</TooltipProvider>
 	)

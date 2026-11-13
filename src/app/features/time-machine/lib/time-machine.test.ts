@@ -1,440 +1,247 @@
-import { beforeEach, describe, expect, test } from "vitest"
-import { createJazzTestAccount, setupJazzTestSync } from "jazz-tools/testing"
-import { co } from "jazz-tools"
-import {
-	Document,
-	Asset,
-	TldrawAsset,
-	TldrawRevision,
-	UserAccount,
-} from "@/schema"
-import { createPersonalDocument } from "@/app/features/documents/lib/documents"
+// @vitest-environment node
+import { afterEach, beforeEach, expect, test } from "vitest"
+import { createPolicyTestApp, type PolicyTestApp } from "jazz-tools/testing"
+import { app } from "@/jazz/schema"
+import { permissions } from "@/jazz/permissions"
 import {
 	getEditHistory,
-	getContentAtEdit,
-	accountIdFromSessionId,
-	formatEditDate,
+	historyQuery,
 	restoreAssetsAtTime,
 } from "./time-machine"
-
-describe("Time Machine - Edit History", () => {
-	let adminAccount: co.loaded<typeof UserAccount>
-
-	beforeEach(async () => {
-		await setupJazzTestSync()
-
-		adminAccount = await createJazzTestAccount({
-			isCurrentActiveAccount: true,
-			AccountSchema: UserAccount,
-		})
-	})
-
-	test("accountIdFromSessionId extracts account ID correctly", () => {
-		let sessionId = "co_zabc123_session_xyz789"
-		let accountId = accountIdFromSessionId(sessionId)
-		expect(accountId).toBe("co_zabc123")
-	})
-
-	test("getEditHistory returns edits ordered by madeAt timestamp", async () => {
-		let doc = await createPersonalDocument(adminAccount, "Initial content")
-
-		await new Promise(r => setTimeout(r, 10))
-		doc.content!.$jazz.applyDiff("Second edit")
-
-		await new Promise(r => setTimeout(r, 10))
-		doc.content!.$jazz.applyDiff("Third edit")
-
-		let loaded = await Document.load(doc.$jazz.id, {
-			resolve: { content: true, assets: true },
-		})
-		if (!loaded.$isLoaded) throw new Error("Doc not loaded")
-
-		let editHistory = getEditHistory(loaded)
-
-		expect(editHistory.length).toBeGreaterThanOrEqual(3)
-		for (let i = 1; i < editHistory.length; i++) {
-			expect(editHistory[i].madeAt.getTime()).toBeGreaterThanOrEqual(
-				editHistory[i - 1].madeAt.getTime(),
-			)
-		}
-
-		for (let i = 0; i < editHistory.length; i++) {
-			expect(editHistory[i].index).toBe(i)
-		}
-	})
-
-	test("getEditHistory handles single edit document", async () => {
-		let doc = await createPersonalDocument(adminAccount, "Only content")
-
-		let loaded = await Document.load(doc.$jazz.id, {
-			resolve: { content: true, assets: true },
-		})
-		if (!loaded.$isLoaded) throw new Error("Doc not loaded")
-
-		let editHistory = getEditHistory(loaded)
-
-		expect(editHistory.length).toBeGreaterThanOrEqual(1)
-		expect(editHistory[0].index).toBe(0)
-		expect(editHistory[0].madeAt).toBeInstanceOf(Date)
-	})
-
-	test("getEditHistory includes accountId for each edit", async () => {
-		let doc = await createPersonalDocument(adminAccount, "Test content")
-
-		await new Promise(r => setTimeout(r, 10))
-		doc.content!.$jazz.applyDiff("Another edit")
-
-		let loaded = await Document.load(doc.$jazz.id, {
-			resolve: { content: true, assets: true },
-		})
-		if (!loaded.$isLoaded) throw new Error("Doc not loaded")
-
-		let editHistory = getEditHistory(loaded)
-
-		for (let edit of editHistory) {
-			expect(edit.accountId).not.toBeNull()
-			expect(typeof edit.accountId).toBe("string")
-		}
-	})
-
-	test("getContentAtEdit returns content at specific edit index", async () => {
-		let doc = await createPersonalDocument(adminAccount, "Version 1")
-
-		await new Promise(r => setTimeout(r, 50))
-		doc.content!.$jazz.applyDiff("Version 2")
-
-		await new Promise(r => setTimeout(r, 50))
-		doc.content!.$jazz.applyDiff("Version 3")
-
-		let loaded = await Document.load(doc.$jazz.id, {
-			resolve: { content: true, assets: true },
-		})
-		if (!loaded.$isLoaded) throw new Error("Doc not loaded")
-
-		let editHistory = getEditHistory(loaded)
-		expect(editHistory.length).toBeGreaterThanOrEqual(3)
-
-		let contents = editHistory.map((_, i) => getContentAtEdit(loaded, i))
-		expect(contents).toContain("Version 1")
-		expect(contents).toContain("Version 2")
-		expect(contents).toContain("Version 3")
-
-		let v1Index = contents.indexOf("Version 1")
-		let v2Index = contents.indexOf("Version 2")
-		let v3Index = contents.indexOf("Version 3")
-		expect(v1Index).toBeLessThan(v2Index)
-		expect(v2Index).toBeLessThan(v3Index)
-	})
-
-	test("getContentAtEdit handles out of bounds indices", async () => {
-		let doc = await createPersonalDocument(adminAccount, "Only content")
-
-		let loaded = await Document.load(doc.$jazz.id, {
-			resolve: { content: true, assets: true },
-		})
-		if (!loaded.$isLoaded) throw new Error("Doc not loaded")
-
-		expect(getContentAtEdit(loaded, -1)).toBe("Only content")
-		expect(getContentAtEdit(loaded, 100)).toBe("Only content")
-	})
-
-	test("getEditHistory is efficient with caching", async () => {
-		let doc = await createPersonalDocument(adminAccount, "Test content")
-
-		let loaded = await Document.load(doc.$jazz.id, {
-			resolve: { content: true, assets: true },
-		})
-		if (!loaded.$isLoaded) throw new Error("Doc not loaded")
-
-		let history1 = getEditHistory(loaded)
-		let history2 = getEditHistory(loaded)
-		let history3 = getEditHistory(loaded)
-
-		expect(history1).toBe(history2)
-		expect(history2).toBe(history3)
-	})
-
-	test("getEditHistory handles document with many edits", async () => {
-		let doc = await createPersonalDocument(adminAccount, "Initial")
-
-		let editCount = 100
-		for (let i = 1; i <= editCount; i++) {
-			doc.content!.$jazz.applyDiff(`Edit ${i}`)
-		}
-
-		let loaded = await Document.load(doc.$jazz.id, {
-			resolve: { content: true, assets: true },
-		})
-		if (!loaded.$isLoaded) throw new Error("Doc not loaded")
-
-		let editHistory = getEditHistory(loaded)
-
-		expect(editHistory.length).toBeGreaterThan(0)
-
-		for (let i = 0; i < 10; i++) {
-			expect(getEditHistory(loaded)).toBe(editHistory)
-		}
-
-		let middleEdit = Math.floor(editHistory.length / 2)
-		let middleContent = getContentAtEdit(loaded, middleEdit)
-
-		expect(middleContent.length).toBeGreaterThan(0)
-	})
-
-	test("restores the tldraw revision active at the selected time", async () => {
-		let doc = await createPersonalDocument(adminAccount, "Whiteboard")
-		let firstRevision = await createTldrawTestRevision(adminAccount, "first")
-		let asset = TldrawAsset.create(
-			{
-				version: 1,
-				type: "tldraw",
-				name: "Diagram",
-				revision: firstRevision,
-				createdAt: new Date(),
-			},
-			adminAccount,
-		)
-		doc.$jazz.set("assets", co.list(Asset).create([], adminAccount))
-		doc.assets!.$jazz.push(asset)
-
-		await new Promise(resolve => setTimeout(resolve, 20))
-		let firstRevisionTime = Date.now()
-		await new Promise(resolve => setTimeout(resolve, 20))
-		let secondRevision = await createTldrawTestRevision(adminAccount, "second")
-		asset.$jazz.set("revision", secondRevision)
-
-		let loaded = await Document.load(doc.$jazz.id, {
-			resolve: { content: true, assets: true },
-		})
-		if (!loaded.$isLoaded) throw new Error("Doc not loaded")
-
-		await restoreAssetsAtTime(loaded, firstRevisionTime)
-
-		let restored = loaded.assets?.[0]
-		expect(restored?.$isLoaded && restored.type).toBe("tldraw")
-		if (!restored?.$isLoaded || restored.type !== "tldraw") return
-		expect(restored.revision?.$jazz.id).toBe(firstRevision.$jazz.id)
-	})
-
-	test("does not partially restore when a historical asset is unavailable", async () => {
-		let doc = await createPersonalDocument(adminAccount, "Whiteboard")
-		let revision = await createTldrawTestRevision(adminAccount, "deleted")
-		let asset = TldrawAsset.create(
-			{
-				version: 1,
-				type: "tldraw",
-				name: "Deleted diagram",
-				revision,
-				createdAt: new Date(),
-			},
-			adminAccount,
-		)
-		doc.$jazz.set("assets", co.list(Asset).create([asset], adminAccount))
-
-		await new Promise(resolve => setTimeout(resolve, 20))
-		let historicalTimestamp = Date.now()
-		await new Promise(resolve => setTimeout(resolve, 20))
-		doc.assets!.$jazz.splice(0, 1)
-		asset.$jazz.raw.core.deleteCoValue()
-
-		let loaded = await Document.load(doc.$jazz.id, {
-			resolve: { content: true, assets: true },
-		})
-		if (!loaded.$isLoaded) throw new Error("Doc not loaded")
-
-		await expect(
-			restoreAssetsAtTime(loaded, historicalTimestamp),
-		).rejects.toThrow("Historical asset is unavailable")
-		expect(loaded.assets).toHaveLength(0)
-	})
-
-	test("getEditHistory maintains O(n) complexity", async () => {
-		let doc = await createPersonalDocument(adminAccount, "Initial")
-
-		for (let i = 1; i <= 50; i++) {
-			doc.content!.$jazz.applyDiff(`Edit ${i}`)
-		}
-
-		let loaded50 = await Document.load(doc.$jazz.id, {
-			resolve: { content: true, assets: true },
-		})
-		if (!loaded50.$isLoaded) throw new Error("Doc not loaded")
-
-		let start50 = performance.now()
-		getEditHistory(loaded50)
-		let duration50 = performance.now() - start50
-
-		for (let i = 51; i <= 100; i++) {
-			doc.content!.$jazz.applyDiff(`Edit ${i}`)
-		}
-
-		let loaded100 = await Document.load(doc.$jazz.id, {
-			resolve: { content: true, assets: true },
-		})
-		if (!loaded100.$isLoaded) throw new Error("Doc not loaded")
-
-		let start100 = performance.now()
-		getEditHistory(loaded100)
-		let duration100 = performance.now() - start100
-
-		expect(duration100).toBeLessThan(duration50 * 5 + 10)
-	})
+let fixture: PolicyTestApp
+let aliceId = "00000000-0000-4000-8000-000000000001",
+	bobId = "00000000-0000-4000-8000-000000000002"
+beforeEach(async () => {
+	fixture = await createPolicyTestApp(app, permissions, expect)
 })
-
-async function createTldrawTestRevision(
-	owner: co.loaded<typeof UserAccount>,
-	content: string,
-) {
-	let snapshot = await co
-		.fileStream()
-		.createFromBlob(new ReadableBlob(content, "application/vnd.tldraw+json"), {
-			owner,
-		})
-	let original = await co.fileStream().createFromBlob(new ReadableBlob(""), {
-		owner,
+afterEach(async () => {
+	await fixture.shutdown()
+})
+function actor(id: string) {
+	return fixture.as({
+		issuer: "https://alkalye.test",
+		user_id: id,
+		account_id: id,
+		claims: {},
+		authMode: "external",
 	})
-	let preview = co.image().create(
-		{
-			original,
-			originalSize: [1, 1],
-			progressive: false,
-		},
-		owner,
-	)
-	return TldrawRevision.create(
-		{
-			snapshot,
-			lightPreview: preview,
-			darkPreview: preview,
+}
+test("accepted history merges imported dates and authors; restore is another accepted write", async () => {
+	let alice = actor(aliceId),
+		bob = actor(bobId)
+	let doc = await alice
+		.insert(app.documents, {
+			ownerId: aliceId,
+			title: "History",
+			content: "Initial",
 			createdAt: new Date(),
-		},
-		owner,
+			updatedAt: new Date(),
+		})
+		.wait({ tier: "global" })
+	await fixture.seed(db =>
+		db.insert(app.documentGrants, {
+			documentId: doc.id,
+			accountId: bobId,
+			role: "writer",
+		}),
 	)
-}
-
-class ReadableBlob extends Blob {
-	readonly content: string
-
-	constructor(content: string, type = "application/octet-stream") {
-		super([content], { type })
-		this.content = content
-	}
-
-	async arrayBuffer() {
-		let bytes = new TextEncoder().encode(this.content)
-		let buffer = new ArrayBuffer(bytes.byteLength)
-		new Uint8Array(buffer).set(bytes)
-		return buffer
-	}
-}
-
-describe("Time Machine - Offline Support", () => {
-	let adminAccount: co.loaded<typeof UserAccount>
-
-	beforeEach(async () => {
-		await setupJazzTestSync()
-
-		adminAccount = await createJazzTestAccount({
-			isCurrentActiveAccount: true,
-			AccountSchema: UserAccount,
+	await bob
+		.update(app.documents, doc.id, { content: "Bob's edit" })
+		.wait({ tier: "global" })
+	await alice
+		.update(app.documents, doc.id, { presentationLine: 1 })
+		.wait({ tier: "global" })
+	let imported = await fixture.seed(db =>
+		db.insert(app.documentVersions, {
+			documentId: doc.id,
+			content: "Classic",
+			authorId: "classic-author",
+			authorName: "Classic author",
+			createdAt: new Date("2020-01-01"),
+		}),
+	)
+	let versions = await alice.all(historyQuery(doc.id)),
+		edits = getEditHistory(versions, [imported])
+	expect(edits.map(edit => edit.content)).toEqual([
+		"Classic",
+		"Initial",
+		"Bob's edit",
+	])
+	expect(edits.map(edit => edit.accountId)).toEqual([
+		"classic-author",
+		aliceId,
+		bobId,
+	])
+	await alice.transaction(tx =>
+		tx.update(
+			app.documents,
+			doc.id,
+			{ content: edits[0].content },
+			{ editedFrom: { content: "Bob's edit" } },
+		),
+	)
+	await alice.waitForSync()
+	expect((await alice.one(app.documents.where({ id: doc.id })))?.content).toBe(
+		"Classic",
+	)
+	expect((await alice.all(historyQuery(doc.id))).length).toBeGreaterThan(
+		versions.length,
+	)
+})
+test("asset restore recovers a previous whiteboard revision and removes later assets", async () => {
+	let db = actor(aliceId)
+	let doc = await db
+		.insert(app.documents, {
+			ownerId: aliceId,
+			title: "Assets",
+			content: "Text",
+			createdAt: new Date(),
+			updatedAt: new Date(),
 		})
-	})
-
-	test("getEditHistory uses only locally cached data (no network calls)", async () => {
-		let doc = await createPersonalDocument(adminAccount, "Initial content")
-
-		await new Promise(r => setTimeout(r, 10))
-		doc.content!.$jazz.applyDiff("Second version")
-
-		await new Promise(r => setTimeout(r, 10))
-		doc.content!.$jazz.applyDiff("Third version")
-
-		let loaded = await Document.load(doc.$jazz.id, {
-			resolve: { content: true, assets: true },
+		.wait({ tier: "global" })
+	let asset = await db
+		.insert(app.assets, {
+			documentId: doc.id,
+			type: "image",
+			name: "Original",
+			data: new Uint8Array([1]),
+			createdAt: new Date(),
 		})
-		if (!loaded.$isLoaded) throw new Error("Doc not loaded")
-
-		let editHistory = getEditHistory(loaded)
-		expect(editHistory.length).toBeGreaterThanOrEqual(3)
-
-		for (let i = 0; i < editHistory.length; i++) {
-			let content = getContentAtEdit(loaded, i)
-			expect(typeof content).toBe("string")
-		}
-	})
-
-	test("edit history reconstruction works from local CRDT operations", async () => {
-		let doc = await createPersonalDocument(adminAccount, "Version A")
-
-		await new Promise(r => setTimeout(r, 20))
-		doc.content!.$jazz.applyDiff("Version B")
-
-		await new Promise(r => setTimeout(r, 20))
-		doc.content!.$jazz.applyDiff("Version C")
-
-		let loaded = await Document.load(doc.$jazz.id, {
-			resolve: { content: true, assets: true },
+		.wait({ tier: "global" })
+	let history = await db.all(app.$history.assets.where({ id: asset.id }))
+	let timestamp = history[0].$acceptedAt.getTime()
+	await db
+		.update(app.assets, asset.id, { name: "New", data: new Uint8Array([2]) })
+		.wait({ tier: "global" })
+	let later = await db
+		.insert(app.assets, {
+			documentId: doc.id,
+			type: "image",
+			name: "Later",
+			createdAt: new Date(),
 		})
-		if (!loaded.$isLoaded) throw new Error("Doc not loaded")
+		.wait({ tier: "global" })
+	await restoreAssetsAtTime(db, doc.id, timestamp)
+	await db.waitForSync()
+	expect((await db.one(app.assets.where({ id: asset.id })))?.name).toBe(
+		"Original",
+	)
+	expect((await db.one(app.assets.where({ id: asset.id })))?.data).toEqual(
+		new Uint8Array([1]),
+	)
+	expect(await db.one(app.assets.where({ id: later.id }))).toBeNull()
+})
 
-		let editHistory = getEditHistory(loaded)
+test("local-first author attribution uses the account rather than the device identity", () => {
+	let edits = getEditHistory(
+		[
+			{
+				content: "By device",
+				$acceptedAt: new Date(),
+				$transactionId: "tx",
+				$updatedBy: {
+					account: aliceId,
+					identity: { subject: "device-identity" },
+				},
+			},
+		],
+		[],
+	)
+	expect(edits[0].accountId).toBe(aliceId)
+})
 
-		let allVersions = editHistory.map((_, i) => getContentAtEdit(loaded, i))
-
-		expect(allVersions).toContain("Version A")
-		expect(allVersions).toContain("Version B")
-		expect(allVersions).toContain("Version C")
-
-		let indexA = allVersions.indexOf("Version A")
-		let indexB = allVersions.indexOf("Version B")
-		let indexC = allVersions.indexOf("Version C")
-
-		expect(indexA).toBeLessThan(indexB)
-		expect(indexB).toBeLessThan(indexC)
+test("historical copies retain assets and comments with new IDs", async () => {
+	let db = actor(aliceId)
+	let doc = await db
+		.insert(app.documents, {
+			ownerId: aliceId,
+			title: "Original",
+			content: "# Original\n\nSelected words",
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		})
+		.wait({ tier: "global" })
+	let { createCommentThreadFromQuote, loadCommentDocument, getExportComments } =
+		await import("@/app/features/comments")
+	createCommentThreadFromQuote(
+		{ ...doc, db, comments: [] },
+		"Selected words",
+		"Keep this comment",
+		"Alice",
+	)
+	await db.waitForSync()
+	let { createTimeMachineCopy } = await import("./create-copy")
+	let copy = await createTimeMachineCopy(
+		db,
+		aliceId,
+		doc,
+		doc.content,
+		Date.now(),
+	)
+	await db.waitForSync()
+	expect(copy.id).not.toBe(doc.id)
+	expect(copy.content).toContain("# Original (restored)")
+	let comments = getExportComments(await loadCommentDocument(db, copy))
+	expect(comments[0]).toMatchObject({
+		quote: "Selected words",
+		replies: [{ body: "Keep this comment", authorName: "Alice" }],
 	})
 })
 
-describe("Time Machine - Very Old Edits", () => {
-	test("formatEditDate displays old dates correctly", () => {
-		let oneYearAgo = new Date()
-		oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1)
-		let formatted = formatEditDate(oneYearAgo)
+test("text-only documents can restore without an asset transaction", async () => {
+	let db = actor(aliceId)
+	let doc = await db
+		.insert(app.documents, {
+			ownerId: aliceId,
+			title: "No assets",
+			content: "Text",
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		})
+		.wait({ tier: "global" })
+	await restoreAssetsAtTime(db, doc.id, Date.now())
+})
 
-		expect(formatted).toMatch(/\d{4}/)
-		expect(formatted).toMatch(/\d{1,2}:\d{2}/)
-
-		let sixMonthsAgo = new Date()
-		sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
-		let formattedSixMonths = formatEditDate(sixMonthsAgo)
-
-		expect(formattedSixMonths).toMatch(
-			/Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec/,
-		)
-		expect(formattedSixMonths).toMatch(/\d{1,2}:\d{2}/)
-
-		let twoYearsAgo = new Date()
-		twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2)
-		let formattedTwoYears = formatEditDate(twoYearsAgo)
-
-		expect(formattedTwoYears).toMatch(/\d{4}/)
-	})
-
-	test("formatEditDate handles dates at Unix epoch boundaries", () => {
-		let y2k = new Date(2000, 0, 1, 12, 30)
-		let formatted = formatEditDate(y2k)
-
-		expect(formatted).toContain("2000")
-		expect(formatted).toContain("Jan")
-	})
-
-	test("formatEditDate displays all date components correctly", () => {
-		let testDate = new Date(2023, 5, 15, 14, 30)
-
-		let formatted = formatEditDate(testDate)
-
-		expect(formatted).toContain("Jun")
-		expect(formatted).toContain("15")
-		expect(formatted).toContain("2023")
-		expect(formatted).toMatch(/\d{1,2}:\d{2}/)
-	})
+test("copies without comments and recovers deleted assets", async () => {
+	let db = actor(aliceId)
+	let doc = await db
+		.insert(app.documents, {
+			ownerId: aliceId,
+			title: "Original",
+			content: "# Original",
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		})
+		.wait({ tier: "global" })
+	let asset = await db
+		.insert(app.assets, {
+			documentId: doc.id,
+			type: "image",
+			name: "Original image",
+			data: new Uint8Array([1, 2, 3]),
+			createdAt: new Date(),
+		})
+		.wait({ tier: "global" })
+	let versions = await db.all(app.$history.assets.where({ id: asset.id }))
+	let timestamp = versions[0].$acceptedAt.getTime()
+	await db.delete(app.assets, asset.id).wait({ tier: "global" })
+	await restoreAssetsAtTime(db, doc.id, timestamp)
+	await db.waitForSync()
+	expect((await db.one(app.assets.where({ id: asset.id })))?.name).toBe(
+		"Original image",
+	)
+	let { createTimeMachineCopy } = await import("./create-copy")
+	let copy = await createTimeMachineCopy(
+		db,
+		aliceId,
+		doc,
+		`# Original\n\n![Image](asset:${asset.id})`,
+		timestamp,
+	)
+	await db.waitForSync()
+	let assets = await db.all(app.assets.where({ documentId: copy.id }))
+	expect(assets).toHaveLength(1)
+	expect(assets[0].id).not.toBe(asset.id)
+	expect(copy.content).toContain(`asset:${assets[0].id}`)
+	expect(assets[0].data).toEqual(new Uint8Array([1, 2, 3]))
 })

@@ -1,13 +1,15 @@
+import { readAssetBlob } from "@/app/features/assets"
+import {
+	exportComments,
+	importComments,
+} from "@/app/features/import-export/lib/comment-format"
+import { sharingRequest } from "@/app/features/sharing"
+import { createSpaceDocument } from "@/app/features/spaces"
 import type { RefObject } from "react"
 import type { useNavigate } from "@tanstack/react-router"
-import { co, Group } from "jazz-tools"
-import { toast } from "sonner"
 import { unfoldEffect } from "@codemirror/language"
-import { Document, UserAccount } from "@/schema"
-import { leavePersonalDocument } from "@/app/features/sharing"
 import {
 	parseFrontmatter,
-	togglePinned,
 	getFrontmatterRange,
 	getFrontmatterInsertion,
 	getFrontmatterFieldValueRange,
@@ -15,15 +17,15 @@ import {
 } from "@/app/features/editor"
 import { exportDocument, type ExportAsset } from "@/app/features/import-export"
 import {
-	applyContentDiffWithCommentAnchors,
-	copyCommentsAndApplyContent,
-	getExportComments,
-} from "@/app/features/comments"
-import { serializeAsset } from "@/app/features/assets"
-import { readDocumentText } from "./document-text"
+	app,
+	createDocument,
+	readDocument,
+	setPinned,
+	type Database,
+	type LibraryDocument,
+} from "./library"
+import { watchWrite } from "./writes"
 import { getDocumentTitle, addCopyToTitle } from "./title"
-import { createDocumentMetadata, syncDocumentMetadata } from "./metadata"
-
 export {
 	getExistingFolders,
 	getExportAssets,
@@ -38,24 +40,9 @@ export {
 	makeTogglePin,
 	makeTurnIntoPresentation,
 }
-export type { EditorRef, LoadedDocument, LoadedMe }
-
-type LoadedDocument = co.loaded<
-	typeof Document,
-	{
-		content: true
-		assets: true
-		comments: { $each: { replies: true } }
-	}
->
-
-type LoadedMe = co.loaded<
-	typeof UserAccount,
-	{ root: { documents: true; settings: true } }
->
-
+export type { EditorRef, LoadedDocument }
+type LoadedDocument = LibraryDocument
 type EditorRef = RefObject<MarkdownEditorRef | null>
-
 function makeOpenTimeMachine(
 	doc: LoadedDocument,
 	navigate: ReturnType<typeof useNavigate>,
@@ -71,7 +58,7 @@ function makeOpenTimeMachine(
 		setRightOpenMobile(false)
 		navigate({
 			to: "/doc/$id/timemachine",
-			params: { id: doc.$jazz.id },
+			params: { id: doc.id },
 		})
 	}
 }
@@ -137,15 +124,8 @@ function makeRename(
 	}
 }
 
-function makeTogglePin(docWithContent: LoadedDocument) {
-	return function handleTogglePin() {
-		if (!docWithContent?.$isLoaded || !docWithContent.content) return
-		let content = docWithContent.content.toString()
-		let newContent = togglePinned(content)
-		applyContentDiffWithCommentAnchors(docWithContent, newContent)
-		docWithContent.$jazz.set("updatedAt", new Date())
-		syncDocumentMetadata(docWithContent)
-	}
+function makeTogglePin(db: Database, ownerId: string, doc: LoadedDocument) {
+	return () => setPinned(db, ownerId, doc, !doc.pinned)
 }
 
 function makeAddTag(
@@ -245,92 +225,77 @@ function makeTurnIntoPresentation(
 	}
 }
 
-function makeDownload(doc: LoadedDocument, content: string) {
+function makeDownload(db: Database, doc: LoadedDocument, content: string) {
 	return async function handleDownload() {
-		let docAssets = await getExportAssets(doc)
+		let docAssets = await getExportAssets(db, doc)
 		let title = getDocumentTitle(content)
 		await exportDocument(
 			content,
 			title,
 			docAssets.length > 0 ? docAssets : undefined,
-			getExportComments(doc),
+			await exportComments(db, doc.id),
 		)
 	}
 }
 
 function makeDelete(
+	db: Database,
 	doc: LoadedDocument,
 	navigate: ReturnType<typeof useNavigate>,
-	spaceId: string | undefined,
+	spaceId?: string,
 ) {
 	return function handleDelete() {
-		doc.$jazz.set("deletedAt", new Date())
-		if (spaceId) {
-			navigate({ to: "/spaces/$spaceId", params: { spaceId } })
-			return
-		}
-		navigate({ to: "/" })
+		watchWrite(db.update(app.documents, doc.id, { deletedAt: new Date() }))
+		void (spaceId
+			? navigate({ to: "/spaces/$spaceId", params: { spaceId } })
+			: navigate({ to: "/" }))
 	}
 }
 
 function makeLeave(
-	docWithContent: LoadedDocument,
-	me: LoadedMe | undefined,
+	db: Database,
 	doc: LoadedDocument,
 	navigate: ReturnType<typeof useNavigate>,
 ) {
 	return async function handleLeave() {
-		if (!docWithContent?.$isLoaded || !me) return
-		await leavePersonalDocument(docWithContent, me)
-		let idx = me.root?.documents?.findIndex(d => d?.$jazz.id === doc.$jazz.id)
-		if (idx !== undefined && idx !== -1 && me.root?.documents?.$isLoaded) {
-			me.root.documents.$jazz.splice(idx, 1)
-		}
-		navigate({ to: "/" })
+		await sharingRequest(db, "leave", { documentId: doc.id })
+		void navigate({ to: "/" })
 	}
 }
 
 function makeDuplicate(
+	db: Database,
 	doc: LoadedDocument,
-	me: LoadedMe | undefined,
+	ownerId: string,
 	spaceId: string | undefined,
 	navigate: ReturnType<typeof useNavigate>,
 ) {
 	return async function handleDuplicate() {
-		if (!me?.root?.documents?.$isLoaded) return
-
-		let content = doc.content?.$isLoaded ? readDocumentText(doc.content) : ""
-		let newContent = addCopyToTitle(content)
-
-		let now = new Date()
-		let group = Group.create()
-		let newDoc = Document.create(
-			{
-				version: 1,
-				content: co.plainText().create(content, group),
-				...createDocumentMetadata(newContent, now),
-				createdAt: now,
-				updatedAt: now,
-			},
-			group,
+		let loaded = await readDocument(db, doc.id)
+		let content = addCopyToTitle(loaded.content)
+		let copy = spaceId
+			? await createSpaceDocument(db, ownerId, spaceId, content)
+			: await createDocument(db, ownerId, content)
+		let { copyDocumentAssets } = await import("@/app/features/assets")
+		let { updateContent } = await import("./library")
+		await updateContent(
+			db,
+			copy,
+			await copyDocumentAssets(db, doc.id, copy.id, copy.content),
 		)
-		try {
-			await copyCommentsAndApplyContent(doc, newDoc, newContent)
-		} catch (error) {
-			console.error("Failed to duplicate document:", error)
-			toast.error("Failed to duplicate document")
-			return
-		}
-		me.root.documents.$jazz.push(newDoc)
-
-		if (spaceId) {
-			navigate({
-				to: "/spaces/$spaceId/doc/$id",
-				params: { spaceId, id: newDoc.$jazz.id },
-			})
-		} else {
-			navigate({ to: "/doc/$id", params: { id: newDoc.$jazz.id } })
-		}
+		await importComments(
+			db,
+			copy.id,
+			ownerId,
+			await exportComments(db, doc.id),
+			loaded.content,
+		)
+		void (spaceId
+			? navigate({
+					to: "/spaces/$spaceId/doc/$id",
+					params: { spaceId, id: copy.id },
+				})
+			: navigate({ to: "/doc/$id", params: { id: copy.id } }))
 	}
 }
 
@@ -362,33 +327,30 @@ function makeMoveToSpace(
 	}
 }
 
-function getExistingFolders(me?: LoadedMe): string[] {
-	if (!me?.root?.documents?.$isLoaded) return []
-
+function getExistingFolders(documents: LoadedDocument[] = []): string[] {
 	let folders = new Set<string>()
-	for (let doc of me.root.documents.values()) {
-		if (!doc?.$isLoaded || !doc.path) continue
-		folders.add(doc.path)
+	for (let doc of documents) {
+		if (!doc.path) continue
 		let parts = doc.path.split("/")
-		for (let i = 1; i < parts.length; i++) {
+		for (let i = 1; i <= parts.length; i++)
 			folders.add(parts.slice(0, i).join("/"))
-		}
 	}
-
 	return [...folders].sort()
 }
 
-async function getExportAssets(doc: LoadedDocument) {
-	let docAssets: ExportAsset[] = []
-	if (!doc.assets?.$isLoaded) return docAssets
-
-	for (let asset of Array.from(doc.assets)) {
-		if (!asset?.$isLoaded) continue
-		let blob = await serializeAsset(asset)
-		if (blob) docAssets.push({ id: asset.$jazz.id, name: asset.name, blob })
-	}
-
-	return docAssets
+async function getExportAssets(
+	db: Database,
+	doc: LoadedDocument,
+): Promise<ExportAsset[]> {
+	let assets = await db.all(
+		app.assets.where({ documentId: doc.id }).select("id", "name"),
+	)
+	return Promise.all(
+		assets.map(async asset => ({
+			...asset,
+			blob: await readAssetBlob(db, asset.id),
+		})),
+	)
 }
 
 function runWithMobileClose(

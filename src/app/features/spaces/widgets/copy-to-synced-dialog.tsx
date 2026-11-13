@@ -1,8 +1,13 @@
 import { useState } from "react"
 import { useForm } from "@tanstack/react-form"
 import { toast } from "sonner"
-import { co, Group } from "jazz-tools"
-import { useAccount } from "jazz-tools/react"
+import { useLibrary } from "@/app/features/documents"
+import {
+	useSpaces,
+	createSpace,
+	copyToSynced,
+	type LocalCopyAsset,
+} from "../lib/spaces"
 import { User, Plus, Copy } from "lucide-react"
 import { useNavigate } from "@tanstack/react-router"
 import { useIntl, T } from "@/shared/intl/setup"
@@ -25,32 +30,8 @@ import {
 import { SpaceInitials } from "./space-selector"
 import { Field, FieldLabel } from "@/app/components/ui/field"
 import { Input } from "@/app/components/ui/input"
-import {
-	Document,
-	UserAccount,
-	createSpace,
-	createSpaceDocument,
-} from "@/schema"
-import { getSpaceGroup } from "../lib/spaces"
-import { createDocumentMetadata } from "@/app/features/documents"
-import { waitForLocalJazzStorage } from "@/app/lib/local-jazz-poke"
-import {
-	prepareLocalAssetCopy,
-	attachLocalAssetCopy,
-	assertLocalAssetReferencesAvailable,
-	type LocalAsset,
-} from "@/app/features/assets"
-
 export { CopyToSyncedDialog }
 export type { CopyToSyncedDialogProps }
-
-let spacesQuery = {
-	root: {
-		documents: true,
-		spaces: { $each: { avatar: true, documents: true } },
-	},
-} as const
-type LoadedSpaces = co.loaded<typeof UserAccount, typeof spacesQuery>
 
 type SpaceOption = {
 	id: string
@@ -59,7 +40,7 @@ type SpaceOption = {
 
 interface CopyToSyncedDialogProps {
 	content: string
-	localAssets?: LocalAsset[]
+	localAssets?: LocalCopyAsset[]
 	filename: string | null
 	open: boolean
 	onOpenChange: (open: boolean) => void
@@ -75,98 +56,36 @@ function CopyToSyncedDialog({
 	onCopy,
 }: CopyToSyncedDialogProps) {
 	let t = useIntl()
-	let me = useAccount(UserAccount, { resolve: spacesQuery })
+	let { db, ownerId } = useLibrary()
 	let [isSubmitting, setIsSubmitting] = useState(false)
 	let navigate = useNavigate()
 
-	let spaces = me?.$isLoaded ? getSortedSpaces(me.root.spaces) : []
-	let defaultDestination = spaces[0]?.$jazz.id ?? "personal"
+	let spaces = useSpaces().filter(
+		space => space.role && space.role !== "reader",
+	)
+	let defaultDestination = spaces[0]?.id ?? "personal"
 
-	async function copyToNewSpace(newSpaceName: string) {
-		if (!me?.$isLoaded || !newSpaceName) return false
-
-		let space = createSpace(newSpaceName, me.root)
-		if (!space.documents?.$isLoaded) return false
-
-		let newDoc = createSpaceDocument(space.$jazz.owner, space.$jazz.id, "")
-		let copy = await prepareLocalAssetCopy(
-			content,
-			localAssets,
-			newDoc.$jazz.owner,
-		)
-		newDoc.content.$jazz.applyDiff(copy.content)
-		newDoc.$jazz.applyDiff(createDocumentMetadata(copy.content, new Date()))
-		attachLocalAssetCopy(newDoc, copy.assets, newDoc.$jazz.owner)
-		space.documents.$jazz.push(newDoc)
-		await waitForLocalJazzStorage(me)
-
-		onCopy?.({ id: space.$jazz.id, name: newSpaceName })
-		handleOpenChange(false)
-		void navigate({
-			to: "/spaces/$spaceId/doc/$id",
-			params: { spaceId: space.$jazz.id, id: newDoc.$jazz.id },
-		})
-		return true
+	async function copyToNewSpace(name: string) {
+		let space = await createSpace(db, ownerId, name)
+		return copyToExistingSpace(space.id)
 	}
-
 	async function copyToPersonalSpace() {
-		if (!me?.$isLoaded) return false
-
-		let now = new Date()
-		let owner = Group.create()
-		let copy = await prepareLocalAssetCopy(content, localAssets, owner)
-		let newDoc = Document.create(
-			{
-				version: 1,
-				content: co.plainText().create(copy.content, owner),
-				...createDocumentMetadata(copy.content, now),
-				createdAt: now,
-				updatedAt: now,
-			},
-			owner,
-		)
-		attachLocalAssetCopy(newDoc, copy.assets, owner)
-
-		let docs = me.root.documents
-		if (!docs) {
-			docs = co.list(Document).create([])
-			me.root.$jazz.set("documents", docs)
-		}
-		docs.$jazz.push(newDoc)
-		await waitForLocalJazzStorage(me)
-
-		onCopy?.({ id: "personal", name: t("spaces.copy.personal") })
+		let doc = await copyToSynced(db, ownerId, null, content, localAssets)
+		onCopy?.(null)
 		handleOpenChange(false)
-		void navigate({
-			to: "/doc/$id",
-			params: { id: newDoc.$jazz.id },
-		})
+		void navigate({ to: "/doc/$id", params: { id: doc.id } })
 		return true
 	}
-
 	async function copyToExistingSpace(spaceId: string) {
-		if (!me?.$isLoaded) return false
-
-		let space = spaces.find(s => s.$jazz.id === spaceId)
-		if (!space?.documents?.$isLoaded) return false
-
-		let newDoc = createSpaceDocument(space.$jazz.owner, space.$jazz.id, "")
-		let copy = await prepareLocalAssetCopy(
-			content,
-			localAssets,
-			newDoc.$jazz.owner,
-		)
-		newDoc.content.$jazz.applyDiff(copy.content)
-		newDoc.$jazz.applyDiff(createDocumentMetadata(copy.content, new Date()))
-		attachLocalAssetCopy(newDoc, copy.assets, newDoc.$jazz.owner)
-		space.documents.$jazz.push(newDoc)
-		await waitForLocalJazzStorage(me)
-
-		onCopy?.({ id: space.$jazz.id, name: space.name })
+		let doc = await copyToSynced(db, ownerId, spaceId, content, localAssets)
+		onCopy?.({
+			id: spaceId,
+			name: spaces.find(space => space.id === spaceId)?.name ?? "",
+		})
 		handleOpenChange(false)
 		void navigate({
 			to: "/spaces/$spaceId/doc/$id",
-			params: { spaceId: space.$jazz.id, id: newDoc.$jazz.id },
+			params: { spaceId, id: doc.id },
 		})
 		return true
 	}
@@ -177,14 +96,11 @@ function CopyToSyncedDialog({
 			newSpaceName: "",
 		},
 		onSubmit: async ({ value }) => {
-			if (!me?.$isLoaded) return
-
 			setIsSubmitting(true)
 			let destination = value.destination
 			let newSpaceName = value.newSpaceName.trim()
 
 			try {
-				assertLocalAssetReferencesAvailable(content, localAssets)
 				let success: boolean
 				if (destination === "__new__") {
 					success = await copyToNewSpace(newSpaceName)
@@ -210,14 +126,6 @@ function CopyToSyncedDialog({
 			}
 		},
 	})
-
-	{
-		let currentSpaces = me?.$isLoaded ? getSortedSpaces(me.root.spaces) : []
-		let newDefault = currentSpaces[0]?.$jazz.id ?? "personal"
-		if (me?.$isLoaded && form.state.values.destination !== newDefault) {
-			form.reset({ destination: newDefault, newSpaceName: "" })
-		}
-	}
 
 	function handleOpenChange(newOpen: boolean) {
 		if (!newOpen) {
@@ -272,7 +180,7 @@ function CopyToSyncedDialog({
 											<T k="spaces.copy.personal" />
 										</SelectItem>
 										{spaces.map(space => (
-											<SelectItem key={space.$jazz.id} value={space.$jazz.id}>
+											<SelectItem key={space.id} value={space.id}>
 												<SpaceInitials name={space.name} />
 												{space.name}
 											</SelectItem>
@@ -350,23 +258,4 @@ function CopyToSyncedDialog({
 			</DialogContent>
 		</Dialog>
 	)
-}
-
-type LoadedSpaceWithAvatar = NonNullable<
-	NonNullable<LoadedSpaces["root"]["spaces"]>[number]
->
-
-function getSortedSpaces(
-	spaces: LoadedSpaces["root"]["spaces"],
-): LoadedSpaceWithAvatar[] {
-	if (!spaces) return []
-
-	return [...spaces.values()]
-		.filter((s): s is LoadedSpaceWithAvatar => {
-			if (!s?.$isLoaded) return false
-			let spaceGroup = getSpaceGroup(s)
-			let role = spaceGroup?.myRole()
-			return role === "admin" || role === "writer"
-		})
-		.sort((a, b) => a.name.localeCompare(b.name))
 }

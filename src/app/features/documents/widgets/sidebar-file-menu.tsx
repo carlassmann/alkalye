@@ -1,6 +1,12 @@
-import { useSyncExternalStore } from "react"
+import { exportComments } from "@/app/features/import-export"
+import { loadThemesForPdf } from "@/app/features/themes"
+import { printToPdf, printSlidesToPdf } from "@/app/features/import-export"
+import { app, type Database } from "../lib/library"
+import { readAssetBlob } from "@/app/features/assets"
+import { DuplicateDocDialog } from "./duplicate-doc-dialog"
+import { useState, useSyncExternalStore } from "react"
 import { useNavigate } from "@tanstack/react-router"
-import { useAccount } from "jazz-tools/react"
+
 import { FileText } from "lucide-react"
 import {
 	SidebarMenuButton,
@@ -21,53 +27,45 @@ import {
 import { testIds } from "@/app/lib/test-ids"
 import { getShortcutLabel } from "@/app/lib/shortcut-registry"
 import { isFocusMode, toggleFocusMode } from "@/app/lib/focus-mode"
-import { UserAccount } from "@/schema"
+
 import { canEdit, getDocumentGroup } from "@/app/features/sharing"
-import { parseFrontmatter, parseWikiLinks } from "@/app/features/editor"
 import { getPresentationMode } from "@/app/features/presentation"
 import {
 	canShareDocument,
 	shareDocument,
 	saveDocumentAs,
-	printToPdf,
-	printSlidesToPdf,
 	type SlideAspectRatio,
 	type SlidePrintLayout,
 } from "@/app/features/import-export"
-import { getExportComments } from "@/app/features/comments"
-import { getLoadedAssets, toPrintableAsset } from "@/app/features/assets"
-import { loadThemesForPdf } from "@/app/features/themes"
 import { useIntl } from "@/shared/intl/setup"
-import { readDocumentText } from "../lib/document-text"
+import { useLibrary } from "../lib/library"
 import { getDocumentTitle } from "../lib/title"
-import { resolveDocTitles } from "../lib/wikilink-titles"
 import {
 	getExportAssets,
 	makeAddTag,
 	makeDownload,
-	makeDuplicate,
 	makeOpenTimeMachine,
 	makeRename,
 	makeTogglePin,
 	makeTurnIntoPresentation,
 	type EditorRef,
 	type LoadedDocument,
-	type LoadedMe,
 } from "../lib/document-file-actions"
 import { runDocumentCommand } from "./document-commands"
 
-export { SidebarFileMenu }
+export { SidebarFileMenu, makeShare, makePrintSlidesFactory }
 
 interface SidebarFileMenuProps {
-	doc: LoadedDocument
+	doc: LoadedDocument & { content: string }
 	editor: EditorRef
-	me?: LoadedMe
 	spaceId?: string
 }
 
 // --- Component ---
 
-function SidebarFileMenu({ doc, editor, me, spaceId }: SidebarFileMenuProps) {
+function SidebarFileMenu({ doc, editor }: SidebarFileMenuProps) {
+	let { db, ownerId, documents: libraryDocuments } = useLibrary()
+	let me = libraryDocuments
 	let t = useIntl()
 	let navigate = useNavigate()
 	let {
@@ -83,20 +81,38 @@ function SidebarFileMenu({ doc, editor, me, spaceId }: SidebarFileMenuProps) {
 	let docWithContent = doc
 
 	// Themes carry binary assets, so load them on demand when exporting
-	let account = useAccount(UserAccount)
 
-	let content = doc.content?.$isLoaded ? readDocumentText(doc.content) : ""
+	let [duplicateOpen, setDuplicateOpen] = useState(false)
+	let content = doc.content
 	let readOnly = !canEdit(doc)
 	let docGroup = getDocumentGroup(doc)
 	let isAdmin = docGroup?.myRole() === "admin"
-	let isPinned = parseFrontmatter(content).frontmatter?.pinned === true
+	let isPinned = doc.pinned
 	let isPresentation = getPresentationMode(content)
-	let handlePrintPdf = makePrintPdf(content, account, doc)
-	let makePrintSlides = makePrintSlidesFactory(content, account, doc)
+	let handlePrintPdf = makePrintPdf(db, content, doc)
+	let makePrintSlides = makePrintSlidesFactory(
+		db,
+		content,
+		doc,
+		new Map(libraryDocuments.map(doc => [doc.id, doc.title])),
+	)
 	let canShare = canShareDocument()
 
 	return (
 		<SidebarMenuItem>
+			<DuplicateDocDialog
+				doc={doc}
+				open={duplicateOpen}
+				onOpenChange={setDuplicateOpen}
+				onDuplicate={(id, destination) => {
+					if (destination)
+						void navigate({
+							to: "/spaces/$spaceId/doc/$id",
+							params: { spaceId: destination.id, id },
+						})
+					else void navigate({ to: "/doc/$id", params: { id } })
+				}}
+			/>
 			<DropdownMenu>
 				<DropdownMenuTrigger
 					render={
@@ -142,7 +158,7 @@ function SidebarFileMenu({ doc, editor, me, spaceId }: SidebarFileMenuProps) {
 						</DropdownMenuShortcut>
 					</DropdownMenuItem>
 					<DropdownMenuItem
-						onClick={makeTogglePin(docWithContent)}
+						onClick={makeTogglePin(db, ownerId, docWithContent)}
 						disabled={readOnly}
 					>
 						{isPinned ? t("doc.unpin") : t("doc.pin")}
@@ -175,12 +191,12 @@ function SidebarFileMenu({ doc, editor, me, spaceId }: SidebarFileMenuProps) {
 					>
 						{t("doc.turnIntoPresentation")}
 					</DropdownMenuItem>
-					<DropdownMenuItem onClick={makeDownload(doc, content)}>
+					<DropdownMenuItem onClick={makeDownload(db, doc, content)}>
 						{t("doc.download")}
 					</DropdownMenuItem>
 					{canShare && (
 						<DropdownMenuItem
-							onClick={makeShare(doc, content)}
+							onClick={makeShare(db, doc, content)}
 							data-testid={testIds.doc.nativeShareButton}
 						>
 							{t("doc.shareCopy")}
@@ -221,7 +237,7 @@ function SidebarFileMenu({ doc, editor, me, spaceId }: SidebarFileMenuProps) {
 						</DropdownMenuSub>
 					)}
 					<DropdownMenuItem
-						onClick={makeDuplicate(doc, me, spaceId, navigate)}
+						onClick={() => setDuplicateOpen(true)}
 						data-testid={testIds.doc.duplicateButton}
 					>
 						{t("doc.duplicate")}
@@ -271,39 +287,37 @@ function makeSaveAs(content: string) {
 	}
 }
 
-function makeShare(doc: LoadedDocument, content: string) {
+function makeShare(
+	db: import("../lib/library").Database,
+	doc: LoadedDocument & { content: string },
+	content: string,
+) {
 	return async function handleShare() {
-		let docAssets = await getExportAssets(doc)
+		let docAssets = await getExportAssets(db, doc)
 		let title = getDocumentTitle(content)
 		await shareDocument(
 			content,
 			title,
 			docAssets.length > 0 ? docAssets : undefined,
-			getExportComments(doc),
+			await exportComments(db, doc.id),
 		)
 	}
 }
 
 function makePrintPdf(
+	db: Database,
 	content: string,
-	account: ReturnType<typeof useAccount<typeof UserAccount>>,
-	doc: LoadedDocument,
+	doc: LoadedDocument & { content: string },
 ) {
-	return async function handlePrintPdf() {
-		if (!account.$isLoaded) return
-		let { themes, defaultPreviewTheme, defaultSyntaxTheme } =
-			await loadThemesForPdf(account)
-		let assets = getLoadedAssets(doc.assets).map(toPrintableAsset)
+	return async () => {
+		let themes = await loadThemesForPdf(db)
 		await printToPdf({
+			...themes,
 			content,
-			themes,
-			defaultPreviewTheme,
-			defaultSyntaxTheme,
-			assets,
+			assets: await printableAssets(db, doc),
 		})
 	}
 }
-
 let slidePrintOptions: {
 	layout: SlidePrintLayout
 	aspectRatio: SlideAspectRatio
@@ -313,34 +327,52 @@ let slidePrintOptions: {
 	{ layout: "notes", aspectRatio: "16:9" },
 	{ layout: "notes", aspectRatio: "4:3" },
 ]
-
 function makePrintSlidesFactory(
+	db: Database,
 	content: string,
-	account: ReturnType<typeof useAccount<typeof UserAccount>>,
-	doc: LoadedDocument,
+	doc: LoadedDocument & { content: string },
+	wikilinkTitles: Map<string, string>,
 ) {
-	return function makePrintSlides(option: (typeof slidePrintOptions)[number]) {
-		return async function handlePrintSlides() {
-			if (!account.$isLoaded) return
-			let { themes, defaultSlideshowTheme, defaultSyntaxTheme } =
-				await loadThemesForPdf(account)
-			let wikilinks = await resolveDocTitles(
-				parseWikiLinks(content).map(link => link.id),
-			)
+	return (option: {
+			layout: SlidePrintLayout
+			aspectRatio: SlideAspectRatio
+		}) =>
+		async () => {
+			let themes = await loadThemesForPdf(db)
 			await printSlidesToPdf({
+				...themes,
+				...option,
 				content,
-				themes,
-				defaultSlideshowTheme,
-				defaultSyntaxTheme,
-				assets: getLoadedAssets(doc.assets).map(toPrintableAsset),
-				layout: option.layout,
-				aspectRatio: option.aspectRatio,
-				wikilinkTitles: new Map(
-					Array.from(wikilinks.values())
-						.filter(link => link.exists)
-						.map(link => [link.id, link.title]),
-				),
+				wikilinkTitles,
+				assets: await printableAssets(db, doc),
 			})
 		}
-	}
+}
+async function printableAssets(
+	db: Database,
+	doc: LoadedDocument & { content: string },
+) {
+	let rows = await db.all(
+		app.assets
+			.where({ documentId: doc.id })
+			.select("id", "name", "type", "revisionId"),
+	)
+	return rows.map(row => ({
+		...row,
+		getBlob: async () => {
+			if (row.type === "tldraw" && row.revisionId) {
+				let revision = await db.one(
+					app.tldrawRevisions
+						.where({ id: row.revisionId })
+						.select("lightPreview"),
+				)
+				return revision
+					? new Blob([new Uint8Array(revision.lightPreview)], {
+							type: "image/png",
+						})
+					: undefined
+			}
+			return readAssetBlob(db, row.id)
+		},
+	}))
 }

@@ -1,6 +1,5 @@
 import type { APIRoute } from "astro"
 import { z } from "zod"
-import { accountCredentialsSchema } from "@/mcp/credentials"
 import { createUserConnection } from "@/mcp/jazz"
 import { getMcpConfig } from "@/mcp/config"
 import { approveAuthorization, consentRequestSchema } from "@/mcp/oauth"
@@ -10,12 +9,11 @@ export { POST }
 export const prerender = false
 
 let requestSchema = z.discriminatedUnion("decision", [
-	z.object({
+	z.strictObject({
 		decision: z.literal("approve"),
-		credentials: accountCredentialsSchema,
 		consent: z.string(),
 	}),
-	z.object({ decision: z.literal("deny"), consent: z.string() }),
+	z.strictObject({ decision: z.literal("deny"), consent: z.string() }),
 ])
 
 let POST: APIRoute = async ({ request }) => {
@@ -42,8 +40,7 @@ let POST: APIRoute = async ({ request }) => {
 			)
 		}
 		let credential = await createUserConnection(
-			config.syncServer,
-			input.credentials,
+			request,
 			{
 				id: consent.authorization.client_id,
 				name: consent.client.name,

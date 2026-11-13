@@ -34,22 +34,18 @@ interface SignOutArgs {
 async function waitForEditorBoot(page: Page, args: WaitForEditorBootArgs = {}) {
 	let path = args.path ?? "/app"
 	await page.goto(path)
-	await expect
-		.poll(
-			async () => {
-				return page.evaluate(() => {
-					return document.body.getAttribute("data-alkalye-ready")
-				})
-			},
-			{ timeout: 30_000 },
+	let route: string | null = null
+	await expect(async () => {
+		await expect(page.locator("body")).toHaveAttribute(
+			"data-alkalye-ready",
+			"true",
 		)
-		.toBe("true")
-
-	let route = await page.evaluate(() => {
-		return (
-			(window as { __alkalyeReadyRoute?: string }).__alkalyeReadyRoute ?? null
-		)
-	})
+		route = await page.evaluate(() => {
+			return (
+				(window as { __alkalyeReadyRoute?: string }).__alkalyeReadyRoute ?? null
+			)
+		})
+	}).toPass({ timeout: 10_000 })
 
 	return {
 		ok: true,
@@ -101,7 +97,7 @@ async function createAccount(page: Page, args: CreateAccountArgs = {}) {
 	await waitForAuthNavigation(page)
 	await openSettings(page)
 	await expect(page.getByTestId(testIds.auth.settingsSignOut)).toBeVisible({
-		timeout: 30_000,
+		timeout: 10_000,
 	})
 
 	return {
@@ -117,7 +113,9 @@ async function signOut(page: Page, args: SignOutArgs = {}) {
 	}
 
 	await page.getByTestId(testIds.auth.settingsSignOut).click()
-	await expect(page.getByTestId(testIds.auth.settingsSignIn)).toBeVisible()
+	await expect(page.getByTestId(testIds.auth.settingsSignIn)).toBeVisible({
+		timeout: 10_000,
+	})
 
 	return {
 		ok: true,
@@ -153,7 +151,7 @@ async function signIn(page: Page, args: SignInArgs) {
 	await waitForAuthNavigation(page)
 	await openSettings(page)
 	await expect(page.getByTestId(testIds.auth.settingsSignOut)).toBeVisible({
-		timeout: 30_000,
+		timeout: 10_000,
 	})
 
 	return {
@@ -165,7 +163,7 @@ async function signIn(page: Page, args: SignInArgs) {
 async function waitForAuthNavigation(page: Page) {
 	await page.waitForURL(
 		url => url.pathname.startsWith("/app") && url.pathname !== "/app/settings",
-		{ timeout: 30_000 },
+		{ timeout: 10_000 },
 	)
 	await waitForEditorBoot(page)
 }

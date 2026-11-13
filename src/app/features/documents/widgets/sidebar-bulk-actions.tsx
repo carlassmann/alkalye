@@ -1,7 +1,6 @@
-import { co } from "jazz-tools"
+import { type LibraryDocument, useLibrary } from "../lib/library"
 import { toast } from "sonner"
 import { FolderInput, Pin, PinOff, Trash2, X } from "lucide-react"
-import { Document } from "@/schema"
 import {
 	ContextMenuGroup,
 	ContextMenuItem,
@@ -12,7 +11,7 @@ import { ConfirmDialog } from "@/app/components/ui/confirm-dialog"
 import { canEdit, getDocumentGroup } from "@/app/features/sharing"
 import { useIntl } from "@/shared/intl/setup"
 import { testIds } from "@/app/lib/test-ids"
-import { setDocumentsPinned } from "../lib/document-pin"
+import { setDocumentsPinned } from "../lib/documents"
 import type { BatchResult } from "../lib/folders"
 import { MoveToFolderDialog } from "./move-to-folder-dialog"
 
@@ -24,7 +23,7 @@ export {
 }
 export type { SidebarBulkDialog }
 
-type SidebarDoc = co.loaded<typeof Document>
+type SidebarDoc = LibraryDocument
 type SidebarBulkDialog = "move" | "delete" | null
 
 function getDeletableDocs(docs: SidebarDoc[]): SidebarDoc[] {
@@ -48,12 +47,16 @@ function SidebarBulkMenuItems({
 	onOpenDialog: (dialog: SidebarBulkDialog) => void
 	onClear: () => void
 }) {
+	let { db, ownerId } = useLibrary()
 	let t = useIntl()
 	let areAllPinned = docs.every(doc => doc.pinned)
 	let hasEditableDocs = docs.some(canEdit)
 
 	async function handleTogglePinned() {
-		notifySkippedDocuments(await setDocumentsPinned(docs, !areAllPinned), t)
+		notifySkippedDocuments(
+			await setDocumentsPinned(db, ownerId, docs, !areAllPinned),
+			t,
+		)
 	}
 
 	return (
@@ -110,6 +113,7 @@ function SidebarBulkDialogs({
 	onDelete: (doc: SidebarDoc) => void
 	onClear: () => void
 }) {
+	useLibrary()
 	let t = useIntl()
 	let deletableDocs = getDeletableDocs(docs)
 	let skippedCount = docs.length - deletableDocs.length

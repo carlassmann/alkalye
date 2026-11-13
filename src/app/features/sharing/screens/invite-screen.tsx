@@ -1,10 +1,10 @@
+import { useIsBackedUp } from "@/app/features/auth"
 import { useState, useEffect, useRef, startTransition } from "react"
 import { useNavigate, Link } from "@tanstack/react-router"
-import { useAccount, useIsAuthenticated } from "jazz-tools/react"
+import { useLibrary } from "@/app/features/documents"
 import { FileText, FolderOpen, AlertCircle, Loader2 } from "lucide-react"
 import { Button } from "@/app/components/ui/button"
 import { AuthDialog } from "@/app/features/auth"
-import { UserAccount } from "@/schema"
 import {
 	acceptDocumentInvite,
 	type DocInviteData,
@@ -18,8 +18,8 @@ export { InviteScreen }
 function InviteScreen() {
 	let t = useIntl()
 	let navigate = useNavigate()
-	let isAuthenticated = useIsAuthenticated()
-	let me = useAccount(UserAccount)
+	let { db } = useLibrary()
+	let isAuthenticated = useIsBackedUp()
 
 	let [inviteData] = useState(() => {
 		let hash = typeof window !== "undefined" ? window.location.hash : ""
@@ -36,19 +36,19 @@ function InviteScreen() {
 	let acceptInviteRef = useRef<() => void | Promise<void>>(() => {})
 
 	async function handleAcceptInvite() {
-		if (!me.$isLoaded || !inviteData || isAccepting) return
+		if (!inviteData || isAccepting) return
 		setIsAccepting(true)
 		setStatus("accepting")
 
 		try {
 			if (inviteData.type === "doc") {
-				await acceptDocumentInvite(me, inviteData)
+				await acceptDocumentInvite(db, inviteData)
 				setStatus("success")
 				setTimeout(() => {
 					navigate({ to: "/doc/$id", params: { id: inviteData.docId } })
 				}, 1000)
 			} else {
-				await acceptSpaceInvite(me, inviteData)
+				await acceptSpaceInvite(db, inviteData)
 				setStatus("success")
 				setTimeout(() => {
 					navigate({
@@ -76,17 +76,16 @@ function InviteScreen() {
 	})
 
 	// Derive needs-auth state during render
-	let shouldShowAuth =
-		inviteData && me.$isLoaded && !isAuthenticated && status === "loading"
+	let shouldShowAuth = inviteData && !isAuthenticated && status === "loading"
 
 	// Auto-accept when authenticated and ready
 	useEffect(() => {
-		if (!inviteData || !me.$isLoaded || !isAuthenticated) return
+		if (!inviteData || !isAuthenticated) return
 		if (status !== "loading" || isAccepting) return
 		startTransition(() => {
 			void acceptInviteRef.current()
 		})
-	}, [me.$isLoaded, isAuthenticated, inviteData, status, isAccepting])
+	}, [isAuthenticated, inviteData, status, isAccepting])
 
 	let pageTitle = isSpaceInvite
 		? t("sharing.invite.join.space")
@@ -309,27 +308,23 @@ type InviteData =
 	| ({ type: "space" } & SpaceInviteData)
 
 function parseInviteHash(hash: string): InviteData | null {
-	let docMatch = hash.match(
-		/^#\/doc\/(co_[^/]+)\/invite\/(co_[^/]+)\/(inviteSecret_z[^/]+)$/,
-	)
+	let docMatch = hash.match(/^#\/doc\/([^/]+)\/invite\/([^/]+)\/([^/]+)$/)
 	if (docMatch) {
 		return {
 			type: "doc",
 			docId: docMatch[1],
 			inviteGroupId: docMatch[2],
-			inviteSecret: docMatch[3] as `inviteSecret_z${string}`,
+			inviteSecret: docMatch[3],
 		}
 	}
 
-	let spaceMatch = hash.match(
-		/^#\/space\/(co_[^/]+)\/invite\/(co_[^/]+)\/(inviteSecret_z[^/]+)$/,
-	)
+	let spaceMatch = hash.match(/^#\/space\/([^/]+)\/invite\/([^/]+)\/([^/]+)$/)
 	if (spaceMatch) {
 		return {
 			type: "space",
 			spaceId: spaceMatch[1],
 			inviteGroupId: spaceMatch[2],
-			inviteSecret: spaceMatch[3] as `inviteSecret_z${string}`,
+			inviteSecret: spaceMatch[3],
 		}
 	}
 

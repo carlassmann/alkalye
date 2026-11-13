@@ -1,17 +1,17 @@
-import { readDocumentText } from "@/app/features/documents/lib/document-text"
-import { co } from "jazz-tools"
-import type { TextPos } from "jazz-tools"
-import { stringifyOpID } from "cojson"
-import { calcPatch, diff } from "fast-myers-diff"
+import { useAll, useDb } from "jazz-tools/react"
+import { schema } from "jazz-tools"
+import { z } from "zod"
+import { diff } from "fast-myers-diff"
+import { app, type DocumentRow } from "@/jazz/schema"
+import type { Database } from "@/app/features/documents/lib/library"
 import {
-	CommentReply,
-	CommentThread,
-	Document,
-} from "@/app/features/documents/lib/schema"
-import type { DocumentContentPatch } from "@/app/features/documents/lib/document-save-protocol"
-import { syncDocumentMetadata } from "@/app/features/documents/lib/metadata"
+	countOccurrences,
+	findBestTextOccurrence,
+} from "@/app/features/documents/lib/comment-text-match"
 
 export {
+	useComments,
+	loadCommentDocument,
 	createCommentThread,
 	createCommentThreadFromQuote,
 	createCommentThreadFromQuoteOccurrence,
@@ -27,62 +27,42 @@ export {
 	getExportComments,
 	getExportCommentsForContent,
 	restoreExportedComments,
-	cloneCommentThreads,
-	copyCommentsAndApplyContent,
-	applyContentDiffWithCommentAnchors,
-	applyContentDiffLoadingCommentAnchors,
-	applyDocumentContentPatches,
-	applyContentPatchesInBoundedTransactions,
-	replaceDocumentContentPreservingAnchors,
-	replaceDocumentContentMappingAnchors,
 	recoverRange,
 	mapCommentRangeAcrossContent,
-	type LoadedCommentDocument,
-	type LoadedAnchorDocument,
-	type CommentRange,
-	type ExportComment,
 }
+export type { LoadedCommentDocument, ExportComment, CommentRange }
 
-type CommentResolve = {
-	content: true
-	comments: { $each: { replies: true } }
-}
-
-type LoadedCommentDocument = co.loaded<typeof Document, CommentResolve>
-type LoadedCommentThread = co.loaded<typeof CommentThread, { replies: true }>
-type LoadedAnchorDocument = co.loaded<
-	typeof Document,
-	{ content: true; comments: { $each: true } }
->
-
-type CommentRange = {
-	from: number
-	to: number
-	orphaned: boolean
-}
-
-type RecoveredRange = {
-	from: number
-	to: number
-}
-
-type RangeRecovery = (
-	content: string,
-	anchor: CommentAnchorData,
-) => RecoveredRange | null
-
-let MAX_DELETE_GRAPHEMES_PER_TRANSACTION = 2_000
+type CommentRange = { from: number; to: number; orphaned: boolean }
+type RecoveredRange = { from: number; to: number }
 let MAX_ANCHOR_QUOTE_LENGTH = 1_000
-
-type CommentAnchorData = {
-	start?: string
-	end?: string
-	quote: string
-	originalQuote?: string
-	contextBefore: string
-	contextAfter: string
-	collapsed?: boolean
+let textRange = z.object({
+	version: z.number().optional(),
+	start: z.number().optional(),
+	end: z.number().optional(),
+	before: z.string(),
+	matched: z.string(),
+	after: z.string(),
+})
+let commentAnchor = z.object({
+	range: textRange.optional(),
+	quote: z.string(),
+	originalQuote: z.string().optional(),
+	contextBefore: z.string(),
+	contextAfter: z.string(),
+})
+type CommentAnchorData = z.infer<typeof commentAnchor>
+type LoadedCommentThread = Omit<
+	schema.RowOf<typeof app.commentThreads>,
+	"anchor"
+> & {
+	anchor: CommentAnchorData
+	replies: schema.RowOf<typeof app.commentReplies>[]
+	db: Database
 }
+type LoadedCommentDocument = Pick<
+	DocumentRow,
+	"id" | "content" | "commentsDisabled"
+> & { db: Database; comments: LoadedCommentThread[] }
 
 type ExportComment = {
 	id: string
@@ -102,46 +82,97 @@ type ExportComment = {
 	}[]
 }
 
+function useComments(
+	doc: Pick<DocumentRow, "id" | "content" | "commentsDisabled">,
+): LoadedCommentDocument {
+	let db = useDb()
+	let { data: threads = [] } = useAll(
+		app.commentThreads.where({ documentId: doc.id }),
+	)
+	let { data: replies = [] } = useAll(
+		app.commentReplies.where({
+			threadId: { in: threads.map(thread => thread.id) },
+		}),
+	)
+	return assembleCommentDocument(db, doc, threads, replies)
+}
+async function loadCommentDocument(
+	db: Database,
+	doc: Pick<DocumentRow, "id" | "content" | "commentsDisabled">,
+) {
+	let threads = await db.all(app.commentThreads.where({ documentId: doc.id }))
+	let replies = await db.all(
+		app.commentReplies.where({
+			threadId: { in: threads.map(thread => thread.id) },
+		}),
+	)
+	return assembleCommentDocument(db, doc, threads, replies)
+}
+function assembleCommentDocument(
+	db: Database,
+	doc: Pick<DocumentRow, "id" | "content" | "commentsDisabled">,
+	threads: schema.RowOf<typeof app.commentThreads>[],
+	replies: schema.RowOf<typeof app.commentReplies>[],
+): LoadedCommentDocument {
+	return {
+		...doc,
+		db,
+		comments: threads.flatMap(thread => {
+			let anchor = commentAnchor.safeParse(thread.anchor)
+			return [
+				{
+					...thread,
+					anchor: anchor.success
+						? anchor.data
+						: { quote: "", contextBefore: "", contextAfter: "" },
+					db,
+					replies: replies
+						.filter(reply => reply.threadId === thread.id && !reply.deletedAt)
+						.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()),
+				},
+			]
+		}),
+	}
+}
+
 function createCommentThread(
 	doc: LoadedCommentDocument,
 	selection: { from: number; to: number },
 	body: string,
 	authorName?: string,
 ) {
-	if (!areCommentsEnabled(doc)) return null
-
-	let content = readDocumentText(doc.content)
-	let from = Math.min(
-		content.length,
-		Math.max(0, Math.min(selection.from, selection.to)),
+	if (!areCommentsEnabled(doc) || !body.trim()) return null
+	let from = Math.max(
+		0,
+		Math.min(doc.content.length, selection.from, selection.to),
 	)
-	let to = Math.min(content.length, Math.max(selection.from, selection.to))
-	let text = body.trim()
-
-	if (from === to || !text) return null
-
-	let comments = ensureComments(doc)
-	if (!comments?.$isLoaded) return null
-
+	let to = Math.min(doc.content.length, Math.max(selection.from, selection.to))
+	if (from === to) return null
+	let id = crypto.randomUUID()
 	let now = new Date()
-	let reply = CommentReply.create(
-		{ body: text, authorName: cleanAuthorName(authorName), createdAt: now },
-		doc.$jazz.owner,
-	)
-	let thread = CommentThread.create(
-		{
-			anchor: makeAnchor(doc, from, to),
-			replies: co.list(CommentReply).create([reply], doc.$jazz.owner),
+	let authorId = doc.db.getAuthState().session?.user
+	if (!authorId) return null
+	void doc.db.transaction(tx => {
+		tx.insert(
+			app.commentThreads,
+			{
+				documentId: doc.id,
+				authorId,
+				anchor: makeAnchor(doc, from, to),
+				createdAt: now,
+				updatedAt: now,
+			},
+			{ id },
+		)
+		tx.insert(app.commentReplies, {
+			threadId: id,
+			authorId,
+			body: body.trim(),
+			authorName: authorName?.trim() || null,
 			createdAt: now,
-			updatedAt: now,
-		},
-		doc.$jazz.owner,
-	)
-
-	comments.$jazz.push(thread)
-	doc.$jazz.set("updatedAt", now)
-	syncDocumentMetadata(doc, { contentChanged: false })
-	return thread
+		})
+	})
+	return { id }
 }
 
 function createCommentThreadFromQuote(
@@ -152,7 +183,6 @@ function createCommentThreadFromQuote(
 ) {
 	return createCommentThreadFromQuoteOccurrence(doc, quote, 0, body, authorName)
 }
-
 function createCommentThreadFromQuoteOccurrence(
 	doc: LoadedCommentDocument,
 	quote: string,
@@ -160,391 +190,250 @@ function createCommentThreadFromQuoteOccurrence(
 	body: string,
 	authorName?: string,
 ) {
-	if (!areCommentsEnabled(doc)) return null
-
-	let content = readDocumentText(doc.content)
-	let selected = quote.trim()
-	if (!selected) return null
-
-	let from = findNthOccurrence(content, selected, occurrence)
-	if (from < 0) return null
-
+	let from = findNthOccurrence(doc.content, quote.trim(), occurrence)
+	if (from < 0 || !quote.trim()) return null
 	return createCommentThread(
 		doc,
-		{ from, to: from + selected.length },
+		{ from, to: from + quote.trim().length },
 		body,
 		authorName,
 	)
 }
-
-function restoreExportedComments(
-	doc: LoadedCommentDocument,
-	comments: ExportComment[],
-	sourceContent?: string,
-) {
-	let threads = co.list(CommentThread).create([], doc.$jazz.owner)
-	let targetContent = readDocumentText(doc.content)
-	let changes = sourceContent
-		? getContentChanges(sourceContent, targetContent)
-		: getContentChanges(targetContent, targetContent)
-
-	for (let comment of comments) {
-		let range = getRestoredCommentRange(comment, targetContent, changes)
-		let replies = co.list(CommentReply).create([], doc.$jazz.owner)
-		for (let reply of comment.replies) {
-			replies.$jazz.push(
-				CommentReply.create(
-					{
-						body: reply.body,
-						authorName: reply.authorName ?? undefined,
-						createdAt: new Date(reply.createdAt),
-						updatedAt: reply.updatedAt ? new Date(reply.updatedAt) : undefined,
-					},
-					doc.$jazz.owner,
-				),
-			)
-		}
-		if (replies.length === 0) continue
-		let anchor = range.orphaned
-			? {
-					quote: comment.quote,
-					contextBefore: comment.contextBefore,
-					contextAfter: comment.contextAfter,
-					originalQuote: comment.quote,
-					start: undefined,
-					end: undefined,
-				}
-			: makeAnchor(doc, range.from, range.to, {
-					quote: comment.quote,
-					contextBefore: comment.contextBefore,
-					contextAfter: comment.contextAfter,
-					originalQuote: comment.quote,
-				})
-		threads.$jazz.push(
-			CommentThread.create(
-				{
-					anchor,
-					replies,
-					resolvedAt: comment.resolved
-						? new Date(comment.updatedAt)
-						: undefined,
-					createdAt: new Date(comment.createdAt),
-					updatedAt: new Date(comment.updatedAt),
-				},
-				doc.$jazz.owner,
-			),
-		)
-	}
-
-	doc.$jazz.set("comments", threads)
-}
-
 function addCommentReply(
-	thread: co.loaded<typeof CommentThread, { replies: true }>,
+	thread: LoadedCommentThread,
 	body: string,
 	authorName?: string,
 ) {
-	let text = body.trim()
-	if (!text || !thread.replies?.$isLoaded) return
+	let authorId = thread.db.getAuthState().session?.user
+	if (!body.trim() || !authorId) return
 	let now = new Date()
-	thread.replies.$jazz.push(
-		CommentReply.create(
-			{ body: text, authorName: cleanAuthorName(authorName), createdAt: now },
-			thread.$jazz.owner,
-		),
-	)
-	thread.$jazz.set("updatedAt", now)
+	return thread.db.transaction(tx => {
+		tx.insert(app.commentReplies, {
+			threadId: thread.id,
+			authorId,
+			body: body.trim(),
+			authorName: authorName?.trim() || null,
+			createdAt: now,
+		})
+		tx.update(app.commentThreads, thread.id, { updatedAt: now })
+	})
 }
-
-function resolveCommentThread(thread: co.loaded<typeof CommentThread>) {
-	let now = new Date()
-	thread.$jazz.set("resolvedAt", now)
-	thread.$jazz.set("updatedAt", now)
+function resolveCommentThread(thread: LoadedCommentThread) {
+	return thread.db.update(app.commentThreads, thread.id, {
+		resolvedAt: new Date(),
+		updatedAt: new Date(),
+	})
 }
-
-function reopenCommentThread(thread: co.loaded<typeof CommentThread>) {
-	let now = new Date()
-	thread.$jazz.set("resolvedAt", undefined)
-	thread.$jazz.set("updatedAt", now)
+function reopenCommentThread(thread: LoadedCommentThread) {
+	return thread.db.update(app.commentThreads, thread.id, {
+		resolvedAt: null,
+		updatedAt: new Date(),
+	})
 }
-
-function deleteCommentThread(thread: co.loaded<typeof CommentThread>) {
-	let now = new Date()
-	thread.$jazz.set("deletedAt", now)
-	thread.$jazz.set("updatedAt", now)
+function deleteCommentThread(thread: LoadedCommentThread) {
+	return thread.db.update(app.commentThreads, thread.id, {
+		deletedAt: new Date(),
+		updatedAt: new Date(),
+	})
 }
-
+function areCommentsEnabled(doc: Pick<DocumentRow, "commentsDisabled">) {
+	return !doc.commentsDisabled
+}
+function setCommentsEnabled(doc: LoadedCommentDocument, enabled: boolean) {
+	return doc.db.update(app.documents, doc.id, {
+		commentsDisabled: !enabled,
+		updatedAt: new Date(),
+	})
+}
 function getVisibleCommentThreads(doc: LoadedCommentDocument) {
-	if (!areCommentsEnabled(doc)) return []
-	return getActiveCommentThreads(doc)
+	return areCommentsEnabled(doc)
+		? doc.comments
+				.filter(thread => !thread.deletedAt)
+				.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+		: []
 }
-
-function getUnresolvedCommentCount(doc: co.loaded<typeof Document>) {
-	if (!areCommentsEnabled(doc)) return 0
-	if (!doc.comments?.$isLoaded) return 0
-	let count = 0
-	for (let thread of doc.comments.values()) {
-		if (thread?.$isLoaded && !thread.deletedAt && !thread.resolvedAt) count++
+function getUnresolvedCommentCount(doc: LoadedCommentDocument) {
+	return getVisibleCommentThreads(doc).filter(thread => !thread.resolvedAt)
+		.length
+}
+function makeAnchor(
+	doc: LoadedCommentDocument,
+	from: number,
+	to: number,
+): CommentAnchorData {
+	return {
+		range: doc.db.textAnchors().captureRange(doc.content, from, to),
+		quote: doc.content.slice(from, to).slice(0, MAX_ANCHOR_QUOTE_LENGTH),
+		contextBefore: doc.content.slice(Math.max(0, from - 80), from),
+		contextAfter: doc.content.slice(to, to + 80),
 	}
-	return count
 }
-
-function areCommentsEnabled(doc: co.loaded<typeof Document>) {
-	return doc.commentsDisabled !== true
-}
-
-function setCommentsEnabled(doc: co.loaded<typeof Document>, enabled: boolean) {
-	doc.$jazz.set("commentsDisabled", enabled ? undefined : true)
-	doc.$jazz.set("updatedAt", new Date())
-}
-
 function getCommentRange(
-	doc: co.loaded<typeof Document, { content: true }>,
+	doc: LoadedCommentDocument,
 	anchor: CommentAnchorData,
 ): CommentRange {
-	let tracked = getTrackedCommentRange(doc, anchor)
-	if (tracked) return tracked
-
-	let recovered = recoverRange(readDocumentText(doc.content), anchor)
-	if (recovered) return { ...recovered, orphaned: false }
-
-	return orphanedRange()
-}
-
-function applyContentDiffWithCommentAnchors(
-	doc: LoadedAnchorDocument,
-	newContent: string,
-) {
-	let oldContent = readDocumentText(doc.content)
-	if (oldContent === newContent) return
-	if (newContent.startsWith(oldContent)) {
-		doc.content.insertBefore(
-			doc.content.$jazz.raw.entries().length,
-			newContent.slice(oldContent.length),
-		)
-		return
+	if (anchor.range) {
+		let found = doc.db.textAnchors().resolveRange(anchor.range, doc.content)
+		if (!found.ambiguous && found.confidence >= 0.8 && found.end > found.start)
+			return { from: found.start, to: found.end, orphaned: false }
+	}
+	if (anchor.range) {
+		let recovered = recoverRange(doc.content, anchor)
+		if (!recovered) return orphanedRange()
+		let before = anchor.contextBefore.slice(-12),
+			after = anchor.contextAfter.slice(0, 12)
+		let matchesBefore =
+			!!before.trim() && doc.content.slice(0, recovered.from).endsWith(before)
+		let matchesAfter =
+			!!after.trim() && doc.content.slice(recovered.to).startsWith(after)
+		return matchesBefore || matchesAfter
+			? { ...recovered, orphaned: false }
+			: orphanedRange()
 	}
 
-	let patches: DocumentContentPatch[] = Array.from(
-		calcPatch(
-			doc.content.$jazz.raw.entries().map(entry => entry.value),
-			doc.content.$jazz.raw.toGraphemes(newContent),
-		),
-		([from, to, inserted]) => ({ from, to, inserted: inserted.join("") }),
+	let recovered = recoverRange(doc.content, anchor)
+	return recovered ? { ...recovered, orphaned: false } : orphanedRange()
+}
+function recoverRange(
+	content: string,
+	anchor: CommentAnchorData,
+): RecoveredRange | null {
+	if (!anchor.quote) return null
+	let count = countOccurrences(content, anchor.quote)
+	if (count === 1) {
+		let from = content.indexOf(anchor.quote)
+		return { from, to: from + anchor.quote.length }
+	}
+	if (count > 1) {
+		let match = anchor.contextBefore + anchor.quote + anchor.contextAfter
+		if (match === anchor.quote || countOccurrences(content, match) !== 1)
+			return null
+		let from = findBestTextOccurrence(content, anchor.quote, {
+			...anchor,
+			occurrence: 0,
+		})
+		return from < 0 ? null : { from, to: from + anchor.quote.length }
+	}
+	// Fuzzy matching is confined to a unique context window to avoid moving a comment elsewhere.
+	let before = anchor.contextBefore.trim(),
+		after = anchor.contextAfter.trim()
+	if (
+		!before ||
+		!after ||
+		countOccurrences(content, before) !== 1 ||
+		countOccurrences(content, after) !== 1
 	)
-	applyDocumentContentPatches(doc, newContent, patches)
-}
-
-function applyDocumentContentPatches(
-	doc: LoadedAnchorDocument,
-	newContent: string,
-	patches: DocumentContentPatch[],
-) {
-	let threads = getActiveCommentAnchorThreads(doc)
-	if (threads.length === 0) {
-		applyContentPatchesInBoundedTransactions(doc.content, patches)
-		return
+		return null
+	let from = content.indexOf(before) + before.length,
+		to = content.indexOf(after, from)
+	if (to < from) return null
+	let tokens = anchor.quote.match(/[^\s]+/g) ?? []
+	let first = -1,
+		end = from
+	for (let token of tokens) {
+		let index = content.indexOf(token, end)
+		if (index < 0 || index + token.length > to) return null
+		if (first < 0) first = index
+		end = index + token.length
 	}
-	let changes = getContentChanges(readDocumentText(doc.content), newContent)
-	let updates = threads.map(thread => ({
-		thread,
-		range: mapCommentRange(
-			getCommentRange(doc, thread.anchor),
-			changes,
-			newContent,
-		),
-	}))
-
-	applyContentPatchesInBoundedTransactions(doc.content, patches)
-
-	for (let update of updates) {
-		if (update.range.orphaned) continue
-		update.thread.$jazz.set(
-			"anchor",
-			makeAnchor(doc, update.range.from, update.range.to, update.thread.anchor),
-		)
-	}
+	return first < 0 ? null : { from: first, to: end }
 }
-
-function applyContentPatchesInBoundedTransactions(
-	content: LoadedAnchorDocument["content"],
-	patches: DocumentContentPatch[],
-) {
-	let raw = content.$jazz.raw
-
-	raw.core.pauseNotifyUpdate()
-	try {
-		for (let { from, to, inserted } of patches.reverse()) {
-			let deleteTo = to
-			while (deleteTo > from) {
-				let deleteFrom = Math.max(
-					from,
-					deleteTo - MAX_DELETE_GRAPHEMES_PER_TRANSACTION,
-				)
-				content.deleteRange({ from: deleteFrom, to: deleteTo })
-				deleteTo = deleteFrom
-			}
-			if (inserted.length > 0) {
-				content.insertBefore(from, inserted)
-			}
-		}
-	} finally {
-		raw.core.resumeNotifyUpdate()
-	}
-}
-
-function replaceDocumentContentPreservingAnchors(
-	doc: LoadedAnchorDocument,
-	content: co.loaded<ReturnType<typeof co.plainText>>,
-) {
-	replaceDocumentContentMappingAnchors(doc, content)
-}
-
-function replaceDocumentContentMappingAnchors(
-	doc: LoadedAnchorDocument,
-	content: co.loaded<ReturnType<typeof co.plainText>>,
-) {
-	let newContent = content.toString()
-	let changes = getContentChanges(readDocumentText(doc.content), newContent)
-	let updates = getActiveCommentAnchorThreads(doc).map(thread => ({
-		thread,
-		range: mapCommentRange(
-			getCommentRange(doc, thread.anchor),
-			changes,
-			newContent,
-		),
-	}))
-
-	doc.$jazz.set("content", content)
-
-	for (let update of updates) {
-		if (update.range.orphaned) {
-			update.thread.$jazz.set("anchor", {
-				...update.thread.anchor,
-				start: undefined,
-				end: undefined,
-			})
-			continue
-		}
-		update.thread.$jazz.set(
-			"anchor",
-			makeAnchor(doc, update.range.from, update.range.to, update.thread.anchor),
-		)
-	}
-}
-
-// For callers holding a document whose comments may still be streaming in:
-// anchors can only be remapped for loaded threads, so load them first.
-async function applyContentDiffLoadingCommentAnchors(
-	doc: co.loaded<typeof Document, { content: true }>,
-	newContent: string,
-) {
-	let withComments = await doc.$jazz.ensureLoaded({
-		resolve: { content: true, comments: { $each: true } },
-	})
-	applyContentDiffWithCommentAnchors(withComments, newContent)
-}
-
-async function copyCommentsAndApplyContent(
-	sourceDoc: co.loaded<typeof Document>,
-	targetDoc: co.loaded<typeof Document>,
-	newContent: string,
-	options: { copyComments?: boolean } = {},
-) {
-	let copyComments = options.copyComments ?? true
-	let source = await sourceDoc.$jazz.ensureLoaded({
-		resolve: { content: true, comments: { $each: { replies: true } } },
-	})
-	let target = await targetDoc.$jazz.ensureLoaded({
-		resolve: { content: true, comments: { $each: true } },
-	})
-	if (!source?.$isLoaded || !target?.$isLoaded) {
-		throw new Error("Could not load documents for comment copy")
-	}
-
-	let sourceContent = source.content.toString()
-	if (target.content.toString() !== sourceContent) {
-		applyContentDiffWithCommentAnchors(target, sourceContent)
-	}
-
-	if (copyComments) {
-		cloneCommentThreads(source, target)
-	} else {
-		target.$jazz.set("commentsDisabled", source.commentsDisabled)
-	}
-
-	applyContentDiffWithCommentAnchors(target, newContent)
-}
-
-function cloneCommentThreads(
-	sourceDoc: LoadedCommentDocument,
-	targetDoc: co.loaded<typeof Document, { content: true }>,
-) {
-	let threads = getActiveCommentThreads(sourceDoc)
-	targetDoc.$jazz.set("commentsDisabled", sourceDoc.commentsDisabled)
-
-	let cloned = co.list(CommentThread).create([], targetDoc.$jazz.owner)
-	for (let thread of threads) {
-		let range = getCommentRange(sourceDoc, thread.anchor)
-		let anchor = range.orphaned
-			? {
-					...thread.anchor,
-					start: undefined,
-					end: undefined,
-				}
-			: makeAnchor(targetDoc, range.from, range.to, thread.anchor)
-		let replies = co.list(CommentReply).create([], targetDoc.$jazz.owner)
-		for (let reply of thread.replies.values()) {
-			if (!reply?.$isLoaded || reply.deletedAt) continue
-			replies.$jazz.push(
-				CommentReply.create(
-					{
-						body: reply.body,
-						authorName: reply.authorName,
-						createdAt: reply.createdAt,
-						updatedAt: reply.updatedAt,
-					},
-					targetDoc.$jazz.owner,
-				),
-			)
-		}
-		cloned.$jazz.push(
-			CommentThread.create(
-				{
-					anchor,
-					replies,
-					resolvedAt: thread.resolvedAt,
-					createdAt: thread.createdAt,
-					updatedAt: thread.updatedAt,
-				},
-				targetDoc.$jazz.owner,
-			),
-		)
-	}
-
-	targetDoc.$jazz.set("comments", cloned)
-}
-
 function getExportComments(doc: LoadedCommentDocument): ExportComment[] {
-	return getExportCommentsForContent(doc, readDocumentText(doc.content))
+	return getExportCommentsForContent(doc, doc.content)
 }
-
 function getExportCommentsForContent(
 	doc: LoadedCommentDocument,
 	transformedContent: string,
 ): ExportComment[] {
-	let content = readDocumentText(doc.content)
-	let changes = getContentChanges(content, transformedContent)
-	return getActiveCommentThreads(doc).map(thread => {
-		let range = mapCommentRange(
-			getCommentRange(doc, thread.anchor),
-			changes,
-			transformedContent,
-		)
-		return exportCommentThread(transformedContent, thread, range)
-	})
+	return doc.comments
+		.filter(thread => !thread.deletedAt)
+		.map(thread => {
+			let range = mapCommentRangeAcrossContent(
+				doc.content,
+				transformedContent,
+				getCommentRange(doc, thread.anchor),
+			)
+			return {
+				id: thread.id,
+				quote: range.orphaned
+					? thread.anchor.quote
+					: transformedContent.slice(range.from, range.to) ||
+						thread.anchor.quote,
+				contextBefore: range.orphaned
+					? thread.anchor.contextBefore
+					: transformedContent.slice(Math.max(0, range.from - 80), range.from),
+				contextAfter: range.orphaned
+					? thread.anchor.contextAfter
+					: transformedContent.slice(range.to, range.to + 80),
+				from: range.orphaned ? null : range.from,
+				to: range.orphaned ? null : range.to,
+				resolved: !!thread.resolvedAt,
+				createdAt: thread.createdAt.toISOString(),
+				updatedAt: thread.updatedAt.toISOString(),
+				replies: thread.replies.map(reply => ({
+					body: reply.body,
+					authorName: reply.authorName,
+					createdAt: reply.createdAt.toISOString(),
+					updatedAt: reply.updatedAt?.toISOString() ?? null,
+				})),
+			}
+		})
 }
-
+async function restoreExportedComments(
+	doc: LoadedCommentDocument,
+	comments: ExportComment[],
+	sourceContent?: string,
+) {
+	let authorId = doc.db.getAuthState().session?.user
+	if (
+		!authorId ||
+		(!doc.comments.length && !comments.some(comment => comment.replies.length))
+	)
+		return
+	let write = await doc.db.transaction(tx => {
+		for (let thread of doc.comments) tx.delete(app.commentThreads, thread.id)
+		for (let comment of comments) {
+			if (!comment.replies.length) continue
+			let range =
+				sourceContent && comment.from !== null && comment.to !== null
+					? mapCommentRangeAcrossContent(sourceContent, doc.content, {
+							from: comment.from,
+							to: comment.to,
+							orphaned: false,
+						})
+					: null
+			let recovered = recoverRange(doc.content, comment)
+			let anchor =
+				range && !range.orphaned
+					? makeAnchor(doc, range.from, range.to)
+					: recovered
+						? makeAnchor(doc, recovered.from, recovered.to)
+						: {
+								quote: comment.quote,
+								contextBefore: comment.contextBefore,
+								contextAfter: comment.contextAfter,
+							}
+			let thread = tx.insert(app.commentThreads, {
+				documentId: doc.id,
+				authorId,
+				anchor,
+				createdAt: new Date(comment.createdAt),
+				updatedAt: new Date(comment.updatedAt),
+				resolvedAt: comment.resolved ? new Date(comment.updatedAt) : null,
+			})
+			for (let reply of comment.replies)
+				tx.insert(app.commentReplies, {
+					threadId: thread.id,
+					authorId,
+					body: reply.body,
+					authorName: reply.authorName,
+					createdAt: new Date(reply.createdAt),
+					updatedAt: reply.updatedAt ? new Date(reply.updatedAt) : null,
+				})
+		}
+	})
+	await write.wait({ tier: "local" })
+}
 function mapCommentRangeAcrossContent(
 	oldContent: string,
 	newContent: string,
@@ -556,239 +445,6 @@ function mapCommentRangeAcrossContent(
 		newContent,
 	)
 }
-
-function recoverRange(content: string, anchor: CommentAnchorData) {
-	if (!anchor.quote) return null
-	return firstRecoveredRange(content, anchor, [
-		recoverContextRange,
-		recoverQuoteRange,
-		recoverFuzzyRange,
-	])
-}
-
-function getTrackedCommentRange(
-	doc: co.loaded<typeof Document, { content: true }>,
-	anchor: CommentAnchorData,
-) {
-	let start = anchor.start
-		? getTextPositionIndex(doc, "before", anchor.start)
-		: undefined
-	let end = anchor.end
-		? getTextPositionIndex(doc, "after", anchor.end)
-		: undefined
-
-	if (start !== undefined && end !== undefined && start <= end) {
-		if (anchor.collapsed) return { from: start, to: start, orphaned: false }
-		return { from: start, to: end, orphaned: false }
-	}
-	return null
-}
-
-function firstRecoveredRange(
-	content: string,
-	anchor: CommentAnchorData,
-	recoveries: RangeRecovery[],
-) {
-	for (let recover of recoveries) {
-		let range = recover(content, anchor)
-		if (range) return range
-	}
-	return null
-}
-
-function recoverContextRange(content: string, anchor: CommentAnchorData) {
-	let contextMatch = `${anchor.contextBefore}${anchor.quote}${anchor.contextAfter}`
-	let contextIndex = content.indexOf(contextMatch)
-	if (contextIndex >= 0) {
-		let from = contextIndex + anchor.contextBefore.length
-		return { from, to: from + anchor.quote.length }
-	}
-	return null
-}
-
-function recoverQuoteRange(content: string, anchor: CommentAnchorData) {
-	let quoteIndex = content.indexOf(anchor.quote)
-	if (quoteIndex < 0) return null
-	return { from: quoteIndex, to: quoteIndex + anchor.quote.length }
-}
-
-function exportCommentThread(
-	content: string,
-	thread: LoadedCommentThread,
-	range: CommentRange,
-): ExportComment {
-	let replies = []
-	for (let reply of thread.replies.values()) {
-		if (!reply?.$isLoaded || reply.deletedAt) continue
-		replies.push({
-			body: reply.body,
-			authorName: reply.authorName ?? null,
-			createdAt: reply.createdAt.toISOString(),
-			updatedAt: reply.updatedAt?.toISOString() ?? null,
-		})
-	}
-	let quote = range.orphaned
-		? thread.anchor.quote
-		: content.slice(range.from, range.to)
-	return {
-		id: thread.$jazz.id,
-		quote: quote || thread.anchor.quote,
-		contextBefore: range.orphaned
-			? thread.anchor.contextBefore
-			: content.slice(Math.max(0, range.from - 80), range.from),
-		contextAfter: range.orphaned
-			? thread.anchor.contextAfter
-			: content.slice(range.to, Math.min(content.length, range.to + 80)),
-		from: range.orphaned ? null : range.from,
-		to: range.orphaned ? null : range.to,
-		resolved: Boolean(thread.resolvedAt),
-		createdAt: thread.createdAt.toISOString(),
-		updatedAt: thread.updatedAt.toISOString(),
-		replies,
-	}
-}
-
-function cleanAuthorName(authorName: string | undefined) {
-	let name = authorName?.trim()
-	return name ? name.slice(0, 80) : undefined
-}
-
-function getActiveCommentThreads(doc: LoadedCommentDocument) {
-	if (!doc.comments?.$isLoaded) return []
-	let threads: LoadedCommentThread[] = []
-	for (let thread of doc.comments.values()) {
-		if (thread?.$isLoaded && thread.replies?.$isLoaded && !thread.deletedAt) {
-			threads.push(thread)
-		}
-	}
-	return threads
-}
-
-function getActiveCommentAnchorThreads(doc: LoadedAnchorDocument) {
-	if (!doc.comments?.$isLoaded) return []
-	let threads: co.loaded<typeof CommentThread>[] = []
-	for (let thread of doc.comments.values()) {
-		if (thread?.$isLoaded && !thread.deletedAt) threads.push(thread)
-	}
-	return threads
-}
-
-function ensureComments(doc: LoadedCommentDocument) {
-	if (!doc.comments) {
-		doc.$jazz.set(
-			"comments",
-			co.list(CommentThread).create([], doc.$jazz.owner),
-		)
-	}
-	return doc.comments
-}
-
-function makeAnchor(
-	doc: co.loaded<typeof Document, { content: true }>,
-	from: number,
-	to: number,
-	previous?: CommentAnchorData,
-): CommentAnchorData {
-	let content = readDocumentText(doc.content)
-	let safeFrom = Math.max(0, Math.min(from, content.length))
-	let safeTo = Math.max(safeFrom, Math.min(to, content.length))
-	let quotes = deriveAnchorQuotes(content.slice(safeFrom, safeTo), previous)
-	return {
-		start: stringifyTextPos(doc.content.posAfter(safeFrom)),
-		end: stringifyTextPos(
-			safeFrom === safeTo
-				? (doc.content.posBefore(safeTo) ?? doc.content.posAfter(safeTo))
-				: doc.content.posBefore(safeTo),
-		),
-		quote: quotes.current,
-		originalQuote: quotes.original,
-		contextBefore: content.slice(Math.max(0, safeFrom - 80), safeFrom),
-		contextAfter: content.slice(safeTo, Math.min(content.length, safeTo + 80)),
-		collapsed: safeFrom === safeTo ? true : undefined,
-	}
-}
-
-function deriveAnchorQuotes(current: string, previous?: CommentAnchorData) {
-	let currentQuote = current || previous?.quote || ""
-	let originalQuote = previous?.originalQuote ?? previous?.quote ?? current
-	return {
-		current: currentQuote.slice(0, MAX_ANCHOR_QUOTE_LENGTH),
-		original: originalQuote.slice(0, MAX_ANCHOR_QUOTE_LENGTH),
-	}
-}
-
-function stringifyTextPos(pos: TextPos | undefined) {
-	if (!pos) return undefined
-	return stringifyOpID(pos)
-}
-
-function getTextPositionIndex(
-	doc: co.loaded<typeof Document, { content: true }>,
-	side: "before" | "after",
-	id: string,
-): number | undefined {
-	let mapping =
-		side === "before"
-			? doc.content.$jazz.raw.mapping.idxBeforeOpID
-			: doc.content.$jazz.raw.mapping.idxAfterOpID
-	// Jazz types mapping keys as branded op IDs; comment anchors persist them as plain strings.
-	let index = Reflect.get(mapping, id)
-	return typeof index === "number" ? index : undefined
-}
-
-function recoverFuzzyRange(content: string, anchor: CommentAnchorData) {
-	let tokens = getSearchTokens(anchor.quote)
-	if (tokens.length === 0) return null
-
-	let window = getContextWindow(content, anchor)
-	let match = findOrderedTokenSpan(window.text, tokens)
-	if (!match) return null
-
-	return {
-		from: window.offset + match.from,
-		to: window.offset + match.to,
-	}
-}
-
-function getContextWindow(content: string, anchor: CommentAnchorData) {
-	let from = 0
-	let to = content.length
-	let before = anchor.contextBefore.trim()
-	let after = anchor.contextAfter.trim()
-
-	if (before) {
-		let beforeIndex = content.indexOf(before)
-		if (beforeIndex >= 0) from = beforeIndex + before.length
-	}
-
-	if (after) {
-		let afterIndex = content.indexOf(after, from)
-		if (afterIndex >= 0) to = afterIndex
-	}
-
-	return { text: content.slice(from, to), offset: from }
-}
-
-function getSearchTokens(text: string) {
-	return text.match(/[^\s]+/g) ?? []
-}
-
-function findOrderedTokenSpan(content: string, tokens: string[]) {
-	let searchFrom = 0
-	let from = -1
-	let to = -1
-
-	for (let token of tokens) {
-		let index = content.indexOf(token, searchFrom)
-		if (index < 0) return null
-		if (from < 0) from = index
-		to = index + token.length
-		searchFrom = to
-	}
-
-	return from < 0 ? null : { from, to }
-}
-
 type DiffChange = {
 	fromA: number
 	toA: number
@@ -829,41 +485,6 @@ function getChangedContentSpan(oldContent: string, newContent: string) {
 		fromB: prefix,
 		toB: newContent.length - suffix,
 	}
-}
-
-function getRestoredCommentRange(
-	comment: ExportComment,
-	content: string,
-	changes: DiffChange[],
-): CommentRange {
-	return (
-		getRestoredOffsetRange(comment, content, changes) ??
-		getRecoveredExportRange(comment, content) ??
-		orphanedRange()
-	)
-}
-
-function getRestoredOffsetRange(
-	comment: ExportComment,
-	content: string,
-	changes: DiffChange[],
-) {
-	if (comment.from === null || comment.to === null) return null
-	return mapCommentRange(
-		{ from: comment.from, to: comment.to, orphaned: false },
-		changes,
-		content,
-	)
-}
-
-function getRecoveredExportRange(comment: ExportComment, content: string) {
-	let recovered = recoverRange(content, {
-		quote: comment.quote,
-		contextBefore: comment.contextBefore,
-		contextAfter: comment.contextAfter,
-	})
-	if (recovered) return { ...recovered, orphaned: false }
-	return null
 }
 
 function orphanedRange(): CommentRange {

@@ -1,0 +1,557 @@
+import { benchmarkBrowserArgs } from "./network"
+import { measureReplay, withDeadline } from "./replay"
+import { execFileSync } from "node:child_process"
+import { mkdir, readFile, writeFile } from "node:fs/promises"
+import { dirname } from "node:path"
+import { z } from "zod"
+import {
+	chromium,
+	expect,
+	type Browser,
+	type BrowserContext,
+} from "@playwright/test"
+import { parseArgs } from "node:util"
+import { cpus, platform, release, loadavg } from "node:os"
+import { fetchDatasets } from "./fetch"
+import { loadDatasets } from "./datasets"
+import {
+	createAccount,
+	waitForEditorBoot,
+	seed,
+	resolveDocument,
+	waitForDocumentList,
+	openDocument,
+	readContent,
+	configureEditor,
+	captureCredentials,
+	verifyExport,
+	editor,
+} from "./adapter"
+import { installObservers, instrument, summary } from "./metrics"
+
+let { values } = parseArgs({
+	args: process.argv.slice(2).filter(arg => arg !== "--"),
+	options: {
+		target: { type: "string" },
+		label: { type: "string" },
+		out: { type: "string" },
+		runs: { type: "string", default: "3" },
+		cpu: { type: "string", default: "1" },
+		notes: { type: "string", default: "50" },
+		edits: { type: "string", default: "200" },
+		"replay-timeout-ms": { type: "string" },
+		"load-only": { type: "boolean", default: false },
+		"performance-only": { type: "boolean", default: false },
+		"large-only": { type: "boolean", default: false },
+		"sw-only": { type: "boolean", default: false },
+		"skip-sw": { type: "boolean", default: false },
+		"literal-newlines": { type: "boolean", default: false },
+	},
+})
+if (!values.target || !values.label || !values.out)
+	throw new Error(
+		"Required: --target <url> --label classic|v2 --out <path> [--runs 3 --cpu 1 --notes 50 --edits 200|full]",
+	)
+let target = values.target
+let runs = positive(values.runs)
+let cpu = positive(values.cpu)
+let notes = positive(values.notes)
+let sources = await fetchDatasets()
+let { documents, trace } = await loadDatasets(notes)
+let editCount =
+	values.edits === "full" ? trace.edits.length : positive(values.edits)
+let replayTimeoutMs = values["replay-timeout-ms"]
+	? positive(values["replay-timeout-ms"])
+	: Math.max(120_000, editCount * 500)
+if (replayTimeoutMs > 2_147_483_647)
+	throw new Error("Replay deadline exceeds timer range")
+if (editCount > trace.edits.length)
+	throw new Error("Requested more edits than trace contains")
+let browser = await chromium.launch({
+	headless: true,
+	args: benchmarkBrowserArgs,
+})
+let samples: Record<string, number[]> = {}
+let scenarioFailures: {
+	run: number
+	scenario: string
+	elapsedMs: number
+	message: string
+}[] = []
+let runLoads: { run: number; start: number[]; end?: number[] }[] = []
+let syncDiagnostics: unknown[] = []
+let bundleTransfers: unknown[] = []
+let serviceWorkerDiagnostics: unknown[] = []
+let result = {
+	runLoads,
+	syncDiagnostics,
+	bundleTransfers,
+	serviceWorkerDiagnostics,
+	label: values.label,
+	target,
+	createdAt: new Date().toISOString(),
+	environment: {
+		platform: platform(),
+		release: release(),
+		cpu: cpus()[0]?.model,
+		cores: cpus().length,
+		browser: browser.version(),
+		cpuThrottle: cpu,
+		networkCapture: "CDP pages, iframes, dedicated workers and SharedWorkers",
+		serverRuntime: process.env.BENCH_SERVER_NOTE ?? "unspecified",
+		jazz:
+			process.env.BENCH_JAZZ ??
+			JSON.parse(await readFile("package.json", "utf8")).dependencies[
+				"jazz-tools"
+			],
+		gitHead:
+			process.env.BENCH_GIT_HEAD ??
+			execFileSync("git", ["rev-parse", "HEAD"], {
+				encoding: "utf8",
+			}).trim(),
+		server:
+			process.env.BENCH_SERVER_MODE ??
+			"production Node adapter; local store; first visit SW blocked, returning SW installed",
+	},
+	config: {
+		runs,
+		notes,
+		edits: editCount,
+		totalTraceEdits: trace.edits.length,
+		serviceWorkersOnly: values["sw-only"],
+		largeOnly: values["large-only"],
+		performanceOnly: values["performance-only"],
+		loadOnly: values["load-only"],
+		firstVisitHttpCache: "fresh context, enabled",
+		literalNewlines: values["literal-newlines"],
+		automaticPairsAndCompletion: false,
+		replayTimeoutMs,
+	},
+	sources,
+	datasets: documents.map(doc => ({
+		title: doc.title,
+		source: doc.source,
+		bytes: Buffer.byteLength(doc.content),
+	})),
+	completedRuns: 0,
+	scenarioFailures,
+	metrics: {},
+}
+
+try {
+	for (let run = 0; run < runs; run++) {
+		console.error(
+			`Run ${run + 1}/${runs}: import ${documents.length} documents`,
+		)
+		runLoads.push({ run: run + 1, start: loadavg() })
+		let context = await newContext(browser)
+		try {
+			let page = await context.newPage()
+			let sourceNetwork = await instrument(page, cpu)
+			page.on("pageerror", error => console.error(error.message))
+			page.on("console", message => {
+				if (message.type() === "error") console.error(message.text())
+			})
+			await createAccount(page)
+			await configureEditor(page)
+			console.error("Account ready; importing ZIP")
+			let start = performance.now()
+			let seeded = await seed(page, documents)
+			add("importMs", performance.now() - start)
+			await page.waitForTimeout(5000)
+			let storage = await page.evaluate(() => navigator.storage.estimate())
+			add(
+				"indexedDBBytes",
+				z
+					.object({ usageDetails: z.object({ indexedDB: z.number() }) })
+					.parse(storage).usageDetails.indexedDB,
+			)
+			let credentials = await captureCredentials(context)
+			let large = seeded.find(doc => doc.title === "Book dracula")
+			let medium = seeded.find(doc => doc.title === "Book alice")
+			if (!large || !medium) throw new Error("Books missing")
+
+			if (!values["sw-only"]) {
+				console.error("Cold list and large-document open")
+				for (let scenario of ["coldListMs", "coldLargeOpenMs"]) {
+					let fresh = await newContext(browser, credentials)
+					try {
+						let cold = await fresh.newPage()
+						let network = await instrument(cold, cpu)
+						await network.setCacheDisabled(false)
+						start = performance.now()
+						if (scenario === "coldListMs") {
+							await cold.goto("/app", { waitUntil: "domcontentloaded" })
+							await resolveDocument(cold, large.title)
+						} else {
+							await waitForEditorBoot(cold, { path: `/app/doc/${large.id}` })
+							await expect(editor(cold)).toContainText("Book dracula", {
+								timeout: 120_000,
+							})
+						}
+						add(scenario, performance.now() - start)
+						await cold.waitForTimeout(1000)
+						network.ensureHealthy()
+						if (scenario === "coldListMs") {
+							add("firstLoadJsWasmBytes", network.wire.bundle)
+							bundleTransfers.push(...network.bundleTransfers.values())
+						}
+					} finally {
+						await fresh.close()
+					}
+				}
+				await page.bringToFront()
+				await sourceNetwork.setCacheDisabled(false)
+				await waitForEditorBoot(page)
+				start = performance.now()
+				await page.reload({ waitUntil: "domcontentloaded" })
+				await resolveDocument(page, large.title)
+				add("warmListMs", performance.now() - start)
+
+				if (!values["performance-only"]) {
+					console.error(
+						"Fresh device: credentials-only restore and verified bulk export",
+					)
+					let receiver = await newContext(browser, credentials)
+					start = performance.now()
+					try {
+						let other = await receiver.newPage()
+						await instrument(other, cpu)
+						await waitForEditorBoot(other)
+						console.error("Fresh device ready; exporting all bodies")
+						await verifyExport(other, seeded)
+						add("freshDeviceWholeDatasetMs", performance.now() - start)
+					} catch (error) {
+						let message = error instanceof Error ? error.message : String(error)
+						scenarioFailures.push({
+							run: run + 1,
+							scenario: "freshDeviceWholeDatasetMs",
+							elapsedMs: performance.now() - start,
+							message: message.slice(0, 1000),
+						})
+						console.error(`Fresh-device failure: ${message.slice(0, 200)}`)
+					} finally {
+						await receiver.close()
+					}
+					console.error("Sync: independent second client on the small note")
+					let syncReceiver = await newContext(browser, credentials)
+					try {
+						let other = await syncReceiver.newPage()
+						let syncNetwork = await instrument(other, cpu)
+						let syncDoc = seeded[0]
+						if (!syncDoc) throw new Error("Small sync note missing")
+						await openDocument(other, syncDoc)
+						await editor(other).focus()
+						await other.keyboard.press("ControlOrMeta+End")
+						await openDocument(page, syncDoc)
+						if (process.env.BENCH_SYNC_PROFILE_DIR) {
+							await sourceNetwork.cdp.send("Profiler.enable")
+							await sourceNetwork.cdp.send("Profiler.start")
+							await syncNetwork.cdp.send("Profiler.enable")
+							await syncNetwork.cdp.send("Profiler.start")
+						}
+						for (let n = 0; n < 5; n++) {
+							console.error(`Sync marker ${n + 1}/5`)
+							let marker = ` sync-${run}-${n}`
+							await editor(page).focus()
+							await page.keyboard.press("ControlOrMeta+End")
+							start = performance.now()
+							await page.keyboard.insertText(marker)
+							await expect
+								.poll(() => editor(other).innerText(), {
+									timeout: 120_000,
+									intervals: [20],
+								})
+								.toContain(marker)
+							let elapsedMs = performance.now() - start
+							add("syncEditMs", elapsedMs)
+							syncDiagnostics.push({
+								marker,
+								startedAt: start,
+								endedAt: performance.now(),
+								elapsedMs,
+								load: loadavg(),
+								sender: { ...sourceNetwork.wire },
+								senderTimeline: sourceNetwork.timeline.slice(-200),
+								receiverTimeline: syncNetwork.timeline.slice(-200),
+								senderLifecycle: sourceNetwork.timeline.filter(event =>
+									event.kind.startsWith("Network."),
+								),
+								receiverLifecycle: syncNetwork.timeline.filter(event =>
+									event.kind.startsWith("Network."),
+								),
+								receiver: { ...syncNetwork.wire },
+							})
+						}
+						if (process.env.BENCH_SYNC_PROFILE_DIR) {
+							await mkdir(process.env.BENCH_SYNC_PROFILE_DIR, {
+								recursive: true,
+							})
+							for (let [name, cdp] of [
+								["sender", sourceNetwork.cdp],
+								["receiver", syncNetwork.cdp],
+							] satisfies [string, typeof sourceNetwork.cdp][]) {
+								let { profile } = await cdp.send("Profiler.stop")
+								await writeFile(
+									`${process.env.BENCH_SYNC_PROFILE_DIR}/${name}.cpuprofile`,
+									JSON.stringify(profile),
+								)
+							}
+						}
+					} finally {
+						await syncReceiver.close()
+					}
+				}
+
+				for (let doc of values["load-only"]
+					? []
+					: values["large-only"]
+						? [large]
+						: values["performance-only"]
+							? [seeded[0], large]
+							: [seeded[0], medium, large]) {
+					if (!doc) throw new Error("Small note missing")
+					let name =
+						doc === large ? "large" : doc === medium ? "medium" : "small"
+					console.error(`Replay ${editCount} edits in isolated ${name} context`)
+					let typingContext = await newContext(browser, credentials)
+					let replayStarted = performance.now()
+					try {
+						let typingPage = await typingContext.newPage()
+						let metrics = await withDeadline(
+							measureReplay(typingPage, {
+								document: doc,
+								edits: trace.edits.slice(0, editCount),
+								cpu,
+								reset: name === "small",
+								literalNewlines: values["literal-newlines"],
+								finalText:
+									editCount === trace.edits.length
+										? trace.finalText
+										: undefined,
+							}),
+							replayTimeoutMs,
+							`${name} replay`,
+						)
+						for (let event of metrics.events) {
+							add(`${name}EventDurationMs`, event.duration)
+							add(`${name}EventInputDelayMs`, event.inputDelay)
+							add(`${name}EventProcessingMs`, event.processing)
+							add(`${name}EventPresentationMs`, event.presentation)
+						}
+						for (let value of metrics.paint) add(`${name}InputToPaintMs`, value)
+						for (let value of metrics.dispatchToPaint)
+							add(`${name}DispatchToPaintMs`, value)
+						add(`${name}LongTaskCount`, metrics.longTaskCount)
+						add(`${name}LongTaskTotalMs`, metrics.longTaskTotalMs)
+						add(`${name}SentBytesPerEdit`, metrics.sentBytesPerEdit)
+						add(`${name}ReceivedWsBytesPerEdit`, metrics.receivedWsBytesPerEdit)
+						add(`${name}JsHeapBytes`, metrics.jsHeapBytes)
+					} catch (error) {
+						let message = error instanceof Error ? error.message : String(error)
+						scenarioFailures.push({
+							run: run + 1,
+							scenario: `${name}Replay`,
+							elapsedMs: performance.now() - replayStarted,
+							message: message.slice(0, 1000),
+						})
+						console.error(`${name} replay failure: ${message.slice(0, 200)}`)
+					} finally {
+						await withDeadline(
+							typingContext.close(),
+							10_000,
+							"closing typing context",
+						).catch(async () => {
+							await withDeadline(
+								browser.close(),
+								10_000,
+								"closing stalled browser",
+							).catch(() => {})
+						})
+					}
+				}
+			}
+			if (!values["skip-sw"]) {
+				console.error("Returning user: service worker and offline reload")
+				let returningStage = "startup"
+				let returningStarted = performance.now()
+				let returning = await newContext(browser, credentials, true)
+				let returningPage = await returning.newPage()
+				try {
+					await withDeadline(
+						(async () => {
+							let returningNetwork = await instrument(returningPage, cpu)
+							await returningNetwork.setCacheDisabled(false)
+							await waitForEditorBoot(returningPage)
+							returningStage = "initialLibrary"
+							await waitForDocumentList(returningPage)
+							returningStage = "largeOpen"
+							await waitForEditorBoot(returningPage, {
+								path: `/app/doc/${large.id}`,
+							})
+							await expect(editor(returningPage)).toContainText("Book dracula")
+							if (values["sw-only"]) {
+								returningStage = "verifiedHydration"
+								await expect(() => verifyExport(returningPage, seeded)).toPass({
+									timeout: 60_000,
+									intervals: [2000],
+								})
+								await expect
+									.poll(() => readContent(returningPage), { timeout: 60_000 })
+									.toBe(large.content)
+								await returningPage.waitForTimeout(5000)
+							}
+							returningStage = "serviceWorkerReady"
+							await returningPage.evaluate(async () => {
+								await navigator.serviceWorker.ready
+							})
+							returningStage = "controlledReload"
+							await returningPage.reload()
+							await expect
+								.poll(() =>
+									returningPage.evaluate(
+										() => !!navigator.serviceWorker.controller,
+									),
+								)
+								.toBe(true)
+							start = performance.now()
+							await returningPage.reload({ waitUntil: "domcontentloaded" })
+							await waitForDocumentList(returningPage)
+							add("returningSwListMs", performance.now() - start)
+							returningStage = "offlineOpen"
+							await returning.setOffline(true)
+							start = performance.now()
+							await waitForEditorBoot(returningPage, {
+								path: `/app/doc/${large.id}`,
+							})
+							await expect(editor(returningPage)).toContainText("Book dracula")
+							let offlineOpenMs = performance.now() - start
+							if (values["sw-only"])
+								await expect
+									.poll(() => readContent(returningPage), { timeout: 30_000 })
+									.toBe(large.content)
+							add("offlineSwLargeOpenMs", offlineOpenMs)
+						})(),
+						150_000,
+						"returning SW case",
+					)
+				} catch (error) {
+					scenarioFailures.push({
+						run: run + 1,
+						scenario: "returningServiceWorker",
+						elapsedMs: performance.now() - returningStarted,
+						message: `${returningStage}: ${String(error)}`.slice(0, 1000),
+					})
+					serviceWorkerDiagnostics.push({
+						stage: returningStage,
+						ui: await returningPage
+							.locator("body")
+							.innerText({ timeout: 3000 })
+							.then(text => text.slice(0, 1500))
+							.catch(String),
+						controller: await withDeadline(
+							returningPage.evaluate(
+								() => navigator.serviceWorker.controller?.state ?? null,
+							),
+							3000,
+							"SW diagnostic",
+						).catch(String),
+					})
+					if (returningStage !== "offlineOpen") {
+						let offlineStart = performance.now()
+						try {
+							await returning.setOffline(true)
+							await withDeadline(
+								(async () => {
+									await waitForEditorBoot(returningPage, {
+										path: `/app/doc/${large.id}`,
+									})
+									await expect(editor(returningPage)).toContainText(
+										"Book dracula",
+									)
+								})(),
+								30_000,
+								"independent offline open",
+							)
+							let offlineOpenMs = performance.now() - offlineStart
+							if (values["sw-only"])
+								await expect
+									.poll(() => readContent(returningPage), { timeout: 30_000 })
+									.toBe(large.content)
+							add("offlineSwLargeOpenMs", offlineOpenMs)
+						} catch (offlineError) {
+							scenarioFailures.push({
+								run: run + 1,
+								scenario: "offlineServiceWorker",
+								elapsedMs: performance.now() - offlineStart,
+								message: String(offlineError).slice(0, 1000),
+							})
+						}
+					}
+				} finally {
+					await withDeadline(
+						returning.close(),
+						10_000,
+						"closing returning context",
+					).catch(async () => {
+						await withDeadline(
+							browser.close(),
+							10_000,
+							"closing stalled browser",
+						).catch(() => {})
+					})
+				}
+			}
+
+			let load = runLoads.at(-1)
+			if (load) load.end = loadavg()
+			result.completedRuns++
+			await save()
+		} finally {
+			await context.close()
+		}
+	}
+} catch (error) {
+	await save()
+	throw error
+} finally {
+	await browser.close()
+}
+
+async function newContext(
+	browser: Browser,
+	storageState?: Awaited<ReturnType<BrowserContext["storageState"]>>,
+	allowServiceWorker = false,
+) {
+	let context = await browser.newContext({
+		baseURL: target,
+		ignoreHTTPSErrors: true,
+		permissions: ["clipboard-read", "clipboard-write"],
+		serviceWorkers: allowServiceWorker ? "allow" : "block",
+		viewport: { width: 1280, height: 900 },
+		storageState,
+	})
+	context.setDefaultTimeout(120_000)
+	context.setDefaultNavigationTimeout(120_000)
+	await installObservers(context)
+	return context
+}
+function positive(value: string) {
+	let n = Number(value)
+	if (!Number.isFinite(n) || n < 1 || !Number.isInteger(n))
+		throw new Error(`Expected positive integer: ${value}`)
+	return n
+}
+function add(name: string, value: number) {
+	if (!name.includes("ToPaint")) console.error(`${name}: ${value.toFixed(2)}`)
+	;(samples[name] ??= []).push(value)
+}
+async function save() {
+	result.metrics = Object.fromEntries(
+		Object.entries(samples).map(([name, values]) => [name, summary(values)]),
+	)
+	await mkdir(dirname(values.out!), { recursive: true })
+	await writeFile(values.out!, JSON.stringify(result, null, "\t") + "\n")
+}
+
+if (scenarioFailures.length > 0) process.exitCode = 1

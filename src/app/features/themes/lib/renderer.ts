@@ -1,8 +1,6 @@
-import { parse, walk, type CssNode } from "css-tree"
-import { type co } from "jazz-tools"
-import { type Theme, type ThemeAsset } from "./schema"
-import { type ThemesQuery, type ThemePresetType } from "./document-theme"
-
+import type { ThemeRow, ThemeAssetRow } from "./schema"
+import { scopeThemeCss } from "./scope"
+import type { ThemePresetType } from "./document-theme"
 export {
 	buildThemeStyles,
 	buildThemeStylesAsync,
@@ -19,9 +17,7 @@ export {
 	type ThemeRenderResult,
 }
 
-type LoadedTheme = co.loaded<typeof Theme, ThemesQuery["$each"]>
-type LoadedAsset = co.loaded<typeof ThemeAsset, { data: true }>
-
+type LoadedTheme = ThemeRow & { assets?: ThemeAssetRow[] }
 type ThemeStyles = {
 	css: string
 	cssHash: string
@@ -33,6 +29,7 @@ type ThemeStyles = {
 type CacheEntry = {
 	styles: ThemeStyles
 	themeUpdatedAt: number
+	assetVersion: string
 }
 
 let themeStylesCache = new Map<string, CacheEntry>()
@@ -41,84 +38,24 @@ type ThemeRenderResult =
 	| { ok: true; styles: ThemeStyles }
 	| { ok: false; error: string }
 
-function scopeThemeCss(css: string, scopeSelector: string): string {
-	if (!css.trim()) return ""
-
-	let { globalRules, scopedCss } = splitGlobalThemeRules(css)
-	let scoped = `@scope (${scopeSelector}) {\n${scopedCss}\n}`
-	return [...globalRules, scoped].join("\n")
-}
-
-function splitGlobalThemeRules(css: string) {
-	let globalRules: string[] = []
-	let spans: { from: number; to: number; replacement: string }[] = []
-	try {
-		let stylesheet = parse(css, {
-			positions: true,
-			parseAtrulePrelude: false,
-			parseRulePrelude: true,
-			parseValue: false,
-		})
-		if (stylesheet.type === "StyleSheet") {
-			stylesheet.children.forEach(rule => collectGlobalRules(rule, []))
-			walk(stylesheet, node => {
-				if (
-					node.type === "PseudoClassSelector" &&
-					node.name.toLowerCase() === "root" &&
-					node.loc
-				)
-					spans.push({
-						from: node.loc.start.offset,
-						to: node.loc.end.offset,
-						replacement: ":scope",
-					})
-			})
-		}
-	} catch {
-		return { globalRules: [], scopedCss: css }
-	}
-	function collectGlobalRules(rule: CssNode, wrappers: string[]) {
-		if (rule.type !== "Atrule" || !rule.loc) return
-		let name = rule.name.toLowerCase()
-		let from = rule.loc.start.offset
-		let to = rule.loc.end.offset
-		if (["import", "font-face", "page"].includes(name)) {
-			let globalRule = css.slice(from, to)
-			for (let wrapper of [...wrappers].reverse())
-				globalRule = `${wrapper}{\n${globalRule}\n}`
-			globalRules.push(globalRule)
-			spans.push({ from, to, replacement: "" })
-		} else if (
-			["media", "supports", "layer"].includes(name) &&
-			rule.block?.loc
-		) {
-			let wrapper = css.slice(from, rule.block.loc.start.offset)
-			rule.block.children.forEach(child =>
-				collectGlobalRules(child, [...wrappers, wrapper]),
-			)
-		}
-	}
-
-	let scopedCss = css
-	for (let span of spans.sort((a, b) => b.from - a.from))
-		scopedCss =
-			scopedCss.slice(0, span.from) +
-			span.replacement +
-			scopedCss.slice(span.to)
-	return { globalRules, scopedCss }
-}
-
 function getCachedThemeStyles(
 	theme: LoadedTheme,
 	preset: ThemePresetType | null,
 ): ThemeStyles {
-	let themeId = theme.$jazz.id
+	let themeId = theme.id
 	let presetName = preset?.name ?? null
 	let cacheKey = getCacheKey(themeId, presetName)
 	let themeUpdatedAt = theme.updatedAt?.getTime() ?? 0
+	let assetVersion = (theme.assets ?? [])
+		.map(asset => `${asset.id}:${asset.data.byteLength}`)
+		.join(",")
 
 	let cached = themeStylesCache.get(cacheKey)
-	if (cached && cached.themeUpdatedAt === themeUpdatedAt) {
+	if (
+		cached &&
+		cached.themeUpdatedAt === themeUpdatedAt &&
+		cached.assetVersion === assetVersion
+	) {
 		return cached.styles
 	}
 
@@ -129,7 +66,7 @@ function getCachedThemeStyles(
 	}
 
 	let styles = buildThemeStyles(theme, preset)
-	themeStylesCache.set(cacheKey, { styles, themeUpdatedAt })
+	themeStylesCache.set(cacheKey, { styles, themeUpdatedAt, assetVersion })
 
 	return styles
 }
@@ -153,14 +90,16 @@ function buildThemeStyles(
 	let fontFaceRules = ""
 	let presetVariables = ""
 
-	if (theme.assets?.$isLoaded) {
+	if (theme.assets) {
 		for (let asset of theme.assets.values()) {
-			if (!asset?.$isLoaded) continue
-			let loaded = asset as LoadedAsset
-			if (!loaded.data?.$isLoaded) continue
+			if (!asset) continue
+			let loaded = asset
+
 			if (!loaded.mimeType.startsWith("font/")) continue
 
-			let blob = loaded.data.toBlob()
+			let blob = new Blob([new Uint8Array(loaded.data)], {
+				type: loaded.mimeType,
+			})
 			if (!blob) continue
 
 			let url = URL.createObjectURL(blob)
@@ -231,13 +170,20 @@ async function getCachedThemeStylesAsync(
 	theme: LoadedTheme,
 	preset: ThemePresetType | null,
 ): Promise<ThemeStyles> {
-	let themeId = theme.$jazz.id
+	let themeId = theme.id
 	let presetName = preset?.name ?? null
 	let cacheKey = getCacheKey(themeId, presetName)
 	let themeUpdatedAt = theme.updatedAt?.getTime() ?? 0
+	let assetVersion = (theme.assets ?? [])
+		.map(asset => `${asset.id}:${asset.data.byteLength}`)
+		.join(",")
 
 	let cached = themeStylesCache.get(cacheKey)
-	if (cached && cached.themeUpdatedAt === themeUpdatedAt) {
+	if (
+		cached &&
+		cached.themeUpdatedAt === themeUpdatedAt &&
+		cached.assetVersion === assetVersion
+	) {
 		return cached.styles
 	}
 
@@ -248,7 +194,7 @@ async function getCachedThemeStylesAsync(
 	}
 
 	let styles = await buildThemeStylesAsync(theme, preset)
-	themeStylesCache.set(cacheKey, { styles, themeUpdatedAt })
+	themeStylesCache.set(cacheKey, { styles, themeUpdatedAt, assetVersion })
 
 	return styles
 }
@@ -267,16 +213,18 @@ async function buildThemeStylesAsync(
 
 	await yieldToMain()
 
-	if (theme.assets?.$isLoaded) {
+	if (theme.assets) {
 		let assets = Array.from(theme.assets.values())
 		for (let i = 0; i < assets.length; i++) {
 			let asset = assets[i]
-			if (!asset?.$isLoaded) continue
-			let loaded = asset as LoadedAsset
-			if (!loaded.data?.$isLoaded) continue
+			if (!asset) continue
+			let loaded = asset
+
 			if (!loaded.mimeType.startsWith("font/")) continue
 
-			let blob = loaded.data.toBlob()
+			let blob = new Blob([new Uint8Array(loaded.data)], {
+				type: loaded.mimeType,
+			})
 			if (!blob) continue
 
 			let url = URL.createObjectURL(blob)

@@ -1,55 +1,13 @@
+import { runCommand, executeCommand } from "@/cli/runtime"
 import { Command, Options } from "@effect/cli"
 import { version as packageVersion } from "@/cli/version"
 import { descriptions } from "@/cli/help"
-import {
-	createPersonalDocument,
-	deletePersonalDocument,
-	permanentlyDeletePersonalDocument,
-	restorePersonalDocument,
-} from "@/app/features/documents"
-import {
-	acceptDocumentInvite,
-	changeCollaboratorRole,
-	createDocumentInvite,
-	getDocumentOwner,
-	leavePersonalDocument,
-	listCollaborators,
-	makeDocumentPrivate,
-	makeDocumentPublic,
-	parseInviteLink,
-	revokeDocumentInvite,
-	canEdit,
-} from "@/app/features/sharing"
-import { syncDocumentMetadata } from "@/app/features/documents"
-import {
-	acceptSpaceInvite,
-	changeSpaceCollaboratorRole,
-	createSpaceInvite,
-	getSpaceGroup,
-	getSpaceOwner,
-	isSpaceMember,
-	isSpacePublic,
-	leaveSpace,
-	listSpaceCollaborators,
-	listSpaceMembers,
-	makeSpacePrivate,
-	makeSpacePublic,
-	parseSpaceInviteLink,
-	permanentlyDeleteSpace,
-	revokeSpaceInvite,
-} from "@/app/features/spaces"
-import { getDocumentTitle } from "@/app/features/documents"
-import { moveDocumentToSpace } from "@/app/features/documents"
-import {
-	buildDocumentPublicLink,
-	buildSpacePublicLink,
-} from "@/app/features/sharing"
-import { setDocumentTitle } from "@/cli/document-title"
+
 import { docAssetCommand } from "@/cli/assets"
 import { docCommentCommand } from "@/cli/doc-comments"
 import { docExportCommand } from "@/cli/export"
 import { themeCommand } from "@/cli/themes"
-import { CliUsageError, PermissionError } from "@/cli/errors"
+
 import {
 	contentFileOption,
 	contentOption,
@@ -73,37 +31,6 @@ import {
 	syncOption,
 	titleOption,
 } from "@/cli/options"
-import { parseDocScope } from "@/cli/parse"
-import {
-	createAuthenticatedJazz,
-	generatePassphrase,
-	getPassphraseFromStorage,
-	getStoredCredentials,
-	logInWithPassphrase,
-	logOut,
-	signUpWithPassphrase,
-} from "@/cli/jazz"
-import { printContent } from "@/cli/output"
-import {
-	createSpaceScopedDoc,
-	findDocument,
-	findSpace,
-	getOptionString,
-	inspectInvite,
-	listDocs,
-	loadAccount,
-	loadDocumentContent,
-	loadDocumentForMutation,
-	loadDocumentMetadata,
-	replaceCliDocumentContent,
-	readRequiredContentInput,
-	readRequiredSecretInput,
-	readSecretInput,
-	runCommand,
-	summarizeDoc,
-	syncMutation,
-} from "@/cli/runtime"
-import { createSpace, getRandomWriterName } from "@/schema"
 
 export { cli }
 
@@ -117,28 +44,9 @@ let authSignup = Command.make(
 		passphraseStdin: passphraseStdinOption,
 	},
 	args =>
-		runCommand("auth.signup", args, async config => {
-			let name = getOptionString(args.name) ?? getRandomWriterName()
-			let passphrase =
-				(await readSecretInput(
-					args.passphrase,
-					args.passphraseFile,
-					args.passphraseStdin,
-				)) ?? (await generatePassphrase())
-			let jazz = await signUpWithPassphrase({ config, name, passphrase })
-			let account = await jazz.account.$jazz.ensureLoaded({
-				resolve: { profile: true },
-			})
-			await jazz.account.$jazz.waitForAllCoValuesSync({
-				timeout: config.timeoutMs,
-			})
-			await jazz.done()
-			return {
-				accountId: account.$jazz.id,
-				name: account.profile.name,
-				passphrase,
-			}
-		}),
+		runCommand("auth.signup", args, config =>
+			executeCommand("auth.signup", args, config),
+		),
 )
 
 let authLogin = Command.make(
@@ -150,55 +58,27 @@ let authLogin = Command.make(
 		passphraseStdin: passphraseStdinOption,
 	},
 	args =>
-		runCommand("auth.login", args, async config => {
-			let passphrase = await readRequiredSecretInput(
-				args.passphrase,
-				args.passphraseFile,
-				args.passphraseStdin,
-			)
-			let jazz = await logInWithPassphrase({ config, passphrase })
-			let account = await jazz.account.$jazz.ensureLoaded({
-				resolve: { profile: true },
-			})
-			await jazz.done()
-			return {
-				accountId: account.$jazz.id,
-				name: account.profile.name,
-				provider: "passphrase",
-				syncPeer: config.syncPeer,
-			}
-		}),
+		runCommand("auth.login", args, config =>
+			executeCommand("auth.login", args, config),
+		),
 )
 
 let authLogout = Command.make("logout", globalOptions, args =>
-	runCommand("auth.logout", args, async config => {
-		await logOut(config)
-		return { status: "logged out" }
-	}),
+	runCommand("auth.logout", args, config =>
+		executeCommand("auth.logout", args, config),
+	),
 )
 
 let authWhoami = Command.make("whoami", globalOptions, args =>
-	runCommand("auth.whoami", args, async config => {
-		let jazz = await createAuthenticatedJazz(config)
-		let credentials = await jazz.authSecretStorage.get()
-		let account = await jazz.account.$jazz.ensureLoaded({
-			resolve: { profile: true },
-		})
-		await jazz.done()
-		return {
-			accountId: account.$jazz.id,
-			name: account.profile.name,
-			provider: credentials?.provider ?? "unknown",
-			syncPeer: config.syncPeer,
-		}
-	}),
+	runCommand("auth.whoami", args, config =>
+		executeCommand("auth.whoami", args, config),
+	),
 )
 
 let authPassphrase = Command.make("passphrase", globalOptions, args =>
-	runCommand("auth.passphrase", args, async config => {
-		let passphrase = await getPassphraseFromStorage(config)
-		return { passphrase }
-	}),
+	runCommand("auth.passphrase", args, config =>
+		executeCommand("auth.passphrase", args, config),
+	),
 )
 
 let authCommand = Command.make("auth").pipe(
@@ -213,30 +93,9 @@ let authCommand = Command.make("auth").pipe(
 )
 
 let accountShow = Command.make("show", globalOptions, args =>
-	runCommand("account.show", args, async config => {
-		let jazz = await createAuthenticatedJazz(config)
-		let credentials = await jazz.authSecretStorage.get()
-		let account = await loadAccount(jazz, config.timeoutMs)
-		let personalDocs = account.root.documents.filter(Boolean).length
-		let spaces =
-			account.root.spaces?.flatMap(space =>
-				space?.$isLoaded ? [space] : [],
-			) ?? []
-		let spaceDocs = spaces.reduce(
-			(sum, space) => sum + space.documents.filter(Boolean).length,
-			0,
-		)
-		await jazz.done()
-		return {
-			accountId: account.$jazz.id,
-			name: account.profile.name,
-			provider: credentials?.provider ?? "unknown",
-			syncPeer: config.syncPeer,
-			documents: personalDocs + spaceDocs,
-			personalDocuments: personalDocs,
-			spaces: spaces.length,
-		}
-	}),
+	runCommand("account.show", args, config =>
+		executeCommand("account.show", args, config),
+	),
 )
 
 let accountRename = Command.make(
@@ -246,16 +105,9 @@ let accountRename = Command.make(
 		name: nameOption,
 	},
 	args =>
-		runCommand("account.rename", args, async config => {
-			let jazz = await createAuthenticatedJazz(config)
-			let account = await jazz.account.$jazz.ensureLoaded({
-				resolve: { profile: true },
-			})
-			account.profile.$jazz.set("name", args.name)
-			await syncMutation(jazz, config.timeoutMs)
-			await jazz.done()
-			return { accountId: account.$jazz.id, name: account.profile.name }
-		}),
+		runCommand("account.rename", args, config =>
+			executeCommand("account.rename", args, config),
+		),
 )
 
 let accountCommand = Command.make("account").pipe(
@@ -264,26 +116,15 @@ let accountCommand = Command.make("account").pipe(
 )
 
 let syncFlush = Command.make("flush", globalOptions, args =>
-	runCommand("sync.flush", args, async config => {
-		let jazz = await createAuthenticatedJazz(config)
-		await jazz.account.$jazz.waitForAllCoValuesSync({
-			timeout: config.timeoutMs,
-		})
-		await jazz.done()
-		return { synced: true, syncPeer: config.syncPeer }
-	}),
+	runCommand("sync.flush", args, config =>
+		executeCommand("sync.flush", args, config),
+	),
 )
 
 let syncStatus = Command.make("status", globalOptions, args =>
-	runCommand("sync.status", args, async config => {
-		let credentials = await getStoredCredentials(config)
-		return {
-			authenticated: Boolean(credentials),
-			accountId: credentials?.accountID ?? null,
-			provider: credentials?.provider ?? null,
-			syncPeer: config.syncPeer,
-		}
-	}),
+	runCommand("sync.status", args, config =>
+		executeCommand("sync.status", args, config),
+	),
 )
 
 let syncCommand = Command.make("sync").pipe(
@@ -299,18 +140,9 @@ let docList = Command.make(
 		deleted: deletedOption,
 	},
 	args =>
-		runCommand("doc.list", args, async config => {
-			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz, config.timeoutMs)
-			let docs = await listDocs(
-				account,
-				getOptionString(args.scope),
-				args.deleted,
-				config.timeoutMs,
-			)
-			await jazz.done()
-			return docs
-		}),
+		runCommand("doc.list", args, config =>
+			executeCommand("doc.list", args, config),
+		),
 )
 
 let docGet = Command.make(
@@ -323,24 +155,9 @@ let docGet = Command.make(
 		staleOk: staleOkOption,
 	},
 	args =>
-		runCommand("doc.get", args, async config => {
-			let jazz = await createAuthenticatedJazz(config)
-			let doc = await loadDocumentMetadata(jazz, args.docId, {
-				allowStale: args.offline || args.local || args.staleOk,
-				timeoutMs: config.timeoutMs,
-			})
-			let owner = await getDocumentOwner(doc)
-			await jazz.done()
-			return {
-				docId: doc.$jazz.id,
-				title: getDocumentTitle(doc),
-				spaceId: doc.spaceId ?? null,
-				createdAt: doc.createdAt.toISOString(),
-				updatedAt: doc.updatedAt.toISOString(),
-				deletedAt: doc.deletedAt?.toISOString() ?? null,
-				owner,
-			}
-		}),
+		runCommand("doc.get", args, config =>
+			executeCommand("doc.get", args, config),
+		),
 )
 
 let docContent = Command.make(
@@ -353,17 +170,9 @@ let docContent = Command.make(
 		staleOk: staleOkOption,
 	},
 	args =>
-		runCommand("doc.content", args, async config => {
-			let jazz = await createAuthenticatedJazz(config)
-			let doc = await loadDocumentContent(jazz, args.docId, {
-				allowStale: args.offline || args.local || args.staleOk,
-				timeoutMs: config.timeoutMs,
-			})
-			let content = doc.content.toString()
-			await jazz.done()
-			if (config.json) return { docId: doc.$jazz.id, content }
-			if (!config.quiet) printContent(content)
-		}),
+		runCommand("doc.content", args, config =>
+			executeCommand("doc.content", args, config),
+		),
 )
 
 let docCreate = Command.make(
@@ -377,26 +186,9 @@ let docCreate = Command.make(
 		sync: syncOption,
 	},
 	args =>
-		runCommand("doc.create", args, async config => {
-			let content = await readRequiredContentInput(
-				args.content,
-				args.contentFile,
-				args.stdin,
-			)
-			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz, config.timeoutMs)
-			let scope = parseDocScope(getOptionString(args.scope))
-			let doc =
-				scope.kind === "personal"
-					? await createPersonalDocument(account, content)
-					: await createSpaceScopedDoc(account, scope.spaceId, content)
-			await syncMutation(jazz, config.timeoutMs)
-			await jazz.done()
-			return summarizeDoc(
-				doc,
-				scope.kind === "space" ? scope.spaceId : undefined,
-			)
-		}),
+		runCommand("doc.create", args, config =>
+			executeCommand("doc.create", args, config),
+		),
 )
 
 let docUpdate = Command.make(
@@ -410,31 +202,9 @@ let docUpdate = Command.make(
 		sync: syncOption,
 	},
 	args =>
-		runCommand("doc.update", args, async config => {
-			let content = await readRequiredContentInput(
-				args.content,
-				args.contentFile,
-				args.stdin,
-			)
-			let jazz = await createAuthenticatedJazz(config)
-			let doc = await loadDocumentForMutation(
-				jazz,
-				args.docId,
-				config.timeoutMs,
-			)
-			if (!canEdit(doc))
-				throw new PermissionError({ message: "Document is read-only" })
-			if (doc.content.toString() === content) {
-				await jazz.done()
-				return summarizeDoc(doc)
-			}
-			await replaceCliDocumentContent(doc, content)
-			doc.$jazz.set("updatedAt", new Date())
-			syncDocumentMetadata(doc)
-			await syncMutation(jazz, config.timeoutMs)
-			await jazz.done()
-			return summarizeDoc(doc)
-		}),
+		runCommand("doc.update", args, config =>
+			executeCommand("doc.update", args, config),
+		),
 )
 
 let docRename = Command.make(
@@ -445,27 +215,9 @@ let docRename = Command.make(
 		title: titleOption,
 	},
 	args =>
-		runCommand("doc.rename", args, async config => {
-			let jazz = await createAuthenticatedJazz(config)
-			let doc = await loadDocumentForMutation(
-				jazz,
-				args.docId,
-				config.timeoutMs,
-			)
-			if (!canEdit(doc))
-				throw new PermissionError({ message: "Document is read-only" })
-			let nextContent = setDocumentTitle(doc.content.toString(), args.title)
-			if (doc.content.toString() === nextContent) {
-				await jazz.done()
-				return summarizeDoc(doc)
-			}
-			await replaceCliDocumentContent(doc, nextContent)
-			doc.$jazz.set("updatedAt", new Date())
-			syncDocumentMetadata(doc)
-			await syncMutation(jazz, config.timeoutMs)
-			await jazz.done()
-			return summarizeDoc(doc)
-		}),
+		runCommand("doc.rename", args, config =>
+			executeCommand("doc.rename", args, config),
+		),
 )
 
 let docMove = Command.make(
@@ -478,30 +230,9 @@ let docMove = Command.make(
 		),
 	},
 	args =>
-		runCommand("doc.move", args, async config => {
-			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz, config.timeoutMs)
-			let located = await findDocument(account, args.docId)
-			let nextScope = parseDocScope(args.scope)
-			await moveDocumentToSpace({
-				doc: located.doc,
-				destination:
-					nextScope.kind === "personal"
-						? null
-						: {
-								id: nextScope.spaceId,
-								name: findSpace(account, nextScope.spaceId).name,
-							},
-				currentSpaceId: located.space?.$jazz.id,
-				me: account,
-			})
-			await syncMutation(jazz, config.timeoutMs)
-			await jazz.done()
-			return summarizeDoc(
-				located.doc,
-				nextScope.kind === "space" ? nextScope.spaceId : undefined,
-			)
-		}),
+		runCommand("doc.move", args, config =>
+			executeCommand("doc.move", args, config),
+		),
 )
 
 let docDelete = Command.make(
@@ -511,17 +242,9 @@ let docDelete = Command.make(
 		docId: docIdArg,
 	},
 	args =>
-		runCommand("doc.delete", args, async config => {
-			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz, config.timeoutMs)
-			let located = await findDocument(account, args.docId)
-			let result = await deletePersonalDocument(located.doc)
-			if (result.type === "error")
-				throw new PermissionError({ message: result.error })
-			await syncMutation(jazz, config.timeoutMs)
-			await jazz.done()
-			return summarizeDoc(located.doc, located.space?.$jazz.id)
-		}),
+		runCommand("doc.delete", args, config =>
+			executeCommand("doc.delete", args, config),
+		),
 )
 
 let docRestore = Command.make(
@@ -531,22 +254,9 @@ let docRestore = Command.make(
 		docId: docIdArg,
 	},
 	args =>
-		runCommand("doc.restore", args, async config => {
-			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz, config.timeoutMs)
-			let located = await findDocument(account, args.docId)
-			if (located.space) {
-				located.doc.$jazz.set("deletedAt", undefined)
-				located.doc.$jazz.set("updatedAt", new Date())
-			} else {
-				let result = await restorePersonalDocument(located.doc, account)
-				if (result.type === "error")
-					throw new PermissionError({ message: result.error })
-			}
-			await syncMutation(jazz, config.timeoutMs)
-			await jazz.done()
-			return summarizeDoc(located.doc, located.space?.$jazz.id)
-		}),
+		runCommand("doc.restore", args, config =>
+			executeCommand("doc.restore", args, config),
+		),
 )
 
 let docPurge = Command.make(
@@ -556,29 +266,9 @@ let docPurge = Command.make(
 		docId: docIdArg,
 	},
 	args =>
-		runCommand("doc.purge", args, async config => {
-			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz, config.timeoutMs)
-			let located = await findDocument(account, args.docId)
-			if (located.space) {
-				let index = located.space.documents.findIndex(
-					doc => doc?.$jazz.id === located.doc.$jazz.id,
-				)
-				if (index !== -1) located.space.documents.$jazz.splice(index, 1)
-				let deleteModule = await import("@/app/features/documents")
-				await deleteModule.permanentlyDeleteDocument(located.doc)
-			} else {
-				let result = await permanentlyDeletePersonalDocument(
-					located.doc,
-					account,
-				)
-				if (result.type === "error")
-					throw new PermissionError({ message: result.error })
-			}
-			await syncMutation(jazz, config.timeoutMs)
-			await jazz.done()
-			return { docId: args.docId, purged: true }
-		}),
+		runCommand("doc.purge", args, config =>
+			executeCommand("doc.purge", args, config),
+		),
 )
 
 let docLeave = Command.make(
@@ -588,17 +278,9 @@ let docLeave = Command.make(
 		docId: docIdArg,
 	},
 	args =>
-		runCommand("doc.leave", args, async config => {
-			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz, config.timeoutMs)
-			let located = await findDocument(account, args.docId)
-			if (located.space)
-				throw new CliUsageError({ message: "Use `space leave` for space docs" })
-			await leavePersonalDocument(located.doc, account)
-			await syncMutation(jazz, config.timeoutMs)
-			await jazz.done()
-			return { docId: args.docId, left: true }
-		}),
+		runCommand("doc.leave", args, config =>
+			executeCommand("doc.leave", args, config),
+		),
 )
 
 let docShareCreate = Command.make(
@@ -609,24 +291,9 @@ let docShareCreate = Command.make(
 		role: roleOption,
 	},
 	args =>
-		runCommand("doc.share.create", args, async config => {
-			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz, config.timeoutMs)
-			let located = await findDocument(account, args.docId)
-			let result = await createDocumentInvite(
-				located.doc,
-				args.role,
-				config.baseUrl,
-			)
-			await syncMutation(jazz, config.timeoutMs)
-			await jazz.done()
-			return {
-				docId: args.docId,
-				role: args.role,
-				inviteGroupId: result.inviteGroup.$jazz.id,
-				link: result.link,
-			}
-		}),
+		runCommand("doc.share.create", args, config =>
+			executeCommand("doc.share.create", args, config),
+		),
 )
 
 let docShareRevoke = Command.make(
@@ -637,19 +304,9 @@ let docShareRevoke = Command.make(
 		inviteGroupId: inviteGroupIdOption,
 	},
 	args =>
-		runCommand("doc.share.revoke", args, async config => {
-			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz, config.timeoutMs)
-			let located = await findDocument(account, args.docId)
-			revokeDocumentInvite(located.doc, args.inviteGroupId)
-			await syncMutation(jazz, config.timeoutMs)
-			await jazz.done()
-			return {
-				docId: args.docId,
-				inviteGroupId: args.inviteGroupId,
-				revoked: true,
-			}
-		}),
+		runCommand("doc.share.revoke", args, config =>
+			executeCommand("doc.share.revoke", args, config),
+		),
 )
 
 let docShareList = Command.make(
@@ -659,17 +316,9 @@ let docShareList = Command.make(
 		docId: docIdArg,
 	},
 	args =>
-		runCommand("doc.share.list", args, async config => {
-			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz, config.timeoutMs)
-			let located = await findDocument(account, args.docId)
-			let collaborators = await listCollaborators(
-				located.doc,
-				located.space ? getSpaceGroup(located.space)?.$jazz.id : undefined,
-			)
-			await jazz.done()
-			return collaborators
-		}),
+		runCommand("doc.share.list", args, config =>
+			executeCommand("doc.share.list", args, config),
+		),
 )
 
 let docShareRole = Command.make(
@@ -681,19 +330,9 @@ let docShareRole = Command.make(
 		role: roleOption,
 	},
 	args =>
-		runCommand("doc.share.role", args, async config => {
-			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz, config.timeoutMs)
-			let located = await findDocument(account, args.docId)
-			await changeCollaboratorRole(located.doc, args.inviteGroupId, args.role)
-			await syncMutation(jazz, config.timeoutMs)
-			await jazz.done()
-			return {
-				docId: args.docId,
-				inviteGroupId: args.inviteGroupId,
-				role: args.role,
-			}
-		}),
+		runCommand("doc.share.role", args, config =>
+			executeCommand("doc.share.role", args, config),
+		),
 )
 
 let docShareCommand = Command.make("share").pipe(
@@ -713,15 +352,9 @@ let docPublicEnable = Command.make(
 		docId: docIdArg,
 	},
 	args =>
-		runCommand("doc.public.enable", args, async config => {
-			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz, config.timeoutMs)
-			let located = await findDocument(account, args.docId)
-			await makeDocumentPublic(located.doc, account.$jazz.id)
-			await syncMutation(jazz, config.timeoutMs)
-			await jazz.done()
-			return { docId: args.docId, public: true }
-		}),
+		runCommand("doc.public.enable", args, config =>
+			executeCommand("doc.public.enable", args, config),
+		),
 )
 
 let docPublicDisable = Command.make(
@@ -731,15 +364,9 @@ let docPublicDisable = Command.make(
 		docId: docIdArg,
 	},
 	args =>
-		runCommand("doc.public.disable", args, async config => {
-			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz, config.timeoutMs)
-			let located = await findDocument(account, args.docId)
-			await makeDocumentPrivate(located.doc)
-			await syncMutation(jazz, config.timeoutMs)
-			await jazz.done()
-			return { docId: args.docId, public: false }
-		}),
+		runCommand("doc.public.disable", args, config =>
+			executeCommand("doc.public.disable", args, config),
+		),
 )
 
 let docPublicLink = Command.make(
@@ -749,16 +376,9 @@ let docPublicLink = Command.make(
 		docId: docIdArg,
 	},
 	args =>
-		runCommand("doc.public.link", args, async config => {
-			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz, config.timeoutMs)
-			let located = await findDocument(account, args.docId)
-			await jazz.done()
-			return {
-				docId: args.docId,
-				link: buildDocumentPublicLink(config.baseUrl, located.doc.$jazz.id),
-			}
-		}),
+		runCommand("doc.public.link", args, config =>
+			executeCommand("doc.public.link", args, config),
+		),
 )
 
 let docPublicCommand = Command.make("public").pipe(
@@ -789,22 +409,9 @@ let docCommand = Command.make("doc").pipe(
 )
 
 let spaceList = Command.make("list", globalOptions, args =>
-	runCommand("space.list", args, async config => {
-		let jazz = await createAuthenticatedJazz(config)
-		let account = await loadAccount(jazz, config.timeoutMs)
-		let spaces = (account.root.spaces ?? [])
-			.flatMap(space => (space?.$isLoaded ? [space] : []))
-			.map(space => ({
-				spaceId: space.$jazz.id,
-				name: space.name,
-				documents: space.documents.length,
-				public: isSpacePublic(space),
-				member: isSpaceMember(space),
-			}))
-			.sort((left, right) => left.name.localeCompare(right.name))
-		await jazz.done()
-		return spaces
-	}),
+	runCommand("space.list", args, config =>
+		executeCommand("space.list", args, config),
+	),
 )
 
 let spaceGet = Command.make(
@@ -814,20 +421,9 @@ let spaceGet = Command.make(
 		spaceId: spaceIdArg,
 	},
 	args =>
-		runCommand("space.get", args, async config => {
-			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz, config.timeoutMs)
-			let space = findSpace(account, args.spaceId)
-			let owner = await getSpaceOwner(space)
-			await jazz.done()
-			return {
-				spaceId: space.$jazz.id,
-				name: space.name,
-				documents: space.documents.length,
-				public: isSpacePublic(space),
-				owner,
-			}
-		}),
+		runCommand("space.get", args, config =>
+			executeCommand("space.get", args, config),
+		),
 )
 
 let spaceMembers = Command.make(
@@ -837,14 +433,9 @@ let spaceMembers = Command.make(
 		spaceId: spaceIdArg,
 	},
 	args =>
-		runCommand("space.members", args, async config => {
-			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz, config.timeoutMs)
-			let space = findSpace(account, args.spaceId)
-			let members = await listSpaceMembers(space)
-			await jazz.done()
-			return members
-		}),
+		runCommand("space.members", args, config =>
+			executeCommand("space.members", args, config),
+		),
 )
 
 let spaceDocs = Command.make(
@@ -854,19 +445,9 @@ let spaceDocs = Command.make(
 		spaceId: spaceIdArg,
 	},
 	args =>
-		runCommand("space.docs", args, async config => {
-			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz, config.timeoutMs)
-			let space = findSpace(account, args.spaceId)
-			let docs = await listDocs(
-				account,
-				`space:${space.$jazz.id}`,
-				false,
-				config.timeoutMs,
-			)
-			await jazz.done()
-			return docs
-		}),
+		runCommand("space.docs", args, config =>
+			executeCommand("space.docs", args, config),
+		),
 )
 
 let spaceCreate = Command.make(
@@ -876,14 +457,9 @@ let spaceCreate = Command.make(
 		name: nameOption,
 	},
 	args =>
-		runCommand("space.create", args, async config => {
-			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz, config.timeoutMs)
-			let space = createSpace(args.name, account.root)
-			await syncMutation(jazz, config.timeoutMs)
-			await jazz.done()
-			return { spaceId: space.$jazz.id, name: space.name }
-		}),
+		runCommand("space.create", args, config =>
+			executeCommand("space.create", args, config),
+		),
 )
 
 let spaceRename = Command.make(
@@ -894,16 +470,9 @@ let spaceRename = Command.make(
 		name: nameOption,
 	},
 	args =>
-		runCommand("space.rename", args, async config => {
-			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz, config.timeoutMs)
-			let space = findSpace(account, args.spaceId)
-			space.$jazz.set("name", args.name)
-			space.$jazz.set("updatedAt", new Date())
-			await syncMutation(jazz, config.timeoutMs)
-			await jazz.done()
-			return { spaceId: space.$jazz.id, name: space.name }
-		}),
+		runCommand("space.rename", args, config =>
+			executeCommand("space.rename", args, config),
+		),
 )
 
 let spaceDelete = Command.make(
@@ -913,15 +482,9 @@ let spaceDelete = Command.make(
 		spaceId: spaceIdArg,
 	},
 	args =>
-		runCommand("space.delete", args, async config => {
-			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz, config.timeoutMs)
-			let space = findSpace(account, args.spaceId)
-			await permanentlyDeleteSpace(space, account)
-			await syncMutation(jazz, config.timeoutMs)
-			await jazz.done()
-			return { spaceId: args.spaceId, deleted: true }
-		}),
+		runCommand("space.delete", args, config =>
+			executeCommand("space.delete", args, config),
+		),
 )
 
 let spaceLeave = Command.make(
@@ -931,15 +494,9 @@ let spaceLeave = Command.make(
 		spaceId: spaceIdArg,
 	},
 	args =>
-		runCommand("space.leave", args, async config => {
-			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz, config.timeoutMs)
-			let space = findSpace(account, args.spaceId)
-			await leaveSpace(space, account)
-			await syncMutation(jazz, config.timeoutMs)
-			await jazz.done()
-			return { spaceId: args.spaceId, left: true }
-		}),
+		runCommand("space.leave", args, config =>
+			executeCommand("space.leave", args, config),
+		),
 )
 
 let spaceShareCreate = Command.make(
@@ -950,20 +507,9 @@ let spaceShareCreate = Command.make(
 		role: spaceRoleOption,
 	},
 	args =>
-		runCommand("space.share.create", args, async config => {
-			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz, config.timeoutMs)
-			let space = findSpace(account, args.spaceId)
-			let result = await createSpaceInvite(space, args.role, config.baseUrl)
-			await syncMutation(jazz, config.timeoutMs)
-			await jazz.done()
-			return {
-				spaceId: args.spaceId,
-				role: args.role,
-				inviteGroupId: result.inviteGroup.$jazz.id,
-				link: result.link,
-			}
-		}),
+		runCommand("space.share.create", args, config =>
+			executeCommand("space.share.create", args, config),
+		),
 )
 
 let spaceShareRevoke = Command.make(
@@ -974,19 +520,9 @@ let spaceShareRevoke = Command.make(
 		inviteGroupId: inviteGroupIdOption,
 	},
 	args =>
-		runCommand("space.share.revoke", args, async config => {
-			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz, config.timeoutMs)
-			let space = findSpace(account, args.spaceId)
-			revokeSpaceInvite(space, args.inviteGroupId)
-			await syncMutation(jazz, config.timeoutMs)
-			await jazz.done()
-			return {
-				spaceId: args.spaceId,
-				inviteGroupId: args.inviteGroupId,
-				revoked: true,
-			}
-		}),
+		runCommand("space.share.revoke", args, config =>
+			executeCommand("space.share.revoke", args, config),
+		),
 )
 
 let spaceShareList = Command.make(
@@ -996,14 +532,9 @@ let spaceShareList = Command.make(
 		spaceId: spaceIdArg,
 	},
 	args =>
-		runCommand("space.share.list", args, async config => {
-			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz, config.timeoutMs)
-			let space = findSpace(account, args.spaceId)
-			let collaborators = await listSpaceCollaborators(space)
-			await jazz.done()
-			return collaborators
-		}),
+		runCommand("space.share.list", args, config =>
+			executeCommand("space.share.list", args, config),
+		),
 )
 
 let spaceShareRole = Command.make(
@@ -1015,19 +546,9 @@ let spaceShareRole = Command.make(
 		role: spaceRoleOption,
 	},
 	args =>
-		runCommand("space.share.role", args, async config => {
-			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz, config.timeoutMs)
-			let space = findSpace(account, args.spaceId)
-			await changeSpaceCollaboratorRole(space, args.inviteGroupId, args.role)
-			await syncMutation(jazz, config.timeoutMs)
-			await jazz.done()
-			return {
-				spaceId: args.spaceId,
-				inviteGroupId: args.inviteGroupId,
-				role: args.role,
-			}
-		}),
+		runCommand("space.share.role", args, config =>
+			executeCommand("space.share.role", args, config),
+		),
 )
 
 let spaceShareCommand = Command.make("share").pipe(
@@ -1047,15 +568,9 @@ let spacePublicEnable = Command.make(
 		spaceId: spaceIdArg,
 	},
 	args =>
-		runCommand("space.public.enable", args, async config => {
-			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz, config.timeoutMs)
-			let space = findSpace(account, args.spaceId)
-			makeSpacePublic(space)
-			await syncMutation(jazz, config.timeoutMs)
-			await jazz.done()
-			return { spaceId: args.spaceId, public: true }
-		}),
+		runCommand("space.public.enable", args, config =>
+			executeCommand("space.public.enable", args, config),
+		),
 )
 
 let spacePublicDisable = Command.make(
@@ -1065,15 +580,9 @@ let spacePublicDisable = Command.make(
 		spaceId: spaceIdArg,
 	},
 	args =>
-		runCommand("space.public.disable", args, async config => {
-			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz, config.timeoutMs)
-			let space = findSpace(account, args.spaceId)
-			makeSpacePrivate(space)
-			await syncMutation(jazz, config.timeoutMs)
-			await jazz.done()
-			return { spaceId: args.spaceId, public: false }
-		}),
+		runCommand("space.public.disable", args, config =>
+			executeCommand("space.public.disable", args, config),
+		),
 )
 
 let spacePublicLink = Command.make(
@@ -1083,16 +592,9 @@ let spacePublicLink = Command.make(
 		spaceId: spaceIdArg,
 	},
 	args =>
-		runCommand("space.public.link", args, async config => {
-			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz, config.timeoutMs)
-			let space = findSpace(account, args.spaceId)
-			await jazz.done()
-			return {
-				spaceId: args.spaceId,
-				link: buildSpacePublicLink(config.baseUrl, space.$jazz.id),
-			}
-		}),
+		runCommand("space.public.link", args, config =>
+			executeCommand("space.public.link", args, config),
+		),
 )
 
 let spacePublicCommand = Command.make("public").pipe(
@@ -1127,7 +629,9 @@ let inviteInspect = Command.make(
 		link: linkOption,
 	},
 	args =>
-		runCommand("invite.inspect", args, async () => inspectInvite(args.link)),
+		runCommand("invite.inspect", args, config =>
+			executeCommand("invite.inspect", args, config),
+		),
 )
 
 let inviteAccept = Command.make(
@@ -1138,19 +642,9 @@ let inviteAccept = Command.make(
 		sync: syncOption,
 	},
 	args =>
-		runCommand("invite.accept", args, async config => {
-			let jazz = await createAuthenticatedJazz(config)
-			let account = await loadAccount(jazz, config.timeoutMs)
-			let invite = inspectInvite(args.link)
-			if (invite.kind === "doc") {
-				await acceptDocumentInvite(account, parseInviteLink(args.link))
-			} else {
-				await acceptSpaceInvite(account, parseSpaceInviteLink(args.link))
-			}
-			await syncMutation(jazz, config.timeoutMs)
-			await jazz.done()
-			return invite
-		}),
+		runCommand("invite.accept", args, config =>
+			executeCommand("invite.accept", args, config),
+		),
 )
 
 let inviteCommand = Command.make("invite").pipe(

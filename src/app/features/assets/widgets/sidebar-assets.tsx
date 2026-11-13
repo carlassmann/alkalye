@@ -1,7 +1,6 @@
 import { useRef, useState, useEffect, type ReactNode } from "react"
 import { useForm } from "@tanstack/react-form"
 import { z } from "zod"
-import { Image as JazzImage } from "jazz-tools/react"
 import { toast } from "sonner"
 import {
 	SidebarGroupLabel,
@@ -385,15 +384,17 @@ function SidebarAssets({
 													render={
 														<SidebarMenuButton disabled={readOnly} nativeButton>
 															<div className="bg-muted size-8 shrink-0 overflow-hidden rounded">
-																{asset.type === "image" && asset.imageUrl ? (
+																{(asset.type === "image" ||
+																	asset.type === "video") &&
+																asset.imageUrl ? (
 																	<img
 																		src={asset.imageUrl}
 																		alt=""
 																		className="size-full object-cover"
 																	/>
 																) : asset.type === "image" && asset.imageId ? (
-																	<JazzImage
-																		imageId={asset.imageId}
+																	<img
+																		src={asset.imageId}
 																		className="size-full object-cover"
 																	/>
 																) : asset.type === "tldraw" &&
@@ -413,8 +414,8 @@ function SidebarAssets({
 																  (colorScheme === "dark"
 																		? asset.darkPreviewId
 																		: asset.lightPreviewId) ? (
-																	<JazzImage
-																		imageId={
+																	<img
+																		src={
 																			colorScheme === "dark"
 																				? asset.darkPreviewId!
 																				: asset.lightPreviewId!

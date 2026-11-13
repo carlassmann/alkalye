@@ -1,22 +1,9 @@
 import type { APIRoute } from "astro"
-import { PUBLIC_JAZZ_SYNC_SERVER } from "astro:env/client"
-
 export { GET }
-
-let GET: APIRoute = ({ request }) => {
-	let url = new URL(request.url)
-	let baseUrl = `${url.protocol}//${url.host}`
-
-	return new Response(
-		JSON.stringify({
-			baseUrl,
-			syncPeer: PUBLIC_JAZZ_SYNC_SERVER,
-		}),
-		{
-			headers: {
-				"content-type": "application/json; charset=utf-8",
-				"cache-control": "public, max-age=300",
-			},
-		},
-	)
-}
+export const prerender = false
+let GET: APIRoute = ({ request }) =>
+	Response.json({
+		baseUrl: new URL(request.url).origin,
+		jazzUrl: new URL("/jazz", request.url).href,
+		authentication: "device-recovery-phrase",
+	})

@@ -1,4 +1,4 @@
-export { Theme, ThemeAsset, ThemePreset, ThemeType } from "./lib/schema"
+export { ThemePreset, ThemeType } from "./lib/schema"
 export {
 	useDocumentTheme,
 	resolveDocumentTheme,
@@ -13,7 +13,6 @@ export {
 	loadThemesForPdf,
 	type ResolvedTheme,
 	type LoadedThemes,
-	type ThemesQuery,
 	type ThemePresetType,
 } from "./lib/document-theme"
 export {
@@ -28,17 +27,12 @@ export {
 	type ThemeUploadError,
 } from "./lib/upload"
 export {
-	createDefaultTheme,
 	getDefaultDocumentCss,
 	getDefaultThemeCss,
 	getDefaultThemeSource,
 	getSlideshowBaseCss,
 } from "./lib/default-theme"
-export {
-	exportTheme,
-	serializePortableTheme,
-	type ThemeExportQuery,
-} from "./lib/export"
+export { exportTheme, serializePortableTheme } from "./lib/export"
 export { sanitizeCss, sanitizeHtml, type SanitizeResult } from "./lib/sanitize"
 export { ThemePicker } from "./widgets/theme-picker"
 export { ThemeWorkbenchScreen } from "./screens/theme-workbench-screen"
@@ -53,3 +47,8 @@ export {
 	type ThemeSourceError,
 } from "./lib/source"
 export { PresetPicker } from "./parts/preset-picker"
+
+export { createTheme, createDefaultTheme } from "./lib/create"
+
+export { ThemesSection } from "./widgets/themes-settings"
+export type { ThemeRow, ThemeAssetRow } from "./lib/schema"

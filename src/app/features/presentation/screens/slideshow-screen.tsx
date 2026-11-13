@@ -1,107 +1,51 @@
 import { isLaserPreview } from "../lib/laser-preview"
 import { useNavigate } from "@tanstack/react-router"
-import { useCoState } from "jazz-tools/react"
-import { type ResolveQuery, co } from "jazz-tools"
-import { Document } from "@/schema"
-import {
-	DocumentNotFound,
-	DocumentUnauthorized,
-} from "@/app/components/error-states"
-import { parseWikiLinks } from "@/app/features/editor"
-import {
-	resolveDocTitles,
-	useDocTitles,
-	type ResolvedDoc,
-} from "@/app/features/documents"
-import { canEdit } from "@/app/features/sharing"
+import { useOne, useDb } from "jazz-tools/react"
+import { app } from "@/jazz/schema"
+import { useLibrary, useDocumentAccess } from "@/app/features/documents"
+import { DocumentNotFound } from "@/app/components/error-states"
 import { LaserReceiver } from "../widgets/laser-pointer"
 import { Slideshow, getSlides } from "../widgets/slideshow"
-import { parsePresentation, type PresentationItem } from "../lib/presentation"
+import { useDocumentAssets } from "@/app/features/assets"
+import { parsePresentation } from "../lib/presentation"
 import { useScreenWakeLock } from "../lib/screen-wake-lock"
-import { assetPreviewResolve } from "@/app/features/assets"
+export { SlideshowScreen }
 
-export { SlideshowScreen, resolve, loadWikilinkCache }
-export type { LoaderData }
-
-let resolve = {
-	content: true,
-	assets: {
-		$each: assetPreviewResolve,
-	},
-} as const satisfies ResolveQuery<typeof Document>
-
-type LoadedDoc = co.loaded<typeof Document, typeof resolve>
-
-interface LoaderData {
-	doc: LoadedDoc | null
-	loadingState: string | null
-	wikilinkCache: Map<string, ResolvedDoc>
-}
-
-async function loadWikilinkCache(
-	doc: LoadedDoc,
-): Promise<Map<string, ResolvedDoc>> {
-	let content = doc.content?.toString() ?? ""
-	let wikilinks = parseWikiLinks(content)
-	let wikilinkIds = wikilinks.map(w => w.id)
-	return resolveDocTitles(wikilinkIds)
-}
-
-interface SlideshowScreenProps {
-	id: string
-	loaderData: LoaderData
-}
-
-function SlideshowScreen({ id, loaderData }: SlideshowScreenProps) {
-	let navigate = useNavigate()
-
+function SlideshowScreen({ id }: { id: string }) {
+	let navigate = useNavigate(),
+		db = useDb()
+	let { documents } = useLibrary()
+	let { data: doc, isLoading } = useOne(app.documents.where({ id }))
+	let { previewAssets: assets } = useDocumentAssets(id, doc?.content ?? "")
+	let { canEdit: canEditDoc } = useDocumentAccess(doc)
 	useScreenWakeLock()
-
-	let subscribedDoc = useCoState(Document, id, { resolve })
-
-	let content =
-		(subscribedDoc.$isLoaded
-			? subscribedDoc
-			: loaderData.doc
-		)?.content?.toString() ?? ""
-	let wikilinkIds = parseWikiLinks(content).map(w => w.id)
-	let wikilinks = useDocTitles(wikilinkIds, loaderData.wikilinkCache)
-
-	if (!loaderData.doc) {
-		if (loaderData.loadingState === "unauthorized")
-			return <DocumentUnauthorized />
-		return <DocumentNotFound />
-	}
-
-	if (
-		!subscribedDoc.$isLoaded &&
-		subscribedDoc.$jazz.loadingState !== "loading"
-	) {
-		if (subscribedDoc.$jazz.loadingState === "unauthorized")
-			return <DocumentUnauthorized />
-		return <DocumentNotFound />
-	}
-
-	let doc = subscribedDoc.$isLoaded ? subscribedDoc : loaderData.doc
+	if (isLoading) return <p role="status">Opening document…</p>
+	if (!doc || doc.deletedAt) return <DocumentNotFound />
+	let content = doc.content
+	let wikilinks = new Map(
+		documents.map(doc => [
+			doc.id,
+			{
+				title: doc.title,
+				exists: !doc.deletedAt,
+				isPresentation: doc.isPresentation,
+			},
+		]),
+	)
 	let items = content ? parsePresentation(content) : []
 	let slides = getSlides(items)
-
 	let currentSlideNumber =
-		doc.presentationLine !== undefined && items[doc.presentationLine]
+		doc.presentationLine !== null && items[doc.presentationLine]
 			? items[doc.presentationLine].slideNumber
 			: 1
-
-	let assets = doc.assets?.$isLoaded
-		? doc.assets.filter(asset => asset?.$isLoaded)
-		: []
-	let canEditDoc = canEdit(doc)
 	let previewAppearance = isLaserPreview()
 		? new URLSearchParams(window.location.search).get("laserAppearance")
 		: null
-
 	return (
 		<>
-			<LaserReceiver docId={id} slideNumber={currentSlideNumber} />
+			{canEditDoc && (
+				<LaserReceiver docId={id} slideNumber={currentSlideNumber} />
+			)}
 			<Slideshow
 				appearanceOverride={
 					previewAppearance === "dark" || previewAppearance === "light"
@@ -109,11 +53,22 @@ function SlideshowScreen({ id, loaderData }: SlideshowScreenProps) {
 						: undefined
 				}
 				content={content}
-				slides={slides}
 				assets={assets}
+				slides={slides}
 				wikilinks={wikilinks}
 				currentSlideNumber={currentSlideNumber}
-				onSlideChange={canEditDoc ? makeSlideChange(doc, items) : undefined}
+				onSlideChange={
+					canEditDoc
+						? slideNumber => {
+								let idx = items.findIndex(
+									item =>
+										item.slideNumber === slideNumber && item.type === "block",
+								)
+								if (idx >= 0)
+									void db.update(app.documents, id, { presentationLine: idx })
+							}
+						: undefined
+				}
 				onExit={
 					canEditDoc
 						? () => navigate({ to: "/doc/$id", params: { id } })
@@ -127,15 +82,4 @@ function SlideshowScreen({ id, loaderData }: SlideshowScreenProps) {
 			/>
 		</>
 	)
-}
-
-function makeSlideChange(doc: LoadedDoc, items: PresentationItem[]) {
-	return function handleSlideChange(slideNumber: number) {
-		let idx = items.findIndex(
-			i => i.slideNumber === slideNumber && i.type === "block",
-		)
-		if (idx >= 0) {
-			doc.$jazz.set("presentationLine", idx)
-		}
-	}
 }

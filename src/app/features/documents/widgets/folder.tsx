@@ -2,7 +2,7 @@ import { useState } from "react"
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 import { Combobox } from "@base-ui/react/combobox"
-import { co } from "jazz-tools"
+import { type LibraryDocument, useLibrary, app } from "../lib/library"
 import {
 	Folder,
 	Pencil,
@@ -28,10 +28,8 @@ import {
 import { Button } from "@/app/components/ui/button"
 import { Input } from "@/app/components/ui/input"
 import { Label } from "@/app/components/ui/label"
-import { Document } from "@/schema"
 import { parseFrontmatter } from "@/app/features/editor"
-import { applyContentDiffLoadingCommentAnchors } from "@/app/features/comments"
-import { syncDocumentMetadata } from "../lib/metadata"
+import { updateContent, type Database } from "../lib/library"
 import { useIntl } from "@/shared/intl/setup"
 
 import { SidebarFolderButton } from "./sidebar-folder-button"
@@ -39,7 +37,7 @@ import { SidebarFolderButton } from "./sidebar-folder-button"
 export { FolderRow, useFolderStore }
 export type { FolderState }
 
-type LoadedDocument = co.loaded<typeof Document>
+type LoadedDocument = LibraryDocument
 type ViewMode = "folders" | "flat"
 
 interface FolderState {
@@ -142,6 +140,7 @@ function FolderRow({
 	onNewDocument,
 	isDropTarget = false,
 }: FolderRowProps) {
+	let { db } = useLibrary()
 	let t = useIntl()
 	let { renameFolder, removeFolder } = useFolderStore()
 
@@ -196,7 +195,7 @@ function FolderRow({
 				path={path}
 				existingFolders={existingFolders}
 				onRename={newPath => {
-					void handleRenameFolder(docsInFolder, path, newPath)
+					void handleRenameFolder(db, docsInFolder, path, newPath)
 					renameFolder(path, newPath)
 				}}
 			/>
@@ -207,7 +206,7 @@ function FolderRow({
 				path={path}
 				existingFolders={existingFolders}
 				onMove={targetPath => {
-					void handleMoveFolder(docsInFolder, path, targetPath)
+					void handleMoveFolder(db, docsInFolder, path, targetPath)
 					removeFolder(path)
 				}}
 			/>
@@ -224,7 +223,7 @@ function FolderRow({
 						onDeleteDocs(docsToDelete)
 					} else {
 						// Fallback: handle deletion/path-removal directly
-						void handleDeleteFolder(docsInFolder, path, deleteDocuments)
+						void handleDeleteFolder(db, docsInFolder, path, deleteDocuments)
 					}
 					removeFolder(path)
 				}}
@@ -266,6 +265,7 @@ function RenameFolderDialog({
 	existingFolders,
 	onRename,
 }: RenameFolderDialogProps) {
+	useLibrary()
 	let t = useIntl()
 	let folderName = path.split("/").pop() || path
 	let parentPath = path.includes("/")
@@ -365,6 +365,7 @@ function MoveFolderDialog({
 	existingFolders,
 	onMove,
 }: MoveFolderDialogProps) {
+	useLibrary()
 	let t = useIntl()
 	let [inputValue, setInputValue] = useState("")
 	let folderName = path.split("/").pop() || path
@@ -497,6 +498,7 @@ function DeleteFolderDialog({
 	docCount,
 	onDelete,
 }: DeleteFolderDialogProps) {
+	useLibrary()
 	let t = useIntl()
 	let folderName = path.split("/").pop() || path
 
@@ -545,6 +547,7 @@ function DeleteFolderDialog({
 // Handlers
 
 async function handleRenameFolder(
+	db: Database,
 	docs: LoadedDocument[],
 	oldPath: string,
 	newPath: string,
@@ -562,20 +565,20 @@ async function handleRenameFolder(
 			continue
 		}
 
-		let loaded = await doc.$jazz.ensureLoaded({ resolve: { content: true } })
+		let loaded = await db.one(app.documents.where({ id: doc.id }))
+		if (!loaded) continue
 		let newContent = updatePathInContent(loaded.content.toString(), updatedPath)
-		await applyContentDiffLoadingCommentAnchors(loaded, newContent)
-		loaded.$jazz.set("updatedAt", new Date())
-		syncDocumentMetadata(loaded)
+		await updateContent(db, loaded, newContent)
 	}
 }
 
 async function handleMoveFolder(
+	db: Database,
 	docs: LoadedDocument[],
 	oldPath: string,
 	newPath: string,
 ) {
-	await handleRenameFolder(docs, oldPath, newPath)
+	await handleRenameFolder(db, docs, oldPath, newPath)
 }
 
 function getDocsToDeleteInFolder(
@@ -590,6 +593,7 @@ function getDocsToDeleteInFolder(
 }
 
 async function handleDeleteFolder(
+	db: Database,
 	docs: LoadedDocument[],
 	path: string,
 	deleteDocuments: boolean,
@@ -602,13 +606,12 @@ async function handleDeleteFolder(
 		if (!isInFolder) continue
 
 		if (deleteDocuments) {
-			doc.$jazz.set("deletedAt", new Date())
+			db.update(app.documents, doc.id, { deletedAt: new Date() })
 		} else {
-			let loaded = await doc.$jazz.ensureLoaded({ resolve: { content: true } })
+			let loaded = await db.one(app.documents.where({ id: doc.id }))
+			if (!loaded) continue
 			let newContent = removePathFromContent(loaded.content.toString())
-			await applyContentDiffLoadingCommentAnchors(loaded, newContent)
-			loaded.$jazz.set("updatedAt", new Date())
-			syncDocumentMetadata(loaded)
+			await updateContent(db, loaded, newContent)
 		}
 	}
 }

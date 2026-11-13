@@ -1,13 +1,16 @@
+import { AgentConnectionsSection } from "@/app/features/agents"
+import { ThemesSection } from "@/app/features/themes"
+import type { JazzClient } from "jazz-tools/client"
 import { IconTransition } from "@/app/components/ui/icon-transition"
 import { useState, useRef } from "react"
 import { Link, useNavigate } from "@tanstack/react-router"
+import { useJazzSession } from "jazz-tools/react"
+import { RecoveryPhrase } from "jazz-tools/passphrase"
 import {
-	useAccount,
-	useIsAuthenticated,
-	usePassphraseAuth,
-	useLogOut,
-} from "jazz-tools/react"
-import { co, type ResolveQuery } from "jazz-tools"
+	app,
+	useLibrary,
+	type SettingsRow as SettingsData,
+} from "@/app/features/documents"
 import {
 	ArrowLeft,
 	Copy,
@@ -19,10 +22,7 @@ import {
 	Plus,
 	RefreshCw,
 	WifiOff,
-	Upload,
-	Download,
 	Trash2,
-	Palette,
 	Loader2,
 	AlertCircle,
 	Sun,
@@ -43,19 +43,6 @@ import { Field, FieldError, FieldLabel } from "@/app/components/ui/field"
 import { Input } from "@/app/components/ui/input"
 import { Textarea } from "@/app/components/ui/textarea"
 import { Switch } from "@/app/components/ui/switch"
-import { UserAccount, Theme, ThemeAsset, Settings } from "@/schema"
-import {
-	parseThemeMarkdown,
-	parseThemeZip,
-	createDefaultTheme,
-	exportTheme,
-	createThemeSourceDocument,
-	serializeThemeSource,
-	type ThemeUploadError,
-	type ThemeExportQuery,
-} from "@/app/features/themes"
-import { createImage } from "jazz-tools/media"
-import { ConfirmDialog } from "@/app/components/ui/confirm-dialog"
 import {
 	Select,
 	SelectContent,
@@ -64,14 +51,13 @@ import {
 	SelectValue,
 } from "@/app/components/ui/select"
 import { useTheme } from "@/app/components/appearance"
-import { AuthDialog, wordlist } from "@/app/features/auth"
+import { AuthDialog, useIsBackedUp } from "@/app/features/auth"
 import {
 	useEditorSettings,
 	DEFAULT_EDITOR_SETTINGS,
 	type EditorSettingsData,
 } from "@/app/features/editor"
 import { Footer } from "@/app/components/footer"
-import { waitForLocalJazzStorage } from "@/app/lib/local-jazz-poke"
 import { usePWA, PWAInstallDialog } from "@/app/lib/pwa"
 import { useIsPWAInstalled } from "@/app/lib/platform"
 import {
@@ -91,10 +77,6 @@ import {
 import { useIntl, T } from "@/shared/intl/setup"
 import { makeProfileNameSchema } from "../lib/profile-name"
 import {
-	AgentConnectionsSection,
-	agentConnectionsQuery,
-} from "@/app/features/agents"
-import {
 	SettingsCategoryNavigation,
 	SettingsCategoryPicker,
 	type SettingsCategory,
@@ -107,35 +89,9 @@ import {
 	SettingsGroupLabel,
 	SettingsStatus,
 	SettingsActions,
-	SettingsEmpty,
 } from "@/app/components/ui/settings-layout"
 
-export { SettingsScreen, settingsQuery }
-export type { LoadedAccount, SettingsLoaderData, SettingsSearch }
-
-let settingsQuery = {
-	profile: true,
-	root: {
-		...agentConnectionsQuery.root,
-		settings: true,
-		themes: {
-			$each: {
-				css: true,
-				template: true,
-				slideTemplate: true,
-				thumbnail: { original: true },
-				assets: { $each: { data: true } },
-			},
-		},
-	},
-} as const satisfies ResolveQuery<typeof UserAccount>
-
-type LoadedAccount = co.loaded<typeof UserAccount, typeof settingsQuery>
-
-interface SettingsLoaderData {
-	me: LoadedAccount | null
-}
-
+export { SettingsScreen }
 interface SettingsSearch {
 	from?: string
 	oauth?: string
@@ -143,18 +99,16 @@ interface SettingsSearch {
 }
 
 interface SettingsScreenProps {
-	loaderData: SettingsLoaderData
 	search: SettingsSearch
 }
 
-function SettingsScreen({ loaderData, search }: SettingsScreenProps) {
+function SettingsScreen({ search }: SettingsScreenProps) {
 	let t = useIntl()
 	let navigate = useNavigate()
 	let { theme, setTheme } = useTheme()
 	let { from } = search
-	let subscribedMe = useAccount(UserAccount, { resolve: settingsQuery })
-	let me = subscribedMe.$isLoaded ? subscribedMe : loaderData.me
-	let isAuthenticated = useIsAuthenticated()
+	let { settings } = useLibrary()
+	let isAuthenticated = useIsBackedUp()
 	let pageRef = useRef<HTMLDivElement>(null)
 	let [announcedCategory, setAnnouncedCategory] = useState("")
 	let [category, setCategory] = useState<SettingsCategory>(
@@ -225,29 +179,22 @@ function SettingsScreen({ loaderData, search }: SettingsScreenProps) {
 						<div id={`settings-${category}`} className="min-w-0 space-y-10">
 							{category === "general" && (
 								<>
-									<ProfileSection me={me} />
+									<ProfileSection />
 									<SyncSection isAuthenticated={isAuthenticated} />
-									<AppearanceSection
-										theme={theme}
-										setTheme={setTheme}
-										me={me}
-									/>
+									<AppearanceSection theme={theme} setTheme={setTheme} />
 								</>
 							)}
 							{category === "editor" && (
 								<>
-									<EditorSection settings={me?.root?.settings ?? null} />
-									<ThemesSection me={me} />
+									<EditorSection settings={settings ?? null} />
+									<ThemesSection />
 								</>
 							)}
 							{category === "connections" && (
-								<>
-									<AgentConnectionsSection
-										account={me}
-										isAuthenticated={isAuthenticated}
-										oauth={search.oauth}
-									/>
-								</>
+								<AgentConnectionsSection
+									isAuthenticated={isAuthenticated}
+									oauth={search.oauth}
+								/>
 							)}
 							{category === "app" && (
 								<>
@@ -280,10 +227,9 @@ type AppTheme = ReturnType<typeof useTheme>["theme"]
 interface AppearanceSectionProps {
 	theme: AppTheme
 	setTheme: (theme: AppTheme) => void
-	me: LoadedAccount | null
 }
 
-function AppearanceSection({ theme, setTheme, me }: AppearanceSectionProps) {
+function AppearanceSection({ theme, setTheme }: AppearanceSectionProps) {
 	let t = useIntl()
 
 	function handleThemeChange(value: string | null) {
@@ -320,18 +266,15 @@ function AppearanceSection({ theme, setTheme, me }: AppearanceSectionProps) {
 						</SelectContent>
 					</Select>
 				</SettingsRow>
-				<SyntaxThemeSetting settings={me?.root?.settings} />
-				<LanguageSetting me={me} />
+				<SyntaxThemeSetting />
+				<LanguageSetting />
 			</SettingsPanel>
 		</SettingsSection>
 	)
 }
 
-function SyntaxThemeSetting({
-	settings,
-}: {
-	settings: co.loaded<typeof Settings> | null | undefined
-}) {
+function SyntaxThemeSetting() {
+	let { db, settings } = useLibrary()
 	let t = useIntl()
 	let selectedFamily = SYNTAX_THEME_FAMILIES.find(
 		family => family.id === settings?.syntaxTheme,
@@ -340,7 +283,9 @@ function SyntaxThemeSetting({
 
 	function handleChange(value: string | null) {
 		if (!settings || !value) return
-		settings.$jazz.set("syntaxTheme", value === "github" ? undefined : value)
+		db.update(app.settings, settings.id, {
+			syntaxTheme: value === "github" ? null : value,
+		})
 	}
 
 	return (
@@ -368,10 +313,6 @@ function SyntaxThemeSetting({
 	)
 }
 
-interface ProfileSectionProps {
-	me: LoadedAccount | null
-}
-
 function makeNameSchema(t: ReturnType<typeof useIntl>) {
 	return z.object({
 		name: makeProfileNameSchema({
@@ -381,13 +322,12 @@ function makeNameSchema(t: ReturnType<typeof useIntl>) {
 	})
 }
 
-function ProfileSection({ me }: ProfileSectionProps) {
+function ProfileSection() {
+	let { db, ownerId, profile } = useLibrary()
 	let t = useIntl()
 	let [dialogOpen, setDialogOpen] = useState(false)
 
-	if (!me) return null
-
-	let name = me.profile?.name ?? t("common.anonymous")
+	let name = profile?.name ?? t("common.anonymousUser")
 
 	return (
 		<SettingsSection
@@ -410,10 +350,10 @@ function ProfileSection({ me }: ProfileSectionProps) {
 			<EditNameDialog
 				open={dialogOpen}
 				onOpenChange={setDialogOpen}
-				currentName={me.profile?.name ?? ""}
+				currentName={profile?.name ?? ""}
 				onSave={newName => {
-					if (!me.profile) return
-					me.profile.$jazz.set("name", newName)
+					if (profile) db.update(app.profiles, profile.id, { name: newName })
+					else db.insert(app.profiles, { ownerId, name: newName })
 				}}
 			/>
 		</SettingsSection>
@@ -506,14 +446,15 @@ function EditNameDialog({
 	)
 }
 
-function LanguageSetting({ me }: { me: LoadedAccount | null }) {
+function LanguageSetting() {
+	let { db, settings } = useLibrary()
 	let t = useIntl()
-	let currentLanguage = me?.root?.language || "en"
+	let currentLanguage = settings?.language || "en"
 
 	function handleLanguageChange(value: string | null) {
-		if (!me?.root) return
+		if (!settings) return
 		if (value !== "en" && value !== "de") return
-		me.root.$jazz.set("language", value)
+		db.update(app.settings, settings.id, { language: value })
 	}
 
 	return (
@@ -543,423 +484,7 @@ function LanguageSetting({ me }: { me: LoadedAccount | null }) {
 	)
 }
 
-interface ThemesSectionProps {
-	me: LoadedAccount | null
-}
-
-function ThemesSection({ me }: ThemesSectionProps) {
-	let t = useIntl()
-	let fileInputRef = useRef<HTMLInputElement>(null)
-	let [isUploading, setIsUploading] = useState(false)
-	let [uploadError, setUploadError] = useState<ThemeUploadError | null>(null)
-	let [themeToDelete, setThemeToDelete] = useState<co.loaded<
-		typeof Theme
-	> | null>(null)
-	let [exportingThemeId, setExportingThemeId] = useState<string | null>(null)
-
-	if (!me?.root) return null
-
-	let themes = me.root.themes ?? []
-
-	async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
-		let file = e.target.files?.[0]
-		if (!file || !me?.root) return
-
-		e.target.value = ""
-
-		setIsUploading(true)
-		setUploadError(null)
-
-		let result = file.name.toLowerCase().endsWith(".md")
-			? await parseThemeMarkdown(file)
-			: await parseThemeZip(file)
-
-		if (!result.ok) {
-			setUploadError(result.error)
-			setIsUploading(false)
-			return
-		}
-
-		let parsed = result.theme
-		let owner = me.root.$jazz.owner
-
-		let assets: co.loaded<typeof ThemeAsset>[] = []
-		for (let asset of parsed.assets) {
-			let buffer = await asset.file.arrayBuffer()
-			let fileStream = await co
-				.fileStream()
-				.createFromArrayBuffer(buffer, asset.mimeType, asset.name, { owner })
-			let themeAsset = ThemeAsset.create(
-				{
-					name: asset.name,
-					mimeType: asset.mimeType,
-					data: fileStream,
-					createdAt: new Date(),
-				},
-				owner,
-			)
-			assets.push(themeAsset)
-		}
-
-		let thumbnail =
-			parsed.thumbnail && !parsed.thumbnailDataUrl
-				? await createImage(parsed.thumbnail, { owner, maxSize: 256 })
-				: undefined
-
-		let now = new Date()
-		let theme = Theme.create(
-			{
-				version: 1,
-				name: parsed.name,
-				author: parsed.author,
-				description: parsed.description,
-				type: parsed.type,
-				css: co.plainText().create(parsed.css, owner),
-				template: parsed.template
-					? co.plainText().create(parsed.template, owner)
-					: undefined,
-				slideTemplate: parsed.slideTemplate
-					? co.plainText().create(parsed.slideTemplate, owner)
-					: undefined,
-				presets: parsed.presets ? JSON.stringify(parsed.presets) : undefined,
-				assets:
-					assets.length > 0
-						? co.list(ThemeAsset).create(assets, owner)
-						: undefined,
-				thumbnail,
-				thumbnailDataUrl: parsed.thumbnailDataUrl,
-				createdAt: now,
-				updatedAt: now,
-			},
-			owner,
-		)
-		let source = await createThemeSourceDocument(me, {
-			themeId: theme.$jazz.id,
-			name: parsed.name,
-			source:
-				parsed.source ??
-				serializeThemeSource({
-					css: parsed.css,
-					documentTemplate: parsed.template,
-					slideTemplate: parsed.slideTemplate,
-				}),
-		})
-		theme.$jazz.set("sourceDocId", source.$jazz.id)
-
-		await waitForLocalJazzStorage(me)
-
-		if (!me.root.themes) {
-			me.root.$jazz.set("themes", co.list(Theme).create([], owner))
-		}
-		me.root.themes!.$jazz.push(theme)
-		await waitForLocalJazzStorage(me)
-
-		setIsUploading(false)
-	}
-
-	async function handleCreateTheme() {
-		if (!me?.root) return
-		await createDefaultTheme(me)
-	}
-
-	function handleDeleteTheme() {
-		if (!themeToDelete || !me?.root?.themes) return
-
-		let index = me.root.themes.findIndex(
-			t => t?.$jazz.id === themeToDelete.$jazz.id,
-		)
-		if (index !== -1) {
-			me.root.themes.$jazz.splice(index, 1)
-		}
-		setThemeToDelete(null)
-	}
-
-	return (
-		<SettingsSection
-			title={<T k="settings.themes" />}
-			description={<T k="settings.themes.description" />}
-		>
-			{uploadError && (
-				<div className="border-destructive/30 bg-destructive/5 text-destructive flex items-start gap-2 border p-3 text-base/6 sm:text-sm/5">
-					<AlertCircle className="mt-0.5 size-4 shrink-0" />
-					<div className="min-w-0 flex-1">
-						<div className="font-medium">{uploadError.message}</div>
-						{"errors" in uploadError && uploadError.errors.length > 0 && (
-							<ul className="mt-1 list-inside list-disc text-sm opacity-80 sm:text-xs">
-								{uploadError.errors.slice(0, 3).map((err, i) => (
-									<li key={i}>{err}</li>
-								))}
-								{uploadError.errors.length > 3 && (
-									<li>
-										{t("settings.themes.moreErrors", {
-											count: String(uploadError.errors.length - 3),
-										})}
-									</li>
-								)}
-							</ul>
-						)}
-					</div>
-					<Button
-						variant="ghost"
-						size="icon-sm"
-						className="-mt-1 -mr-1 shrink-0"
-						onClick={() => setUploadError(null)}
-					>
-						<span className="sr-only">
-							<T k="settings.themes.dismiss" />
-						</span>
-						<span aria-hidden>×</span>
-					</Button>
-				</div>
-			)}
-
-			<SettingsPanel>
-				{themes.length === 0 ? (
-					<SettingsEmpty
-						icon={<Palette className="size-8" />}
-						title={<T k="settings.themes.noThemes" />}
-						description={<T k="settings.themes.uploadHint" />}
-					/>
-				) : (
-					<>
-						{themes.map(theme => {
-							if (!theme) return null
-							return (
-								<div
-									key={theme.$jazz.id}
-									className="flex items-center gap-3 px-4 py-2.5"
-								>
-									<Palette className="text-muted-foreground size-4 shrink-0" />
-									<div className="min-w-0 flex-1">
-										<div className="truncate text-base font-medium sm:text-sm">
-											{theme.name}
-										</div>
-										<div className="text-muted-foreground truncate text-sm sm:text-xs">
-											{theme.type === "both"
-												? t("settings.themes.previewAndSlideshow")
-												: theme.type === "preview"
-													? t("settings.themes.preview")
-													: t("settings.themes.slideshow")}
-											{theme.author &&
-												` • ${t("settings.themes.by")} ${theme.author}`}
-										</div>
-									</div>
-									{theme.sourceDocId && (
-										<Button
-											variant="ghost"
-											size="icon-sm"
-											nativeButton={false}
-											render={
-												<Link
-													to="/themes/$id/workbench"
-													params={{ id: theme.$jazz.id }}
-												/>
-											}
-											aria-label={`Edit ${theme.name} in workbench`}
-										>
-											<Pencil className="size-4" />
-										</Button>
-									)}
-									<Button
-										variant="ghost"
-										size="icon-sm"
-										onClick={makeExportTheme(theme, setExportingThemeId)}
-										disabled={exportingThemeId === theme.$jazz.id}
-										aria-label={`Export ${theme.name}`}
-									>
-										{exportingThemeId === theme.$jazz.id ? (
-											<Loader2 className="size-4 animate-spin" />
-										) : (
-											<Download className="size-4" />
-										)}
-									</Button>
-									<Button
-										variant="ghost"
-										size="icon-sm"
-										onClick={() => setThemeToDelete(theme)}
-										aria-label={`Delete ${theme.name}`}
-									>
-										<Trash2 className="size-4" />
-									</Button>
-								</div>
-							)
-						})}
-						<DefaultThemeSettings
-							settings={me.root.settings}
-							themes={me.root.themes}
-						/>
-					</>
-				)}
-
-				<SettingsActions>
-					<input
-						ref={fileInputRef}
-						type="file"
-						accept=".md,.theme.md,.zip"
-						className="hidden"
-						onChange={handleFileSelect}
-					/>
-					<Button onClick={handleCreateTheme} variant="outline" size="sm">
-						<Plus className="mr-1.5 size-3.5" />
-						<T k="settings.themes.newTheme" />
-					</Button>
-					<Button
-						onClick={() => fileInputRef.current?.click()}
-						variant="outline"
-						size="sm"
-						disabled={isUploading}
-					>
-						{isUploading ? (
-							<>
-								<Loader2 className="mr-1.5 size-3.5 animate-spin" />
-								<T k="settings.themes.uploading" />
-							</>
-						) : (
-							<>
-								<Upload className="mr-1.5 size-3.5" />
-								<T k="settings.themes.uploadTheme" />
-							</>
-						)}
-					</Button>
-				</SettingsActions>
-			</SettingsPanel>
-
-			<ConfirmDialog
-				open={!!themeToDelete}
-				onOpenChange={open => !open && setThemeToDelete(null)}
-				title={t("settings.themes.deleteTitle")}
-				description={t("settings.themes.deleteDescription", {
-					name: themeToDelete?.name ?? "",
-				})}
-				confirmLabel={t("settings.themes.deleteConfirm")}
-				onConfirm={handleDeleteTheme}
-				variant="destructive"
-			/>
-		</SettingsSection>
-	)
-}
-
-interface DefaultThemeSettingsProps {
-	settings: co.loaded<typeof Settings> | null | undefined
-	themes: LoadedAccount["root"]["themes"]
-}
-
-type LoadedTheme = co.loaded<typeof Theme>
-
-function DefaultThemeSettings({ settings, themes }: DefaultThemeSettingsProps) {
-	let t = useIntl()
-	let themesList = themes ?? []
-
-	function isLoadedTheme(t: unknown): t is LoadedTheme {
-		return (
-			!!t && typeof t === "object" && "$isLoaded" in t && t.$isLoaded === true
-		)
-	}
-
-	let loadedThemes = Array.from(themesList).filter(isLoadedTheme)
-	let previewThemes = loadedThemes.filter(
-		t => t.type === "preview" || t.type === "both",
-	)
-	let slideshowThemes = loadedThemes.filter(
-		t => t.type === "slideshow" || t.type === "both",
-	)
-
-	function handlePreviewThemeChange(value: string | null) {
-		if (!settings || !value) return
-		if (value === "__none__") {
-			settings.$jazz.set("defaultPreviewTheme", undefined)
-		} else {
-			settings.$jazz.set("defaultPreviewTheme", value)
-		}
-	}
-
-	function handleSlideshowThemeChange(value: string | null) {
-		if (!settings || !value) return
-		if (value === "__none__") {
-			settings.$jazz.set("defaultSlideshowTheme", undefined)
-		} else {
-			settings.$jazz.set("defaultSlideshowTheme", value)
-		}
-	}
-
-	if (previewThemes.length === 0 && slideshowThemes.length === 0) {
-		return null
-	}
-
-	return (
-		<>
-			<SettingsGroupLabel>
-				<T k="settings.themes.defaultThemes" />
-			</SettingsGroupLabel>
-			{previewThemes.length > 0 && (
-				<SettingsRow
-					htmlFor="default-preview-theme"
-					label={<T k="settings.themes.preview" />}
-				>
-					<Select
-						value={settings?.defaultPreviewTheme ?? "__none__"}
-						onValueChange={handlePreviewThemeChange}
-					>
-						<SelectTrigger id="default-preview-theme" className="w-40">
-							<SelectValue>
-								{getThemeSelectLabel(
-									settings?.defaultPreviewTheme ?? "__none__",
-									t,
-								)}
-							</SelectValue>
-						</SelectTrigger>
-						<SelectContent>
-							<SelectItem value="__none__">
-								<T k="settings.themes.none" />
-							</SelectItem>
-							{previewThemes.map(theme => (
-								<SelectItem key={theme.$jazz.id} value={theme.name}>
-									{theme.name}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-				</SettingsRow>
-			)}
-			{slideshowThemes.length > 0 && (
-				<SettingsRow
-					htmlFor="default-slideshow-theme"
-					label={<T k="settings.themes.slideshow" />}
-				>
-					<Select
-						value={settings?.defaultSlideshowTheme ?? "__none__"}
-						onValueChange={handleSlideshowThemeChange}
-					>
-						<SelectTrigger id="default-slideshow-theme" className="w-40">
-							<SelectValue>
-								{getThemeSelectLabel(
-									settings?.defaultSlideshowTheme ?? "__none__",
-									t,
-								)}
-							</SelectValue>
-						</SelectTrigger>
-						<SelectContent>
-							<SelectItem value="__none__">
-								<T k="settings.themes.none" />
-							</SelectItem>
-							{slideshowThemes.map(theme => (
-								<SelectItem key={theme.$jazz.id} value={theme.name}>
-									{theme.name}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-				</SettingsRow>
-			)}
-		</>
-	)
-}
-
-interface SyncSectionProps {
-	isAuthenticated: boolean
-}
-
-function SyncSection({ isAuthenticated }: SyncSectionProps) {
+function SyncSection({ isAuthenticated }: { isAuthenticated: boolean }) {
 	if (isAuthenticated) {
 		return <SignedInView />
 	}
@@ -997,7 +522,7 @@ function SignInView() {
 }
 
 interface EditorSectionProps {
-	settings: LoadedAccount["root"]["settings"] | null
+	settings: SettingsData | null
 }
 
 function EditorSection({ settings: jazzSettings }: EditorSectionProps) {
@@ -1353,13 +878,6 @@ function spellcheckLanguageLabel(
 	return t("settings.editor.spellcheckLanguage.system")
 }
 
-function getThemeSelectLabel(
-	value: string,
-	t: ReturnType<typeof useIntl>,
-): string {
-	return value === "__none__" ? t("settings.themes.none") : value
-}
-
 function getStatsBadgeUnitLabel(
 	value: EditorSettingsData["statsBadgeUnit"],
 	t: ReturnType<typeof useIntl>,
@@ -1403,17 +921,16 @@ function makeHandleStatsBadgeUnitChange(
 
 function SyncNowSection() {
 	let t = useIntl()
-	let me = useAccount(UserAccount)
+	let { db } = useLibrary()
 	let isOnline = useIsOnline()
 	let [isSyncing, setIsSyncing] = useState(false)
 	let [error, setError] = useState<string | null>(null)
 
 	async function handleSyncNow() {
-		if (!me.$isLoaded) return
 		setIsSyncing(true)
 		setError(null)
 		try {
-			await me.$jazz.waitForAllCoValuesSync({ timeout: 10000 })
+			await db.waitForSync()
 		} catch {
 			setError(t("settings.sync.syncTimeout"))
 			setTimeout(() => setError(null), 5000)
@@ -1430,7 +947,7 @@ function SyncNowSection() {
 						onClick={handleSyncNow}
 						variant="outline"
 						size="sm"
-						disabled={isSyncing || !me.$isLoaded || !isOnline}
+						disabled={isSyncing || !isOnline}
 					>
 						<RefreshCw
 							className={`mr-1.5 size-3.5 ${isSyncing ? "animate-spin" : ""}`}
@@ -1454,14 +971,18 @@ function SyncNowSection() {
 }
 
 function SignedInView() {
-	let auth = usePassphraseAuth({ wordlist })
-	let logOut = useLogOut()
+	let auth = useJazzSession<JazzClient>()
+	let passphrase = RecoveryPhrase.fromSecret(auth.exportDeviceKey())
+	let logOut = async () => {
+		await auth.signOut()
+		await auth.createDeviceAccount()
+	}
 	let isOnline = useIsOnline()
 	let [showPassphrase, setShowPassphrase] = useState(false)
 	let [isCopied, setIsCopied] = useState(false)
 
 	async function handleCopy() {
-		await navigator.clipboard.writeText(auth.passphrase)
+		await navigator.clipboard.writeText(passphrase)
 		setIsCopied(true)
 		setTimeout(() => setIsCopied(false), 2000)
 	}
@@ -1494,7 +1015,7 @@ function SignedInView() {
 							</div>
 							<Textarea
 								readOnly
-								value={auth.passphrase}
+								value={passphrase}
 								data-syntwin-hidden
 								className="bg-background border-border w-full resize-none border p-3 font-mono text-base/6 sm:text-sm/5"
 								minRows={3}
@@ -1662,6 +1183,7 @@ function AppSection() {
 }
 
 function ReloadDiagnosticsSection() {
+	let { db, ownerId } = useLibrary()
 	let [entries, setEntries] = useState(readReloadDiagnostics)
 	let [copyState, setCopyState] = useState<
 		"idle" | "preparing" | "copied" | "failed"
@@ -1670,10 +1192,10 @@ function ReloadDiagnosticsSection() {
 
 	async function handleCopy() {
 		setCopyState("preparing")
-		let { collectStartupDiagnosticLabels } =
+		let { collectStartupDiagnostics } =
 			await import("../lib/startup-diagnostic-labels")
-		let labels = await collectStartupDiagnosticLabels()
-		await collectStorageDiagnostics(labels)
+		collectStartupDiagnostics(db, ownerId)
+		await collectStorageDiagnostics()
 		setEntries(readReloadDiagnostics())
 		let copied = await copyText(reloadDiagnosticsReport())
 		setCopyState(copied ? "copied" : "failed")
@@ -1778,18 +1300,4 @@ async function copyText(value: string): Promise<boolean> {
 	let copied = document.execCommand("copy")
 	textarea.remove()
 	return copied
-}
-
-function makeExportTheme(
-	theme: co.loaded<typeof Theme, ThemeExportQuery>,
-	setExporting: (id: string | null) => void,
-) {
-	return async function handleExport() {
-		setExporting(theme.$jazz.id)
-		try {
-			await exportTheme(theme)
-		} finally {
-			setExporting(null)
-		}
-	}
 }

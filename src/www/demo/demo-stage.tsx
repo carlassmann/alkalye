@@ -487,8 +487,8 @@ function DemoTimeMachine({
 		index,
 		madeAt: editDate(now, entry, index),
 		accountId: entry.by.name,
-		contentId: `demo-${index}`,
-		generationIndex: index,
+		key: `demo-${index}`,
+		content: entry.content,
 	}))
 
 	return (

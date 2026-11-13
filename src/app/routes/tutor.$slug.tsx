@@ -1,8 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router"
-import { tutorLoader } from "@/app/features/onboarding"
-
+import { OnboardingScreen } from "@/app/features/onboarding/screens"
 export { Route }
-
-let Route = createFileRoute("/tutor/$slug")({
-	loader: ({ context, params }) => tutorLoader(context.me, params.slug),
-})
+let Route = createFileRoute("/tutor/$slug")({ component: Screen })
+function Screen() {
+	return <OnboardingScreen slug={Route.useParams().slug} />
+}

@@ -1,13 +1,10 @@
-import { co, z } from "jazz-tools"
+import { z } from "zod"
 
 export {
 	laserMessageSchema,
 	packLaserMessage,
 	unpackLaserMessage,
 	laserSampleLimit,
-	LaserState,
-	LaserHub,
-	LaserSender,
 }
 export type { LaserMessage }
 
@@ -60,17 +57,6 @@ let laserMessageSchema = z.discriminatedUnion("type", [
 	z.object({ type: z.literal("closed"), id: z.string() }),
 ])
 type LaserMessage = z.infer<typeof laserMessageSchema>
-
-let LaserSender = co.map({
-	value: z.object({
-		docId: z.string(),
-		sequence: z.number(),
-		sentAt: z.number(),
-		message: laserMessageSchema,
-	}),
-})
-let LaserState = co.record(z.string(), LaserSender)
-let LaserHub = co.map({ current: LaserState })
 
 function packLaserMessage(message: LaserMessage): LaserMessage {
 	if (message.type !== "point" || !message.samples) return message

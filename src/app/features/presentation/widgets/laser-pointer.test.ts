@@ -14,7 +14,7 @@ let transport = vi.hoisted(() => {
 })
 vi.mock("jazz-tools/react", () => {
 	let account = { $isLoaded: true }
-	return { useAccount: () => account }
+	return { useDb: () => account }
 })
 vi.mock("@/shared/intl/setup", () => ({ useIntl: () => (key: string) => key }))
 vi.mock("../lib/laser-channel", () => ({

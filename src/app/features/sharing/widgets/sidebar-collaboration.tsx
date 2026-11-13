@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react"
-import { useCoState, useAccount } from "jazz-tools/react"
-import { co, type ResolveQuery } from "jazz-tools"
+import { useState } from "react"
+import { useLibrary } from "@/app/features/documents"
 import {
 	SidebarGroupLabel,
 	SidebarGroupContent,
@@ -16,10 +15,7 @@ import {
 } from "@/app/components/ui/context-menu"
 import { Globe, Lock, Trash2, UserCog, Users } from "lucide-react"
 import { ShareDialog } from "./share-dialog"
-import { Document, UserAccount } from "@/schema"
 import {
-	listCollaborators,
-	isDocumentPublic,
 	getDocumentGroup,
 	revokeDocumentInvite,
 	type Collaborator,
@@ -30,12 +26,6 @@ import { useIntl, T } from "@/shared/intl/setup"
 
 export { SidebarCollaboration }
 
-let docResolve = { content: true } as const satisfies ResolveQuery<
-	typeof Document
->
-
-type LoadedDocWithContent = co.loaded<typeof Document, typeof docResolve>
-
 interface SidebarCollaborationProps {
 	docId: string
 	spaceGroupId?: string
@@ -43,40 +33,34 @@ interface SidebarCollaborationProps {
 
 function SidebarCollaboration({
 	docId,
-	spaceGroupId,
+	spaceGroupId: _spaceGroupId,
 }: SidebarCollaborationProps) {
 	let t = useIntl()
 	let hasFinePointer = useHasFinePointer()
 	let [shareOpen, setShareOpen] = useState(false)
-	let [collaborators, setCollaborators] = useState<Collaborator[]>([])
 
-	let me = useAccount(UserAccount)
-	let doc = useCoState(Document, docId, {
-		resolve: docResolve,
-	})
-
-	let isPublic = doc?.$isLoaded ? isDocumentPublic(doc) : false
-	let currentUserId = me.$isLoaded ? me.$jazz.id : null
-
-	useEffect(() => {
-		async function loadCollaborators() {
-			if (!doc?.$isLoaded) return
-			let result = await listCollaborators(doc, spaceGroupId)
-			setCollaborators(result.collaborators)
-		}
-		loadCollaborators()
-	}, [doc, spaceGroupId])
+	let { db, documents, ownerId, grants, profiles } = useLibrary()
+	let doc = documents.find(doc => doc.id === docId)
+	let isPublic = doc?.publicRead ?? false
+	let currentUserId = ownerId
+	let collaborators = grants
+		.filter(grant => grant.documentId === docId)
+		.map(grant => ({
+			id: grant.accountId,
+			name:
+				profiles.find(profile => profile.ownerId === grant.accountId)?.name ??
+				t("common.anonymous"),
+			role: grant.role,
+			inviteGroupId: grant.id,
+		}))
 
 	let otherCollaborators = collaborators.filter(c => c.id !== currentUserId)
 	let hasCollaborators = otherCollaborators.length > 0 || isPublic
-	let isAdmin = doc?.$isLoaded && getDocumentGroup(doc)?.myRole() === "admin"
+	let isAdmin = doc && getDocumentGroup(doc)?.myRole() === "admin"
 
 	function removeCollaborator(collaborator: Collaborator) {
-		if (!doc?.$isLoaded || !isAdmin) return
-		revokeDocumentInvite(doc, collaborator.inviteGroupId)
-		setCollaborators(current =>
-			current.filter(item => item.id !== collaborator.id),
-		)
+		if (!doc || !isAdmin) return
+		void revokeDocumentInvite(db, doc, collaborator.inviteGroupId)
 	}
 
 	return (
@@ -169,12 +153,8 @@ function SidebarCollaboration({
 				</SidebarMenu>
 			</SidebarGroupContent>
 
-			{shareOpen && doc?.$isLoaded && (
-				<ShareDialog
-					doc={doc as LoadedDocWithContent}
-					open={shareOpen}
-					onOpenChange={setShareOpen}
-				/>
+			{shareOpen && doc && (
+				<ShareDialog doc={doc} open={shareOpen} onOpenChange={setShareOpen} />
 			)}
 		</>
 	)

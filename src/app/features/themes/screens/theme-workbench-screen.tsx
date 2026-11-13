@@ -8,8 +8,10 @@ import {
 	type RefObject,
 } from "react"
 import { Link, useNavigate } from "@tanstack/react-router"
-import { co, type ResolveQuery } from "jazz-tools"
-import { useAccount, useCoState } from "jazz-tools/react"
+import type { ThemeRow } from "../lib/schema"
+import type { LibraryDocument } from "@/app/features/documents"
+import { app, useLibrary, updateContent } from "@/app/features/documents"
+import { useOne, useAll } from "jazz-tools/react"
 import {
 	AlertCircle,
 	ArrowLeft,
@@ -39,56 +41,28 @@ import {
 	SelectValue,
 } from "@/app/components/ui/select"
 import {
+	codeMirrorSync,
 	Preview,
-	persistDocumentContentSynchronously,
-	useDocTitles,
 	type ResolvedDoc,
 } from "@/app/features/documents"
 import {
 	MarkdownEditor,
-	parseWikiLinks,
 	useEditorSettings,
 	useMarkdownEditorRef,
 	type MarkdownEditorRef,
 } from "@/app/features/editor"
-import { assetPreviewResolve } from "@/app/features/assets"
+import { useDocumentAssets } from "@/app/features/assets"
 import {
 	parsePresentation,
 	Slideshow,
 	type PresentationItem,
 	type Slide,
 } from "@/app/features/presentation"
-import { Document, UserAccount } from "@/schema"
-import {
-	getThemeSourceId,
-	parseThemeSource,
-	createDefaultTheme,
-	syncThemeFromSource,
-	Theme,
-} from "@/app/features/themes"
+import { parseThemeSource, createDefaultTheme } from "@/app/features/themes"
 
 import { bindThemeSource } from "../lib/source"
 
 export { ThemeWorkbenchScreen }
-
-let themeResolve = {
-	css: true,
-	template: true,
-	slideTemplate: true,
-} as const satisfies ResolveQuery<typeof Theme>
-
-let sourceResolve = { content: true } as const satisfies ResolveQuery<
-	typeof Document
->
-
-let documentsResolve = {
-	root: {
-		settings: true,
-		documents: {
-			$each: { content: true, assets: { $each: assetPreviewResolve } },
-		},
-	},
-} as const satisfies ResolveQuery<typeof UserAccount>
 
 let sampleContent = `# Theme workbench
 
@@ -133,24 +107,19 @@ Design the opening moment.
 `
 
 function ThemeWorkbenchScreen({ id }: { id: string }) {
-	let account = useAccount(UserAccount, { resolve: documentsResolve })
-	let theme = useCoState(Theme, id, { resolve: themeResolve })
-	let sourceId = theme.$isLoaded ? theme.sourceDocId : undefined
-	let source = useCoState(Document, sourceId, { resolve: sourceResolve })
-
-	if (!theme.$isLoaded && theme.$jazz.loadingState !== "loading") {
-		return <ThemeUnavailable />
-	}
-
-	if (!theme.$isLoaded || !account.$isLoaded) {
-		return <LoadingWorkbench />
-	}
-
-	if (!sourceId || !source.$isLoaded || !source.content?.$isLoaded) {
-		return <MissingSource themeName={theme.name} />
-	}
-
-	return <Workbench theme={theme} source={source} account={account} />
+	let { data: theme, isLoading } = useOne(app.themes.where({ id }))
+	let { documents } = useLibrary()
+	let summary = documents.find(doc => doc.id === theme?.sourceDocId)
+	let { data: body, isLoading: bodyLoading } = useOne(
+		theme?.sourceDocId
+			? app.documents.where({ id: theme.sourceDocId }).select("content")
+			: undefined,
+	)
+	let source = summary && body ? { ...summary, content: body.content } : null
+	if (isLoading || bodyLoading) return <LoadingWorkbench />
+	if (!theme) return <ThemeUnavailable />
+	if (!source) return <MissingSource themeName={theme.name} />
+	return <Workbench key={id} theme={theme} source={source} />
 }
 
 function LoadingWorkbench() {
@@ -199,19 +168,16 @@ function MissingSource({ themeName }: { themeName: string }) {
 	)
 }
 
-type LoadedTheme = co.loaded<typeof Theme, typeof themeResolve>
-type LoadedSource = co.loaded<typeof Document, typeof sourceResolve>
-type LoadedAccount = co.loaded<typeof UserAccount, typeof documentsResolve>
-
+type LoadedTheme = ThemeRow
+type LoadedSource = LibraryDocument & { content: string }
 function Workbench({
 	theme,
 	source,
-	account,
 }: {
 	theme: LoadedTheme
 	source: LoadedSource
-	account: LoadedAccount
 }) {
+	let account = useLibrary()
 	let editor = useMarkdownEditorRef()
 	let sourceContent = source.content.toString()
 	let parsed = parseThemeSource(sourceContent)
@@ -226,29 +192,49 @@ function Workbench({
 	let layoutRef = useRef<HTMLDivElement>(null)
 	let isResizing = useRef(false)
 	let isDesktop = useWorkbenchDesktop()
-	let sourceSyncState = useRef({ content: sourceContent, sequence: 0 })
-	if (sourceSyncState.current.content !== sourceContent) {
-		sourceSyncState.current = {
-			content: sourceContent,
-			sequence: sourceSyncState.current.sequence + 1,
-		}
-	}
+	let [binding] = useState(() =>
+		codeMirrorSync(source.content, (content, editedFrom) => {
+			void updateContent(
+				account.db,
+				source,
+				bindThemeSource(content, theme.id),
+				editedFrom,
+			)
+				.then(() => setSourceSyncError(null))
+				.catch(error => setSourceSyncError(getSourceSyncError(error)))
+		}),
+	)
+	useEffect(() => () => binding.destroy(), [binding])
 	let navigate = useNavigate()
-	let documents = getTargetDocuments(account, source.$jazz.id)
-	let targetDocument = documents.find(document => document.$jazz.id === target)
+	let { data: themes = [] } = useAll(app.themes.select("sourceDocId"))
+	let documents = account.documents.filter(
+		doc =>
+			!doc.deletedAt &&
+			doc.id !== source.id &&
+			!themes.some(theme => theme.sourceDocId === doc.id),
+	)
+	let targetDocument = documents.find(document => document.id === target)
+	let { data: targetBody } = useOne(
+		targetDocument
+			? app.documents.where({ id: targetDocument.id }).select("content")
+			: undefined,
+	)
 	let targetContent =
-		targetDocument?.content.toString() ??
+		targetBody?.content ??
 		(mode === "slideshow" ? presentationSampleContent : sampleContent)
 	let previewContent = targetContent
-	let editorSettings = account.root?.settings?.$isLoaded
-		? account.root.settings
-		: undefined
+	let editorSettings = account.settings
 	let { settings } = useEditorSettings(editorSettings)
-	let wikilinkIds = parseWikiLinks(targetContent).map(link => link.id)
-	let wikilinks = useDocTitles(wikilinkIds, new Map<string, ResolvedDoc>())
-	let assets = targetDocument?.assets?.$isLoaded
-		? targetDocument.assets.filter(asset => asset?.$isLoaded)
-		: []
+	let wikilinks = new Map<string, ResolvedDoc>(
+		documents.map(doc => [
+			doc.id,
+			{ id: doc.id, title: doc.title, exists: true },
+		]),
+	)
+	let { previewAssets: assets } = useDocumentAssets(
+		targetDocument?.id ?? source.id,
+		targetContent,
+	)
 	let slides = getSlides(parsePresentation(targetContent))
 	let currentSlideNumber = slides.some(
 		slide => slide.slideNumber === slideNumber,
@@ -259,10 +245,10 @@ function Workbench({
 	async function handleCreateDefaultTheme() {
 		setIsCreatingDefault(true)
 		try {
-			let defaultTheme = await createDefaultTheme(account)
+			let defaultTheme = await createDefaultTheme(account.db, account.ownerId)
 			navigate({
 				to: "/themes/$id/workbench",
-				params: { id: defaultTheme.$jazz.id },
+				params: { id: defaultTheme.id },
 			})
 		} finally {
 			setIsCreatingDefault(false)
@@ -294,7 +280,7 @@ function Workbench({
 					>
 						New from default
 					</Button>
-					<Link to="/doc/$id" params={{ id: source.$jazz.id }}>
+					<Link to="/doc/$id" params={{ id: source.id }}>
 						<Button variant="outline" size="sm">
 							<ExternalLink className="size-3.5" />
 							Open source
@@ -333,13 +319,7 @@ function Workbench({
 							<MarkdownEditor
 								ref={editor}
 								value={sourceContent}
-								onChange={makeSourceChange(
-									theme.$jazz.id,
-									source,
-									account,
-									setSourceSyncError,
-									sourceSyncState,
-								)}
+								sync={binding}
 								placeholder="Write theme source"
 								spellcheck={settings.spellcheck}
 								spellcheckLanguage={settings.spellcheckLanguage}
@@ -350,7 +330,7 @@ function Workbench({
 								autocomplete={settings.autocomplete}
 								typeToFocus={mode !== "slideshow" || layout === "source"}
 								documents={documents.map(document => ({
-									id: document.$jazz.id,
+									id: document.id,
 									title: document.title || "Untitled document",
 								}))}
 							/>
@@ -414,10 +394,7 @@ function Workbench({
 									<SelectContent align="end">
 										<SelectItem value="sample">Sample content</SelectItem>
 										{documents.map(document => (
-											<SelectItem
-												key={document.$jazz.id}
-												value={document.$jazz.id}
-											>
+											<SelectItem key={document.id} value={document.id}>
 												{document.title || "Untitled document"}
 											</SelectItem>
 										))}
@@ -431,19 +408,26 @@ function Workbench({
 									content={previewContent}
 									slides={slides}
 									assets={assets}
-									wikilinks={wikilinks}
+									wikilinks={
+										new Map(
+											[...wikilinks].map(([id, doc]) => [
+												id,
+												{ ...doc, isPresentation: false },
+											]),
+										)
+									}
 									currentSlideNumber={currentSlideNumber}
 									onSlideChange={setSlideNumber}
 									embedded
-									themeOverrideId={theme.$jazz.id}
+									themeOverrideId={theme.id}
 									appearanceOverride={appearance}
 								/>
 							) : (
 								<Preview
 									content={previewContent}
-									assets={assets}
+									localAssets={assets}
 									wikilinks={wikilinks}
-									themeOverrideId={theme.$jazz.id}
+									themeOverrideId={theme.id}
 									appearanceOverride={appearance}
 									embedded
 								/>
@@ -461,7 +445,7 @@ function Workbench({
 
 function getTargetLabel(
 	target: PreviewTarget,
-	document: ReturnType<typeof getTargetDocuments>[number] | undefined,
+	document: LibraryDocument | undefined,
 ) {
 	if (target === "sample") return "Sample content"
 	return document?.title || "Untitled document"
@@ -784,54 +768,6 @@ function getSlides(items: PresentationItem[]): Slide[] {
 	return Array.from(slideMap.entries())
 		.sort((a, b) => a[0] - b[0])
 		.map(([slideNumber, blocks]) => ({ slideNumber, blocks }))
-}
-
-function getTargetDocuments(account: LoadedAccount, sourceId: string) {
-	if (!account.$isLoaded || !account.root?.documents?.$isLoaded) return []
-	return Array.from(account.root.documents).filter(
-		(document): document is co.loaded<typeof Document, { content: true }> =>
-			document?.$isLoaded === true &&
-			document.$jazz.id !== sourceId &&
-			getThemeSourceId(document.content.toString()) === null,
-	)
-}
-
-function makeSourceChange(
-	themeId: string,
-	source: LoadedSource,
-	account: LoadedAccount,
-	setSourceSyncError: (error: string | null) => void,
-	sourceSyncState: MutableRefObject<{ content: string; sequence: number }>,
-) {
-	return function handleSourceChange(readContent: () => string) {
-		let sequence = sourceSyncState.current.sequence + 1
-		sourceSyncState.current.sequence = sequence
-		let content: string
-		try {
-			content = persistDocumentContentSynchronously(
-				source,
-				bindThemeSource(readContent(), themeId),
-			)
-			sourceSyncState.current.content = content
-		} catch (error) {
-			if (sourceSyncState.current.sequence === sequence) {
-				setSourceSyncError(getSourceSyncError(error))
-			}
-			return
-		}
-		void syncThemeFromSource(account, source.$jazz.id, content).then(
-			() => {
-				if (sourceSyncState.current.sequence === sequence) {
-					setSourceSyncError(null)
-				}
-			},
-			error => {
-				if (sourceSyncState.current.sequence === sequence) {
-					setSourceSyncError(getSourceSyncError(error))
-				}
-			},
-		)
-	}
 }
 
 function getSourceSyncError(error: unknown) {

@@ -1,3 +1,4 @@
+import { DuplicateDocDialog } from "./duplicate-doc-dialog"
 import { useEffect, useState } from "react"
 import { useNavigate } from "@tanstack/react-router"
 import { useSidebar } from "@/app/components/ui/sidebar"
@@ -13,14 +14,13 @@ import { MoveToSpaceDialog } from "@/app/features/spaces"
 import { canEdit, getDocumentGroup } from "@/app/features/sharing"
 import { getPresentationMode } from "@/app/features/presentation"
 import { useIntl } from "@/shared/intl/setup"
-import { readDocumentText } from "../lib/document-text"
+import { useLibrary } from "../lib/library"
 import { MoveToFolderDialog } from "./move-to-folder-dialog"
 import {
 	getExistingFolders,
 	makeAddTag,
 	makeDelete,
 	makeDownload,
-	makeDuplicate,
 	makeLeave,
 	makeMoveToSpace,
 	makeOpenTimeMachine,
@@ -29,7 +29,6 @@ import {
 	makeTurnIntoPresentation,
 	type EditorRef,
 	type LoadedDocument,
-	type LoadedMe,
 } from "../lib/document-file-actions"
 
 export { DocumentCommands, runDocumentCommand }
@@ -48,9 +47,8 @@ let documentShortcuts: DocumentShortcutId[] = [
 ]
 
 interface DocumentCommandsProps {
-	doc: LoadedDocument
+	doc: LoadedDocument & { content: string }
 	editor: EditorRef
-	me?: LoadedMe
 	spaceId?: string
 	documents: { id: string; title: string }[]
 }
@@ -58,10 +56,11 @@ interface DocumentCommandsProps {
 function DocumentCommands({
 	doc,
 	editor,
-	me,
 	spaceId,
 	documents,
 }: DocumentCommandsProps) {
+	let { db, ownerId, documents: libraryDocuments } = useLibrary()
+	let me = libraryDocuments
 	let t = useIntl()
 	let navigate = useNavigate()
 	let {
@@ -72,12 +71,13 @@ function DocumentCommands({
 		setRightOpenMobile,
 	} = useSidebar()
 	let [openDocumentOpen, setOpenDocumentOpen] = useState(false)
+	let [duplicateOpen, setDuplicateOpen] = useState(false)
 	let [deleteOpen, setDeleteOpen] = useState(false)
 	let [leaveOpen, setLeaveOpen] = useState(false)
 	let [moveOpen, setMoveOpen] = useState(false)
 	let [moveSpaceOpen, setMoveSpaceOpen] = useState(false)
 
-	let content = doc.content?.$isLoaded ? readDocumentText(doc.content) : ""
+	let content = doc.content
 	let readOnly = !canEdit(doc)
 	let isAdmin = getDocumentGroup(doc)?.myRole() === "admin"
 
@@ -90,11 +90,11 @@ function DocumentCommands({
 			if (isAdmin) setDeleteOpen(true)
 			else if (me) setLeaveOpen(true)
 		} else if (id === "duplicateDocument") {
-			void makeDuplicate(doc, me, spaceId, navigate)()
+			setDuplicateOpen(true)
 		} else if (id === "moveToSpace") {
 			if (me) setMoveSpaceOpen(true)
 		} else if (id === "downloadDocument") {
-			void makeDownload(doc, content)()
+			void makeDownload(db, doc, content)()
 		} else if (id === "timeMachine") {
 			makeOpenTimeMachine(
 				doc,
@@ -112,7 +112,7 @@ function DocumentCommands({
 	function runEditCommand(id: RunnableDocumentCommand) {
 		if (id === "renameDocument")
 			makeRename(editor, isMobile, setRightOpenMobile)()
-		else if (id === "togglePin") makeTogglePin(doc)()
+		else if (id === "togglePin") makeTogglePin(db, ownerId, doc)()
 		else if (id === "addTag") makeAddTag(editor, isMobile, setRightOpenMobile)()
 		else if (id === "moveToFolder" && me) setMoveOpen(true)
 		else if (id === "turnIntoPresentation" && !getPresentationMode(content))
@@ -142,6 +142,19 @@ function DocumentCommands({
 
 	return (
 		<>
+			<DuplicateDocDialog
+				doc={doc}
+				open={duplicateOpen}
+				onOpenChange={setDuplicateOpen}
+				onDuplicate={(id, destination) => {
+					if (destination)
+						void navigate({
+							to: "/spaces/$spaceId/doc/$id",
+							params: { spaceId: destination.id, id },
+						})
+					else void navigate({ to: "/doc/$id", params: { id } })
+				}}
+			/>
 			{openDocumentOpen && (
 				<QuickJumpDialog
 					open
@@ -179,7 +192,7 @@ function DocumentCommands({
 				description={t("doc.deleteDialog.description")}
 				confirmLabel={t("doc.deleteDialog.confirm")}
 				variant="destructive"
-				onConfirm={makeDelete(doc, navigate, spaceId)}
+				onConfirm={makeDelete(db, doc, navigate, spaceId)}
 				confirmTestId={testIds.dialog.deleteConfirm}
 			/>
 			<ConfirmDialog
@@ -189,7 +202,7 @@ function DocumentCommands({
 				description={t("doc.leaveDialog.description")}
 				confirmLabel={t("doc.leaveDialog.confirm")}
 				variant="destructive"
-				onConfirm={makeLeave(doc, me, doc, navigate)}
+				onConfirm={makeLeave(db, doc, navigate)}
 			/>
 			{moveSpaceOpen && (
 				<MoveToSpaceDialog

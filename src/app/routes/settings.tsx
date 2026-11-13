@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router"
-import { SettingsScreen, settingsQuery } from "@/app/features/settings"
-import { startStartupSpan } from "@/app/lib/reload-diagnostics"
+import { SettingsScreen } from "@/app/features/settings"
 
 export { Route }
 
@@ -23,22 +22,10 @@ let Route = createFileRoute("/settings")({
 		}
 		return result
 	},
-	loader: async ({ context }) => {
-		let { me } = context
-		if (!me) return { me: null }
-		let finishLoad = startStartupSpan("settings-loader")
-		let loadedMe = await me.$jazz.ensureLoaded({ resolve: settingsQuery })
-		finishLoad({
-			loaded: loadedMe.$isLoaded,
-			themeCount: loadedMe.root?.themes?.length ?? 0,
-		})
-		return { me: loadedMe }
-	},
 	component: RouteComponent,
 })
 
 function RouteComponent() {
-	let loaderData = Route.useLoaderData()
 	let search = Route.useSearch()
-	return <SettingsScreen loaderData={loaderData} search={search} />
+	return <SettingsScreen search={search} />
 }

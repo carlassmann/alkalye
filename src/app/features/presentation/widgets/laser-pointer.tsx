@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type PointerEvent } from "react"
-import { useAccount } from "jazz-tools/react"
+import { useDb } from "jazz-tools/react"
 import {
 	Dialog,
 	DialogContent,
@@ -8,7 +8,6 @@ import {
 } from "@/app/components/ui/dialog"
 import { Button } from "@/app/components/ui/button"
 import { X } from "lucide-react"
-import { UserAccount } from "@/schema"
 import { createLaserChannel } from "../lib/laser-channel"
 import {
 	createLaserLease,
@@ -34,7 +33,7 @@ function LaserReceiver({
 	docId: string
 	slideNumber: number
 }) {
-	let me = useAccount(UserAccount)
+	let db = useDb()
 	let trailRef = useRef<LaserTrailController | null>(null)
 	let idRef = useRef(crypto.randomUUID())
 	let slideRef = useRef(slideNumber)
@@ -48,7 +47,7 @@ function LaserReceiver({
 
 	useEffect(() => {
 		// The preview must not announce itself as another projector.
-		if (isLaserPreview() || !me.$isLoaded) return
+		if (isLaserPreview()) return
 		let leases = createLaserLease()
 		let requests = new Set<string>()
 		let announcedLayout = ""
@@ -103,7 +102,7 @@ function LaserReceiver({
 			}
 			trailRef.current?.add(message)
 		}
-		let channel = createLaserChannel(me, docId, handleMessage)
+		let channel = createLaserChannel(db, docId, handleMessage)
 		announceRef.current = announce
 		announce()
 		let heartbeat = window.setInterval(announce, laserTiming.announce)
@@ -118,7 +117,7 @@ function LaserReceiver({
 			window.removeEventListener("resize", announce)
 			window.removeEventListener("pagehide", hide)
 		}
-	}, [docId, me])
+	}, [docId, db])
 
 	return <LaserTrail controllerRef={trailRef} fixed />
 }
@@ -135,7 +134,7 @@ function LaserPreview({
 	onClose?: () => void
 }) {
 	let t = useIntl()
-	let me = useAccount(UserAccount)
+	let db = useDb()
 	let [displays, setDisplays] = useState<Display[]>([])
 	let [selectedId, setSelectedId] = useState<string | null>(null)
 	let [previewSize, setPreviewSize] = useState({ width: 0, height: 0 })
@@ -172,7 +171,6 @@ function LaserPreview({
 	}
 
 	useEffect(() => {
-		if (!me.$isLoaded) return
 		let connected = new Map<string, Display>()
 		let request = crypto.randomUUID()
 		function refresh() {
@@ -203,7 +201,7 @@ function LaserPreview({
 				refresh()
 			}
 		}
-		let channel = createLaserChannel(me, docId, handleMessage)
+		let channel = createLaserChannel(db, docId, handleMessage)
 		channelRef.current = channel
 		channel.postMessage({ type: "discover", request })
 		let expiry = window.setInterval(refresh, 500)
@@ -235,7 +233,7 @@ function LaserPreview({
 			window.removeEventListener("blur", stop)
 			document.removeEventListener("visibilitychange", stop)
 		}
-	}, [docId, me])
+	}, [docId, db])
 
 	useEffect(() => {
 		stopPointing()

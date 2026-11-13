@@ -5,7 +5,7 @@ import {
 	type PresentationItem,
 	type TextSegment,
 } from "../lib/presentation"
-import { type ResolvedDoc } from "@/app/features/documents"
+type ResolvedDoc = { title: string; exists: boolean; isPresentation: boolean }
 import { ArrowUp, ArrowDown, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/app/components/ui/button"
 import {

@@ -1,6 +1,6 @@
 import type JSZip from "jszip"
 import { assetExtensionFromMimeType } from "@/app/features/assets"
-import type { ExportComment } from "@/app/features/comments"
+import type { ExportComment } from "./comment-format"
 
 export {
 	exportDocument,

@@ -1,14 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router"
-import { SpaceListScreen, spaceListLoader } from "@/app/features/spaces"
-
+import { z } from "zod"
+import { SpaceListScreen } from "@/app/features/spaces"
 export { Route }
-
 let Route = createFileRoute("/spaces/$spaceId/")({
-	loader: ({ params }) => spaceListLoader(params.spaceId),
-	component: SpaceIndexPage,
+	validateSearch: z.object({
+		from: z.string().optional(),
+		spaceId: z.string().optional(),
+		step: z.number().optional(),
+	}),
+	component: Screen,
 })
-
-function SpaceIndexPage() {
-	let data = Route.useLoaderData()
-	return <SpaceListScreen loaderData={data} />
+function Screen() {
+	let { spaceId } = Route.useParams()
+	return <SpaceListScreen spaceId={spaceId} />
 }

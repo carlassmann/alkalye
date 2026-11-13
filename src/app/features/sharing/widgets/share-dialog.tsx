@@ -1,6 +1,7 @@
+import { useIsBackedUp } from "@/app/features/auth"
 import { IconTransition } from "@/app/components/ui/icon-transition"
 import { useState, useEffect, useRef } from "react"
-import { useAccount, useIsAuthenticated, useCoState } from "jazz-tools/react"
+import { useLibrary, type LibraryDocument } from "@/app/features/documents"
 import { useNavigate, Link, useLocation } from "@tanstack/react-router"
 import {
 	Copy,
@@ -13,7 +14,6 @@ import {
 	Globe,
 	Lock,
 } from "lucide-react"
-import { co } from "jazz-tools"
 import {
 	Dialog,
 	DialogContent,
@@ -23,31 +23,27 @@ import {
 } from "@/app/components/ui/dialog"
 import { Badge } from "@/app/components/ui/badge"
 import { Button } from "@/app/components/ui/button"
-import { Document, UserAccount } from "@/schema"
 import { useIntl, T } from "@/shared/intl/setup"
 import {
 	createDocumentInvite,
 	revokeDocumentInvite,
 	leavePersonalDocument,
 	listCollaborators,
-	migrateDocumentToGroup,
 	getDocumentGroup,
 	getDocumentOwner,
 	makeDocumentPublic,
 	makeDocumentPrivate,
-	isDocumentPublic,
 	getPublicLink,
 	type Collaborator,
 } from "../lib/document-sharing"
 import { testIds } from "@/app/lib/test-ids"
-import { getDocumentTitle } from "@/app/features/documents"
 import { NativeShareIcon } from "@/app/components/native-share-icon"
 
 export { ShareDialog }
 
 type InviteRole = "writer" | "reader"
 
-type LoadedDocument = co.loaded<typeof Document>
+type LoadedDocument = LibraryDocument
 
 interface ShareDialogProps {
 	doc: LoadedDocument
@@ -63,7 +59,8 @@ function ShareDialog({
 	let t = useIntl()
 	let navigate = useNavigate()
 	let location = useLocation()
-	let isAuthenticated = useIsAuthenticated()
+	let { db, ownerId } = useLibrary()
+	let isAuthenticated = useIsBackedUp()
 	let [internalOpen, setInternalOpen] = useState(false)
 
 	let open = controlledOpen ?? internalOpen
@@ -77,55 +74,30 @@ function ShareDialog({
 		{ inviteGroupId: string }[]
 	>([])
 	let [owner, setOwner] = useState<{ id: string; name: string } | null>(null)
-	let [currentDocId, setCurrentDocId] = useState(doc.$jazz.id)
-	let [docIsPublic, setDocIsPublic] = useState(() => isDocumentPublic(doc))
-	let me = useAccount(UserAccount, { resolve: { root: { documents: true } } })
-
-	// Subscribe to the document for reactive updates
-	let subscribedDoc = useCoState(
-		Document,
-		currentDocId as Parameters<typeof useCoState>[1],
-		{ resolve: { content: true } },
-	)
-	let currentDoc = subscribedDoc?.$isLoaded ? subscribedDoc : doc
-
-	// Reset currentDocId when doc prop changes (e.g., navigating to different doc)
-	let [prevDocId, setPrevDocId] = useState(doc.$jazz.id)
-	if (doc.$jazz.id !== prevDocId) {
-		setPrevDocId(doc.$jazz.id)
-		setCurrentDocId(doc.$jazz.id)
-	}
-
-	// Sync public state when dialog opens (calculate from current state)
-	let [prevOpen, setPrevOpen] = useState(open)
-	if (open && !prevOpen) {
-		setPrevOpen(open)
-		setDocIsPublic(isDocumentPublic(currentDoc))
-	} else if (!open && prevOpen) {
-		setPrevOpen(open)
-	}
+	let currentDoc = doc
+	let docIsPublic = doc.publicRead
 
 	let docGroup = getDocumentGroup(currentDoc)
 	let isAdmin = docGroup?.myRole() === "admin"
 	let isGroupOwned = docGroup !== null
-	let isOwner = !isGroupOwned || isAdmin
+	let isOwner = isAdmin
 	let isCollaborator = isGroupOwned && !isAdmin
 	let canShareInvite =
 		typeof navigator !== "undefined" && typeof navigator.share === "function"
 
 	let refreshCollaboratorsRef = useRef(async () => {
-		let result = await listCollaborators(currentDoc)
+		let result = await listCollaborators(db, currentDoc)
 		setCollaborators(result.collaborators)
 		setPendingInvites(result.pendingInvites)
-		let docOwner = await getDocumentOwner(currentDoc)
+		let docOwner = await getDocumentOwner(db, currentDoc)
 		setOwner(docOwner)
 	})
 	useEffect(() => {
 		refreshCollaboratorsRef.current = async () => {
-			let result = await listCollaborators(currentDoc)
+			let result = await listCollaborators(db, currentDoc)
 			setCollaborators(result.collaborators)
 			setPendingInvites(result.pendingInvites)
-			let docOwner = await getDocumentOwner(currentDoc)
+			let docOwner = await getDocumentOwner(db, currentDoc)
 			setOwner(docOwner)
 		}
 	})
@@ -136,22 +108,11 @@ function ShareDialog({
 	}, [open, currentDoc])
 
 	async function handleCreateLink(role: InviteRole) {
-		if (!me.$isLoaded) return
 		setLoading(true)
 
 		try {
-			let currentDoc = doc
-			if (!getDocumentGroup(doc)) {
-				let loaded = await doc.$jazz.ensureLoaded({
-					resolve: { content: true },
-				})
-				if (!loaded) return
-				let result = await migrateDocumentToGroup(loaded, me.$jazz.id)
-				currentDoc = result.document
-			}
-
-			let { link } = await createDocumentInvite(currentDoc, role)
-			setInviteLink(link)
+			let { link } = await createDocumentInvite(db, doc, role)
+			setInviteLink(link ?? null)
 			await refreshCollaboratorsRef.current()
 		} catch (e) {
 			console.error("Failed to create invite link:", e)
@@ -172,7 +133,7 @@ function ShareDialog({
 
 		try {
 			await navigator.share({
-				title: getDocumentTitle(currentDoc.content?.toString() ?? ""),
+				title: currentDoc.title,
 				url: inviteLink,
 			})
 		} catch (error) {
@@ -189,18 +150,10 @@ function ShareDialog({
 	}
 
 	async function handleMakePublic() {
-		if (!me.$isLoaded) return
 		setLoading(true)
 
 		try {
-			let loaded = await currentDoc.$jazz.ensureLoaded({
-				resolve: { content: true },
-			})
-			if (!loaded) return
-			let updatedDoc = await makeDocumentPublic(loaded, me.$jazz.id)
-			// Update the doc ID in case migration created a new document
-			setCurrentDocId(updatedDoc.$jazz.id)
-			setDocIsPublic(true)
+			await makeDocumentPublic(db, currentDoc)
 		} catch (e) {
 			console.error("Failed to make document public:", e)
 		} finally {
@@ -211,8 +164,7 @@ function ShareDialog({
 	async function handleMakePrivate() {
 		setLoading(true)
 		try {
-			await makeDocumentPrivate(currentDoc)
-			setDocIsPublic(false)
+			await makeDocumentPrivate(db, currentDoc)
 		} catch (e) {
 			console.error("Failed to make document private:", e)
 		} finally {
@@ -220,8 +172,8 @@ function ShareDialog({
 		}
 	}
 
-	function handleRevoke(inviteGroupId: string) {
-		revokeDocumentInvite(doc, inviteGroupId)
+	async function handleRevoke(inviteGroupId: string) {
+		await revokeDocumentInvite(db, doc, inviteGroupId)
 		refreshCollaboratorsRef.current()
 		if (inviteLink?.includes(inviteGroupId)) {
 			setInviteLink(null)
@@ -229,10 +181,11 @@ function ShareDialog({
 	}
 
 	async function handleLeave() {
-		if (!me.$isLoaded) return
 		setLoading(true)
 		try {
-			await handleLeaveDocument(doc, me, navigate, setOpen)
+			await leavePersonalDocument(db, doc)
+			setOpen(false)
+			void navigate({ to: "/" })
 		} finally {
 			setLoading(false)
 		}
@@ -428,7 +381,7 @@ function ShareDialog({
 								>
 									<span className="flex items-center gap-2">
 										{c.name}
-										{c.id === me?.$jazz.id && (
+										{c.id === ownerId && (
 											<Badge variant="secondary">
 												<T k="sharing.document.collaborators.you" />
 											</Badge>
@@ -508,18 +461,4 @@ function ShareDialog({
 			</DialogContent>
 		</Dialog>
 	)
-}
-
-// --- Helpers ---
-
-async function handleLeaveDocument(
-	doc: LoadedDocument,
-	me: co.loaded<typeof UserAccount, { root: { documents: true } }>,
-	navigate: ReturnType<typeof useNavigate>,
-	setOpen: (open: boolean) => void,
-) {
-	await leavePersonalDocument(doc, me)
-
-	setOpen(false)
-	navigate({ to: "/" })
 }

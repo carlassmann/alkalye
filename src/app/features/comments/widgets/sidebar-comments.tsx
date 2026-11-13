@@ -241,11 +241,11 @@ function CommentSection({
 			</h3>
 			{threads.map(thread => (
 				<CommentThreadItem
-					key={thread.$jazz.id}
+					key={thread.id}
 					doc={doc}
 					thread={thread}
-					selected={thread.$jazz.id === selectedThreadId}
-					onSelect={() => onSelectThread(thread.$jazz.id)}
+					selected={thread.id === selectedThreadId}
+					onSelect={() => onSelectThread(thread.id)}
 					readOnly={readOnly}
 					authorName={authorName}
 				/>
@@ -277,7 +277,7 @@ function CommentThreadItem({
 	let range = getCommentRange(doc, thread.anchor)
 	let replies = []
 	for (let item of thread.replies.values()) {
-		if (item?.$isLoaded && !item.deletedAt) replies.push(item)
+		if (!item.deletedAt) replies.push(item)
 	}
 
 	function openReply() {
@@ -314,8 +314,8 @@ function CommentThreadItem({
 							range.orphaned ? t("comments.orphaned") : thread.anchor.quote
 						}
 						replies={replies.map(item => ({
-							id: item.$jazz.id,
-							authorName: item.authorName,
+							id: item.id,
+							authorName: item.authorName ?? undefined,
 							body: item.body,
 						}))}
 						resolved={Boolean(thread.resolvedAt)}

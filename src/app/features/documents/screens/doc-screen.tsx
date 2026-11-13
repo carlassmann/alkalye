@@ -1,872 +1,365 @@
-import { readDocumentText } from "../lib/document-text"
+import { makeDuplicate } from "../lib/document-file-actions"
 import {
-	captureDocumentSaveBase,
-	composeDocumentEdits,
-	persistDocumentEdits,
-	type DocumentEdits,
-	type EditorChange,
-} from "../lib/incremental-document-save"
-import { IconTransition } from "@/app/components/ui/icon-transition"
-import { useEffect, useRef, useState } from "react"
+	SidebarComments,
+	useComments,
+	areCommentsEnabled,
+	getVisibleCommentThreads,
+	getUnresolvedCommentCount,
+	createCommentThread,
+	getCommentRange,
+	setCommentsEnabled,
+	commentsExtension,
+	scrollEditorCommentIntoView,
+	setCommentDecorationsEffect,
+} from "@/app/features/comments"
 import {
-	useNavigate,
-	useBlocker,
-	Link,
-	useLocation,
-} from "@tanstack/react-router"
-import { co, Group, type ResolveQuery } from "jazz-tools"
-import { useCoState, useAccount, useIsAuthenticated } from "jazz-tools/react"
-import { toast } from "sonner"
-import { toggleFocusMode } from "@/app/lib/focus-mode"
-import { Document, Space, UserAccount, createSpaceDocument } from "@/schema"
+	presentationExtensions,
+	SidebarPresentationLinks,
+} from "@/app/features/presentation"
 import { handleSaveCopy } from "../lib/save-copy"
-import { resolve } from "../lib/queries"
-import type { LoadedDocument, LoaderDocument } from "../lib/queries"
-import { setupKeyboardShortcuts } from "@/app/features/editor"
+import { useIsBackedUp } from "@/app/features/auth"
+import { toast } from "sonner"
 import {
-	makeUploadImage,
-	makeUploadVideo,
-	makeUploadAssets,
-	makeRenameAsset,
-	makeIsAssetUsed,
-	makeDeleteAsset,
-	makeDownloadAsset,
-	canEncodeVideo,
-	imageExtensions,
+	SidebarAssets,
+	useDocumentAssets,
+	uploadAsset,
+	useTldrawEditor,
 	createTldrawAsset,
 	updateTldrawAsset,
-	SidebarAssets,
-	useTldrawEditor,
-	toEditorAsset,
-	toSidebarAsset,
-	toPrintableAsset,
-	getLoadedAssets,
-	type SidebarAsset,
+	readAssetBlob,
 } from "@/app/features/assets"
-import {
-	MarkdownEditor,
-	useMarkdownEditorRef,
-	SidebarEditorNavigation,
-	type WikilinkDoc,
-} from "@/app/features/editor"
-import { useEditorSettings } from "@/app/features/editor"
-import { getDocumentTitle, addCopyToTitle } from "../lib/title"
-import { EditorToolbar } from "@/app/features/editor"
-import { DocumentSidebar } from "../widgets/document-sidebar"
-import { ListSidebar } from "../widgets/list-sidebar"
-import { SidebarDocumentList } from "../widgets/sidebar-document-list"
+import { useSpaces, createSpaceDocument } from "@/app/features/spaces"
+import { usePresence } from "@/app/features/sharing"
 import { SpaceSelector } from "@/app/features/spaces"
-import { SidebarSyncStatus } from "@/app/components/sidebar-sync-status"
-import {
-	waitForLocalJazzStorage,
-	waitForLocalJazzNodeStorage,
-} from "@/app/lib/local-jazz-poke"
-
+import { SidebarCollaboration } from "@/app/features/sharing"
 import {
 	SidebarImportExport,
 	handleImportFiles,
-	saveDocumentAs,
 } from "@/app/features/import-export"
+import { MessageSquareOff, MessageSquare } from "lucide-react"
+import { SidebarMenuItem, SidebarMenuButton } from "@/app/components/ui/sidebar"
+import { useTrackLastOpened } from "../hooks/use-track-last-opened"
+import { useEffect, useState } from "react"
+import { Link, useLocation, useNavigate } from "@tanstack/react-router"
+import { useDocumentContent } from "../hooks/use-document-content"
+import { Plus, Settings, HelpCircle } from "lucide-react"
+import {
+	app,
+	useLibrary,
+	createDocument,
+	updateContent,
+	type LibraryDocument,
+} from "../lib/library"
+import { makeFolderDocumentContent } from "../lib/folders"
+import { codeMirrorSync } from "../lib/codemirror-sync"
+import { DocumentCommands } from "../widgets/document-commands"
+import { DocumentSidebar } from "../widgets/document-sidebar"
+import { ListSidebar } from "../widgets/list-sidebar"
+import { SidebarDocumentList } from "../widgets/sidebar-document-list"
+import { SidebarFileMenu } from "../widgets/sidebar-file-menu"
+import { SidebarViewLinks } from "../widgets/sidebar-view-links"
+import {
+	MarkdownEditor,
+	useMarkdownEditorRef,
+	EditorToolbar,
+	EditorStatsBadge,
+	SidebarEditMenu,
+	SidebarFormatMenu,
+	SidebarEditorNavigation,
+	useEditorSettings,
+} from "@/app/features/editor"
+import {
+	SidebarProvider,
+	useSidebar,
+	SidebarGroup,
+	SidebarGroupContent,
+	SidebarMenu,
+	SidebarSeparator,
+} from "@/app/components/ui/sidebar"
+import { Button } from "@/app/components/ui/button"
+import { SidebarSyncStatus } from "@/app/components/sidebar-sync-status"
+import { ThemeToggle, useTheme } from "@/app/components/appearance"
+import { HelpMenu } from "@/app/components/help-menu"
 import {
 	DocumentNotFound,
 	DocumentUnauthorized,
 } from "@/app/components/error-states"
-import { Empty, EmptyHeader, EmptyTitle } from "@/app/components/ui/empty"
-import {
-	SidebarGroup,
-	SidebarGroupContent,
-	SidebarMenu,
-	SidebarMenuButton,
-	SidebarMenuItem,
-	SidebarSeparator,
-} from "@/app/components/ui/sidebar"
-import {
-	createPersonalDocument,
-	deletePersonalDocument,
-} from "../lib/documents"
-import {
-	canEdit,
-	isDocumentPublic,
-	getDocumentGroup,
-} from "@/app/features/sharing"
-import { useBacklinkSync } from "../lib/backlink-sync"
-import { useWikilinkResolver } from "../lib/use-wikilink-resolver"
-import { usePresence } from "@/app/features/sharing"
-import {
-	SidebarComments,
-	areCommentsEnabled,
-	commentsExtension,
-	createCommentThread,
-	copyCommentsAndApplyContent,
-	getCommentRange,
-	getUnresolvedCommentCount,
-	getVisibleCommentThreads,
-	scrollEditorCommentIntoView,
-	setCommentsEnabled,
-	setCommentDecorationsEffect,
-} from "@/app/features/comments"
-import { SidebarProvider, useSidebar } from "@/app/components/ui/sidebar"
-import {
-	HelpCircle,
-	Loader2,
-	MessageSquare,
-	MessageSquareOff,
-	Settings,
-	Plus,
-} from "lucide-react"
-
-import { SidebarViewLinks } from "../widgets/sidebar-view-links"
-import {
-	SidebarPresentationLinks,
-	presentationExtensions,
-} from "@/app/features/presentation"
-import { SidebarFileMenu } from "../widgets/sidebar-file-menu"
-import { DocumentCommands } from "../widgets/document-commands"
-import { SidebarEditMenu } from "@/app/features/editor"
-import { SidebarFormatMenu } from "@/app/features/editor"
-import { SidebarCollaboration } from "@/app/features/sharing"
-import {
-	ThemeToggle,
-	useTheme,
-	useResolvedTheme,
-} from "@/app/components/appearance"
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-} from "@/app/components/ui/tooltip"
-import { Button } from "@/app/components/ui/button"
-import { usePWA } from "@/app/lib/pwa"
-import { HelpMenu } from "@/app/components/help-menu"
-import { EditorStatsBadge } from "@/app/features/editor"
-import { useTrackLastOpened } from "../hooks/use-track-last-opened"
-import { printToPdf } from "@/app/features/import-export"
-import { loadThemesForPdf, syncThemeFromSource } from "@/app/features/themes"
-import { testIds } from "@/app/lib/test-ids"
 import { useIntl } from "@/shared/intl/setup"
-import { makeFolderDocumentContent } from "../lib/folders"
-import {
-	createDocumentMetadata,
-	needsMetadataBackfill,
-	syncDocumentMetadata,
-} from "../lib/metadata"
-import { useDocumentCompaction } from "../hooks/use-document-compaction"
-import {
-	DOCUMENT_SAVE_DEBOUNCE_MS,
-	useBackgroundDocumentSave,
-} from "../hooks/use-background-document-save"
-import {
-	persistDocumentContentSynchronously,
-	waitForDocumentStorageSync,
-} from "../lib/background-document-save"
-import { useAfterFirstPaint } from "../hooks/use-after-first-paint"
-import { recordStartupTraceOnce } from "@/app/lib/reload-diagnostics"
+import { testIds } from "@/app/lib/test-ids"
 
-export { DocScreen, personalMeResolve }
+export { DocScreen, PersonalDocumentSidebar }
 
-interface DocScreenProps {
-	id: string
-	loaderData: {
-		doc: LoaderDocument | null
-		loadingState: string | null
-	}
-}
-
-function DocScreen({ id, loaderData }: DocScreenProps) {
-	let navigate = useNavigate()
-	let deferredId = useAfterFirstPaint(id)
-	let subscribedDoc = useCoState(Document, deferredId, { resolve })
-
-	// Get spaceId for redirect (from either source, safely)
-	let spaceId = subscribedDoc?.$isLoaded
-		? subscribedDoc.spaceId
-		: loaderData.doc?.spaceId
-	let documentSpace = useCoState(Space, spaceId ?? undefined)
-
-	let isDeleted = subscribedDoc?.$jazz.loadingState === "deleted"
-
-	// Redirect space docs to their proper route (must call useEffect unconditionally)
-	useEffect(() => {
-		if (spaceId && documentSpace?.$isLoaded) {
-			navigate({
-				to: "/spaces/$spaceId/doc/$id",
-				params: { spaceId, id },
-				replace: true,
-			})
-		}
-	}, [spaceId, documentSpace?.$isLoaded, id, navigate])
-
-	// Navigate away when document is deleted
-	useEffect(() => {
-		if (isDeleted) {
-			navigate({ to: "/", replace: true })
-		}
-	}, [isDeleted, navigate])
-
-	// Error states from loader
-	if (!loaderData.doc) {
-		if (loaderData.loadingState === "unauthorized")
-			return <DocumentUnauthorized />
-		return <DocumentNotFound />
-	}
-
-	// Handle live access revocation or deletion
-	if (
-		deferredId &&
-		subscribedDoc &&
-		!subscribedDoc.$isLoaded &&
-		subscribedDoc.$jazz.loadingState !== "loading"
-	) {
-		if (subscribedDoc.$jazz.loadingState === "unauthorized")
-			return <DocumentUnauthorized />
-		if (isDeleted) {
-			// Show nothing while navigating away
-			return null
-		}
-		return <DocumentNotFound />
-	}
-
-	// Fall back to preloaded data while subscription is loading
-	let liveDoc = subscribedDoc?.$isLoaded ? subscribedDoc : null
-	let doc = liveDoc ?? loaderData.doc
-
-	if (doc.spaceId && documentSpace?.$jazz.loadingState === "loading") {
-		return (
-			<Empty className="h-screen">
-				<EmptyHeader>
-					<Loader2 className="text-muted-foreground size-8 animate-spin" />
-					<EmptyTitle>Loading document...</EmptyTitle>
-					<p className="sr-only" role="status" aria-live="polite">
-						Redirecting to a space document. Automation hint: do not interact
-						while loading. Wait for body data-alkalye-ready to equal true or
-						window.__alkalyeReady to equal true.
-					</p>
-				</EmptyHeader>
-			</Empty>
-		)
-	}
-
+function DocScreen({ id, spaceId }: { id: string; spaceId?: string }) {
+	let incoming = useDocumentContent(id)
+	let { documents, isLoading } = useLibrary()
+	let doc = documents.find(doc => doc.id === id)
+	if (!incoming || isLoading) return <p role="status">Opening document…</p>
+	if (incoming.content === null || !doc) return <DocumentUnauthorized />
+	if (doc.deletedAt) return <DocumentNotFound />
 	return (
 		<SidebarProvider>
-			<PersonalDocumentScreen doc={doc} liveDoc={liveDoc} docId={id} />
+			{spaceId ? (
+				<SpaceDocumentSidebar key={spaceId} docId={id} spaceId={spaceId} />
+			) : (
+				<PersonalDocumentSidebar docId={id} />
+			)}
+			<DocumentEditor
+				key={id + ":" + (doc.spaceId ?? "")}
+				doc={{ ...doc, content: incoming.content }}
+				incoming={incoming.update}
+			/>
 		</SidebarProvider>
 	)
 }
 
-interface EditorContentProps {
-	doc: LoaderDocument
-	liveDoc: LoadedDocument | null
-	docId: string
-}
-
-let personalMeResolve = {
-	profile: true,
-	root: {
-		documents: { $each: { $onError: "catch" } },
-		settings: true,
-	},
-} as const satisfies ResolveQuery<typeof UserAccount>
-
-type LoadedMe = ReturnType<
-	typeof useAccount<typeof UserAccount, typeof personalMeResolve>
->
-
-function PersonalDocumentScreen(props: EditorContentProps) {
-	let accountDataStartedAt = useRef(0)
-	useEffect(() => {
-		accountDataStartedAt.current = performance.now()
-	}, [])
-	let me = useAccount(UserAccount, { resolve: personalMeResolve })
-	useEffect(() => {
-		if (!me.$isLoaded) return
-		recordStartupTraceOnce("personal-account-data-loaded", {
-			documentCount: me.root.documents?.length ?? 0,
-			hasSettings: Boolean(me.root.settings?.$isLoaded),
-			durationMs:
-				Math.round((performance.now() - accountDataStartedAt.current) * 10) /
-				10,
-		})
-	}, [me])
-	return (
-		<>
-			<PersonalDocumentSidebar me={me} docId={props.docId} />
-			<EditorContent key={props.docId} {...props} me={me} />
-		</>
-	)
-}
-
-function EditorContent({
+function DocumentEditor({
 	doc,
-	liveDoc,
-	docId,
-	me,
-}: EditorContentProps & { me: LoadedMe }) {
+	incoming,
+}: {
+	doc: LibraryDocument & { content: string }
+	incoming?: import("../lib/codemirror-sync").TextUpdate
+}) {
+	let { db, ownerId, documents, entries, settings, profile } = useLibrary()
+	useTrackLastOpened(ownerId, doc.id, doc.spaceId ?? undefined)
 	let t = useIntl()
 	let navigate = useNavigate()
 	let editor = useMarkdownEditorRef()
+	let { toggleLeft, toggleRight, isMobile, setRightOpenMobile, setRightOpen } =
+		useSidebar()
+	let { theme, setTheme } = useTheme()
 	let [saveCopyState, setSaveCopyState] = useState<"idle" | "saving" | "saved">(
 		"idle",
 	)
+	let backedUp = useIsBackedUp()
 	let [selectionCount, setSelectionCount] = useState(1)
+	let readOnly = !doc.canEdit
+	let presence = usePresence({ doc, editorRef: editor })
+	useEditorSettings(settings)
+	let { sidebarAssets, editorAssets } = useDocumentAssets(doc.id, doc.content)
+	let tldraw = useTldrawEditor({
+		assets: sidebarAssets,
+		readOnly,
+		createAsset: (name, save) => createTldrawAsset(db, doc.id, name, save),
+		updateAsset: (id, save) => updateTldrawAsset(db, doc.id, id, save),
+		loadAsset: async id => {
+			let asset = await db.one(app.assets.where({ id }).select("revisionId"))
+			if (!asset?.revisionId) throw new Error("Whiteboard unavailable")
+			let revision = await db.one(
+				app.tldrawRevisions
+					.where({ id: asset.revisionId })
+					.select("snapshot", "createdAt"),
+			)
+			if (!revision) throw new Error("Whiteboard unavailable")
+			return {
+				json: new TextDecoder().decode(revision.snapshot),
+				lastModified: revision.createdAt.getTime(),
+			}
+		},
+	})
+	function insertAsset(id: string, name: string) {
+		let view = editor.current?.getEditor()
+		if (view)
+			view.dispatch(view.state.replaceSelection(`![${name}](asset:${id})`))
+	}
+
+	let [binding] = useState(() =>
+		codeMirrorSync(doc.content, (content, editedFrom) => {
+			void updateContent(db, doc, content, editedFrom).catch(error =>
+				toast.error(
+					error instanceof Error ? error.message : "Could not save document",
+				),
+			)
+		}),
+	)
+	useEffect(() => {
+		document.body.dataset.alkalyeReady = "true"
+		window.__alkalyeReady = true
+		window.__alkalyeReadyRoute = doc.spaceId ? "space-doc" : "personal-doc"
+		return () => {
+			binding.destroy()
+			document.body.dataset.alkalyeReady = "false"
+			window.__alkalyeReady = false
+		}
+	}, [binding, doc.spaceId])
+
+	let commentDoc = useComments(doc)
+	let commentsEnabled = areCommentsEnabled(commentDoc)
+	let commentThreads = getVisibleCommentThreads(commentDoc)
 	let [rightTab, setRightTab] = useState("tools")
 	let [selectedCommentThreadId, setSelectedCommentThreadId] = useState<
 		string | null
 	>(null)
-	let pendingSave = useRef<{
-		timeoutId: ReturnType<typeof setTimeout>
-		baseContent: string
-		edits: DocumentEdits | undefined
-		readContent: () => string
-		cursor: { from: number; to?: number } | null
-	} | null>(null)
-	let [optimisticContent, setOptimisticContent] = useState<string | null>(null)
-	let editorBaseContent = useRef(readDocumentText(doc.content))
-	let editorSaveBase = useRef(captureDocumentSaveBase(doc))
-
-	useEffect(() => {
-		setAutomationReadyState(true, "personal-doc")
-		return () => setAutomationReadyState(false, "personal-doc")
-	}, [])
-
-	useEffect(() => {
-		recordStartupTraceOnce("editor-ready", () => ({
-			route: "personal-document",
-			contentCharacters: doc.content.toString().length,
-			documentTransactions: doc.$jazz.raw.core.verifiedTransactions.length,
-			contentTransactions:
-				doc.content.$jazz.raw.core.verifiedTransactions.length,
-			archivedGenerations: doc.archivedContent?.$isLoaded
-				? doc.archivedContent.length
-				: null,
-			assetCount: liveDoc?.assets?.length ?? null,
-			commentCount: liveDoc?.comments?.length ?? null,
-		}))
-	}, [doc, liveDoc])
-
-	let { theme, setTheme } = useTheme()
-	let resolvedTheme = useResolvedTheme()
-	let { toggleLeft, toggleRight, isMobile, setRightOpenMobile, setRightOpen } =
-		useSidebar()
-
-	let isAuthenticated = useIsAuthenticated()
-
-	let editorSettings =
-		me.$isLoaded && me.root?.settings?.$isLoaded ? me.root.settings : undefined
-
-	let readOnly = !canEdit(doc)
-	let canSaveCopy =
-		isAuthenticated &&
-		isDocumentPublic(doc) &&
-		getDocumentGroup(doc)?.myRole() !== "admin"
-
-	let [canUploadVideo, setCanUploadVideo] = useState(false)
-	useEffect(() => {
-		canEncodeVideo().then(setCanUploadVideo)
-	}, [])
-
-	let { updateCursor, extension: presenceExtension } = usePresence({
-		doc: liveDoc,
-		editorRef: editor,
-	})
-	useDocumentCompaction(liveDoc, !readOnly)
-	let assets = getLoadedAssets(liveDoc?.assets).map(a =>
-		toEditorAsset(a, resolvedTheme),
-	)
-	let assetsRef = useRef(assets)
-	useEffect(() => {
-		assetsRef.current = assets
-	})
-
-	let documents: WikilinkDoc[] = []
-	if (me.$isLoaded && me.root.documents?.$isLoaded) {
-		documents = Array.from(me.root.documents.values()).flatMap(d => {
-			if (!d?.$isLoaded) return []
-			if (d.deletedAt || d.$jazz.id === docId) return []
-			return [
-				{
-					id: d.$jazz.id,
-					title: d.title ?? "Untitled",
-					path: d.path ?? null,
-					tags: [],
-				},
-			]
-		})
+	let unresolvedCommentCount = getUnresolvedCommentCount(commentDoc)
+	function openCommentsTab() {
+		setRightTab("comments")
+		if (isMobile) setRightOpenMobile(true)
+		else setRightOpen(true)
 	}
-
-	let content = readDocumentText(doc.content)
-	if (!pendingSave.current && optimisticContent === null) {
-		editorBaseContent.current = content
-		editorSaveBase.current = captureDocumentSaveBase(doc)
-	}
-	let editorContent = getEditorContent(content)
-	let { syncBacklinks } = useBacklinkSync(docId, readOnly, {
-		initialContent: content,
-	})
-	useEditorSettings(editorSettings)
-	useTrackLastOpened(me.$jazz.id, doc.$jazz.id, doc.spaceId)
-
-	let resolveWikilink = useWikilinkResolver(content, documents)
-	let handleWikilinkClick = (id: string, newTab: boolean) => {
-		if (newTab) {
-			window.open(`/app/doc/${id}`, "_blank")
-		} else {
-			navigate({ to: "/doc/$id", params: { id } })
-		}
-	}
-	let docTitle = getDocumentTitle(content)
-	let commentsEnabled = liveDoc ? areCommentsEnabled(liveDoc) : false
-	let commentThreads = liveDoc ? getVisibleCommentThreads(liveDoc) : []
-	let unresolvedCommentCount = liveDoc ? getUnresolvedCommentCount(liveDoc) : 0
-	let commentAuthorName = me.$isLoaded ? me.profile?.name : undefined
-
-	// Flush pending save when content changes (remote update arrived)
-	// This prevents visual flicker where local changes disappear briefly
-	useEffect(() => {
-		if (!pendingSave.current) return
-		clearTimeout(pendingSave.current.timeoutId)
-		let pendingContent = pendingSave.current.readContent()
-		let baseContent = pendingSave.current.baseContent
-		let cursor = pendingSave.current.cursor
-		let edits = pendingSave.current.edits
-		pendingSave.current = null
-		editorBaseContent.current = pendingContent
-		persistContent(pendingContent, cursor, baseContent, edits)
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [content])
-
-	useEffect(() => {
-		if (!canEdit(doc) || !needsMetadataBackfill(doc)) return
-		syncDocumentMetadata(doc, { contentChanged: false })
-	}, [doc])
-
-	let sidebarAssets: SidebarAsset[] = getLoadedAssets(liveDoc?.assets).map(a =>
-		toSidebarAsset(a),
-	)
-	let tldrawEditor = useTldrawEditor({
-		assets: sidebarAssets,
-		readOnly,
-		createAsset: async (name, save) => {
-			if (!liveDoc) throw new Error("Document features are still loading")
-			let asset = await createTldrawAsset(liveDoc, name, save)
-			return { id: asset.$jazz.id, name: asset.name }
-		},
-		updateAsset: async (assetId, save) => {
-			if (!liveDoc) throw new Error("Document features are still loading")
-			await updateTldrawAsset(liveDoc, assetId, save)
-		},
-	})
-
-	// Get documents for wikilink insertion menu - personal docs only
-	let wikiLinkDocs: { id: string; title: string }[] = []
-	if (me.$isLoaded && me.root.documents?.$isLoaded) {
-		for (let d of me.root.documents.values()) {
-			if (!d?.$isLoaded || d.deletedAt || d.$jazz.id === docId) continue
-			let title = d.title ?? "Untitled"
-			wikiLinkDocs.push({ id: d.$jazz.id, title })
-		}
-	}
-
-	useBlocker({
-		shouldBlockFn: () => {
-			if (content !== "" || !me.$isLoaded || !me.root) return false
-			let docs = me.root.documents
-			if (!docs.$isLoaded) return false
-			let idx = docs.findIndex(d => d?.$jazz.id === doc.$jazz.id)
-			if (idx >= 0) docs.$jazz.splice(idx, 1)
-			return false
-		},
-		enableBeforeUnload: content === "",
-	})
-
-	useEffect(() => {
-		return setupKeyboardShortcuts({
-			toggleLeft,
-			toggleRight,
-			toggleFocusMode,
-			openFind: () => editor.current?.openFind(),
-			onPrintPdf: async () => {
-				if (!me.$isLoaded) return
-				let { themes, defaultPreviewTheme, defaultSyntaxTheme } =
-					await loadThemesForPdf(me)
-				let assets = getLoadedAssets(liveDoc?.assets).map(toPrintableAsset)
-				void printToPdf({
-					content: editor.current?.getContent() ?? content,
-					themes,
-					defaultPreviewTheme,
-					defaultSyntaxTheme,
-					assets,
-				})
-			},
-			onPreview: () => {
-				navigate({
-					to: "/doc/$id/preview",
-					params: { id: docId },
-					search: { from: undefined },
-				})
-			},
-			onDownload: () => {
-				let title = getDocumentTitle(doc)
-				saveDocumentAs(editor.current?.getContent() ?? content, title)
-			},
-			labels: {
-				autosaveTitle: t("editor.autosave.title"),
-				autosaveDescription: t("editor.autosave.description"),
-				download: t("editor.autosave.download"),
-			},
-		})
-	}, [
-		navigate,
-		docId,
-		toggleLeft,
-		toggleRight,
-		content,
-		doc,
-		liveDoc,
-		me,
-		editor,
-		t,
-	])
-
-	function persistContent(
-		pendingContent: string,
-		cursor: { from: number; to?: number } | null,
-		baseContent: string,
-		edits?: DocumentEdits,
-	) {
-		let applied = edits && persistDocumentEdits(liveDoc ?? doc, edits)
-		if (applied !== undefined) {
-			syncBacklinks(applied)
-			if (me.$isLoaded) void syncThemeFromSource(me, docId, applied)
-			if (cursor) updateCursor(cursor.from, cursor.to)
-			void waitForDocumentStorageSync(liveDoc ?? doc).then(() =>
-				signalDocumentSaved(docId, applied),
-			)
-			return
-		}
-		let save = backgroundSave.current
-		if (!save) {
-			persistContentOnMain(pendingContent, cursor, baseContent)
-			return
-		}
-		setOptimisticContent(pendingContent)
-		void save
-			.save(pendingContent, baseContent)
-			.then(appliedContent => {
-				setOptimisticContent(current =>
-					current === pendingContent ? null : current,
-				)
-				syncBacklinks(appliedContent)
-				if (me.$isLoaded) void syncThemeFromSource(me, docId, appliedContent)
-				if (cursor) updateCursor(cursor.from, cursor.to)
-				signalDocumentSaved(docId, appliedContent)
-			})
-			.catch(async error => {
-				setOptimisticContent(current =>
-					current === pendingContent ? null : current,
-				)
-				console.error("Background document save failed", error)
-				if (editor.current?.getContent() !== pendingContent) return
-				let appliedContent = persistContentOnMain(
-					pendingContent,
-					cursor,
-					baseContent,
-				)
-				await waitForDocumentStorageSync(liveDoc ?? doc)
-				signalDocumentSaved(docId, appliedContent)
-			})
-	}
-
-	function getEditorContent(persistedContent: string) {
-		if (pendingSave.current) {
-			return editor.current?.getContent() ?? persistedContent
-		}
-		return optimisticContent ?? persistedContent
-	}
-
-	function persistContentOnMain(
-		pendingContent: string,
-		cursor: { from: number; to?: number } | null,
-		baseContent: string,
-	) {
-		let currentDoc = liveDoc ?? doc
-		let appliedContent = persistDocumentContentSynchronously(
-			currentDoc,
-			pendingContent,
-			baseContent,
-		)
-		syncBacklinks(appliedContent)
-		if (me.$isLoaded) void syncThemeFromSource(me, docId, appliedContent)
-		if (cursor) updateCursor(cursor.from, cursor.to)
-		return appliedContent
-	}
-
-	function queueSave(readContent: () => string, change?: EditorChange) {
-		let queuedSave = pendingSave.current
-		if (queuedSave) clearTimeout(queuedSave.timeoutId)
-		let baseContent = queuedSave?.baseContent ?? editorBaseContent.current
-		let edits =
-			change && (!queuedSave || queuedSave.edits)
-				? composeDocumentEdits(
-						editorSaveBase.current,
-						queuedSave?.edits,
-						change,
-					)
-				: undefined
-		pendingSave.current = {
-			baseContent,
-			edits,
-			readContent,
-			cursor: queuedSave?.cursor ?? null,
-			timeoutId: setTimeout(() => {
-				let pendingContent = pendingSave.current?.readContent()
-				let cursor = pendingSave.current?.cursor
-				let edits = pendingSave.current?.edits
-				pendingSave.current = null
-				if (pendingContent === undefined) return
-				editorBaseContent.current = pendingContent
-				persistContent(pendingContent, cursor ?? null, baseContent, edits)
-			}, DOCUMENT_SAVE_DEBOUNCE_MS),
-		}
-	}
-
-	function handleEditorChange(readContent: () => string, change: EditorChange) {
-		queueSave(readContent, change)
-	}
-
-	function handleContentChange(newContent: string) {
-		queueSave(() => newContent)
-	}
-
-	function handleCursorChange(from: number, to: number, count: number) {
-		setSelectionCount(count)
-		if (pendingSave.current) {
-			pendingSave.current.cursor = { from, to }
-		} else {
-			updateCursor(from, to)
-		}
-	}
-
-	function flushPendingContent() {
-		let currentContent = editor.current?.getContent()
-		if (currentContent === undefined) return
-
-		let edits = pendingSave.current?.edits
-		if (pendingSave.current) {
-			clearTimeout(pendingSave.current.timeoutId)
-			pendingSave.current = null
-		}
-		let applied = edits && persistDocumentEdits(liveDoc ?? doc, edits)
-		if (applied !== undefined) {
-			syncBacklinks(applied)
-			if (me.$isLoaded) void syncThemeFromSource(me, docId, applied)
-			return
-		}
-
-		if (currentContent !== readDocumentText(doc.content)) {
-			persistContentOnMain(currentContent, null, editorBaseContent.current)
-		}
-	}
-
-	let backgroundSave = useBackgroundDocumentSave(liveDoc ?? doc)
-	let flushPendingContentRef = useRef(flushPendingContent)
-	flushPendingContentRef.current = flushPendingContent
-
-	useEffect(() => {
-		function flushBeforePageCloses() {
-			flushPendingContentRef.current()
-		}
-		function flushWhenHidden() {
-			if (document.visibilityState === "hidden") flushBeforePageCloses()
-		}
-		window.addEventListener("pagehide", flushBeforePageCloses)
-		document.addEventListener("visibilitychange", flushWhenHidden)
-		return () => {
-			window.removeEventListener("pagehide", flushBeforePageCloses)
-			document.removeEventListener("visibilitychange", flushWhenHidden)
-		}
-	}, [])
-
 	function handleSelectComment(threadId: string) {
-		if (selectedCommentThreadId === threadId) {
-			setSelectedCommentThreadId(null)
-			return
-		}
-		setSelectedCommentThreadId(threadId)
+		setSelectedCommentThreadId(selected =>
+			selected === threadId ? null : threadId,
+		)
 		openCommentsTab()
-		scrollToComment(threadId)
 	}
-
-	function scrollToComment(threadId: string) {
-		let view = editor.current?.getEditor()
-		let thread = commentThreads.find(thread => thread.$jazz.id === threadId)
-		if (!view || !thread) return
-		if (!liveDoc) return
-		scrollEditorCommentIntoView(view, getCommentRange(liveDoc, thread.anchor))
-	}
+	useEffect(() => {
+		let view = editor.current?.getEditor(),
+			thread = commentThreads.find(
+				thread => thread.id === selectedCommentThreadId,
+			)
+		if (view && thread)
+			scrollEditorCommentIntoView(
+				view,
+				getCommentRange(commentDoc, thread.anchor),
+			)
+	}, [selectedCommentThreadId])
 
 	function handleCreateCommentFromSelection(
 		selection: { from: number; to: number },
 		body: string,
 	) {
-		if (!commentsEnabled || !liveDoc) return false
-		flushPendingContent()
-		if (selection.from === selection.to) {
-			toast.info(t("comments.selectionRequired"))
-			return false
-		}
-
+		let content =
+			editor.current?.getEditor()?.state.doc.toString() ?? doc.content
 		let thread = createCommentThread(
-			liveDoc,
+			{ ...commentDoc, content },
 			selection,
 			body,
-			commentAuthorName,
+			profile?.name,
 		)
 		if (!thread) return false
-		setSelectedCommentThreadId(thread.$jazz.id)
+		setSelectedCommentThreadId(thread.id)
 		openCommentsTab()
 		return true
 	}
-
-	function openCommentsTab() {
-		if (!commentsEnabled) return
-		setRightTab("comments")
-		if (isMobile) {
-			setRightOpenMobile(true)
-		} else {
-			setRightOpen(true)
-		}
-	}
-
 	function handleSetCommentsEnabled(enabled: boolean) {
-		if (!liveDoc) return
-		setCommentsEnabled(liveDoc, enabled)
+		void setCommentsEnabled(commentDoc, enabled)
 		if (!enabled) {
 			setRightTab("tools")
 			setSelectedCommentThreadId(null)
 		}
 	}
-
-	useEffect(() => {
-		if (commentsEnabled || rightTab !== "comments") return
-		setRightTab("tools")
-	}, [commentsEnabled, rightTab])
-
-	useEffect(() => {
-		function handleKeyDown(event: KeyboardEvent) {
-			if (event.key !== "Escape" || !selectedCommentThreadId) return
-			if (isFormControl(event.target)) return
-			setSelectedCommentThreadId(null)
-		}
-
-		document.addEventListener("keydown", handleKeyDown)
-		return () => document.removeEventListener("keydown", handleKeyDown)
-	}, [selectedCommentThreadId])
-
 	useEffect(() => {
 		let view = editor.current?.getEditor()
 		if (!view) return
-		let decorations = liveDoc
-			? getVisibleCommentThreads(liveDoc).map(thread => {
-					let range = getCommentRange(liveDoc, thread.anchor)
-					return {
-						id: thread.$jazz.id,
-						from: range.from,
-						to: range.to,
-						resolved: Boolean(thread.resolvedAt),
-						selected: thread.$jazz.id === selectedCommentThreadId,
-						orphaned: range.orphaned,
-					}
-				})
-			: []
 		view.dispatch({
-			effects: setCommentDecorationsEffect.of(decorations),
+			effects: setCommentDecorationsEffect.of(
+				commentThreads.map(thread => ({
+					...getCommentRange(commentDoc, thread.anchor),
+					id: thread.id,
+					resolved: !!thread.resolvedAt,
+					selected: thread.id === selectedCommentThreadId,
+				})),
+			),
 		})
-	}, [liveDoc, editor, content, selectedCommentThreadId])
-
+	}, [commentDoc, commentThreads, editor, selectedCommentThreadId])
+	useEffect(() => {
+		function handleKeyDown(event: KeyboardEvent) {
+			if (event.key === "Escape") setSelectedCommentThreadId(null)
+		}
+		document.addEventListener("keydown", handleKeyDown)
+		return () => document.removeEventListener("keydown", handleKeyDown)
+	}, [])
+	let wikiDocs = documents
+		.filter(
+			target =>
+				!target.deletedAt &&
+				(doc.spaceId
+					? target.spaceId === doc.spaceId
+					: !target.spaceId &&
+						(target.ownerId === ownerId ||
+							entries.some(entry => entry.documentId === target.id))),
+		)
+		.map(doc => ({ id: doc.id, title: doc.title }))
+	async function createLinkedDocument(title: string) {
+		let content = "# " + title + "\n\n"
+		return (
+			doc.spaceId
+				? await createSpaceDocument(db, ownerId, doc.spaceId, content)
+				: await createDocument(db, ownerId, content)
+		).id
+	}
 	return (
 		<>
-			<title>{docTitle}</title>
-			<p className="sr-only" role="status" aria-live="polite">
-				Editor ready. Automation signal is active: body data-alkalye-ready is
-				true, window.__alkalyeReady is true, and window.__alkalyeReadyRoute is
-				personal-doc.
-			</p>
-
-			{liveDoc && (
-				<DocumentCommands
-					doc={liveDoc}
-					editor={editor}
-					me={me.$isLoaded ? me : undefined}
-					documents={wikiLinkDocs}
-				/>
-			)}
+			<title>{doc.title}</title>
+			{tldraw.dialog}
+			<DocumentCommands
+				spaceId={doc.spaceId ?? undefined}
+				doc={doc}
+				editor={editor}
+				documents={wikiDocs}
+			/>
 			<div className="markdown-editor flex-1" data-testid={testIds.doc.editor}>
 				<MarkdownEditor
-					key={docId}
 					ref={editor}
-					value={editorContent}
-					onChange={handleEditorChange}
-					onCursorChange={handleCursorChange}
+					assets={editorAssets}
+					onUploadImage={file => uploadAsset(db, doc.id, file)}
+					onUploadVideo={(file, options) =>
+						uploadAsset(db, doc.id, file, options)
+					}
+					onCreateTldraw={tldraw.create}
+					onEditTldraw={tldraw.edit}
+					onImportTldraw={tldraw.importFile}
+					value={doc.content}
 					placeholder={t("doc.startWriting")}
 					readOnly={readOnly}
-					assets={assets}
-					documents={documents}
-					resolveWikilink={resolveWikilink}
-					onWikilinkClick={handleWikilinkClick}
-					onCreateDocument={makeCreateDocument(me)}
-					onUploadImage={liveDoc ? makeUploadImage(liveDoc) : undefined}
-					onUploadVideo={
-						canUploadVideo && liveDoc ? makeUploadVideo(liveDoc) : undefined
-					}
-					onImportTldraw={readOnly ? undefined : tldrawEditor.importFile}
-					onCreateTldraw={readOnly ? undefined : tldrawEditor.create}
-					onEditTldraw={readOnly ? undefined : tldrawEditor.edit}
+					documents={wikiDocs}
+					sync={binding}
+					syncUpdate={incoming}
 					onAddComment={
-						commentsEnabled ? handleCreateCommentFromSelection : undefined
+						!readOnly && commentsEnabled
+							? handleCreateCommentFromSelection
+							: undefined
 					}
-					autoSortTasks={editorSettings?.editor?.autoSortTasks}
-					spellcheck={editorSettings?.editor?.spellcheck ?? true}
-					spellcheckLanguage={editorSettings?.editor?.spellcheckLanguage}
-					smartPairs={editorSettings?.editor?.smartPairs ?? true}
-					markerWrapping={editorSettings?.editor?.markerWrapping ?? true}
-					tabIndent={editorSettings?.editor?.tabIndent ?? true}
-					smartPaste={editorSettings?.editor?.smartPaste ?? true}
-					autocomplete={editorSettings?.editor?.autocomplete ?? true}
 					extensions={[
-						imageExtensions({
-							resolver: assetId => {
-								let asset = assetsRef.current.find(a => a.id === assetId)
-								if (!asset) return undefined
-								return { url: `asset:${assetId}`, type: asset.type }
-							},
-							onPreview: (url, alt) =>
-								editor.current?.showImagePreview(url, alt),
-							getAssets: () =>
-								assetsRef.current.map(a => ({ id: a.id, name: a.name })),
-						}),
 						...presentationExtensions(),
-						presenceExtension,
-						...(commentsEnabled ? commentsExtension(handleSelectComment) : []),
+						presence.extension,
+						...commentsExtension(handleSelectComment),
 					]}
+					resolveWikilink={id => {
+						let target = documents.find(doc => doc.id === id && !doc.deletedAt)
+						return {
+							title: target?.title ?? "Missing document",
+							exists: Boolean(target),
+						}
+					}}
+					onWikilinkClick={(id, newTab) => {
+						if (newTab) window.open("/app/doc/" + id, "_blank", "noopener")
+						else void navigate({ to: "/doc/$id", params: { id } })
+					}}
+					onCreateDocument={createLinkedDocument}
+					onCursorChange={(from, to, count) => {
+						setSelectionCount(count ?? 1)
+						presence.updateCursor(from, to)
+					}}
+					autoSortTasks={settings?.editor.autoSortTasks}
+					spellcheck={settings?.editor.spellcheck ?? true}
+					spellcheckLanguage={settings?.editor.spellcheckLanguage}
+					smartPairs={settings?.editor.smartPairs ?? true}
+					markerWrapping={settings?.editor.markerWrapping ?? true}
+					tabIndent={settings?.editor.tabIndent ?? true}
+					smartPaste={settings?.editor.smartPaste ?? true}
+					autocomplete={settings?.editor.autocomplete ?? true}
 				/>
 				<EditorToolbar
 					editor={editor}
 					readOnly={readOnly}
 					onToggleLeftSidebar={toggleLeft}
 					onToggleRightSidebar={toggleRight}
-					docId={docId}
+					docId={doc.id}
 					onSaveCopy={
-						canSaveCopy && me.$isLoaded
-							? () => handleSaveCopy(doc, me, setSaveCopyState, navigate)
+						backedUp && doc.publicRead && doc.ownerId !== ownerId
+							? () =>
+									handleSaveCopy(db, ownerId, doc, setSaveCopyState, navigate)
 							: undefined
 					}
 					saveCopyState={saveCopyState}
-					content={content}
-					onThemeChange={handleContentChange}
+					content={doc.content}
+					onThemeChange={content => {
+						editor.current?.setContent(content)
+					}}
 				/>
 				<EditorStatsBadge
-					content={content}
-					settings={editorSettings}
+					content={doc.content}
+					settings={settings}
 					selectionCount={selectionCount}
 				/>
 			</div>
@@ -883,7 +376,7 @@ function EditorContent({
 							]
 						: []),
 				]}
-				activeTab={rightTab}
+				activeTab={commentsEnabled ? rightTab : "tools"}
 				onTabChange={setRightTab}
 				header={
 					<>
@@ -905,13 +398,13 @@ function EditorContent({
 					/>
 				}
 			>
-				{liveDoc && commentsEnabled && rightTab === "comments" ? (
+				{commentsEnabled && rightTab === "comments" ? (
 					<SidebarComments
-						doc={liveDoc}
+						doc={commentDoc}
 						selectedThreadId={selectedCommentThreadId}
 						onSelectThread={handleSelectComment}
 						readOnly={readOnly}
-						authorName={commentAuthorName}
+						authorName={profile?.name}
 					/>
 				) : (
 					<>
@@ -924,136 +417,224 @@ function EditorContent({
 									/>
 									<SidebarViewLinks doc={doc} />
 									<SidebarPresentationLinks doc={doc} />
-									{!readOnly && (
-										<SidebarMenuItem>
-											<SidebarMenuButton
-												onClick={() =>
-													handleSetCommentsEnabled(!commentsEnabled)
-												}
-												nativeButton
-											>
-												<IconTransition
-													active={commentsEnabled ? "on" : "off"}
-													icons={{
-														on: <MessageSquareOff className="size-4" />,
-														off: <MessageSquare className="size-4" />,
-													}}
-													className="size-4"
-												/>
-												{commentsEnabled
-													? t("comments.disable")
-													: t("comments.enable")}
-											</SidebarMenuButton>
-										</SidebarMenuItem>
-									)}
+									<SidebarMenuItem>
+										<SidebarMenuButton
+											disabled={!doc.canAdmin}
+											onClick={() => handleSetCommentsEnabled(!commentsEnabled)}
+											nativeButton
+										>
+											{commentsEnabled ? (
+												<MessageSquareOff className="size-4" />
+											) : (
+												<MessageSquare className="size-4" />
+											)}
+											{commentsEnabled
+												? t("comments.disable")
+												: t("comments.enable")}
+										</SidebarMenuButton>
+									</SidebarMenuItem>
 									<SidebarSeparator />
-									{liveDoc && (
-										<SidebarFileMenu
-											doc={liveDoc}
-											editor={editor}
-											me={me.$isLoaded ? me : undefined}
-										/>
-									)}
+									<SidebarFileMenu
+										doc={doc}
+										editor={editor}
+										spaceId={doc.spaceId ?? undefined}
+									/>
 									<SidebarEditMenu
 										editor={editor}
-										disabled={!canEdit(doc)}
+										disabled={readOnly}
 										readOnly={readOnly}
 									/>
 									<SidebarFormatMenu
 										editor={editor}
-										disabled={!canEdit(doc)}
+										disabled={readOnly}
 										readOnly={readOnly}
-										documents={wikiLinkDocs}
-										onCreateDocument={makeCreateDocument(me)}
+										documents={wikiDocs}
+										onCreateDocument={createLinkedDocument}
 									/>
 								</SidebarMenu>
 							</SidebarGroupContent>
 						</SidebarGroup>
-
 						<SidebarSeparator />
-
 						<SidebarGroup>
-							<SidebarCollaboration docId={docId} />
+							<SidebarCollaboration docId={doc.id} />
 						</SidebarGroup>
-
 						<SidebarSeparator />
-
 						<SidebarGroup className="flex-1">
 							<SidebarAssets
 								assets={sidebarAssets}
 								readOnly={readOnly}
-								onUploadImages={liveDoc ? makeUploadAssets(liveDoc) : undefined}
-								onUploadVideo={
-									liveDoc
-										? async (file, options) => {
-												await makeUploadVideo(liveDoc)(file, options)
-											}
-										: undefined
-								}
-								onRename={liveDoc ? makeRenameAsset(liveDoc) : undefined}
-								onDelete={
-									liveDoc ? makeDeleteAsset(liveDoc, liveDoc) : undefined
-								}
-								onDownload={liveDoc ? makeDownloadAsset(liveDoc) : undefined}
-								onInsert={(assetId, name) => {
-									editor.current?.insertBlock(`![${name}](asset:${assetId})`)
-								}}
-								onToggleMute={assetId => {
-									let asset = getLoadedAssets(liveDoc?.assets).find(
-										a => a.$jazz.id === assetId,
+								onUploadImages={files => {
+									void Promise.all(
+										Array.from(files).map(file =>
+											uploadAsset(db, doc.id, file),
+										),
 									)
-									if (asset?.$isLoaded && asset.type === "video") {
-										asset.$jazz.applyDiff({ muteAudio: !asset.muteAudio })
-									}
 								}}
-								isAssetUsed={liveDoc ? makeIsAssetUsed(liveDoc) : undefined}
-								canUploadVideo={canUploadVideo}
-								onImportTldraw={tldrawEditor.importFile}
-								onCreateTldraw={tldrawEditor.create}
-								onEditTldraw={tldrawEditor.edit}
+								onUploadVideo={async (file, options) => {
+									await uploadAsset(db, doc.id, file, options)
+								}}
+								canUploadVideo
+								onRename={(id, name) => {
+									void db.update(app.assets, id, { name })
+								}}
+								onDelete={id => {
+									void updateContent(
+										db,
+										doc,
+										doc.content.replace(
+											new RegExp(`!\\[[^\\]]*\\]\\(asset:${id}\\)`, "g"),
+											"",
+										),
+									)
+									void db.delete(app.assets, id)
+								}}
+								onToggleMute={id => {
+									let asset = sidebarAssets.find(asset => asset.id === id)
+									if (asset)
+										void db.update(app.assets, id, {
+											muteAudio: !asset.muteAudio,
+										})
+								}}
+								onInsert={insertAsset}
+								isAssetUsed={id => doc.content.includes(`asset:${id}`)}
+								onCreateTldraw={() => tldraw.create()}
+								onEditTldraw={tldraw.edit}
+								onImportTldraw={tldraw.importFile}
+								onDownload={async (id, name) => {
+									let blob = await readAssetBlob(db, id)
+									let url = URL.createObjectURL(blob)
+									let a = document.createElement("a")
+									a.href = url
+									a.download =
+										name +
+										(sidebarAssets.find(asset => asset.id === id)?.type ===
+										"tldraw"
+											? ".alkalye-tldraw"
+											: "." + blob.type.split("/")[1])
+									a.click()
+									setTimeout(() => URL.revokeObjectURL(url), 1000)
+								}}
 							/>
 						</SidebarGroup>
 					</>
 				)}
 			</DocumentSidebar>
-			{tldrawEditor.dialog}
 		</>
 	)
 }
 
-function PersonalDocumentSidebar({
+function PersonalDocumentSidebar({ docId }: { docId: string }) {
+	let { db, ownerId, documents, entries, isLoading } = useLibrary()
+	let navigate = useNavigate()
+	let t = useIntl()
+	let { isMobile, setLeftOpenMobile } = useSidebar()
+	function closeSidebar() {
+		if (isMobile) setLeftOpenMobile(false)
+	}
+	async function duplicate(doc: LibraryDocument) {
+		await makeDuplicate(db, doc, ownerId, undefined, navigate)()
+		closeSidebar()
+	}
+	async function createFolder(path: string) {
+		let doc = await createDocument(db, ownerId, makeFolderDocumentContent(path))
+		closeSidebar()
+		void navigate({ to: "/doc/$id", params: { id: doc.id } })
+	}
+	return (
+		<ListSidebar
+			header={
+				<>
+					<SidebarImportExport />
+					<Button
+						size="sm"
+						nativeButton={false}
+						data-testid={testIds.doc.newButton}
+						render={<Link to="/new" onClick={closeSidebar} />}
+					>
+						<Plus />
+						{t("doc.new")}
+					</Button>
+				</>
+			}
+			footer={<SidebarSyncStatus />}
+		>
+			<SpaceSelector />
+			<SidebarDocumentList
+				docs={documents.filter(
+					doc =>
+						(!doc.spaceId && doc.ownerId === ownerId) ||
+						entries.some(entry => entry.documentId === doc.id),
+				)}
+				currentDocId={docId}
+				isLoading={isLoading}
+				onDocClick={closeSidebar}
+				onDuplicate={duplicate}
+				onDelete={doc => {
+					void db.update(app.documents, doc.id, { deletedAt: new Date() })
+					if (doc.id === docId) void navigate({ to: "/" })
+				}}
+				onCreateFolder={createFolder}
+				onImport={files => handleImportFiles(files, db, ownerId)}
+			/>
+		</ListSidebar>
+	)
+}
+function SettingsButton() {
+	let location = useLocation()
+	let t = useIntl()
+	return (
+		<Button
+			variant="ghost"
+			size="icon"
+			nativeButton={false}
+			aria-label={t("doc.settings")}
+			render={<Link to="/settings" search={{ from: location.pathname }} />}
+		>
+			<Settings />
+		</Button>
+	)
+}
+
+function SpaceDocumentSidebar({
 	docId,
-	me,
+	spaceId,
 }: {
 	docId: string
-	me: LoadedMe
+	spaceId: string
 }) {
-	let t = useIntl()
+	let { db, ownerId, documents, isLoading } = useLibrary()
+	let space = useSpaces().find(space => space.id === spaceId)
 	let navigate = useNavigate()
+	let t = useIntl()
 	let { isMobile, setLeftOpenMobile } = useSidebar()
-	let allDocs = getPersonalDocs(me)
-
-	let personalDocs =
-		me.$isLoaded && me.root?.documents?.$isLoaded ? me.root.documents : null
+	function closeSidebar() {
+		if (isMobile) setLeftOpenMobile(false)
+	}
+	async function newDocument(content = "") {
+		let doc = await createSpaceDocument(db, ownerId, spaceId, content)
+		closeSidebar()
+		void navigate({
+			to: "/spaces/$spaceId/doc/$id",
+			params: { spaceId, id: doc.id },
+		})
+	}
 	return (
 		<ListSidebar
 			header={
 				<>
 					<SidebarImportExport
-						docs={allDocs.filter(d => !d.deletedAt)}
-						onImport={async files => {
-							if (personalDocs) await handleImportFiles(files, personalDocs)
-						}}
+						docs={documents.filter(doc => doc.spaceId === spaceId)}
+						onImport={(files, options) =>
+							handleImportFiles(files, db, ownerId, { ...options, spaceId })
+						}
 					/>
 					<Button
 						size="sm"
-						nativeButton={false}
 						data-testid={testIds.doc.newButton}
+						disabled={!space?.role || space.role === "reader"}
+						nativeButton={false}
 						render={
-							<Link
-								to="/new"
-								onClick={() => isMobile && setLeftOpenMobile(false)}
-							/>
+							<Link to="/new" search={{ spaceId }} onClick={closeSidebar} />
 						}
 					>
 						<Plus />
@@ -1062,206 +643,28 @@ function PersonalDocumentSidebar({
 				</>
 			}
 			footer={<SidebarSyncStatus />}
-			onImport={async files => {
-				if (personalDocs) await handleImportFiles(files, personalDocs)
-			}}
 		>
 			<SpaceSelector />
 			<SidebarDocumentList
-				docs={allDocs}
+				docs={documents.filter(doc => doc.spaceId === spaceId)}
 				currentDocId={docId}
-				isLoading={!me.$isLoaded}
-				onDocClick={() => isMobile && setLeftOpenMobile(false)}
-				onDuplicate={docToDuplicate =>
-					handleDuplicateDocument(
-						docToDuplicate,
-						me,
-						isMobile,
-						setLeftOpenMobile,
-						navigate,
-					)
-				}
-				onDelete={docToDelete => {
-					deletePersonalDocument(docToDelete)
-					if (docToDelete.$jazz.id === docId) {
-						navigate({ to: "/" })
-					}
+				spaceId={spaceId}
+				isLoading={isLoading}
+				onDocClick={closeSidebar}
+				onDuplicate={async doc => {
+					await makeDuplicate(db, doc, ownerId, spaceId, navigate)()
+					closeSidebar()
 				}}
-				onCreateFolder={makeCreateFolderDocument(
-					me,
-					isMobile,
-					setLeftOpenMobile,
-					navigate,
-				)}
-				onImport={async (files, options) => {
-					if (personalDocs)
-						await handleImportFiles(files, personalDocs, options)
+				onDelete={async doc => {
+					await db
+						.update(app.documents, doc.id, { deletedAt: new Date() })
+						.wait({ tier: "local" })
+					if (doc.id === docId)
+						void navigate({ to: "/spaces/$spaceId", params: { spaceId } })
 				}}
+				onCreateFolder={path => newDocument(makeFolderDocumentContent(path))}
+				onImport={files => handleImportFiles(files, db, ownerId, { spaceId })}
 			/>
 		</ListSidebar>
-	)
-}
-
-function SettingsButton() {
-	let t = useIntl()
-	let { needRefresh } = usePWA()
-	let location = useLocation()
-	return (
-		<Tooltip>
-			<TooltipTrigger
-				render={
-					<Button
-						variant="ghost"
-						size="icon"
-						nativeButton={false}
-						render={
-							<Link to="/settings" search={{ from: location.pathname }} />
-						}
-						className="relative"
-					>
-						<Settings />
-						{needRefresh && (
-							<span className="bg-destructive absolute top-1 right-1 size-2 rounded-full" />
-						)}
-					</Button>
-				}
-			/>
-			<TooltipContent>
-				{needRefresh ? t("doc.settingsUpdateAvailable") : t("doc.settings")}
-			</TooltipContent>
-		</Tooltip>
-	)
-}
-
-type SpaceWithDocuments = co.loaded<
-	typeof Space,
-	{ documents: { $each: true } }
->
-
-function makeCreateDocument(me: LoadedMe, space?: SpaceWithDocuments) {
-	return async function handleCreateDocument(title: string): Promise<string> {
-		if (!me.$isLoaded || !me.root?.documents)
-			throw new Error("Not authenticated")
-
-		if (space?.documents?.$isLoaded) {
-			// Space context: create doc with its own group (space group as admin)
-			let newDoc = createSpaceDocument(
-				space.$jazz.owner,
-				space.$jazz.id,
-				`# ${title}\n\n`,
-			)
-			space.documents.$jazz.push(newDoc)
-			await waitForLocalJazzNodeStorage(space.$jazz.localNode)
-			return newDoc.$jazz.id
-		}
-
-		// Personal context: create new group per document
-		let content = `# ${title}\n\n`
-		let now = new Date()
-		let group = Group.create()
-		let newDoc = Document.create(
-			{
-				version: 1,
-				content: co.plainText().create(content, group),
-				...createDocumentMetadata(content, now),
-				createdAt: now,
-				updatedAt: now,
-			},
-			group,
-		)
-		me.root.documents.$jazz.push(newDoc)
-		await waitForLocalJazzStorage(me)
-		return newDoc.$jazz.id
-	}
-}
-
-function makeCreateFolderDocument(
-	me: LoadedMe,
-	isMobile: boolean,
-	setLeftOpenMobile: (open: boolean) => void,
-	navigate: ReturnType<typeof useNavigate>,
-) {
-	return async function handleCreateFolderDocument(
-		path: string,
-	): Promise<void> {
-		if (!me.$isLoaded || !me.root?.documents?.$isLoaded)
-			throw new Error("Not authenticated")
-
-		let newDoc = await createPersonalDocument(
-			me,
-			makeFolderDocumentContent(path),
-		)
-		await waitForLocalJazzStorage(me)
-		if (isMobile) setLeftOpenMobile(false)
-		navigate({ to: "/doc/$id", params: { id: newDoc.$jazz.id }, search: {} })
-	}
-}
-
-async function handleDuplicateDocument(
-	doc: co.loaded<typeof Document>,
-	me: LoadedMe,
-	isMobile: boolean,
-	setLeftOpenMobile: (open: boolean) => void,
-	navigate: ReturnType<typeof useNavigate>,
-) {
-	if (!me.$isLoaded || !me.root?.documents?.$isLoaded) return
-	let loaded = await doc.$jazz.ensureLoaded({ resolve: { content: true } })
-	let content = loaded.content?.toString() ?? ""
-	let newContent = addCopyToTitle(content)
-	let now = new Date()
-	let group = Group.create()
-	let newDoc = Document.create(
-		{
-			version: 1,
-			content: co.plainText().create(content, group),
-			...createDocumentMetadata(newContent, now),
-			createdAt: now,
-			updatedAt: now,
-		},
-		group,
-	)
-	try {
-		await copyCommentsAndApplyContent(loaded, newDoc, newContent)
-	} catch (error) {
-		console.error("Failed to duplicate document:", error)
-		toast.error("Failed to duplicate document")
-		return
-	}
-	me.root.documents.$jazz.push(newDoc)
-	await waitForLocalJazzStorage(me)
-	if (isMobile) setLeftOpenMobile(false)
-	navigate({ to: "/doc/$id", params: { id: newDoc.$jazz.id }, search: {} })
-}
-
-function getPersonalDocs(me: LoadedMe): co.loaded<typeof Document>[] {
-	if (!me.$isLoaded) return []
-	let docs: co.loaded<typeof Document>[] = []
-	for (let doc of me.root.documents.values()) {
-		if (!doc?.$isLoaded) continue
-		docs.push(doc)
-	}
-	return docs
-}
-
-function isFormControl(target: EventTarget | null) {
-	return (
-		target instanceof HTMLInputElement ||
-		target instanceof HTMLTextAreaElement ||
-		target instanceof HTMLSelectElement
-	)
-}
-
-function setAutomationReadyState(ready: boolean, route: string) {
-	window.__alkalyeReady = ready
-	window.__alkalyeReadyRoute = route
-	if (ready) window.__alkalyeReadyAt = Date.now()
-	document.body.dataset.alkalyeReady = ready ? "true" : "false"
-}
-
-function signalDocumentSaved(documentId: string, content: string) {
-	window.dispatchEvent(
-		new CustomEvent("alkalye:document-saved", {
-			detail: { documentId, content },
-		}),
 	)
 }

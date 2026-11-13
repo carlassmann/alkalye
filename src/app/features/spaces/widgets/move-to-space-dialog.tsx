@@ -1,7 +1,8 @@
 import { useState } from "react"
 import { useForm } from "@tanstack/react-form"
-import { co } from "jazz-tools"
-import { useAccount } from "jazz-tools/react"
+import { useLibrary, type LibraryDocument } from "@/app/features/documents"
+import { useSpaces, createSpace } from "../lib/spaces"
+import { sharingRequest } from "@/app/features/sharing"
 import { User, ArrowRight, Plus } from "lucide-react"
 import { useIntl, T } from "@/shared/intl/setup"
 import {
@@ -23,23 +24,11 @@ import {
 import { SpaceInitials } from "./space-selector"
 import { Field, FieldLabel } from "@/app/components/ui/field"
 import { Input } from "@/app/components/ui/input"
-import { Document, UserAccount, createSpace } from "@/schema"
-import { getSpaceGroup } from "../lib/spaces"
-import { moveDocumentToSpace } from "@/app/features/documents"
-import { waitForLocalJazzStorage } from "@/app/lib/local-jazz-poke"
 
 export { MoveToSpaceDialog }
 export type { MoveToSpaceDialogProps }
 
-type LoadedDocument = co.loaded<typeof Document>
-
-let spacesQuery = {
-	root: {
-		documents: true,
-		spaces: { $each: { avatar: true, documents: true } },
-	},
-} as const
-type LoadedSpaces = co.loaded<typeof UserAccount, typeof spacesQuery>
+type LoadedDocument = LibraryDocument
 
 type SpaceOption = {
 	id: string
@@ -62,20 +51,22 @@ function MoveToSpaceDialog({
 	onMove,
 }: MoveToSpaceDialogProps) {
 	let t = useIntl()
-	let me = useAccount(UserAccount, { resolve: spacesQuery })
+	let { db, ownerId } = useLibrary()
 	let [lastOpen, setLastOpen] = useState(false)
 	let [destination, setDestination] = useState("")
 	let [newSpaceName, setNewSpaceName] = useState("")
 	let [isSubmitting, setIsSubmitting] = useState(false)
 
-	let spaces = me?.$isLoaded ? getSortedSpaces(me.root.spaces) : []
+	let spaces = useSpaces().filter(
+		space => space.role && space.role !== "reader",
+	)
 	let availableSpaces = currentSpaceId
-		? spaces.filter(s => s.$jazz.id !== currentSpaceId)
+		? spaces.filter(s => s.id !== currentSpaceId)
 		: spaces
 
 	let defaultDestination = currentSpaceId
 		? "personal"
-		: (availableSpaces[0]?.$jazz.id ?? "")
+		: (availableSpaces[0]?.id ?? "")
 
 	let form = useForm({
 		defaultValues: {
@@ -83,8 +74,6 @@ function MoveToSpaceDialog({
 			newSpaceName: "",
 		},
 		onSubmit: async ({ value }) => {
-			if (!me?.$isLoaded || !me.root) return
-
 			let { destination, newSpaceName } = value
 			if (destination === "personal" && !currentSpaceId) return
 			if (destination === currentSpaceId) return
@@ -95,22 +84,19 @@ function MoveToSpaceDialog({
 				let selectedSpace: SpaceOption | null = null
 
 				if (destination === "__new__") {
-					let space = createSpace(newSpaceName.trim(), me.root)
-					selectedSpace = { id: space.$jazz.id, name: space.name }
+					let space = await createSpace(db, ownerId, newSpaceName.trim())
+					selectedSpace = { id: space.id, name: space.name }
 				} else if (destination !== "personal") {
-					let space = spaces.find(s => s.$jazz.id === destination)
+					let space = spaces.find(s => s.id === destination)
 					if (space) {
-						selectedSpace = { id: space.$jazz.id, name: space.name }
+						selectedSpace = { id: space.id, name: space.name }
 					}
 				}
 
-				await moveDocumentToSpace({
-					doc,
-					destination: selectedSpace,
-					currentSpaceId,
-					me,
+				await sharingRequest(db, "move", {
+					documentId: doc.id,
+					spaceId: selectedSpace?.id ?? null,
 				})
-				if (destination === "__new__") await waitForLocalJazzStorage(me)
 
 				onMove?.(selectedSpace)
 				onOpenChange(false)
@@ -138,7 +124,7 @@ function MoveToSpaceDialog({
 	let isCreatingNew = destination === "__new__"
 
 	let currentLocation = currentSpaceId
-		? (spaces.find(s => s.$jazz.id === currentSpaceId)?.name ?? "Space")
+		? (spaces.find(s => s.id === currentSpaceId)?.name ?? "Space")
 		: t("spaces.move.personal")
 
 	let isDisabled =
@@ -205,7 +191,7 @@ function MoveToSpaceDialog({
 											) : (
 												(() => {
 													let space = availableSpaces.find(
-														s => s.$jazz.id === field.state.value,
+														s => s.id === field.state.value,
 													)
 													return space ? (
 														<div className="inline-flex items-center gap-3">
@@ -228,7 +214,7 @@ function MoveToSpaceDialog({
 												</SelectItem>
 											)}
 											{availableSpaces.map(space => (
-												<SelectItem key={space.$jazz.id} value={space.$jazz.id}>
+												<SelectItem key={space.id} value={space.id}>
 													<SpaceInitials name={space.name} size="sm" />
 													<span>{space.name}</span>
 												</SelectItem>
@@ -292,25 +278,4 @@ function MoveToSpaceDialog({
 			</DialogContent>
 		</Dialog>
 	)
-}
-
-// --- Helpers ---
-
-type LoadedSpaceWithAvatar = NonNullable<
-	NonNullable<LoadedSpaces["root"]["spaces"]>[number]
->
-
-function getSortedSpaces(
-	spaces: LoadedSpaces["root"]["spaces"],
-): LoadedSpaceWithAvatar[] {
-	if (!spaces) return []
-
-	return [...spaces.values()]
-		.filter((s): s is LoadedSpaceWithAvatar => {
-			if (!s?.$isLoaded) return false
-			let spaceGroup = getSpaceGroup(s)
-			let role = spaceGroup?.myRole()
-			return role === "admin" || role === "writer"
-		})
-		.sort((a, b) => a.name.localeCompare(b.name))
 }

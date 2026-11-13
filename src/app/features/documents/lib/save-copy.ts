@@ -1,27 +1,43 @@
-import { co } from "jazz-tools"
-import { useNavigate } from "@tanstack/react-router"
-import { Document, UserAccount } from "@/schema"
-import { copyDocumentToMyList } from "./documents"
+import type { useNavigate } from "@tanstack/react-router"
+import { copyDocumentAssets } from "@/app/features/assets"
+import { exportComments, importComments } from "@/app/features/import-export"
+import {
+	createDocument,
+	updateContent,
+	type Database,
+	type LibraryDocument,
+} from "./library"
 
 export { handleSaveCopy }
 
 async function handleSaveCopy(
-	doc: co.loaded<typeof Document, { content: true }>,
-	me: co.loaded<typeof UserAccount, { root: { documents: true } }>,
-	setSaveCopyState: (state: "idle" | "saving" | "saved") => void,
+	db: Database,
+	ownerId: string,
+	doc: LibraryDocument & { content: string },
+	setState: (state: "idle" | "saving" | "saved") => void,
 	navigate: ReturnType<typeof useNavigate>,
 ) {
-	if (!me.$isLoaded) return
-	setSaveCopyState("saving")
-
+	setState("saving")
 	try {
-		let newDoc = await copyDocumentToMyList(doc, me)
-		setSaveCopyState("saved")
+		let copy = await createDocument(db, ownerId, doc.content)
+		await updateContent(
+			db,
+			copy,
+			await copyDocumentAssets(db, doc.id, copy.id, doc.content),
+		)
+		await importComments(
+			db,
+			copy.id,
+			ownerId,
+			await exportComments(db, doc.id),
+			doc.content,
+		)
+		setState("saved")
 		setTimeout(() => {
-			navigate({ to: "/doc/$id", params: { id: newDoc.$jazz.id } })
+			void navigate({ to: "/doc/$id", params: { id: copy.id } })
 		}, 1000)
-	} catch (e) {
-		console.error("Failed to save copy:", e)
-		setSaveCopyState("idle")
+	} catch (error) {
+		console.error("Failed to save copy:", error)
+		setState("idle")
 	}
 }

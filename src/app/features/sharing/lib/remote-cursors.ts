@@ -208,6 +208,9 @@ let cursorStyles = EditorView.baseTheme({
 		pointerEvents: "none",
 		zIndex: "10",
 	},
+	".cm-remote-cursor-label::after": {
+		content: "attr(data-name)",
+	},
 	".cm-remote-selection": {
 		mixBlendMode: "multiply",
 	},
@@ -239,7 +242,9 @@ class CursorWidget extends WidgetType {
 
 		let label = document.createElement("span")
 		label.className = "cm-remote-cursor-label"
-		label.textContent = this.name
+		// Keep collaborator names out of copied and inspected document text.
+		label.dataset.name = this.name
+		label.setAttribute("aria-label", this.name)
 
 		wrapper.appendChild(caret)
 		wrapper.appendChild(label)

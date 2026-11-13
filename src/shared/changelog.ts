@@ -17,7 +17,10 @@ let entrySchema = z.object({
 	notes: z.array(z.string().min(1)).min(1),
 	// Where the change came from. A pull request survives a squash merge; a
 	// commit is how the backfilled history points at itself.
-	pr: z.number().int().positive().optional(),
+	pr: z.preprocess(
+		value => (value === 0 ? undefined : value),
+		z.number().int().positive().optional(),
+	),
 	commit: z
 		.string()
 		.regex(/^[0-9a-f]{7,40}$/)

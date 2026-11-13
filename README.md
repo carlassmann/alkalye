@@ -1,12 +1,12 @@
 # Alkalye
 
-Beautiful, end-to-end encrypted markdown editor with real-time collaboration and presentation mode.
+Offline-capable markdown editor with real-time collaboration and presentation mode.
 
 **[alkalye.com](https://alkalye.com)**
 
 ## Features
 
-- **E2E Encrypted** — Your documents are encrypted on your device before syncing
+- **Server-readable sync** — Alkalye’s backend and Jazz Cloud can read synced data
 - **Real-time Collaboration** — Share documents and edit together with live cursors
 - **Presentation Mode** — Turn markdown into slideshows with `mode: present` frontmatter
 - **Teleprompter Mode** — Present with auto-scrolling text
@@ -20,7 +20,7 @@ Beautiful, end-to-end encrypted markdown editor with real-time collaboration and
 
 ## Tech Stack
 
-- [Jazz](https://jazz.tools) for local-first sync and encryption
+- [Jazz](https://jazz.tools) for local-first sync
 - [Astro](https://astro.build) 5 + React 19
 - [Tanstack Router](https://tanstack.com/router) for routing
 - Tailwind CSS 4 + shadcn/ui (base-lyra style)
@@ -96,3 +96,50 @@ restarting the `work` services.
 [MIT](./LICENSE)
 
 © 2025 Carl Assmann
+
+## Jazz benchmarks
+
+Fetch checksum-pinned datasets, start this checkout's services, then run headless Chromium.
+Install Chromium once with `bunx playwright install chromium` if needed:
+
+```sh
+bun run bench:fetch
+bun scripts/bench/production.ts
+bun scripts/bench/interleaved.ts
+```
+
+Run from the migration checkout. The provisioner builds Classic `8379d4e` in a
+temporary worktree with the Node adapter and an external SPA history fallback;
+app source stays unchanged. It builds v2 with `ALKALYE_LOCAL_PREVIEW=1` and
+isolated SQLite. Work setup/start use `--tailscale`. This setup uses the local
+cshed tailnet domain and a 32 GB Classic sync-server heap cap.
+
+The runner alternates five Classic/v2 core pairs, then five separate pairs for
+service-worker reload and offline reopening. Backends restart before each
+account. Raw results retain load averages, exact-content checks and scenario
+failures. Failures produce exit code 1; independent cases still run.
+No fixed performance threshold runs in CI.
+
+`bun run bench:verify-network` checks worker HTTP, binary WebSocket and Wasm
+capture. For individual runs use `bun run bench:compare -- --target <url>
+--label classic|v2 --out <path>`. Set `BENCH_JAZZ`, `BENCH_GIT_HEAD` and
+`BENCH_SERVER_NOTE` when the served app differs from the harness checkout.
+Set `BENCH_SERVER_MODE=development` for a dev-only diagnostic.
+
+Defaults: three accounts, 50 Vite Markdown notes, two Gutenberg books and 200
+Automerge trace edits per document. Use `--cpu 4` for page CPU throttling or
+`--notes 20 --edits 50` for a smoke run. The full 259,778-edit trace exceeds two
+hours at the frame-pacing floor alone. `--edits 5000 --large-only --literal-newlines` runs a longer
+large-document slice; `--replay-timeout-ms <ms>` sets its deadline.
+The literal-newline option uses plain-text paste for trace line breaks, avoiding
+contenteditable newline normalization during cursor-heavy replay.
+`BENCH_PROFILE_DIR` captures main-page CPU profiles. `--sw-only` measures a
+hydrated returning user; `--skip-sw` excludes that case for diagnostics.
+
+Only `scripts/bench/adapter.ts` binds account, import/export and editor UI.
+Scenarios never call Jazz APIs. Credentials stay in memory and out of results.
+Fresh contexts receive Classic's auth secret or v2's selected device root,
+without document databases, cookies, other account roots or session leases.
+See `docs/benchmarks/jazz-classic-vs-v2.md` for measurement definitions and limitations.
+
+written with gpt-6.1-sol in T3 Code (Codex)

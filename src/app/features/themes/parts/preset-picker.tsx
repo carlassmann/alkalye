@@ -1,5 +1,5 @@
-import { useAccount } from "jazz-tools/react"
-import { co } from "jazz-tools"
+import { useAll, useSession } from "jazz-tools/react"
+import { app } from "@/jazz/schema"
 import { Button } from "@/app/components/ui/button"
 import {
 	Tooltip,
@@ -16,14 +16,10 @@ import {
 	DropdownMenuGroup,
 } from "@/app/components/ui/dropdown-menu"
 import { Paintbrush, Check, Sun, Moon } from "lucide-react"
-import { UserAccount } from "@/schema"
 import { parseFrontmatter, setPreset } from "@/app/features/editor"
-import { Theme } from "../lib/schema"
 import { getThemePresets, type ThemePresetType } from "../lib/document-theme"
 
 export { PresetPicker }
-
-type LoadedTheme = co.loaded<typeof Theme>
 
 interface PresetPickerProps {
 	content: string
@@ -38,21 +34,19 @@ function PresetPicker({
 	onPresetChange,
 	disabled,
 }: PresetPickerProps) {
-	let me = useAccount(UserAccount, { resolve: themesResolve })
-
-	let themes: LoadedTheme[] = []
-	if (me.$isLoaded && me.root?.themes?.$isLoaded) {
-		themes = Array.from(me.root.themes).filter(
-			(t): t is LoadedTheme => t?.$isLoaded === true,
-		)
-	}
+	let ownerId = useSession()?.user ?? undefined
+	let { data: themes = [] } = useAll(app.themes.where({ ownerId }))
 
 	let { frontmatter } = parseFrontmatter(content)
 	let currentThemeName = frontmatter?.theme as string | undefined
 	let currentPresetName = frontmatter?.preset as string | undefined
 
 	let currentTheme = currentThemeName
-		? themes.find(t => t.name.toLowerCase() === currentThemeName.toLowerCase())
+		? themes.find(
+				t =>
+					t.id === currentThemeName ||
+					t.name.toLowerCase() === currentThemeName.toLowerCase(),
+			)
 		: null
 
 	// Get presets from current theme
@@ -181,7 +175,3 @@ function PresetMenuItem({
 		</DropdownMenuItem>
 	)
 }
-
-let themesResolve = {
-	root: { themes: true },
-} as const

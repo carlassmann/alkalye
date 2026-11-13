@@ -60,6 +60,17 @@ describe("readChangelog", () => {
 		).toEqual([])
 	})
 
+	it("uses the commit while a pull request number is unassigned", () => {
+		let [entry] = readChangelog([{ ...sample[0], pr: 0, commit: "f1e6c13" }])
+		expect(entry).toBeDefined()
+		expect(entry?.pr).toBeUndefined()
+		expect(sourceLabel(entry!)).toBe("f1e6c13")
+		expect(sourceUrl(entry!)).toBe(
+			"https://github.com/carlassmann/alkalye/commit/f1e6c13",
+		)
+		expect(readChangelog([{ ...sample[0], pr: -1 }])).toEqual([])
+	})
+
 	it("points every shipped entry at a distinct commit or pull request", () => {
 		let entries = readChangelog(shippedChangelog)
 		let refs = entries.map(entry => sourceLabel(entry))

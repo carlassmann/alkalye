@@ -1,7 +1,10 @@
+import { saveGuestTransfer } from "../lib/guest-transfer"
+import type { JazzClient } from "jazz-tools/client"
+import { markAccountBackedUp } from "../lib/backup-state"
 import { IconTransition } from "@/app/components/ui/icon-transition"
 import { useState } from "react"
-import { usePassphraseAuth } from "jazz-tools/react"
-import { Copy, Check, RefreshCw } from "lucide-react"
+import { useJazzSession } from "jazz-tools/react"
+import { Copy, Check } from "lucide-react"
 import { Button } from "@/app/components/ui/button"
 import {
 	Dialog,
@@ -11,9 +14,10 @@ import {
 	DialogDescription,
 } from "@/app/components/ui/dialog"
 import { Textarea } from "@/app/components/ui/textarea"
+import { RecoveryPhrase } from "jazz-tools/passphrase"
+import { entropyToMnemonic } from "@scure/bip39"
 import { wordlist } from "../lib/wordlist"
 import { testIds } from "@/app/lib/test-ids"
-import { getRandomWriterName } from "@/schema"
 import { useIntl, T } from "@/shared/intl/setup"
 
 export { AuthForm, AuthDialog }
@@ -60,18 +64,29 @@ function AuthDialog({
 
 function AuthForm({ onSuccess }: AuthFormProps) {
 	let t = useIntl()
-	let auth = usePassphraseAuth({ wordlist })
+	let auth = useJazzSession<JazzClient>()
 	let [step, setStep] = useState<"initial" | "create" | "login">("initial")
 	let [loginPassphrase, setLoginPassphrase] = useState("")
 	let [isCopied, setIsCopied] = useState(false)
-	let [currentPassphrase, setCurrentPassphrase] = useState(() =>
-		auth.generateRandomPassphrase(),
-	)
+	let [currentPassphrase, setCurrentPassphrase] = useState("")
 	let [error, setError] = useState("")
+	let [isSigningIn, setIsSigningIn] = useState(false)
 
-	function handleReroll() {
-		setCurrentPassphrase(auth.generateRandomPassphrase())
-		setIsCopied(false)
+	function handleCreate() {
+		try {
+			let phrase = auth.user
+				? RecoveryPhrase.fromSecret(auth.exportDeviceKey())
+				: entropyToMnemonic(
+						crypto.getRandomValues(new Uint8Array(32)),
+						wordlist,
+					)
+			setCurrentPassphrase(phrase)
+			setStep("create")
+		} catch (error) {
+			setError(
+				error instanceof Error ? error.message : "Could not create account",
+			)
+		}
 	}
 
 	async function handleCopy() {
@@ -87,7 +102,12 @@ function AuthForm({ onSuccess }: AuthFormProps) {
 
 	async function handleRegister() {
 		try {
-			await auth.registerNewAccount(currentPassphrase, getRandomWriterName())
+			if (!auth.user)
+				await auth.restoreDeviceAccount(
+					RecoveryPhrase.toSecret(currentPassphrase),
+				)
+			await navigator.storage?.persist()
+			markAccountBackedUp(auth.user?.accountId ?? "")
 			onSuccess?.()
 		} catch (e) {
 			setError(
@@ -97,21 +117,42 @@ function AuthForm({ onSuccess }: AuthFormProps) {
 	}
 
 	async function handleLogin() {
+		if (isSigningIn) return
+		setIsSigningIn(true)
 		try {
 			setError("")
-			await auth.logIn(loginPassphrase)
-			onSuccess?.()
+			let secret = RecoveryPhrase.toSecret(loginPassphrase)
+			if (
+				auth.user &&
+				auth.client &&
+				localStorage.getItem("alkalye-recovery-backed-up") !==
+					auth.user.accountId &&
+				secret !== auth.exportDeviceKey()
+			)
+				await saveGuestTransfer(auth.client.db, auth.user.accountId, secret)
+			sessionStorage.setItem("alkalye-restoring-account", "true")
+			sessionStorage.setItem("alkalye-classic-phrase-login", "true")
+			await auth.restoreDeviceAccount(secret)
 		} catch (e) {
+			sessionStorage.removeItem("alkalye-restoring-account")
+			sessionStorage.removeItem("alkalye-classic-phrase-login")
 			setError(
 				e instanceof Error
 					? e.message
 					: t("auth.login.error.invalidPassphrase"),
 			)
+		} finally {
+			setIsSigningIn(false)
 		}
 	}
 
 	return (
 		<div data-syntwin-hidden>
+			<p className="mb-4 text-sm">
+				Keep your 24 recovery words private. Anyone with them can sign in.
+				Server operators can read synced data.
+			</p>
+			{step === "initial" && error && <p role="alert">{error}</p>}
 			{step === "initial" && (
 				<>
 					<p className="text-muted-foreground mb-4 text-sm">
@@ -119,7 +160,7 @@ function AuthForm({ onSuccess }: AuthFormProps) {
 					</p>
 					<div className="flex flex-col justify-end gap-2">
 						<Button
-							onClick={() => setStep("create")}
+							onClick={handleCreate}
 							size="sm"
 							data-testid={testIds.auth.initialCreateAccount}
 						>
@@ -173,14 +214,6 @@ function AuthForm({ onSuccess }: AuthFormProps) {
 							) : (
 								<T k="auth.create.copy" />
 							)}
-						</Button>
-						<Button
-							onClick={handleReroll}
-							variant="outline"
-							size="sm"
-							data-testid={testIds.auth.createReroll}
-						>
-							<RefreshCw className="size-3.5" />
 						</Button>
 					</div>
 					{error && (
@@ -254,7 +287,7 @@ function AuthForm({ onSuccess }: AuthFormProps) {
 						<Button
 							onClick={handleLogin}
 							size="sm"
-							disabled={!loginPassphrase.trim()}
+							disabled={isSigningIn || !loginPassphrase.trim()}
 							className="flex-1"
 							data-testid={testIds.auth.loginSubmit}
 						>

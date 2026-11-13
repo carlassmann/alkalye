@@ -1,3 +1,8 @@
+import { useCleanupDeleted } from "../hooks/use-cleanup-deleted"
+import { getExportAssets } from "../lib/document-file-actions"
+import { exportComments } from "@/app/features/import-export"
+import type { Database } from "../lib/library"
+import { leavePersonalDocument } from "@/app/features/sharing"
 import {
 	useState,
 	useRef,
@@ -15,12 +20,15 @@ import {
 import { createPortal } from "react-dom"
 import { Link } from "@tanstack/react-router"
 import { useVirtualizer } from "@tanstack/react-virtual"
-import { co } from "jazz-tools"
-import { useAccount, useCoState } from "jazz-tools/react"
-import { UserAccount, Document } from "@/schema"
-import { assetContentResolve, serializeAsset } from "@/app/features/assets"
+import { useDb, useOne } from "jazz-tools/react"
+import {
+	type LibraryDocument,
+	useLibrary,
+	readDocument,
+	app,
+} from "../lib/library"
 import { formatRelativeDate } from "../lib/title"
-import { toggleDocumentPinned } from "../lib/document-pin"
+import { setPinned } from "../lib/library"
 import {
 	emptySidebarSelection,
 	extendSidebarSelection,
@@ -41,9 +49,7 @@ import {
 	type SidebarDropAction,
 } from "../lib/sidebar-drop"
 import { getSidebarKeyboardAction } from "../lib/sidebar-keyboard-navigation"
-import { needsMetadataBackfill } from "../lib/metadata"
-import { useMetadataBackfillQueue } from "../hooks/use-metadata-backfill"
-import { getDaysUntilPermanentDelete } from "../lib/delete-covalue"
+import { getDaysUntilPermanentDelete } from "../lib/documents"
 import { permanentlyDeletePersonalDocument } from "../lib/documents"
 import { Button } from "@/app/components/ui/button"
 import { Input } from "@/app/components/ui/input"
@@ -97,7 +103,6 @@ import {
 	hasIndividualShares,
 	canEdit,
 	getDocumentGroup,
-	leavePersonalDocument,
 } from "@/app/features/sharing"
 import { useFolderStore, FolderRow } from "./folder"
 import {
@@ -112,7 +117,6 @@ import {
 	shareDocument,
 	importMarkdownFiles,
 	ImportProgressDialog,
-	type ExportAsset,
 	type ImportedFile,
 	type ImportOptions,
 	type ImportProgress,
@@ -134,12 +138,11 @@ import {
 import { Label } from "@/app/components/ui/label"
 import { moveDocumentsToFolder } from "../lib/folders"
 import { Checkbox } from "@/app/components/ui/checkbox"
-import { getExportComments } from "@/app/features/comments"
 
 export { SidebarDocumentList, matchesSearchTerms, matchesTypeFilter }
 export type { SidebarDoc }
 
-type SidebarDoc = co.loaded<typeof Document>
+type SidebarDoc = LibraryDocument
 type FilterableSidebarDoc = {
 	title?: string
 	tags?: string[]
@@ -179,7 +182,6 @@ function matchesTypeFilter(
 	if (typeFilter === "deleted") return Boolean(doc.deletedAt)
 	if (doc.deletedAt) return false
 	if (typeFilter === "all") return true
-	if (needsMetadataBackfill(doc)) return true
 	if (typeFilter === "presentation") return doc.isPresentation === true
 	if (typeFilter === "document") return doc.isPresentation !== true
 	return false
@@ -191,7 +193,6 @@ function matchesSearchTerms(
 ) {
 	let terms = parseSearchTerms(search).map(t => t.toLowerCase())
 	if (terms.length === 0) return true
-	if (needsMetadataBackfill(doc)) return true
 
 	let searchable = [doc.title ?? "Untitled", ...(doc.tags ?? [])]
 		.join(" ")
@@ -211,6 +212,7 @@ function SidebarDocumentList({
 	spaceId,
 	spaceGroupId,
 }: SidebarDocumentListProps) {
+	useCleanupDeleted(docs)
 	let t = useIntl()
 	let [search, setSearch] = useState("")
 	let [sort, setSort] = useState<SortMode>("latest")
@@ -261,7 +263,6 @@ function SidebarDocumentList({
 
 	return (
 		<>
-			<MetadataBackfillTasks docs={docs} />
 			<SidebarSearchFilterBar
 				search={search}
 				onSearchChange={setSearch}
@@ -306,11 +307,6 @@ function SidebarDocumentList({
 	)
 }
 
-function MetadataBackfillTasks({ docs }: { docs: SidebarDoc[] }) {
-	useMetadataBackfillQueue(docs)
-	return null
-}
-
 function DocumentListContent({
 	docs,
 	currentDocId,
@@ -344,6 +340,7 @@ function DocumentListContent({
 	ref: Ref<DocumentListHandle>
 	t: ReturnType<typeof useIntl>
 }) {
+	let { db } = useLibrary()
 	let parentRef = useRef<HTMLDivElement>(null)
 	let fileInputRef = useRef<HTMLInputElement>(null)
 	let { viewMode, isCollapsed, toggleFolder } = useFolderStore()
@@ -370,7 +367,7 @@ function DocumentListContent({
 	let canSelect = typeFilter !== "deleted"
 	let canDrag = canSelect && viewMode === "folders" && hasFinePointer
 	let visibleDocIds = listItems.flatMap(item =>
-		item.type === "doc" ? [item.doc.$jazz.id] : [],
+		item.type === "doc" ? [item.doc.id] : [],
 	)
 	let visibleSelection = pruneSidebarSelection(
 		selection,
@@ -378,9 +375,7 @@ function DocumentListContent({
 	)
 	// Hidden documents leave the selection for good, so they can't reappear in a later bulk action
 	if (visibleSelection !== selection) setSelection(visibleSelection)
-	let selectedDocs = docs.filter(doc =>
-		visibleSelection.ids.includes(doc.$jazz.id),
-	)
+	let selectedDocs = docs.filter(doc => visibleSelection.ids.includes(doc.id))
 
 	let virtualizer = useVirtualizer({
 		count: listItems.length,
@@ -398,7 +393,7 @@ function DocumentListContent({
 		let index = Number(rowElement.dataset.index)
 		let focusedItem = listItems[index]
 		let focusedDocId =
-			focusedItem?.type === "doc" ? focusedItem.doc.$jazz.id : currentDocId
+			focusedItem?.type === "doc" ? focusedItem.doc.id : currentDocId
 
 		if (event.key === "Escape" && visibleSelection.ids.length > 0) {
 			event.preventDefault()
@@ -416,7 +411,7 @@ function DocumentListContent({
 			return setSelection(
 				toggleSidebarSelection(
 					visibleSelection,
-					focusedItem.doc.$jazz.id,
+					focusedItem.doc.id,
 					currentDocId,
 				),
 			)
@@ -437,7 +432,7 @@ function DocumentListContent({
 				setSelection(
 					extendSidebarSelection(
 						visibleSelection,
-						target.doc.$jazz.id,
+						target.doc.id,
 						focusedDocId,
 						visibleDocIds,
 					),
@@ -496,7 +491,7 @@ function DocumentListContent({
 	}
 
 	function handleDocDragStart(event: DragEvent<HTMLElement>, doc: SidebarDoc) {
-		let isDraggingSelection = visibleSelection.ids.includes(doc.$jazz.id)
+		let isDraggingSelection = visibleSelection.ids.includes(doc.id)
 		let docsToDrag = (isDraggingSelection ? selectedDocs : [doc]).filter(
 			canEdit,
 		)
@@ -504,7 +499,7 @@ function DocumentListContent({
 		event.dataTransfer.clearData()
 		event.dataTransfer.setData(
 			sidebarDocumentsMimeType,
-			docsToDrag.map(draggedDoc => draggedDoc.$jazz.id).join(","),
+			docsToDrag.map(draggedDoc => draggedDoc.id).join(","),
 		)
 		event.dataTransfer.effectAllowed = "move"
 		setSidebarDragPreview(
@@ -548,7 +543,7 @@ function DocumentListContent({
 		event.preventDefault()
 		let docsToMove = draggedDocs
 		handleDocDragEnd()
-		void moveDocumentsToFolder(docsToMove, getDropPath(event.target)).then(
+		void moveDocumentsToFolder(db, docsToMove, getDropPath(event.target)).then(
 			result => notifySkippedDocuments(result, t),
 		)
 	}
@@ -738,12 +733,10 @@ function DocumentListContent({
 											doc={item.doc}
 											isActive={
 												visibleSelection.ids.length > 0
-													? visibleSelection.ids.includes(item.doc.$jazz.id)
-													: item.doc.$jazz.id === currentDocId
+													? visibleSelection.ids.includes(item.doc.id)
+													: item.doc.id === currentDocId
 											}
-											isSelected={visibleSelection.ids.includes(
-												item.doc.$jazz.id,
-											)}
+											isSelected={visibleSelection.ids.includes(item.doc.id)}
 											onClick={handleDocClick}
 											onDragStart={
 												canDrag && canEdit(item.doc)
@@ -754,7 +747,7 @@ function DocumentListContent({
 											onContextMenu={handleDocContextMenu}
 											bulkMenu={
 												selectedDocs.length > 1 &&
-												visibleSelection.ids.includes(item.doc.$jazz.id) ? (
+												visibleSelection.ids.includes(item.doc.id) ? (
 													<SidebarBulkMenuItems
 														docs={selectedDocs}
 														onOpenDialog={openBulkDialog}
@@ -896,6 +889,7 @@ function NewFolderDialog({
 	onCreate: (path: string) => Promise<void>
 	t: ReturnType<typeof useIntl>
 }) {
+	let { db } = useLibrary()
 	let [name, setName] = useState("")
 	let [error, setError] = useState("")
 	let [mode, setMode] = useState<"empty" | "move">("empty")
@@ -906,9 +900,7 @@ function NewFolderDialog({
 		folder => folder.toLowerCase() === path.toLowerCase(),
 	)
 	let selectableDocs = docs.filter(doc => !doc.deletedAt)
-	let selectedDocs = selectableDocs.filter(doc =>
-		selectedDocIds.has(doc.$jazz.id),
-	)
+	let selectedDocs = selectableDocs.filter(doc => selectedDocIds.has(doc.id))
 	let needsSelection = mode === "move" && selectedDocIds.size === 0
 
 	function handleOpenChange(nextOpen: boolean) {
@@ -937,7 +929,10 @@ function NewFolderDialog({
 		}
 
 		if (mode === "move") {
-			notifySkippedDocuments(await moveDocumentsToFolder(selectedDocs, path), t)
+			notifySkippedDocuments(
+				await moveDocumentsToFolder(db, selectedDocs, path),
+				t,
+			)
 		} else {
 			await onCreate(path)
 		}
@@ -1016,7 +1011,7 @@ function NewFolderDialog({
 									</p>
 								) : (
 									selectableDocs.map(doc => {
-										let docId = doc.$jazz.id
+										let docId = doc.id
 										return (
 											<label
 												key={docId}
@@ -1107,6 +1102,7 @@ function DocumentItem({
 	spaceGroupId?: string
 	t: ReturnType<typeof useIntl>
 }) {
+	let { db, ownerId } = useLibrary()
 	let [collaborateOpen, setCollaborateOpen] = useState(false)
 	let [deleteOpen, setDeleteOpen] = useState(false)
 	let [leaveOpen, setLeaveOpen] = useState(false)
@@ -1130,7 +1126,7 @@ function DocumentItem({
 	let path = showPath ? (doc.path ?? null) : null
 	let docGroup = getDocumentGroup(doc)
 	let isAdmin = docGroup?.myRole() === "admin"
-	let docId = doc.$jazz.id
+	let docId = doc.id
 	let canShare = canShareDocument()
 
 	// Build link props based on whether we're in a space context
@@ -1273,13 +1269,13 @@ function DocumentItem({
 									</ContextMenuItem>
 								</>
 							)}
-							<ContextMenuItem onClick={makeDownloadDocument(doc, title)}>
+							<ContextMenuItem onClick={makeDownloadDocument(db, doc, title)}>
 								<Download />
 								{t("doc.download")}
 							</ContextMenuItem>
 							{canShare && (
 								<ContextMenuItem
-									onClick={makeShareDocument(doc, title)}
+									onClick={makeShareDocument(db, doc, title)}
 									data-testid={testIds.doc.shareButton}
 								>
 									<NativeShareIcon />
@@ -1300,7 +1296,7 @@ function DocumentItem({
 								<Copy />
 								{t("doc.duplicate")}
 							</ContextMenuItem>
-							<ContextMenuItem onClick={makeTogglePin(doc)}>
+							<ContextMenuItem onClick={makeTogglePin(db, ownerId, doc)}>
 								<Pin />
 								{isPinned ? t("doc.unpin") : t("doc.pin")}
 							</ContextMenuItem>
@@ -1390,7 +1386,7 @@ function LeaveDocumentDialog({
 	onOpenChange: (open: boolean) => void
 	t: ReturnType<typeof useIntl>
 }) {
-	let me = useAccount(UserAccount, { resolve: { root: { documents: true } } })
+	let { db } = useLibrary()
 	return (
 		<ConfirmDialog
 			open={open}
@@ -1399,7 +1395,7 @@ function LeaveDocumentDialog({
 			description={t("doc.leaveDialog.description")}
 			confirmLabel={t("doc.leaveDialog.confirm")}
 			variant="destructive"
-			onConfirm={makeLeaveDocument(doc, me)}
+			onConfirm={makeLeaveDocument(db, doc)}
 		>
 			<LeaveDocumentPreview doc={doc} />
 		</ConfirmDialog>
@@ -1407,10 +1403,8 @@ function LeaveDocumentDialog({
 }
 
 function LeaveDocumentPreview({ doc }: { doc: SidebarDoc }) {
-	let loaded = useCoState(Document, doc.$jazz.id, {
-		resolve: { content: true },
-	})
-	let content = loaded?.$isLoaded ? loaded.content.toString() : ""
+	let { data } = useOne(app.documents.where({ id: doc.id }).select("content"))
+	let content = data?.content
 	if (!content) return null
 
 	return (
@@ -1430,16 +1424,14 @@ function DeletedDocumentItem({
 	searchQuery: string
 	t: ReturnType<typeof useIntl>
 }) {
+	let { db } = useLibrary()
 	let [deleteOpen, setDeleteOpen] = useState(false)
-	let me = useAccount(UserAccount, { resolve: { root: { documents: true } } })
 
 	let title = doc.title ?? "Untitled"
 	let daysLeft = doc.deletedAt ? getDaysUntilPermanentDelete(doc.deletedAt) : 0
 
 	async function handlePermanentDelete() {
-		if (me.$isLoaded) {
-			await permanentlyDeletePersonalDocument(doc, me)
-		}
+		await permanentlyDeletePersonalDocument(db, doc)
 	}
 
 	return (
@@ -1463,7 +1455,9 @@ function DeletedDocumentItem({
 				/>
 				<DropdownMenuContent align="center">
 					<DropdownMenuItem
-						onClick={() => doc.$jazz.set("deletedAt", undefined)}
+						onClick={() =>
+							db.update(app.documents, doc.id, { deletedAt: null })
+						}
 					>
 						<RotateCcw />
 						Restore
@@ -1509,7 +1503,9 @@ function TagsRow({
 
 		let measure = () => {
 			let containerWidth = container.offsetWidth
-			let children = Array.from(container.children) as HTMLElement[]
+			let children = Array.from(container.children).filter(
+				child => child instanceof HTMLElement,
+			)
 			let totalWidth = 0
 			let count = 0
 
@@ -1585,73 +1581,33 @@ function describeDropAction(
 	}
 }
 
-function makeTogglePin(doc: SidebarDoc) {
-	return () => toggleDocumentPinned(doc)
-}
-
-function makeDownloadDocument(doc: SidebarDoc, title: string) {
-	return async function handleDownloadDocument() {
-		let docAssets = await loadDocumentAssets(doc)
-		let loaded = await doc.$jazz.ensureLoaded({
-			resolve: { content: true, comments: { $each: { replies: true } } },
-		})
-		await exportDocument(
-			loaded.content?.toString() ?? "",
-			title,
-			docAssets.length > 0 ? docAssets : undefined,
-			getExportComments(loaded),
-		)
-	}
-}
-
-function makeShareDocument(doc: SidebarDoc, title: string) {
-	return async function handleShareDocument() {
-		let docAssets = await loadDocumentAssets(doc)
-		let loaded = await doc.$jazz.ensureLoaded({
-			resolve: { content: true, comments: { $each: { replies: true } } },
-		})
-		await shareDocument(
-			loaded.content?.toString() ?? "",
-			title,
-			docAssets.length > 0 ? docAssets : undefined,
-			getExportComments(loaded),
-		)
-	}
-}
-
-function makeLeaveDocument(
+function makeTogglePin(
+	db: ReturnType<typeof useDb>,
+	ownerId: string,
 	doc: SidebarDoc,
-	me: ReturnType<
-		typeof useAccount<typeof UserAccount, { root: { documents: true } }>
-	>,
 ) {
-	return async function handleLeaveDocument() {
-		if (!doc?.$isLoaded || !me.$isLoaded) return
-		await leavePersonalDocument(doc, me)
-	}
+	return () => setPinned(db, ownerId, doc, !doc.pinned)
 }
-
-async function loadDocumentAssets(
-	doc: co.loaded<typeof Document>,
-): Promise<ExportAsset[]> {
-	let loaded = await doc.$jazz.ensureLoaded({
-		resolve: {
-			assets: {
-				$each: assetContentResolve,
-			},
-		},
-	})
-	let docAssets: ExportAsset[] = []
-
-	if (loaded.assets?.$isLoaded) {
-		for (let asset of Array.from(loaded.assets)) {
-			if (!asset?.$isLoaded) continue
-			let blob = await serializeAsset(asset)
-			if (blob) docAssets.push({ id: asset.$jazz.id, name: asset.name, blob })
-		}
-	}
-
-	return docAssets
+function makeDownloadDocument(db: Database, doc: SidebarDoc, title: string) {
+	return async () =>
+		exportDocument(
+			(await readDocument(db, doc.id)).content,
+			title,
+			await getExportAssets(db, doc),
+			await exportComments(db, doc.id),
+		)
+}
+function makeShareDocument(db: Database, doc: SidebarDoc, title: string) {
+	return async () =>
+		shareDocument(
+			(await readDocument(db, doc.id)).content,
+			title,
+			await getExportAssets(db, doc),
+			await exportComments(db, doc.id),
+		)
+}
+function makeLeaveDocument(db: ReturnType<typeof useDb>, doc: SidebarDoc) {
+	return () => leavePersonalDocument(db, doc)
 }
 
 function buildListItems(

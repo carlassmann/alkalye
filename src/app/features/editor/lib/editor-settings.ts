@@ -1,11 +1,8 @@
 import { useEffect } from "react"
 import type { z } from "zod"
-import type { co } from "jazz-tools"
-import {
-	EditorSettings,
-	Settings,
-	DEFAULT_EDITOR_SETTINGS as DEFAULTS,
-} from "@/schema"
+import { useDb } from "jazz-tools/react"
+import { app, type SettingsRow } from "@/app/features/documents"
+import { EditorSettings, DEFAULT_EDITOR_SETTINGS as DEFAULTS } from "@/schema"
 
 export {
 	useEditorSettings,
@@ -15,7 +12,7 @@ export {
 export type { EditorSettingsData }
 
 type EditorSettingsData = z.infer<typeof EditorSettings>
-type SettingsCoMap = co.loaded<typeof Settings>
+type SettingsCoMap = SettingsRow
 
 function applyEditorSettings(settings: EditorSettingsData) {
 	let root = document.documentElement
@@ -39,20 +36,23 @@ if (typeof document !== "undefined" && DEFAULTS) {
 }
 
 function useEditorSettings(settings: SettingsCoMap | null | undefined) {
+	let db = useDb()
 	let editorSettings = { ...DEFAULTS, ...settings?.editor }
 
 	function setSettings(updates: Partial<EditorSettingsData>) {
 		if (!settings) return
-		settings.$jazz.set("editor", {
-			...DEFAULTS,
-			...settings.editor,
-			...updates,
+		db.update(app.settings, settings.id, {
+			editor: {
+				...DEFAULTS,
+				...settings.editor,
+				...updates,
+			},
 		})
 	}
 
 	function resetSettings() {
 		if (!settings) return
-		settings.$jazz.set("editor", DEFAULTS)
+		db.update(app.settings, settings.id, { editor: DEFAULTS })
 	}
 
 	useEffect(() => {

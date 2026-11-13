@@ -1,8 +1,10 @@
-import { z } from "jazz-tools"
+import { z } from "zod"
+import { app } from "@/jazz/schema"
+import {
+	createDocument,
+	type Database,
+} from "@/app/features/documents/lib/library"
 import { ThemeType, ThemePreset } from "./schema"
-import { Group, co } from "jazz-tools"
-import { Document, CommentThread } from "@/app/features/documents/lib/schema"
-import { createDocumentMetadata } from "@/app/features/documents/lib/metadata"
 import {
 	parseFrontmatter,
 	setFrontmatterField,
@@ -14,8 +16,6 @@ import {
 	serializePortableAssetFence,
 	type PortableAsset,
 } from "./portable-assets"
-import { UserAccount } from "@/schema"
-
 export {
 	withThemeSourceMetadata,
 	ThemeSourceMetadataSchema,
@@ -26,7 +26,6 @@ export {
 	validateThemeTemplate,
 	serializeThemeSource,
 	createThemeSourceDocument,
-	buildThemeSourceDocument,
 	createThemeSourceDocumentContent,
 	syncThemeFromSource,
 	getThemeSourceId,
@@ -79,8 +78,6 @@ type ThemeSourceError = {
 type ThemeSourceOptions = {
 	validateTemplate?: (html: string) => string | null
 }
-
-let latestSourceContent = new Map<string, string>()
 
 function parseThemeSource(
 	content: string,
@@ -286,26 +283,6 @@ function hasThemeDefinition(source: ThemeSource): boolean {
 	)
 }
 
-function buildThemeSourceDocument(
-	account: co.loaded<typeof UserAccount>,
-	params: { themeId: string; name: string; source: string },
-) {
-	let content = createThemeSourceDocumentContent(params)
-	let group = Group.create({ owner: account })
-	let now = new Date()
-	return Document.create(
-		{
-			version: 1,
-			content: co.plainText().create(content, group),
-			comments: co.list(CommentThread).create([], group),
-			...createDocumentMetadata(content, now),
-			createdAt: now,
-			updatedAt: now,
-		},
-		group,
-	)
-}
-
 function isThemeFence(
 	info: string,
 	tickCount: number,
@@ -393,177 +370,48 @@ function createThemeSourceDocumentContent(params: {
 }
 
 async function createThemeSourceDocument(
-	account: co.loaded<typeof UserAccount>,
+	db: Database,
+	ownerId: string,
 	params: { themeId: string; name: string; source: string },
 ) {
-	let loaded = await account.$jazz.ensureLoaded({
-		resolve: { root: { documents: true } },
-	})
-	if (!loaded.root?.documents?.$isLoaded)
-		throw new Error("Personal documents are not loaded")
-
-	let document = buildThemeSourceDocument(account, params)
-	loaded.root.documents.$jazz.push(document)
-	return document
+	return createDocument(db, ownerId, createThemeSourceDocumentContent(params))
 }
-
 async function syncThemeFromSource(
-	account: co.loaded<typeof UserAccount>,
+	db: Database,
 	documentId: string,
 	content: string,
 ): Promise<boolean> {
-	latestSourceContent.set(documentId, content)
-	try {
-		let sourceId = getThemeSourceId(content)
-		if (!sourceId) {
-			return false
-		}
-		let parsed = parseThemeSource(content)
-		if (parsed.errors.length > 0) {
-			return false
-		}
-
-		let loaded = await loadThemes(account)
-		if (!loaded) {
-			return false
-		}
-		if (latestSourceContent.get(documentId) !== content) return false
-		let themes = loaded.root?.themes
-		if (!themes?.$isLoaded) {
-			return false
-		}
-		let theme = Array.from(themes).find(
-			candidate =>
-				candidate?.$isLoaded &&
-				candidate.$jazz.id === sourceId &&
-				candidate.sourceDocId === documentId,
-		)
-		if (!theme?.$isLoaded || !theme.css?.$isLoaded) {
-			return false
-		}
-
-		let css = sanitizeCss(parsed.css).sanitized
-		let documentTemplate = parsed.documentTemplate
-			? sanitizeHtml(parsed.documentTemplate).sanitized
-			: undefined
-		let slideTemplate = parsed.slideTemplate
-			? sanitizeHtml(parsed.slideTemplate).sanitized
-			: undefined
-		let currentCss = theme.css.toString()
-		let changed = currentCss !== css
-		if (changed) {
-			if (getChangedCssLength(currentCss, css) > 2_000) {
-				theme.$jazz.set("css", co.plainText().create(css, theme.$jazz.owner))
-			} else {
-				theme.css.$jazz.applyDiff(css)
-			}
-		}
-		let currentTemplate = theme.template?.$isLoaded
-			? theme.template.toString()
-			: undefined
-		if (currentTemplate !== documentTemplate) {
-			changed = true
-			theme.$jazz.set(
-				"template",
-				documentTemplate
-					? co.plainText().create(documentTemplate, theme.$jazz.owner)
-					: undefined,
-			)
-		}
-		let currentSlideTemplate = theme.slideTemplate?.$isLoaded
-			? theme.slideTemplate.toString()
-			: undefined
-		if (currentSlideTemplate !== slideTemplate) {
-			changed = true
-			theme.$jazz.set(
-				"slideTemplate",
-				slideTemplate
-					? co.plainText().create(slideTemplate, theme.$jazz.owner)
-					: undefined,
-			)
-		}
-		if (parsed.metadata) {
-			let metadata = parsed.metadata
-			if (theme.thumbnailDataUrl !== metadata.thumbnail) {
-				theme.$jazz.set("thumbnailDataUrl", metadata.thumbnail)
-				changed = true
-			}
-			if (theme.thumbnail) {
-				theme.$jazz.set("thumbnail", undefined)
-				changed = true
-			}
-			if (metadata.name && theme.name !== metadata.name) {
-				theme.$jazz.set("name", metadata.name)
-				changed = true
-			}
-			if (metadata.type && theme.type !== metadata.type) {
-				theme.$jazz.set("type", metadata.type)
-				changed = true
-			}
-			let presets = metadata.presets
-				? JSON.stringify(metadata.presets)
-				: undefined
-			if (theme.presets !== presets) {
-				theme.$jazz.set("presets", presets)
-				changed = true
-			}
-			if (theme.author !== metadata.author) {
-				theme.$jazz.set("author", metadata.author)
-				changed = true
-			}
-			if (theme.description !== metadata.description) {
-				theme.$jazz.set("description", metadata.description)
-				changed = true
-			}
-		}
-		if (changed) theme.$jazz.set("updatedAt", new Date())
-		return true
-	} finally {
-		clearLatestSourceContent(documentId, content)
-	}
+	let id = getThemeSourceId(content)
+	if (!id) return false
+	let parsed = parseThemeSource(content)
+	if (parsed.errors.length) return false
+	let theme = await db.one(app.themes.where({ id, sourceDocId: documentId }))
+	if (!theme) return false
+	let metadata = parsed.metadata
+	await db
+		.update(app.themes, id, {
+			css: sanitizeCss(parsed.css).sanitized,
+			template: parsed.documentTemplate
+				? sanitizeHtml(parsed.documentTemplate).sanitized
+				: null,
+			slideTemplate: parsed.slideTemplate
+				? sanitizeHtml(parsed.slideTemplate).sanitized
+				: null,
+			...(metadata
+				? {
+						name: metadata.name ?? theme.name,
+						author: metadata.author ?? null,
+						description: metadata.description ?? null,
+						type: metadata.type ?? theme.type,
+						presets: metadata.presets ?? null,
+						thumbnailDataUrl: metadata.thumbnail ?? null,
+					}
+				: {}),
+			updatedAt: new Date(),
+		})
+		.wait({ tier: "local" })
+	return true
 }
-
-function getChangedCssLength(currentCss: string, css: string) {
-	let prefixLength = 0
-	while (
-		prefixLength < currentCss.length &&
-		prefixLength < css.length &&
-		currentCss[prefixLength] === css[prefixLength]
-	) {
-		prefixLength++
-	}
-
-	let suffixLength = 0
-	while (
-		suffixLength < currentCss.length - prefixLength &&
-		suffixLength < css.length - prefixLength &&
-		currentCss.at(-suffixLength - 1) === css.at(-suffixLength - 1)
-	) {
-		suffixLength++
-	}
-
-	return Math.max(currentCss.length, css.length) - prefixLength - suffixLength
-}
-
-function clearLatestSourceContent(documentId: string, content: string) {
-	if (latestSourceContent.get(documentId) === content) {
-		latestSourceContent.delete(documentId)
-	}
-}
-
-async function loadThemes(account: co.loaded<typeof UserAccount>) {
-	let loaded = await account.$jazz.ensureLoaded({
-		resolve: {
-			root: {
-				themes: {
-					$each: { css: true, template: true, slideTemplate: true },
-				},
-			},
-		},
-	})
-	return loaded.$isLoaded ? loaded : null
-}
-
 function bindThemeSource(content: string, themeId: string): string {
 	return setFrontmatterField(content, "theme-source", themeId)
 }

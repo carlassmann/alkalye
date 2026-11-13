@@ -1,4 +1,4 @@
-import type { EditorChange } from "@/app/features/documents"
+import type { MarkdownSync } from "@/app/features/documents"
 import { IconTransition } from "@/app/components/ui/icon-transition"
 import {
 	useImperativeHandle,
@@ -55,7 +55,6 @@ import {
 	selectNextOccurrence,
 } from "../lib/multiple-selections"
 import { bracketMatching, syntaxTree } from "@codemirror/language"
-import { Image as JazzImage } from "jazz-tools/react"
 import { editorBaseExtensions, richMarkdownExtensions } from "../lib/extensions"
 import {
 	applyContentPreservingSelection,
@@ -207,7 +206,9 @@ function spellcheckForDocument(
 interface MarkdownEditorProps {
 	// Core
 	value: string
-	onChange: (readContent: () => string, change: EditorChange) => void
+	syncUpdate?: import("@/app/features/documents/lib/codemirror-sync").TextUpdate
+	sync?: MarkdownSync
+	onChange?: (content: string) => void
 
 	// Cursor/focus callbacks
 	onCursorChange?: (from: number, to: number, selectionCount: number) => void
@@ -335,6 +336,8 @@ function MarkdownEditor(
 ) {
 	let {
 		value,
+		sync,
+		syncUpdate,
 		onChange,
 		onCursorChange,
 		onFocus,
@@ -497,6 +500,8 @@ function MarkdownEditor(
 
 	let initRef = useRef({
 		value,
+		sync,
+		syncUpdate,
 		placeholder,
 		readOnly,
 		spellcheck,
@@ -716,11 +721,7 @@ function MarkdownEditor(
 							transaction.annotation(externalContentChange),
 						)
 					) {
-						callbacksRef.current.onChange(() => update.state.doc.toString(), {
-							changes: update.changes,
-							before: update.startState.doc,
-							after: update.state.doc,
-						})
+						callbacksRef.current.onChange(update.state.doc.toString())
 					}
 					// Keep in-flight drop targets aligned with the live doc so
 					// images dropped while uploads await still land at the
@@ -753,6 +754,7 @@ function MarkdownEditor(
 			orderedListRenumbering,
 			fileDropCursor,
 			...(initRef.current.externalExtensions ?? []),
+			...(initRef.current.sync ? [initRef.current.sync.extension] : []),
 		]
 
 		extensions.push(
@@ -799,6 +801,7 @@ function MarkdownEditor(
 			parent: containerRef.current,
 		})
 
+		initRef.current.sync?.attach(editorView)
 		setView(editorView)
 
 		function handleScrollerPointerDown(event: PointerEvent) {
@@ -1014,12 +1017,16 @@ function MarkdownEditor(
 	useLayoutEffect(() => {
 		if (!view) return
 
+		if (sync) {
+			sync.apply(value, syncUpdate)
+			return
+		}
 		let currentContent = view.state.doc.toString()
 		if (value !== currentContent && value !== lastExternalValue.current) {
 			applyContentPreservingSelection(view, value)
 		}
 		lastExternalValue.current = value
-	}, [value, view])
+	}, [value, view, sync, syncUpdate])
 
 	useEffect(() => {
 		if (view) {
@@ -1750,8 +1757,9 @@ function MediaPreviewContent({
 	// Image asset
 	if ((asset.type === "image" || asset.type === "tldraw") && asset.previewId) {
 		return (
-			<JazzImage
-				imageId={asset.previewId}
+			<img
+				src={asset.previewId}
+				alt={preview.alt}
 				className={cn(
 					"w-full object-contain",
 					expanded ? "h-full" : "max-h-[70vh]",

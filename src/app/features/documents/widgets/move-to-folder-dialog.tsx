@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Folder, Plus, Check } from "lucide-react"
 import { Combobox } from "@base-ui/react/combobox"
-import { co } from "jazz-tools"
+import { type LibraryDocument, useLibrary } from "../lib/library"
 import {
 	Dialog,
 	DialogContent,
@@ -10,7 +10,6 @@ import {
 	DialogTitle,
 } from "@/app/components/ui/dialog"
 import { Button } from "@/app/components/ui/button"
-import { Document } from "@/schema"
 import { cn } from "@/app/lib/cn"
 import { useIntl } from "@/shared/intl/setup"
 import { moveDocumentsToFolder } from "../lib/folders"
@@ -18,7 +17,7 @@ import { notifySkippedDocuments } from "./sidebar-bulk-actions"
 
 export { MoveToFolderDialog }
 
-type SidebarDoc = co.loaded<typeof Document>
+type SidebarDoc = LibraryDocument
 
 interface MoveToFolderDialogProps {
 	docs: SidebarDoc[]
@@ -33,6 +32,7 @@ function MoveToFolderDialog({
 	open: controlledOpen,
 	onOpenChange,
 }: MoveToFolderDialogProps) {
+	let { db } = useLibrary()
 	let t = useIntl()
 	let [internalOpen, setInternalOpen] = useState(false)
 	let open = controlledOpen ?? internalOpen
@@ -51,7 +51,7 @@ function MoveToFolderDialog({
 		!existingFolders.some(f => f.toLowerCase() === inputValue.toLowerCase())
 
 	async function handleMoveToFolder(newPath: string | null) {
-		notifySkippedDocuments(await moveDocumentsToFolder(docs, newPath), t)
+		notifySkippedDocuments(await moveDocumentsToFolder(db, docs, newPath), t)
 	}
 
 	function handleSelect(value: string | null) {

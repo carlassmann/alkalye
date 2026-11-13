@@ -1,14 +1,19 @@
 import { defineConfig, envField } from "astro/config"
 import react from "@astrojs/react"
 import vercel from "@astrojs/vercel"
+import node from "@astrojs/node"
 import pwa from "@vite-pwa/astro"
-import tailwindcss from "@tailwindcss/vite"
 import { tanstackRouter } from "@tanstack/router-plugin/vite"
+import tailwindcss from "@tailwindcss/vite"
+import { jazzDevTransport } from "./scripts/jazz-dev-transport"
 import { criticalAppPreload } from "./scripts/critical-app-preload"
 
 export default defineConfig({
 	site: "https://www.alkalye.com",
-	adapter: vercel(),
+	adapter:
+		process.env.ALKALYE_LOCAL_PREVIEW === "1"
+			? node({ mode: "standalone" })
+			: vercel(),
 	security: { checkOrigin: false },
 	devToolbar: { enabled: false },
 	// Omny currently renders its provider privacy links relative to the host site.
@@ -28,6 +33,13 @@ export default defineConfig({
 		routing: { prefixDefaultLocale: false },
 	},
 	vite: {
+		worker: {
+			rollupOptions: {
+				output: { assetFileNames: "_astro/[name].[hash][extname]" },
+			},
+		},
+		optimizeDeps: { exclude: ["jazz-tools", "jazz-wasm"] },
+		ssr: { external: ["jazz-napi", "jazz-tools"] },
 		server: { allowedHosts: getWorkAllowedHosts() },
 		build: {
 			rollupOptions: {
@@ -42,10 +54,12 @@ export default defineConfig({
 			},
 		},
 		plugins: [
+			jazzDevTransport(),
 			tanstackRouter({
 				target: "react",
 				routesDirectory: "./src/app/routes",
 				generatedRouteTree: "./src/app/routeTree.gen.ts",
+				autoCodeSplitting: true,
 			}),
 			tailwindcss(),
 		] as any,
@@ -73,7 +87,7 @@ export default defineConfig({
 				name: "Alkalye",
 				short_name: "Alkalye",
 				description:
-					"A beautiful markdown editor, on the web. E2E encrypted, realtime collaboration and sync, great on desktop and mobile.",
+					"A beautiful markdown editor, on the web. Realtime collaboration and sync, great on desktop and mobile.",
 				start_url: "/app/",
 				display: "standalone",
 				background_color: "#ffffff",
@@ -105,16 +119,20 @@ export default defineConfig({
 				],
 			},
 			workbox: {
-				globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2,woff,ttf}"],
+				globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2,woff,ttf,wasm}"],
 				// The update prompt links to /changelog, so it must always come
 				// from the network: a precached copy would describe the build
 				// the reader is already running.
 				// Passing globIgnores replaces workbox's default, which must be
 				// kept or every node_modules file is swept into the precache.
-				globIgnores: ["**/node_modules/**/*", "**/changelog/index.html"],
+				globIgnores: [
+					"**/node_modules/**/*",
+					"**/changelog/index.html",
+					"**/jazz-broker-worker.*.js",
+				],
 				navigateFallback: "app",
 				navigateFallbackAllowlist: [/^\/app(?:\/.*)?(?:\?.*)?$/],
-				maximumFileSizeToCacheInBytes: 5.5 * 1024 * 1024,
+				maximumFileSizeToCacheInBytes: 15 * 1024 * 1024,
 			},
 		}),
 	],
@@ -129,10 +147,6 @@ export default defineConfig({
 				context: "client",
 				access: "public",
 				optional: true,
-			}),
-			PUBLIC_JAZZ_SYNC_SERVER: envField.string({
-				context: "client",
-				access: "public",
 			}),
 			PUBLIC_TLDRAW_LICENSE_KEY: envField.string({
 				context: "client",
