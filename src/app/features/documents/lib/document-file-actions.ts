@@ -1,3 +1,5 @@
+import { sharingRequest } from "@/app/features/sharing"
+import { createSpaceDocument } from "@/app/features/spaces"
 import type { RefObject } from "react"
 import type { useNavigate } from "@tanstack/react-router"
 import { unfoldEffect } from "@codemirror/language"
@@ -234,29 +236,45 @@ function makeDelete(
 	db: Database,
 	doc: LoadedDocument,
 	navigate: ReturnType<typeof useNavigate>,
-	_spaceId?: string,
+	spaceId?: string,
 ) {
 	return function handleDelete() {
 		watchWrite(db.update(app.documents, doc.id, { deletedAt: new Date() }))
-		void navigate({ to: "/" })
+		void (spaceId
+			? navigate({ to: "/spaces/$spaceId", params: { spaceId } })
+			: navigate({ to: "/" }))
 	}
 }
 
-function makeLeave(..._args: unknown[]) {
-	// v2-todo(sharing): membership removal.
-	return () => {}
+function makeLeave(
+	db: Database,
+	doc: LoadedDocument,
+	navigate: ReturnType<typeof useNavigate>,
+) {
+	return async function handleLeave() {
+		await sharingRequest(db, "leave", { documentId: doc.id })
+		void navigate({ to: "/" })
+	}
 }
 
 function makeDuplicate(
 	db: Database,
 	doc: LoadedDocument,
 	ownerId: string,
-	_spaceId: string | undefined,
+	spaceId: string | undefined,
 	navigate: ReturnType<typeof useNavigate>,
 ) {
 	return async function handleDuplicate() {
-		let copy = await createDocument(db, ownerId, addCopyToTitle(doc.content))
-		void navigate({ to: "/doc/$id", params: { id: copy.id } })
+		let content = addCopyToTitle(doc.content)
+		let copy = spaceId
+			? await createSpaceDocument(db, ownerId, spaceId, content)
+			: await createDocument(db, ownerId, content)
+		void (spaceId
+			? navigate({
+					to: "/spaces/$spaceId/doc/$id",
+					params: { spaceId, id: copy.id },
+				})
+			: navigate({ to: "/doc/$id", params: { id: copy.id } }))
 	}
 }
 

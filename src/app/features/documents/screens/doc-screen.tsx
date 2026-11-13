@@ -1,5 +1,7 @@
 import { toast } from "sonner"
 import { SidebarAssets } from "@/app/features/assets"
+import { useSpaces, createSpaceDocument } from "@/app/features/spaces"
+import { usePresence } from "@/app/features/sharing"
 import { SpaceSelector } from "@/app/features/spaces"
 import { SidebarCollaboration } from "@/app/features/sharing"
 import { SidebarImportExport } from "@/app/features/import-export"
@@ -57,7 +59,7 @@ import { testIds } from "@/app/lib/test-ids"
 
 export { DocScreen, PersonalDocumentSidebar }
 
-function DocScreen({ id }: { id: string }) {
+function DocScreen({ id, spaceId }: { id: string; spaceId?: string }) {
 	let { data: row, isLoading } = useOne(app.documents.where({ id }))
 	let { documents } = useLibrary()
 	let doc = documents.find(doc => doc.id === id)
@@ -66,26 +68,27 @@ function DocScreen({ id }: { id: string }) {
 	if (doc.deletedAt) return <DocumentNotFound />
 	return (
 		<SidebarProvider>
-			<PersonalDocumentSidebar docId={id} />
+			{spaceId ? (
+				<SpaceDocumentSidebar key={spaceId} docId={id} spaceId={spaceId} />
+			) : (
+				<PersonalDocumentSidebar docId={id} />
+			)}
 			<DocumentEditor key={id} doc={doc} />
 		</SidebarProvider>
 	)
 }
 
 function DocumentEditor({ doc }: { doc: LibraryDocument }) {
-	let { db, ownerId, documents, settings, grants } = useLibrary()
-	useTrackLastOpened(ownerId, doc.id)
+	let { db, ownerId, documents, entries, settings } = useLibrary()
+	useTrackLastOpened(ownerId, doc.id, doc.spaceId ?? undefined)
 	let t = useIntl()
 	let navigate = useNavigate()
 	let editor = useMarkdownEditorRef()
 	let { toggleLeft, toggleRight, isMobile, setRightOpenMobile } = useSidebar()
 	let { theme, setTheme } = useTheme()
 	let [selectionCount, setSelectionCount] = useState(1)
-	let readOnly =
-		doc.ownerId !== ownerId &&
-		!grants.some(
-			grant => grant.documentId === doc.id && grant.role !== "reader",
-		)
+	let readOnly = !doc.canEdit
+	let presence = usePresence({ doc, editorRef: editor })
 	useEditorSettings(settings)
 	let [binding] = useState(() =>
 		codeMirrorSync(doc.content, (content, editedFrom) => {
@@ -99,23 +102,41 @@ function DocumentEditor({ doc }: { doc: LibraryDocument }) {
 	useEffect(() => {
 		document.body.dataset.alkalyeReady = "true"
 		window.__alkalyeReady = true
-		window.__alkalyeReadyRoute = "personal-doc"
+		window.__alkalyeReadyRoute = doc.spaceId ? "space-doc" : "personal-doc"
 		return () => {
 			binding.destroy()
 			document.body.dataset.alkalyeReady = "false"
 			window.__alkalyeReady = false
 		}
-	}, [binding])
+	}, [binding, doc.spaceId])
 	let wikiDocs = documents
-		.filter(doc => !doc.deletedAt)
+		.filter(
+			target =>
+				!target.deletedAt &&
+				(doc.spaceId
+					? target.spaceId === doc.spaceId
+					: !target.spaceId &&
+						(target.ownerId === ownerId ||
+							entries.some(entry => entry.documentId === target.id))),
+		)
 		.map(doc => ({ id: doc.id, title: doc.title }))
 	async function createLinkedDocument(title: string) {
-		return (await createDocument(db, ownerId, "# " + title + "\n\n")).id
+		let content = "# " + title + "\n\n"
+		return (
+			doc.spaceId
+				? await createSpaceDocument(db, ownerId, doc.spaceId, content)
+				: await createDocument(db, ownerId, content)
+		).id
 	}
 	return (
 		<>
 			<title>{doc.title}</title>
-			<DocumentCommands doc={doc} editor={editor} documents={wikiDocs} />
+			<DocumentCommands
+				spaceId={doc.spaceId ?? undefined}
+				doc={doc}
+				editor={editor}
+				documents={wikiDocs}
+			/>
 			<div className="markdown-editor flex-1" data-testid={testIds.doc.editor}>
 				<MarkdownEditor
 					ref={editor}
@@ -136,7 +157,11 @@ function DocumentEditor({ doc }: { doc: LibraryDocument }) {
 						else void navigate({ to: "/doc/$id", params: { id } })
 					}}
 					onCreateDocument={createLinkedDocument}
-					onCursorChange={(_from, _to, count) => setSelectionCount(count ?? 1)}
+					extensions={[presence.extension]}
+					onCursorChange={(from, to, count) => {
+						setSelectionCount(count ?? 1)
+						presence.updateCursor(from, to)
+					}}
 					autoSortTasks={settings?.editor.autoSortTasks}
 					spellcheck={settings?.editor.spellcheck ?? true}
 					spellcheckLanguage={settings?.editor.spellcheckLanguage}
@@ -205,7 +230,11 @@ function DocumentEditor({ doc }: { doc: LibraryDocument }) {
 								</SidebarMenuButton>
 							</SidebarMenuItem>
 							<SidebarSeparator />
-							<SidebarFileMenu doc={doc} editor={editor} />
+							<SidebarFileMenu
+								doc={doc}
+								editor={editor}
+								spaceId={doc.spaceId ?? undefined}
+							/>
 							<SidebarEditMenu
 								editor={editor}
 								disabled={readOnly}
@@ -235,7 +264,7 @@ function DocumentEditor({ doc }: { doc: LibraryDocument }) {
 }
 
 function PersonalDocumentSidebar({ docId }: { docId: string }) {
-	let { db, ownerId, documents, isLoading } = useLibrary()
+	let { db, ownerId, documents, entries, isLoading } = useLibrary()
 	let navigate = useNavigate()
 	let t = useIntl()
 	let { isMobile, setLeftOpenMobile } = useSidebar()
@@ -272,7 +301,11 @@ function PersonalDocumentSidebar({ docId }: { docId: string }) {
 		>
 			<SpaceSelector />
 			<SidebarDocumentList
-				docs={documents.filter(doc => !doc.spaceId)}
+				docs={documents.filter(
+					doc =>
+						(!doc.spaceId && doc.ownerId === ownerId) ||
+						entries.some(entry => entry.documentId === doc.id),
+				)}
 				currentDocId={docId}
 				isLoading={isLoading}
 				onDocClick={closeSidebar}
@@ -302,5 +335,71 @@ function SettingsButton() {
 		>
 			<Settings />
 		</Button>
+	)
+}
+
+function SpaceDocumentSidebar({
+	docId,
+	spaceId,
+}: {
+	docId: string
+	spaceId: string
+}) {
+	let { db, ownerId, documents, isLoading } = useLibrary()
+	let space = useSpaces().find(space => space.id === spaceId)
+	let navigate = useNavigate()
+	let t = useIntl()
+	let { isMobile, setLeftOpenMobile } = useSidebar()
+	function closeSidebar() {
+		if (isMobile) setLeftOpenMobile(false)
+	}
+	async function newDocument(content = "") {
+		let doc = await createSpaceDocument(db, ownerId, spaceId, content)
+		closeSidebar()
+		void navigate({
+			to: "/spaces/$spaceId/doc/$id",
+			params: { spaceId, id: doc.id },
+		})
+	}
+	return (
+		<ListSidebar
+			header={
+				<>
+					<SidebarImportExport />
+					<Button
+						size="sm"
+						data-testid={testIds.doc.newButton}
+						disabled={!space?.role || space.role === "reader"}
+						nativeButton={false}
+						render={
+							<Link to="/new" search={{ spaceId }} onClick={closeSidebar} />
+						}
+					>
+						<Plus />
+						{t("doc.new")}
+					</Button>
+				</>
+			}
+			footer={<SidebarSyncStatus />}
+		>
+			<SpaceSelector />
+			<SidebarDocumentList
+				docs={documents.filter(doc => doc.spaceId === spaceId)}
+				currentDocId={docId}
+				spaceId={spaceId}
+				isLoading={isLoading}
+				onDocClick={closeSidebar}
+				onDuplicate={doc => void newDocument(addCopyToTitle(doc.content))}
+				onDelete={async doc => {
+					await db
+						.update(app.documents, doc.id, { deletedAt: new Date() })
+						.wait({ tier: "local" })
+					if (doc.id === docId)
+						void navigate({ to: "/spaces/$spaceId", params: { spaceId } })
+				}}
+				onCreateFolder={path => newDocument(makeFolderDocumentContent(path))}
+				onImport={async () => {}}
+			/>
+		</ListSidebar>
 	)
 }

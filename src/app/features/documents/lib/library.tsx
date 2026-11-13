@@ -1,6 +1,7 @@
+import type { JazzClient } from "jazz-tools/client"
 import { toast } from "sonner"
 import { createContext, useContext, useEffect } from "react"
-import { useAll, useDb, useSession } from "jazz-tools/react"
+import { useAll, useDb, useSession, useJazzSession } from "jazz-tools/react"
 import { schema } from "jazz-tools"
 import { app, type DocumentRow } from "@/jazz/schema"
 import { DEFAULT_EDITOR_SETTINGS } from "@/jazz/value-types"
@@ -36,6 +37,7 @@ type LibraryDocument = Omit<DocumentRow, "deletedAt"> & {
 	pinned: boolean
 	canEdit: boolean
 	canAdmin: boolean
+	shared?: boolean
 }
 type Library = ReturnType<typeof useLibraryData>
 let LibraryContext = createContext<Library | null>(null)
@@ -57,30 +59,66 @@ function useLibrary() {
 
 function useLibraryData() {
 	let db = useDb()
+	let auth = useJazzSession<JazzClient>()
+	useEffect(() => {
+		// Alpha.61's account-handle path omits this seed; API identity proofs need it.
+		db.initLocalFirstAuth(
+			auth.exportDeviceKey().replace(/^jazz-auth-v1:/, ""),
+			60,
+			false,
+		)
+	}, [db, auth])
 	let ownerId = useSession()?.user
 	if (!ownerId) throw new Error("Account missing")
-	let { data: rows = [], isLoading } = useAll(app.documents.where({ ownerId }))
+	let { data: rows = [], isLoading } = useAll(app.documents)
 	let { data: entries = [] } = useAll(app.userDocuments.where({ ownerId }))
 	let { data: preferences = [], isLoading: settingsLoading } = useAll(
 		app.settings.where({ ownerId }),
 	)
-	let { data: profiles = [] } = useAll(app.profiles.where({ ownerId }))
-	let { data: grants = [] } = useAll(
-		app.documentGrants.where({ accountId: ownerId }),
-	)
+	let { data: profiles = [] } = useAll(app.profiles)
+	let { data: grants = [] } = useAll(app.documentGrants)
 	useEffect(() => db.onMutationError(error => toast.error(error.reason)), [db])
+	let { data: spaces = [] } = useAll(app.spaces)
+	let { data: members = [] } = useAll(app.spaceMembers)
 	let settings = preferences[0]
 	let documents: LibraryDocument[] = rows.map(row => ({
 		...row,
+		shared: grants.some(
+			grant => grant.documentId === row.id && grant.accountId !== row.ownerId,
+		),
 		canEdit:
 			row.ownerId === ownerId ||
+			spaces.some(
+				space => space.id === row.spaceId && space.ownerId === ownerId,
+			) ||
+			members.some(
+				member =>
+					member.spaceId === row.spaceId &&
+					member.accountId === ownerId &&
+					member.role !== "reader",
+			) ||
 			grants.some(
-				grant => grant.documentId === row.id && grant.role !== "reader",
+				grant =>
+					grant.accountId === ownerId &&
+					grant.documentId === row.id &&
+					grant.role !== "reader",
 			),
 		canAdmin:
 			row.ownerId === ownerId ||
+			spaces.some(
+				space => space.id === row.spaceId && space.ownerId === ownerId,
+			) ||
+			members.some(
+				member =>
+					member.spaceId === row.spaceId &&
+					member.accountId === ownerId &&
+					member.role === "admin",
+			) ||
 			grants.some(
-				grant => grant.documentId === row.id && grant.role === "admin",
+				grant =>
+					grant.accountId === ownerId &&
+					grant.documentId === row.id &&
+					grant.role === "admin",
 			),
 		deletedAt: row.deletedAt ?? undefined,
 		path: getPath(row.content),
@@ -105,8 +143,11 @@ function useLibraryData() {
 		documents,
 		entries,
 		settings,
-		profile: profiles[0],
+		profile: profiles.find(profile => profile.ownerId === ownerId),
+		profiles,
 		grants,
+		spaces,
+		members,
 		isLoading,
 	}
 }

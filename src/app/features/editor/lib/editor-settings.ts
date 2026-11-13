@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import type { z } from "zod"
 import { useDb } from "jazz-tools/react"
-import { app, type SettingsRow } from "@/app/features/documents/lib/library"
+import { app, type SettingsRow } from "@/app/features/documents"
 import { EditorSettings, DEFAULT_EDITOR_SETTINGS as DEFAULTS } from "@/schema"
 
 export {

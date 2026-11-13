@@ -1,3 +1,4 @@
+import { leavePersonalDocument } from "@/app/features/sharing"
 import {
 	useState,
 	useRef,
@@ -1376,7 +1377,7 @@ function LeaveDocumentDialog({
 	onOpenChange: (open: boolean) => void
 	t: ReturnType<typeof useIntl>
 }) {
-	useLibrary()
+	let { db } = useLibrary()
 	return (
 		<ConfirmDialog
 			open={open}
@@ -1385,7 +1386,7 @@ function LeaveDocumentDialog({
 			description={t("doc.leaveDialog.description")}
 			confirmLabel={t("doc.leaveDialog.confirm")}
 			variant="destructive"
-			onConfirm={makeLeaveDocument(doc)}
+			onConfirm={makeLeaveDocument(db, doc)}
 		>
 			<LeaveDocumentPreview doc={doc} />
 		</ConfirmDialog>
@@ -1583,9 +1584,8 @@ function makeDownloadDocument(doc: SidebarDoc, title: string) {
 function makeShareDocument(doc: SidebarDoc, title: string) {
 	return () => shareDocument(doc.content, title)
 }
-function makeLeaveDocument(_doc: SidebarDoc) {
-	// v2-todo(sharing): trusted leave operation.
-	return () => {}
+function makeLeaveDocument(db: ReturnType<typeof useDb>, doc: SidebarDoc) {
+	return () => leavePersonalDocument(db, doc)
 }
 
 function buildListItems(
