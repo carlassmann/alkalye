@@ -35,6 +35,7 @@ async function installObservers(context: BrowserContext) {
 }
 
 async function instrument(page: Page, cpu: number) {
+	await page.bringToFront()
 	let cdp = await page.context().newCDPSession(page)
 	await cdp.send("Network.enable")
 	await cdp.send("Network.setCacheDisabled", { cacheDisabled: true })

@@ -95,3 +95,7 @@ credentials move out of localStorage, replace credentials-only context creation;
 never copy IndexedDB into cold-load contexts. Keep every content assertion.
 
 written with gpt-6.1-sol in T3 Code (Codex)
+
+The adapter activates pages before navigation and measurement. Classic defers
+subscriptions until requestAnimationFrame; a background page can otherwise keep
+showing the previous document. This matters when running two headless clients.

@@ -93,6 +93,7 @@ async function readContent(page: Page) {
 }
 
 async function openDocument(page: Page, target: { id: string; title: string }) {
+	await page.bringToFront()
 	await resolveDocument(page, target.title)
 	await page
 		.locator(`[data-doc-id="${target.id}"] a`)

@@ -148,6 +148,7 @@ try {
 					await fresh.close()
 				}
 			}
+			await page.bringToFront()
 			await cdp.send("Network.setCacheDisabled", { cacheDisabled: false })
 			await waitForEditorBoot(page)
 			start = performance.now()
