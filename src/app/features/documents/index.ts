@@ -24,3 +24,5 @@ export { HomeScreen } from "./screens/home-screen"
 export { NewDocScreen } from "./screens/new-doc-screen"
 
 export { useDocumentAssets, assetViews } from "./hooks/use-document-assets"
+
+export { useDocumentAccess } from "./hooks/use-document-access"

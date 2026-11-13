@@ -2,7 +2,11 @@ import { isLaserPreview } from "../lib/laser-preview"
 import { useNavigate } from "@tanstack/react-router"
 import { useOne, useDb } from "jazz-tools/react"
 import { app } from "@/jazz/schema"
-import { useLibrary, useDocumentAssets } from "@/app/features/documents"
+import {
+	useLibrary,
+	useDocumentAssets,
+	useDocumentAccess,
+} from "@/app/features/documents"
 import { DocumentNotFound } from "@/app/components/error-states"
 import { LaserReceiver } from "../widgets/laser-pointer"
 import { Slideshow, getSlides } from "../widgets/slideshow"
@@ -14,13 +18,14 @@ export { SlideshowScreen }
 function SlideshowScreen({ id }: { id: string }) {
 	let navigate = useNavigate(),
 		db = useDb()
-	let { documents, ownerId, grants } = useLibrary()
+	let { documents } = useLibrary()
 	let { data: doc, isLoading } = useOne(app.documents.where({ id }))
 	let appearance = useResolvedTheme()
 	let assets = useDocumentAssets(
 		id,
 		parsePresentationTheme(doc?.content ?? "") ?? appearance,
 	)
+	let { canEdit: canEditDoc } = useDocumentAccess(doc)
 	useScreenWakeLock()
 	if (isLoading) return <p role="status">Opening document…</p>
 	if (!doc || doc.deletedAt) return <DocumentNotFound />
@@ -41,9 +46,6 @@ function SlideshowScreen({ id }: { id: string }) {
 		doc.presentationLine !== null && items[doc.presentationLine]
 			? items[doc.presentationLine].slideNumber
 			: 1
-	let canEditDoc =
-		doc.ownerId === ownerId ||
-		grants.some(grant => grant.documentId === id && grant.role !== "reader")
 	let previewAppearance = isLaserPreview()
 		? new URLSearchParams(window.location.search).get("laserAppearance")
 		: null

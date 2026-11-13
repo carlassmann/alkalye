@@ -7,6 +7,7 @@ import {
 import { toast } from "sonner"
 import { useOne } from "jazz-tools/react"
 import { app, type DocumentRow } from "@/jazz/schema"
+import { useDocumentAccess } from "../hooks/use-document-access"
 import { useLibrary } from "../lib/library"
 import {
 	useComments,
@@ -71,7 +72,7 @@ function DocPreviewScreen({ id }: { id: string }) {
 	return <PreviewContent key={id} id={id} doc={doc} />
 }
 function PreviewContent({ id, doc }: { id: string; doc: DocumentRow }) {
-	let { documents, ownerId, grants, profile } = useLibrary()
+	let { documents, profile } = useLibrary()
 	let t = useIntl(),
 		navigate = useNavigate()
 	let commentDoc = useComments(doc)
@@ -82,9 +83,8 @@ function PreviewContent({ id, doc }: { id: string; doc: DocumentRow }) {
 	let commentsEnabled = areCommentsEnabled(commentDoc)
 	let commentThreads = getVisibleCommentThreads(commentDoc),
 		unresolvedCommentCount = getUnresolvedCommentCount(commentDoc)
-	let readOnly =
-		doc.ownerId !== ownerId &&
-		!grants.some(grant => grant.documentId === id && grant.role !== "reader")
+	let { canEdit } = useDocumentAccess(doc)
+	let readOnly = !canEdit
 	let commentAuthorName = profile?.name
 	let [commentsOpen, setCommentsOpen] = useState(false)
 	let [selectedCommentThreadId, setSelectedCommentThreadId] = useState<

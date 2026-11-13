@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Link, useNavigate } from "@tanstack/react-router"
 import { useOne, useDb } from "jazz-tools/react"
 import { app } from "@/jazz/schema"
-import { useLibrary } from "@/app/features/documents"
+import { useLibrary, useDocumentAccess } from "@/app/features/documents"
 import { FileText } from "lucide-react"
 import {
 	DocumentNotFound,
@@ -27,7 +27,7 @@ import { T } from "@/shared/intl/setup"
 export { TeleprompterScreen }
 function TeleprompterScreen({ id }: { id: string }) {
 	let db = useDb()
-	let { documents, ownerId, grants } = useLibrary()
+	let { documents } = useLibrary()
 	let { data: doc, isLoading } = useOne(app.documents.where({ id }))
 	let navigate = useNavigate()
 	let wide = useWidePresentation()
@@ -39,13 +39,11 @@ function TeleprompterScreen({ id }: { id: string }) {
 		else setMobilePreview(visible)
 	}
 
+	let { canEdit: canEdit } = useDocumentAccess(doc)
 	useScreenWakeLock()
 
 	if (isLoading) return <p role="status">Opening document…</p>
 	if (!doc || doc.deletedAt) return <DocumentNotFound />
-	let canEdit =
-		doc.ownerId === ownerId ||
-		grants.some(grant => grant.documentId === id && grant.role !== "reader")
 	if (!canEdit) return <DocumentUnauthorized />
 	let content = doc.content
 	let wikilinks = new Map(

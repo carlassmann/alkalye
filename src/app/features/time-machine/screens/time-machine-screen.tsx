@@ -8,7 +8,11 @@ import {
 	useMarkdownEditorRef,
 	useEditorSettings,
 } from "@/app/features/editor"
-import { useLibrary, updateContent } from "@/app/features/documents"
+import {
+	useLibrary,
+	updateContent,
+	useDocumentAccess,
+} from "@/app/features/documents"
 import { DocumentNotFound } from "@/app/components/error-states"
 import {
 	getEditHistory,
@@ -71,16 +75,14 @@ function TimeMachineContent({
 		editor = useMarkdownEditorRef(),
 		restoreDialog = useConfirmDialog(),
 		db = useDb()
-	let { ownerId, settings, grants } = useLibrary()
+	let { ownerId, settings } = useLibrary()
 	useEditorSettings(settings)
 	let { data: versions = [] } = useAll(historyQuery(docId))
 	let { data: imported = [] } = useAll(
 		app.documentVersions.where({ documentId: docId }),
 	)
 	let { data: profiles = [] } = useAll(app.profiles)
-	let canEdit =
-		doc.ownerId === ownerId ||
-		grants.some(grant => grant.documentId === doc.id && grant.role !== "reader")
+	let { canEdit } = useDocumentAccess(doc)
 	let docTitle = doc.title
 	let editHistory = getEditHistory(versions, imported),
 		totalEdits = editHistory.length,
