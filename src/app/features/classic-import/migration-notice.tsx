@@ -1,3 +1,4 @@
+import { ClassicLegacyLink } from "./legacy-link"
 import { ClassicImportPending } from "./migration-state"
 import { app } from "@/jazz/schema"
 import { messagesEn, messagesDe } from "@/shared/intl/messages"
@@ -20,7 +21,9 @@ function ClassicMigration({ children }: { children: React.ReactNode }) {
 			locale={locale}
 			messages={locale === "de" ? messagesDe : messagesEn}
 		>
-			<MigrationController>{children}</MigrationController>
+			<MigrationController>
+				<ClassicLegacyLink>{children}</ClassicLegacyLink>
+			</MigrationController>
 		</IntlProvider>
 	)
 }
@@ -98,28 +101,30 @@ function MigrationController({ children }: { children: React.ReactNode }) {
 				await runClassicImport(
 					key,
 					state => {
-						if (!controller.signal.aborted) setProgress(state)
+						if (!controller.signal.aborted) {
+							setProgress(state)
+							if (state.done && !state.errors.length)
+								sessionStorage.removeItem("alkalye-classic-phrase-login")
+						}
 					},
 					controller.signal,
 				)
 			} catch (error) {
-				// Fresh v2 accounts have no Classic account. Stored Classic credentials make failures actionable.
-				if (!controller.signal.aborted && readClassicCredentials())
+				if (!controller.signal.aborted)
 					setError(
 						error instanceof Error ? error.message : "Classic import failed",
 					)
 			} finally {
-				if (!controller.signal.aborted) {
-					setProbing(false)
-					sessionStorage.removeItem("alkalye-classic-phrase-login")
-				}
+				if (!controller.signal.aborted) setProbing(false)
 			}
 		}
 		void migrate()
 		return () => controller.abort()
 	}, [exportDeviceKey, accountId, restoring, attempt])
 	return (
-		<ClassicImportPending.Provider value={restoring || probing}>
+		<ClassicImportPending.Provider
+			value={restoring || probing || !!error || !!progress?.errors.length}
+		>
 			{!dismissed && (progress || error) && (
 				<div
 					role="status"
@@ -129,7 +134,7 @@ function MigrationController({ children }: { children: React.ReactNode }) {
 					<p>{t("migration.disclosure")}</p>
 					{progress && (
 						<p>
-							{progress.done
+							{progress.done && !progress.errors.length
 								? t("migration.complete")
 								: `${t("migration.progress")} ${progress.completed}/${progress.total}`}
 						</p>

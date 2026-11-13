@@ -9,7 +9,7 @@ import {
 	readSpace,
 	readTheme,
 } from "./reader"
-import { stableId, packBytes } from "./conversion"
+import { packBytes } from "./conversion"
 import { readClassicCredentials } from "./identity"
 import type { ImportItem } from "./contract"
 export { runClassicImport }
@@ -73,42 +73,62 @@ async function importClassicAccount(
 		await request("claim", key, proof)
 		localStorage.setItem(`alkalye-classic-user:${challenge.accountId}`, "true")
 		await source.sync()
-		let tasks: { id: string; read: () => Promise<ImportItem> }[] = []
+		let tasks: {
+			id: string
+			kind: ImportItem["kind"]
+			read: () => Promise<ImportItem>
+		}[] = []
 		let seen = new Set<string>()
-		function add(id: string, read: () => Promise<ImportItem>) {
+		function add(
+			id: string,
+			kind: ImportItem["kind"],
+			read: () => Promise<ImportItem>,
+		) {
 			if (!seen.has(id)) {
 				seen.add(id)
-				tasks.push({ id, read })
+				tasks.push({ id, kind, read })
 			}
 		}
 
 		for (let root of source.roots) {
 			for (let theme of root.themes ?? [])
-				add(theme.$jazz.id, () => readTheme(theme))
+				add(theme.$jazz.id, "theme", () => readTheme(theme))
 			for (let space of root.spaces ?? []) {
-				add(space.$jazz.id, () => readSpace(space))
+				add(space.$jazz.id, "space", () => readSpace(space))
 				let loaded = await space.$jazz.ensureLoaded({
 					resolve: { documents: { $each: true } },
 				})
 				loaded.documents.forEach(doc =>
-					add(doc.$jazz.id, () => readDocument(doc, false)),
+					add(doc.$jazz.id, "document", () => readDocument(doc, false)),
 				)
 			}
 			root.documents.forEach(doc =>
-				add(doc.$jazz.id, () => readDocument(doc, false)),
+				add(doc.$jazz.id, "document", () => readDocument(doc, false)),
 			)
 			for (let doc of root.inactiveDocuments ?? [])
-				add(doc.$jazz.id, () => readDocument(doc, true))
+				add(doc.$jazz.id, "document", () => readDocument(doc, true))
 		}
 
-		add(source.account.$jazz.id, async () => source.accountItem())
+		add(source.account.$jazz.id, "account", async () => source.accountItem())
 		state.total = tasks.length
 		progress({ ...state })
 		for (let task of tasks) {
 			if (signal.aborted) return
 			try {
+				let prepared = z.object({ canWrite: z.boolean() }).parse(
+					await request("prepare", key, {
+						challengeId: challenge.challengeId,
+						classicId: task.id,
+						kind: task.kind,
+					}),
+				)
+				if (!prepared.canWrite) {
+					state.completed++
+					progress({ ...state, errors: [...state.errors] })
+					continue
+				}
 				let item = await task.read()
-				await uploadLargeBytes(key, challenge.challengeId, item)
+				await uploadLargeBytes(key, challenge.challengeId, item, item)
 				for (let retry = 0; ; retry++) {
 					try {
 						await request("item", key, {
@@ -135,16 +155,7 @@ async function importClassicAccount(
 			progress({ ...state, errors: [...state.errors] })
 		}
 		progress({ ...state, done: true })
-		let originalPath = window.location.pathname
-		let path = originalPath
-		for (let match of originalPath.matchAll(
-			/\/(?:doc|spaces|themes)\/(co_z[1-9A-HJ-NP-Za-km-z]+)/g,
-		))
-			path = path.replaceAll(match[1]!, await stableId(match[1]!))
-		if (path !== originalPath)
-			window.location.replace(
-				path + window.location.search + window.location.hash,
-			)
+		window.dispatchEvent(new Event("classic-import-complete"))
 	} finally {
 		source.close()
 	}
@@ -155,12 +166,22 @@ async function request(
 	body: unknown,
 ): Promise<unknown> {
 	let serialized = JSON.stringify(body)
-	if (action === "item" && serialized.length > 2 * 1024 * 1024) {
-		let input = z.object({ challengeId: z.string() }).parse(body)
+	if (
+		action === "item" &&
+		new TextEncoder().encode(serialized).length > 2 * 1024 * 1024
+	) {
+		let input = z
+			.object({
+				challengeId: z.string(),
+				item: z.object({ classicId: z.string(), kind: z.string() }),
+			})
+			.parse(body)
 		let staged: { base64?: string; uploadId?: string; sha256: string } =
 			await packBytes(new TextEncoder().encode(serialized))
-		await uploadLargeBytes(key, input.challengeId, staged)
+		await uploadLargeBytes(key, input.challengeId, staged, input.item)
 		return request("staged-item", key, {
+			challengeId: input.challengeId,
+			...input.item,
 			uploadId: staged.uploadId,
 			sha256: staged.sha256,
 		})
@@ -183,6 +204,7 @@ async function uploadLargeBytes(
 	key: string,
 	challengeId: string,
 	value: unknown,
+	scope: { classicId: string; kind: string },
 ): Promise<void> {
 	if (!value || typeof value !== "object") return
 	if (
@@ -190,24 +212,28 @@ async function uploadLargeBytes(
 		typeof value.base64 === "string" &&
 		"sha256" in value &&
 		typeof value.sha256 === "string" &&
-		value.base64.length > 524288
+		value.base64.length > 65536
 	) {
 		let base64 = value.base64
 		for (
 			let offset = 0, part = 0;
 			offset < base64.length;
-			offset += 524288, part++
+			offset += 65536, part++
 		)
 			await request("chunk", key, {
 				challengeId,
+				...scope,
+				byteLength:
+					(base64.length / 4) * 3 -
+					(base64.endsWith("==") ? 2 : base64.endsWith("=") ? 1 : 0),
 				uploadId: value.sha256,
 				part,
-				base64: base64.slice(offset, offset + 524288),
+				base64: base64.slice(offset, offset + 65536),
 			})
 		Reflect.set(value, "uploadId", value.sha256)
 		Reflect.deleteProperty(value, "base64")
 		return
 	}
 	for (let child of Object.values(value))
-		await uploadLargeBytes(key, challengeId, child)
+		await uploadLargeBytes(key, challengeId, child, scope)
 }
