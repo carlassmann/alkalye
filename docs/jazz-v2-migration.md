@@ -404,6 +404,4 @@ The inherited limits still apply: public-space bookmarks lack a schema table; Cl
 
 written with gpt-6.1-sol in T3 Code (Codex)
 
-
-
 - 2026-11-13, phase 1: UI benchmark harness and Classic baseline; three runs, zero scenario failures, v2 pending. Harness commit `262baf5`; results in `bench/results/classic.json`.

@@ -6,24 +6,60 @@ export { instrument, installObservers, summary }
 
 declare global {
 	interface Window {
-		__bench: { paint: number[]; longTasks: number[]; inputAt: number | null }
+		__bench: {
+			paint: number[]
+			longTasks: number[]
+			inputAt: number | null
+			handler: number[]
+			events: {
+				name: string
+				duration: number
+				inputDelay: number
+				processing: number
+				presentation: number
+			}[]
+		}
 	}
 }
 
 async function installObservers(context: BrowserContext) {
 	await installBenchmarkCompatibility(context)
 	await context.addInitScript(() => {
-		window.__bench = { paint: [], longTasks: [], inputAt: null }
+		window.__bench = {
+			paint: [],
+			longTasks: [],
+			inputAt: null,
+			handler: [],
+			events: [],
+		}
 		new PerformanceObserver(list => {
 			window.__bench.longTasks.push(
 				...list.getEntries().map(entry => entry.duration),
 			)
 		}).observe({ type: "longtask", buffered: true })
+		new PerformanceObserver(list => {
+			for (let entry of list.getEntries()) {
+				if (entry instanceof PerformanceEventTiming)
+					window.__bench.events.push({
+						name: entry.name,
+						duration: entry.duration,
+						inputDelay: entry.processingStart - entry.startTime,
+						processing: entry.processingEnd - entry.processingStart,
+						presentation: Math.max(
+							0,
+							entry.startTime + entry.duration - entry.processingEnd,
+						),
+					})
+			}
+		}).observe({ type: "event", durationThreshold: 16, buffered: true })
 		document.addEventListener(
 			"beforeinput",
 			() => {
 				let start = performance.now()
 				window.__bench.inputAt = start
+				queueMicrotask(() =>
+					window.__bench.handler.push(performance.now() - start),
+				)
 				requestAnimationFrame(() =>
 					requestAnimationFrame(() =>
 						window.__bench.paint.push(performance.now() - start),

@@ -32,6 +32,7 @@ function createTraffic() {
 		cacheDisabled: true,
 		closed: false,
 		issues,
+		timeline: new Array<{ at: number; kind: string; bytes?: number }>(),
 		bundleRequests: new Set<string>(),
 		resources: new Map<string, number>(),
 		requests: new Set<string>(),
@@ -127,8 +128,22 @@ async function createCapture(browser: Browser) {
 		if (owner && owner !== sessionId) return
 		state.websocketOwners.set(requestId, sessionId)
 		let bytes = Buffer.byteLength(payload, opcode === 2 ? "base64" : "utf8")
+		state.timeline.push({
+			at: performance.now(),
+			kind: sent ? "sent" : "received",
+			bytes,
+		})
 		if (sent) state.wire.sent += bytes
 		else state.wire.received += bytes
+	}
+	for (let name of [
+		"Network.webSocketCreated",
+		"Network.webSocketClosed",
+		"Network.webSocketFrameError",
+	]) {
+		client.on(name, (_event: unknown, sessionId?: string) => {
+			traffic(sessionId)?.timeline.push({ at: performance.now(), kind: name })
+		})
 	}
 	client.on("Network.webSocketFrameSent", (event, sessionId) =>
 		countFrame(
@@ -218,6 +233,7 @@ async function createCapture(browser: Browser) {
 		let current = state
 		return {
 			wire: current.wire,
+			timeline: current.timeline,
 			ensureHealthy() {
 				if (!connected || current.issues.length)
 					throw new Error(

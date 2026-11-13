@@ -11,7 +11,7 @@ import {
 	type BrowserContext,
 } from "@playwright/test"
 import { parseArgs } from "node:util"
-import { cpus, platform, release } from "node:os"
+import { cpus, platform, release, loadavg } from "node:os"
 import { fetchDatasets } from "./fetch"
 import { loadDatasets } from "./datasets"
 import {
@@ -38,6 +38,7 @@ let { values } = parseArgs({
 		notes: { type: "string", default: "50" },
 		edits: { type: "string", default: "200" },
 		"replay-timeout-ms": { type: "string" },
+		"large-only": { type: "boolean", default: false },
 	},
 })
 if (!values.target || !values.label || !values.out)
@@ -70,7 +71,11 @@ let scenarioFailures: {
 	elapsedMs: number
 	message: string
 }[] = []
+let runLoads: { run: number; start: number[]; end?: number[] }[] = []
+let syncDiagnostics: unknown[] = []
 let result = {
+	runLoads,
+	syncDiagnostics,
 	label: values.label,
 	target,
 	createdAt: new Date().toISOString(),
@@ -83,14 +88,18 @@ let result = {
 		cpuThrottle: cpu,
 		networkCapture: "CDP pages, iframes, dedicated workers and SharedWorkers",
 		serverRuntime: process.env.BENCH_SERVER_NOTE ?? "unspecified",
-		jazz: JSON.parse(await readFile("package.json", "utf8")).dependencies[
-			"jazz-tools"
-		],
-		gitHead: execFileSync("git", ["rev-parse", "HEAD"], {
-			encoding: "utf8",
-		}).trim(),
+		jazz:
+			process.env.BENCH_JAZZ ??
+			JSON.parse(await readFile("package.json", "utf8")).dependencies[
+				"jazz-tools"
+			],
+		gitHead:
+			process.env.BENCH_GIT_HEAD ??
+			execFileSync("git", ["rev-parse", "HEAD"], {
+				encoding: "utf8",
+			}).trim(),
 		server:
-			"work astro dev + local sync; service workers blocked; HTTP cache disabled except warm reload",
+			"production Node adapter; local store; first visit SW blocked, returning SW installed",
 	},
 	config: {
 		runs,
@@ -116,6 +125,7 @@ try {
 		console.error(
 			`Run ${run + 1}/${runs}: import ${documents.length} documents`,
 		)
+		runLoads.push({ run: run + 1, start: loadavg() })
 		let context = await newContext(browser)
 		try {
 			let page = await context.newPage()
@@ -204,7 +214,7 @@ try {
 			let syncReceiver = await newContext(browser, credentials)
 			try {
 				let other = await syncReceiver.newPage()
-				await instrument(other, cpu)
+				let syncNetwork = await instrument(other, cpu)
 				let syncDoc = seeded[0]
 				if (!syncDoc) throw new Error("Small sync note missing")
 				await openDocument(other, syncDoc)
@@ -224,13 +234,25 @@ try {
 							intervals: [20],
 						})
 						.toContain(marker)
-					add("syncEditMs", performance.now() - start)
+					let elapsedMs = performance.now() - start
+					add("syncEditMs", elapsedMs)
+					syncDiagnostics.push({
+						marker,
+						elapsedMs,
+						load: loadavg(),
+						sender: { ...sourceNetwork.wire },
+						senderTimeline: sourceNetwork.timeline.slice(-200),
+						receiverTimeline: syncNetwork.timeline.slice(-200),
+						receiver: { ...syncNetwork.wire },
+					})
 				}
 			} finally {
 				await syncReceiver.close()
 			}
 
-			for (let doc of [seeded[0], medium, large]) {
+			for (let doc of values["large-only"]
+				? [large]
+				: [seeded[0], medium, large]) {
 				if (!doc) throw new Error("Small note missing")
 				let name = doc === large ? "large" : doc === medium ? "medium" : "small"
 				console.error(`Replay ${editCount} edits in isolated ${name} context`)
@@ -250,6 +272,13 @@ try {
 						replayTimeoutMs,
 						`${name} replay`,
 					)
+					for (let value of metrics.handler) add(`${name}InputHandlerMs`, value)
+					for (let event of metrics.events) {
+						add(`${name}EventDurationMs`, event.duration)
+						add(`${name}EventInputDelayMs`, event.inputDelay)
+						add(`${name}EventProcessingMs`, event.processing)
+						add(`${name}EventPresentationMs`, event.presentation)
+					}
 					for (let value of metrics.paint) add(`${name}InputToPaintMs`, value)
 					for (let value of metrics.dispatchToPaint)
 						add(`${name}DispatchToPaintMs`, value)
@@ -272,6 +301,43 @@ try {
 				}
 			}
 
+			console.error("Returning user: service worker and offline reload")
+			let returning = await newContext(browser, credentials, true)
+			try {
+				let returningPage = await returning.newPage()
+				await waitForEditorBoot(returningPage)
+				await openDocument(returningPage, large)
+				await returningPage.evaluate(async () => {
+					await navigator.serviceWorker.register("/sw.js", { scope: "/app/" })
+					await navigator.serviceWorker.ready
+				})
+				await returningPage.reload()
+				await expect
+					.poll(() =>
+						returningPage.evaluate(() => !!navigator.serviceWorker.controller),
+					)
+					.toBe(true)
+				start = performance.now()
+				await returningPage.reload({ waitUntil: "domcontentloaded" })
+				await resolveDocument(returningPage, large.title)
+				add("returningSwListMs", performance.now() - start)
+				await returning.setOffline(true)
+				start = performance.now()
+				await waitForEditorBoot(returningPage, { path: `/app/doc/${large.id}` })
+				await expect(editor(returningPage)).toContainText("Book dracula")
+				add("offlineSwLargeOpenMs", performance.now() - start)
+			} catch (error) {
+				scenarioFailures.push({
+					run: run + 1,
+					scenario: "returningServiceWorker",
+					elapsedMs: performance.now() - start,
+					message: String(error).slice(0, 1000),
+				})
+			} finally {
+				await returning.close()
+			}
+			let load = runLoads.at(-1)
+			if (load) load.end = loadavg()
 			result.completedRuns++
 			await save()
 		} finally {
@@ -288,12 +354,13 @@ try {
 async function newContext(
 	browser: Browser,
 	storageState?: Awaited<ReturnType<BrowserContext["storageState"]>>,
+	allowServiceWorker = false,
 ) {
 	let context = await browser.newContext({
 		baseURL: target,
 		ignoreHTTPSErrors: true,
 		permissions: ["clipboard-read", "clipboard-write"],
-		serviceWorkers: "block",
+		serviceWorkers: allowServiceWorker ? "allow" : "block",
 		viewport: { width: 1280, height: 900 },
 		storageState,
 	})

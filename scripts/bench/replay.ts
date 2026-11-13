@@ -1,6 +1,7 @@
 import { expect, type Page } from "@playwright/test"
 import { editor, openDocument, readContent, replaceContent } from "./adapter"
 import { instrument } from "./metrics"
+import { mkdir, writeFile } from "node:fs/promises"
 
 export { measureReplay, withDeadline }
 
@@ -34,8 +35,15 @@ async function measureReplay(page: Page, options: ReplayOptions) {
 	await page.waitForTimeout(3000)
 	await page.evaluate(() => {
 		window.__bench.paint = []
+		window.__bench.handler = []
+		window.__bench.events = []
 		window.__bench.longTasks = []
 	})
+	let profileDirectory = process.env.BENCH_PROFILE_DIR
+	if (profileDirectory) {
+		await cdp.send("Profiler.enable")
+		await cdp.send("Profiler.start")
+	}
 	let before = { ...wire }
 	let cursor = 0
 	let expected: string[] = []
@@ -78,10 +86,20 @@ async function measureReplay(page: Page, options: ReplayOptions) {
 		expected.join("") !== options.finalText
 	)
 		throw new Error("Full trace differs from upstream finalText")
+	if (profileDirectory) {
+		let { profile } = await cdp.send("Profiler.stop")
+		await mkdir(profileDirectory, { recursive: true })
+		await writeFile(
+			`${profileDirectory}/${document.title}.cpuprofile`,
+			JSON.stringify(profile),
+		)
+	}
 	let heap = await cdp.send("Runtime.getHeapUsage")
 	ensureHealthy()
 	return {
 		paint: metrics.paint,
+		handler: metrics.handler,
+		events: metrics.events,
 		dispatchToPaint,
 		longTaskCount: metrics.longTasks.length,
 		longTaskTotalMs: metrics.longTasks.reduce((a, b) => a + b, 0),

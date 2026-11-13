@@ -1,15 +1,9 @@
 import { readFile } from "node:fs/promises"
 import { expect, type Page, type BrowserContext } from "@playwright/test"
 import JSZip from "jszip"
-import {
-	createAccount as createTestAccount,
-	signIn,
-	waitForEditorBoot,
-} from "../../e2e/auth-helpers"
 
 export {
 	createAccount,
-	signIn,
 	waitForEditorBoot,
 	seed,
 	resolveDocument,
@@ -22,9 +16,23 @@ export {
 	editor,
 }
 
+async function waitForEditorBoot(page: Page, args: { path?: string } = {}) {
+	await page.goto(args.path ?? "/app")
+	await expect(page.locator("body")).toHaveAttribute(
+		"data-alkalye-ready",
+		"true",
+		{ timeout: 120_000 },
+	)
+}
+
 async function createAccount(page: Page) {
 	await waitForEditorBoot(page)
-	return createTestAccount(page)
+	await page.goto("/app/settings")
+	await page.getByTestId("settings-sign-in").click()
+	await page.getByTestId("auth-initial-create-account").click()
+	await page.getByTestId("auth-create-copy").click()
+	await page.getByTestId("auth-create-submit").click()
+	await expect(page.getByTestId("auth-dialog")).toBeHidden({ timeout: 30_000 })
 }
 
 function editor(page: Page) {
@@ -124,9 +132,13 @@ async function configureEditor(page: Page) {
 	]) {
 		let toggle = page.getByRole("switch", { name: label, exact: true })
 		await expect(toggle).toBeVisible()
-		if ((await toggle.getAttribute("aria-checked")) === "true")
-			await toggle.click()
-		await expect(toggle).toHaveAttribute("aria-checked", "false")
+		await expect(async () => {
+			if ((await toggle.getAttribute("aria-checked")) === "true")
+				await toggle.click()
+			await expect(toggle).toHaveAttribute("aria-checked", "false", {
+				timeout: 1000,
+			})
+		}).toPass({ timeout: 30_000 })
 	}
 }
 
@@ -158,14 +170,29 @@ async function captureCredentials(context: BrowserContext) {
 	let storage = await context.storageState({ indexedDB: false })
 	let origins = storage.origins.flatMap(origin => {
 		let auth = origin.localStorage.filter(
-			entry => entry.name === "jazz-logged-in-secret",
+			entry =>
+				entry.name === "jazz-logged-in-secret" ||
+				entry.name.startsWith("jazz-auth-store-v1-") ||
+				entry.name.startsWith("jazz-account-selection"),
 		)
+		auth = auth.map(entry => {
+			if (!entry.name.startsWith("jazz-account-selection")) return entry
+			let selection = JSON.parse(entry.value)
+			let secret = selection.roots[selection.selected]
+			if (typeof secret !== "string")
+				throw new Error("No selected v2 device secret")
+			return {
+				name: entry.name,
+				value: JSON.stringify({
+					format: "jazz-account-selection-v1",
+					roots: [secret],
+					selected: 0,
+				}),
+			}
+		})
 		return auth.length ? [{ origin: origin.origin, localStorage: auth }] : []
 	})
-	if (!origins.length)
-		throw new Error(
-			"No Classic auth credentials found; adapt captureCredentials for this build",
-		)
+	if (!origins.length) throw new Error("No device authentication secret found")
 	return { cookies: [], origins }
 }
 
