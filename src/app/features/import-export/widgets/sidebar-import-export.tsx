@@ -46,6 +46,7 @@ export type { ImportOptions }
 type ImportOptions = {
 	onProgress?: (progress: ImportProgress) => void
 	signal?: AbortSignal
+	spaceId?: string
 }
 function SidebarImportExport({
 	docs,
@@ -55,7 +56,9 @@ function SidebarImportExport({
 	onImport?: (files: ImportedFile[], options?: ImportOptions) => Promise<void>
 }) {
 	let { db, ownerId, documents } = useLibrary()
-	let activeDocs = docs ?? documents.filter(doc => !doc.deletedAt)
+	let activeDocs = (docs ?? documents.filter(doc => !doc.spaceId)).filter(
+		doc => !doc.deletedAt,
+	)
 	let onImport =
 		importHandler ??
 		((files: ImportedFile[], options?: ImportOptions) =>
@@ -185,7 +188,7 @@ async function handleImportFiles(
 			content = setFrontmatterField(content, "title", file.name)
 		if (file.path && !getPath(content))
 			content = setFrontmatterField(content, "path", file.path)
-		let doc = await createDocument(db, ownerId, content)
+		let doc = await createDocument(db, ownerId, content, options.spaceId)
 		for (let [assetIndex, asset] of file.assets.entries()) {
 			options.signal?.throwIfAborted()
 			options.onProgress?.({
