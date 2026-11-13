@@ -48,7 +48,7 @@ Fresh contexts receive only the Classic auth-secret entry, with empty IndexedDB,
 no cookies, blocked service workers and disabled HTTP cache. Session IDs and other
 localStorage caches are deliberately excluded: Classic stores session leases in
 localStorage, and cloning those into isolated clients can reuse a session ID.
-Cold-list time ends when the search input accepts a click and finds the large book.
+Cold-list time opens Documents when collapsed, then ends when the search input accepts a click and finds the large book.
 Cold large-open time ends at the app's ready signal plus the visible book heading.
 Warm reload keeps IndexedDB and enables HTTP cache, ending at usable sidebar search.
 

@@ -152,7 +152,6 @@ try {
 					start = performance.now()
 					if (scenario === "coldListMs") {
 						await cold.goto("/app", { waitUntil: "domcontentloaded" })
-						await cold.getByTestId("doc-search-input").click()
 						await resolveDocument(cold, large.title)
 					} else {
 						await waitForEditorBoot(cold, { path: `/app/doc/${large.id}` })
@@ -174,7 +173,6 @@ try {
 			await waitForEditorBoot(page)
 			start = performance.now()
 			await page.reload({ waitUntil: "domcontentloaded" })
-			await page.getByTestId("doc-search-input").click()
 			await resolveDocument(page, large.title)
 			add("warmListMs", performance.now() - start)
 

@@ -72,6 +72,7 @@ async function seed(
 }
 
 async function resolveDocument(page: Page, title: string) {
+	await showDocumentList(page)
 	await page.getByTestId("doc-search-input").fill(title)
 	let row = page
 		.locator(
@@ -168,4 +169,12 @@ async function captureCredentials(context: BrowserContext) {
 			"No Classic auth credentials found; adapt captureCredentials for this build",
 		)
 	return { cookies: [], origins }
+}
+
+async function showDocumentList(page: Page) {
+	let sidebar = page.locator('[data-slot="sidebar"][data-side="left"]')
+	await sidebar.waitFor({ state: "attached" })
+	if ((await sidebar.getAttribute("data-state")) === "collapsed")
+		await page.getByRole("button", { name: "Documents" }).click()
+	await page.getByTestId("doc-search-input").click()
 }
