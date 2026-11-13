@@ -1,0 +1,80 @@
+import { execFileSync } from "node:child_process"
+import { readFile, writeFile } from "node:fs/promises"
+import { z } from "zod"
+import { summary } from "./metrics"
+
+let head = execFileSync("git", ["rev-parse", "HEAD"], {
+	encoding: "utf8",
+}).trim()
+let results: Record<string, Record<string, number[]>> = { classic: {}, v2: {} }
+for (let run = 1; run <= 5; run++) {
+	for (let label of ["classic", "v2"]) {
+		let path = `bench/results/${label}-${run}.json`
+		execFileSync(
+			"bun",
+			[
+				"scripts/bench/compare.ts",
+				"--target",
+				`https://${label}-main-alkalye-bench.cshed.carlassmann.com`,
+				"--label",
+				label,
+				"--out",
+				path,
+				"--runs",
+				"1",
+				"--edits",
+				"200",
+			],
+			{
+				stdio: "inherit",
+				env: {
+					...process.env,
+					BENCH_JAZZ: label === "classic" ? "0.20.18" : "2.0.0-alpha.61",
+					BENCH_GIT_HEAD: label === "classic" ? "8379d4e" : head,
+					BENCH_SERVER_NOTE:
+						label === "classic"
+							? "Node production + jazz-run 0.20.19, 16GB heap"
+							: "Node production + isolated SQLite",
+				},
+			},
+		)
+		let data = JSON.parse(await readFile(path, "utf8"))
+		for (let [name, metric] of Object.entries(data.metrics)) {
+			let values = z.object({ samples: z.array(z.number()) }).parse(metric)
+			;(results[label]![name] ??= []).push(...values.samples)
+		}
+	}
+}
+for (let label of ["classic", "v2"]) {
+	let runs = await Promise.all(
+		Array.from({ length: 5 }, (_, index) =>
+			readFile(`bench/results/${label}-${index + 1}.json`, "utf8").then(text =>
+				JSON.parse(text),
+			),
+		),
+	)
+	await writeFile(
+		`bench/results/${label}.json`,
+		JSON.stringify(
+			{
+				...runs[0],
+				config: { ...runs[0].config, runs: 5 },
+				completedRuns: 5,
+				runLoads: runs.flatMap((run, index) =>
+					run.runLoads.map((load: object) => ({ ...load, run: index + 1 })),
+				),
+				syncDiagnostics: runs.flatMap(run => run.syncDiagnostics),
+				scenarioFailures: runs.flatMap(run => run.scenarioFailures),
+				metrics: Object.fromEntries(
+					Object.entries(results[label]!).map(([name, samples]) => [
+						name,
+						summary(samples),
+					]),
+				),
+				individualRuns: runs,
+			},
+			null,
+			"\t",
+		) + "\n",
+	)
+}

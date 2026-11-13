@@ -210,6 +210,41 @@ try {
 			} finally {
 				await receiver.close()
 			}
+			console.error("Returning user: service worker and offline reload")
+			let returning = await newContext(browser, credentials, true)
+			try {
+				let returningPage = await returning.newPage()
+				await waitForEditorBoot(returningPage)
+				await openDocument(returningPage, large)
+				await returningPage.evaluate(async () => {
+					await navigator.serviceWorker.register("/sw.js", { scope: "/app/" })
+					await navigator.serviceWorker.ready
+				})
+				await returningPage.reload()
+				await expect
+					.poll(() =>
+						returningPage.evaluate(() => !!navigator.serviceWorker.controller),
+					)
+					.toBe(true)
+				start = performance.now()
+				await returningPage.reload({ waitUntil: "domcontentloaded" })
+				await resolveDocument(returningPage, large.title)
+				add("returningSwListMs", performance.now() - start)
+				await returning.setOffline(true)
+				start = performance.now()
+				await waitForEditorBoot(returningPage, { path: `/app/doc/${large.id}` })
+				await expect(editor(returningPage)).toContainText("Book dracula")
+				add("offlineSwLargeOpenMs", performance.now() - start)
+			} catch (error) {
+				scenarioFailures.push({
+					run: run + 1,
+					scenario: "returningServiceWorker",
+					elapsedMs: performance.now() - start,
+					message: String(error).slice(0, 1000),
+				})
+			} finally {
+				await returning.close()
+			}
 			console.error("Sync: independent second client on the small note")
 			let syncReceiver = await newContext(browser, credentials)
 			try {
@@ -301,41 +336,6 @@ try {
 				}
 			}
 
-			console.error("Returning user: service worker and offline reload")
-			let returning = await newContext(browser, credentials, true)
-			try {
-				let returningPage = await returning.newPage()
-				await waitForEditorBoot(returningPage)
-				await openDocument(returningPage, large)
-				await returningPage.evaluate(async () => {
-					await navigator.serviceWorker.register("/sw.js", { scope: "/app/" })
-					await navigator.serviceWorker.ready
-				})
-				await returningPage.reload()
-				await expect
-					.poll(() =>
-						returningPage.evaluate(() => !!navigator.serviceWorker.controller),
-					)
-					.toBe(true)
-				start = performance.now()
-				await returningPage.reload({ waitUntil: "domcontentloaded" })
-				await resolveDocument(returningPage, large.title)
-				add("returningSwListMs", performance.now() - start)
-				await returning.setOffline(true)
-				start = performance.now()
-				await waitForEditorBoot(returningPage, { path: `/app/doc/${large.id}` })
-				await expect(editor(returningPage)).toContainText("Book dracula")
-				add("offlineSwLargeOpenMs", performance.now() - start)
-			} catch (error) {
-				scenarioFailures.push({
-					run: run + 1,
-					scenario: "returningServiceWorker",
-					elapsedMs: performance.now() - start,
-					message: String(error).slice(0, 1000),
-				})
-			} finally {
-				await returning.close()
-			}
 			let load = runLoads.at(-1)
 			if (load) load.end = loadavg()
 			result.completedRuns++
