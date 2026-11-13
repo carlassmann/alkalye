@@ -284,11 +284,49 @@ function canAdmin(doc: Pick<LibraryDocument, "canAdmin">) {
 	return doc.canAdmin
 }
 
+let pendingMetadata = new WeakMap<
+	Database,
+	Map<string, ReturnType<typeof setTimeout>>
+>()
+
+function scheduleMetadata(db: Database, id: string) {
+	let pending = pendingMetadata.get(db)
+	if (!pending) {
+		pending = new Map()
+		pendingMetadata.set(db, pending)
+	}
+	clearTimeout(pending.get(id))
+	let updatedAt = new Date()
+	pending.set(
+		id,
+		setTimeout(() => {
+			pending.delete(id)
+			void readDocument(db, id)
+				.then(document => {
+					watchWrite(
+						db.update(app.documents, id, {
+							...documentMetadata(document.content),
+							updatedAt,
+						}),
+					)
+				})
+				.catch(error =>
+					toast.error(
+						error instanceof Error
+							? error.message
+							: "Could not save document metadata",
+					),
+				)
+		}, 300),
+	)
+}
+
 async function updateContent(
 	db: Database,
 	doc: DocumentRow | LibraryDocument,
 	content: string,
 	editedFrom?: string,
+	{ deferMetadata = false }: { deferMetadata?: boolean } = {},
 ) {
 	editedFrom ??= (await readDocument(db, doc.id)).content
 	let original = editedFrom
@@ -298,13 +336,16 @@ async function updateContent(
 			doc.id,
 			{
 				content,
-				...documentMetadata(content),
-				updatedAt: new Date(),
+				...(deferMetadata
+					? {}
+					: { ...documentMetadata(content), updatedAt: new Date() }),
 			},
 			{ editedFrom: { content: original } },
 		),
 	)
 	watchWrite(write)
+	if (deferMetadata) scheduleMetadata(db, doc.id)
+	else clearTimeout(pendingMetadata.get(db)?.get(doc.id))
 	if (parseFrontmatter(content).frontmatter?.["theme-source"]) {
 		let { syncThemeFromSource } = await import("@/app/features/themes")
 		await syncThemeFromSource(db, doc.id, content)

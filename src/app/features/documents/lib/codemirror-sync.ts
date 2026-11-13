@@ -8,11 +8,15 @@ import { EditorView } from "@codemirror/view"
 import { diff } from "fast-myers-diff"
 
 export { codeMirrorSync, minimalChanges }
-export type { MarkdownSync, TextUpdate }
+export type { MarkdownSync, TextUpdate, TextSource }
 
 type TextUpdate = {
 	previous: string
 	splices: readonly { at: number; delete: number; insert: string }[]
+}
+
+type TextSource = {
+	subscribe(listener: (value: string, update?: TextUpdate) => void): () => void
 }
 
 type MarkdownSync = ReturnType<typeof codeMirrorSync>
@@ -24,6 +28,7 @@ function codeMirrorSync(
 ) {
 	let base = initial
 	let pending: string[] = []
+	let pendingBase: string | null = null
 	let held: string | null = null
 	let composing = false
 	let view: EditorView | undefined
@@ -32,6 +37,8 @@ function codeMirrorSync(
 		if (text === base) return
 		let editedFrom = base
 		let before = pending
+		let previousPendingBase = pendingBase
+		if (pending.length === 0) pendingBase = editedFrom
 		base = text
 		pending = [...pending, text]
 		try {
@@ -39,6 +46,7 @@ function codeMirrorSync(
 		} catch (error) {
 			base = editedFrom
 			pending = before
+			pendingBase = previousPendingBase
 			throw error
 		}
 		held = null
@@ -55,13 +63,16 @@ function codeMirrorSync(
 			changed(shown)
 			return
 		}
+		if (pending.length > 0 && value === pendingBase) return
 		let echoed =
 			value === pending.at(-1) ? pending.length - 1 : pending.indexOf(value)
 		if (echoed >= 0) {
 			pending = pending.slice(echoed + 1)
+			pendingBase = pending.length > 0 ? value : null
 			return
 		}
 		pending = []
+		pendingBase = null
 		base = value
 		if (value === shown) return
 		view.dispatch({

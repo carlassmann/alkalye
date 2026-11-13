@@ -43,6 +43,20 @@ test("writes each edit against the last shown value and ignores delayed echoes",
 	expect(write).toHaveBeenCalledTimes(2)
 })
 
+test("ignores repeated pre-write snapshots while local text is pending", () => {
+	let { view, sync } = editor("Hello")
+	view.dispatch({ changes: { from: 5, insert: "!" } })
+	sync.apply("Hello")
+	expect(view.state.doc.toString()).toBe("Hello!")
+	view.dispatch({ changes: { from: 6, insert: "!" } })
+	sync.apply("Hello!")
+	sync.apply("Hello!")
+	expect(view.state.doc.toString()).toBe("Hello!!")
+	sync.apply("Hello!!")
+	sync.apply("Hello!")
+	expect(view.state.doc.toString()).toBe("Hello!")
+})
+
 test("maps selections through incoming changes and keeps them out of undo", () => {
 	let { view, sync, write } = editor("alpha middle omega")
 	view.dispatch({ selection: EditorSelection.range(6, 12) })

@@ -81,15 +81,19 @@ function Application() {
 	)
 }
 let routedOwnerId: string | null = null
-function AppRouter({ ownerId }: { ownerId: string }) {
-	let pwa = usePWAProvider()
+function RouteAccount({
+	ownerId,
+	onReady,
+}: {
+	ownerId: string
+	onReady: (ready: boolean) => void
+}) {
 	let { db } = useLibrary()
 	let { exportDeviceKey } = useJazzSession<JazzClient>()
 	let sync = useSyncStatus()
-	let [ready, setReady] = useState(false)
 	useEffect(() => {
 		let restoring = sessionStorage.getItem("alkalye-restoring-account")
-		if (ready || (restoring && sync.link.state !== "connected")) return
+		if (restoring && sync.link.state !== "connected") return
 		let cancelled = false
 		async function routeAccount() {
 			await restoreGuestTransfer(db, ownerId, exportDeviceKey())
@@ -132,17 +136,25 @@ function AppRouter({ ownerId }: { ownerId: string }) {
 					await router.navigate({ to: "/", replace: true })
 			}
 			routedOwnerId = ownerId
-			if (!cancelled) setReady(true)
+			if (!cancelled) onReady(true)
 		}
 		void routeAccount()
 		return () => {
 			cancelled = true
 		}
-	}, [db, ownerId, sync.link.state, ready, exportDeviceKey])
+	}, [db, ownerId, sync.link.state, onReady, exportDeviceKey])
+
+	return null
+}
+
+function AppRouter({ ownerId }: { ownerId: string }) {
+	let pwa = usePWAProvider()
+	let [ready, setReady] = useState(false)
 
 	return (
 		<PWAContext.Provider value={pwa}>
 			<AccountRoutingContext.Provider value={ready}>
+				{!ready && <RouteAccount ownerId={ownerId} onReady={setReady} />}
 				<RouterProvider router={router} context={{ ownerId }} />
 			</AccountRoutingContext.Provider>
 			<PWAInstallHint />

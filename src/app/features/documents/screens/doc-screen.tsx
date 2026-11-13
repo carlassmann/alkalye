@@ -106,7 +106,7 @@ function DocScreen({ id, spaceId }: { id: string; spaceId?: string }) {
 			<DocumentEditor
 				key={id + ":" + (doc.spaceId ?? "")}
 				doc={{ ...doc, content: incoming.content }}
-				incoming={incoming.update}
+				incoming={incoming.source}
 			/>
 		</SidebarProvider>
 	)
@@ -117,7 +117,7 @@ function DocumentEditor({
 	incoming,
 }: {
 	doc: LibraryDocument & { content: string }
-	incoming?: import("../lib/codemirror-sync").TextUpdate
+	incoming: import("../lib/codemirror-sync").TextSource
 }) {
 	let { db, ownerId, documents, entries, settings, profile } = useLibrary()
 	useTrackLastOpened(ownerId, doc.id, doc.spaceId ?? undefined)
@@ -164,7 +164,9 @@ function DocumentEditor({
 
 	let [binding] = useState(() =>
 		codeMirrorSync(doc.content, (content, editedFrom) => {
-			void updateContent(db, doc, content, editedFrom).catch(error =>
+			void updateContent(db, doc, content, editedFrom, {
+				deferMetadata: true,
+			}).catch(error =>
 				toast.error(
 					error instanceof Error ? error.message : "Could not save document",
 				),
@@ -303,7 +305,7 @@ function DocumentEditor({
 					readOnly={readOnly}
 					documents={wikiDocs}
 					sync={binding}
-					syncUpdate={incoming}
+					syncSource={incoming}
 					onAddComment={
 						!readOnly && commentsEnabled
 							? handleCreateCommentFromSelection

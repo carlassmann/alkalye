@@ -206,6 +206,7 @@ function spellcheckForDocument(
 interface MarkdownEditorProps {
 	// Core
 	value: string
+	syncSource?: import("@/app/features/documents/lib/codemirror-sync").TextSource
 	syncUpdate?: import("@/app/features/documents/lib/codemirror-sync").TextUpdate
 	sync?: MarkdownSync
 	onChange?: (content: string) => void
@@ -338,6 +339,7 @@ function MarkdownEditor(
 		value,
 		sync,
 		syncUpdate,
+		syncSource,
 		onChange,
 		onCursorChange,
 		onFocus,
@@ -502,6 +504,7 @@ function MarkdownEditor(
 		value,
 		sync,
 		syncUpdate,
+		syncSource,
 		placeholder,
 		readOnly,
 		spellcheck,
@@ -1017,6 +1020,7 @@ function MarkdownEditor(
 	useLayoutEffect(() => {
 		if (!view) return
 
+		if (sync && syncSource) return syncSource.subscribe(sync.apply)
 		if (sync) {
 			sync.apply(value, syncUpdate)
 			return
@@ -1026,7 +1030,7 @@ function MarkdownEditor(
 			applyContentPreservingSelection(view, value)
 		}
 		lastExternalValue.current = value
-	}, [value, view, sync, syncUpdate])
+	}, [value, view, sync, syncUpdate, syncSource])
 
 	useEffect(() => {
 		if (view) {

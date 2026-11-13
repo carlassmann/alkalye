@@ -27,7 +27,10 @@ function usePresence({
 	let [deviceId] = useState(() => crypto.randomUUID())
 	let rowId = useRef<string | null>(null)
 	let position = useRef({ position: 0, selectionEnd: 0 })
-	let { data: rows = [] } = useAll(app.presence.where({ documentId: doc.id }))
+	let cursorTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+	let { data: rows = [] } = useAll(
+		app.presence.where({ documentId: doc.id, deviceId: { ne: deviceId } }),
+	)
 	let [now, setNow] = useState(() => Date.now())
 	useEffect(() => {
 		let write = db.insert(app.presence, {
@@ -46,6 +49,8 @@ function usePresence({
 		}, 2000)
 		return () => {
 			clearInterval(interval)
+			clearTimeout(cursorTimer.current)
+			cursorTimer.current = undefined
 			rowId.current = null
 			void db.delete(app.presence, write.value.id)
 		}
@@ -74,11 +79,15 @@ function usePresence({
 	}, [rows, deviceId, now, editorRef])
 	function updateCursor(from: number, to: number) {
 		position.current = { position: from, selectionEnd: to }
-		if (rowId.current)
-			void db.update(app.presence, rowId.current, {
-				cursor: { ...position.current, name: profile?.name ?? "Anonymous" },
-				updatedAt: new Date(),
-			})
+		if (cursorTimer.current !== undefined) return
+		cursorTimer.current = setTimeout(() => {
+			cursorTimer.current = undefined
+			if (rowId.current)
+				void db.update(app.presence, rowId.current, {
+					cursor: { ...position.current, name: profile?.name ?? "Anonymous" },
+					updatedAt: new Date(),
+				})
+		}, 100)
 	}
 	return { updateCursor, extension: remoteCursorsExtension }
 }
