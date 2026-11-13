@@ -1,4 +1,2 @@
-export {
-	AgentConnectionsSection,
-	agentConnectionsQuery,
-} from "./widgets/agent-connections-section"
+// v2-todo(agents): reconnect this feature to src/jazz/schema.ts. Classic implementation remains in git history.
+export {}

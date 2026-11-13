@@ -1,9 +1,2 @@
-export { SplashScreen, SplashScreenStatic } from "./widgets/splash-screen"
-export { welcomeLoader } from "./screens/welcome-screen"
-export { tutorLoader } from "./screens/tutor-screen"
-export { loadOrCreateDocFromUrl } from "./lib/load-or-create-doc-from-url"
-export { getRandomWriterName } from "./lib/random-writer-name"
-export {
-	fetchWelcomeContent,
-	getSpaceWelcomeContent,
-} from "./lib/welcome-content"
+// v2-todo(onboarding): reconnect this feature to src/jazz/schema.ts. Classic implementation remains in git history.
+export {}

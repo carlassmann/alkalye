@@ -1,2 +1,2 @@
-export { Settings, EditorSettings, DEFAULT_EDITOR_SETTINGS } from "./lib/schema"
-export { SettingsScreen, settingsQuery } from "./screens/settings-screen"
+// v2-todo(settings): reconnect this feature to src/jazz/schema.ts. Classic implementation remains in git history.
+export {}
