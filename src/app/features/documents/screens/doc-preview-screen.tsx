@@ -1,3 +1,4 @@
+import { useDocumentAssets } from "@/app/features/assets"
 import {
 	useEffect,
 	useState,
@@ -75,6 +76,7 @@ function PreviewContent({ id, doc }: { id: string; doc: DocumentRow }) {
 	let { documents, profile } = useLibrary()
 	let t = useIntl(),
 		navigate = useNavigate()
+	let { previewAssets } = useDocumentAssets(id, doc.content)
 	let commentDoc = useComments(doc)
 	let content = doc.content,
 		docTitle = doc.title
@@ -278,8 +280,8 @@ function PreviewContent({ id, doc }: { id: string; doc: DocumentRow }) {
 			/>
 			<div className="relative flex min-h-0 flex-1">
 				<Preview
-					content={content}
-					assets={[]}
+					content={doc.content}
+					localAssets={previewAssets}
 					wikilinks={wikilinks}
 					onExit={() => navigate({ to: "/doc/$id", params: { id } })}
 					comments={

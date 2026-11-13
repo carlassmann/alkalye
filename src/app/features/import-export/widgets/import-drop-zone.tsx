@@ -1,6 +1,11 @@
 import { useState } from "react"
 import { Upload } from "lucide-react"
-import { importMarkdownFiles, type ImportedFile } from "../index"
+import {
+	importMarkdownFiles,
+	importFolderFiles,
+	readFolderEntries,
+	type ImportedFile,
+} from "../lib/import"
 import { T } from "@/shared/intl/setup"
 
 export { ImportDropZone }
@@ -25,8 +30,8 @@ function ImportDropZone({ onImport, children }: ImportDropZoneProps) {
 
 		let imported: ImportedFile[]
 		if (hasDirectories) {
-			// v2-todo(import-export): folder import.
-			imported = []
+			let filesWithPaths = await readFolderEntries(dataTransfer)
+			imported = await importFolderFiles(filesWithPaths)
 		} else if (dataTransfer.files.length > 0) {
 			imported = await importMarkdownFiles(dataTransfer.files)
 		} else {

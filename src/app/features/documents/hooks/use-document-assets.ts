@@ -1,33 +1,6 @@
-import { useEffect, useState } from "react"
-import { useAll, useDb } from "jazz-tools/react"
-import { app } from "@/jazz/schema"
 import type { EditorAsset } from "@/app/features/assets"
+export { assetViews }
 
-export { useDocumentAssets, assetViews }
-
-function useDocumentAssets(
-	documentId: string,
-	appearance: "light" | "dark" = "light",
-) {
-	let db = useDb()
-	let { data: assets } = useAll(app.assets.where({ documentId }))
-	let revisionIds = (assets ?? []).flatMap(asset =>
-		asset.revisionId ? [asset.revisionId] : [],
-	)
-	let { data: revisions } = useAll(
-		app.tldrawRevisions.where({ id: { in: revisionIds } }),
-	)
-	let [views, setViews] = useState<EditorAsset[]>([])
-	useEffect(() => {
-		let result = assetViews(assets ?? [], revisions ?? [], appearance)
-		let frame = requestAnimationFrame(() => setViews(result.assets))
-		return () => {
-			cancelAnimationFrame(frame)
-			result.release()
-		}
-	}, [assets, revisions, db, appearance])
-	return views
-}
 function assetViews(
 	assets: {
 		id: string

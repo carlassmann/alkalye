@@ -1,3 +1,7 @@
+import {
+	exportComments,
+	importComments,
+} from "@/app/features/import-export/lib/comment-format"
 // @vitest-environment node
 import { afterEach, beforeEach, expect, test } from "vitest"
 import { createPolicyTestApp, type PolicyTestApp } from "jazz-tools/testing"
@@ -159,4 +163,58 @@ test("deleted or ambiguous quotes stay orphaned rather than pointing at other te
 			contextAfter: " C",
 		}),
 	).toEqual({ from: 12, to: 19 })
+})
+
+test("portable comments preserve anchor recovery, replies and resolution in asset copies", async () => {
+	let doc = await document()
+	let content = "# Original\n\n![image](asset:old-id)\n\nSelected words."
+	await doc.db
+		.update(app.documents, doc.id, { content })
+		.wait({ tier: "global" })
+	doc = await reload(doc)
+	createCommentThreadFromQuote(
+		doc,
+		"Selected words",
+		"Initial comment",
+		"Alice",
+	)
+	doc = await reload(doc)
+	await addCommentReply(doc.comments[0], "Reply", "Alice")
+	await resolveCommentThread(doc.comments[0])
+	await doc.db.waitForSync()
+	let exported = await exportComments(doc.db, doc.id)
+	let copyContent =
+		"# Original (copy)\n\n![image](asset:new-longer-id)\n\nSelected words."
+	let copy = await doc.db
+		.insert(app.documents, {
+			ownerId: aliceId,
+			title: "Copy",
+			content: copyContent,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		})
+		.wait({ tier: "global" })
+	await importComments(doc.db, copy.id, aliceId, exported, content)
+	let imported = await reload({ ...copy, db: doc.db, comments: [] })
+	expect(imported.comments).toHaveLength(1)
+	let thread = imported.comments[0]
+	expect(thread.id).not.toBe(doc.comments[0].id)
+	expect(thread.resolvedAt).not.toBeNull()
+	expect(thread.replies.map(reply => reply.body)).toEqual([
+		"Initial comment",
+		"Reply",
+	])
+	let range = getCommentRange(imported, thread.anchor)
+	expect(range.orphaned).toBe(false)
+	expect(copyContent.slice(range.from, range.to)).toBe("Selected words")
+	await doc.db
+		.update(app.documents, copy.id, {
+			content: copyContent.replace("Selected words", ""),
+		})
+		.wait({ tier: "global" })
+	expect((await exportComments(doc.db, copy.id))[0]).toMatchObject({
+		quote: "Selected words",
+		from: null,
+		to: null,
+	})
 })

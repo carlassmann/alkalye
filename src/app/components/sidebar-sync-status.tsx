@@ -1,3 +1,4 @@
+import { testIds } from "@/app/lib/test-ids"
 import type { JazzClient } from "jazz-tools/client"
 import { useState } from "react"
 import { useLocation, useNavigate } from "@tanstack/react-router"
@@ -83,6 +84,7 @@ function SidebarSyncStatus() {
 				render={
 					<Button
 						variant="ghost"
+						data-testid={testIds.sidebar.syncStatus}
 						nativeButton
 						className="relative h-auto w-full flex-1 justify-start gap-2 px-2 py-2 pointer-fine:h-auto"
 					>

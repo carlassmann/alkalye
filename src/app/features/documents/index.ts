@@ -23,6 +23,10 @@ export { DocPreviewScreen } from "./screens/doc-preview-screen"
 export { HomeScreen } from "./screens/home-screen"
 export { NewDocScreen } from "./screens/new-doc-screen"
 
-export { useDocumentAssets, assetViews } from "./hooks/use-document-assets"
+export { assetViews } from "./hooks/use-document-assets"
 
 export { useDocumentAccess } from "./hooks/use-document-access"
+
+export { LocalDocScreen } from "./screens/local-doc-screen"
+export { Preview } from "./widgets/preview"
+export type { ResolvedDoc } from "./lib/wikilink-titles"

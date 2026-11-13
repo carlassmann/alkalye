@@ -1,3 +1,4 @@
+import { DuplicateDocDialog } from "./duplicate-doc-dialog"
 import { useEffect, useState } from "react"
 import { useNavigate } from "@tanstack/react-router"
 import { useSidebar } from "@/app/components/ui/sidebar"
@@ -20,7 +21,6 @@ import {
 	makeAddTag,
 	makeDelete,
 	makeDownload,
-	makeDuplicate,
 	makeLeave,
 	makeMoveToSpace,
 	makeOpenTimeMachine,
@@ -71,6 +71,7 @@ function DocumentCommands({
 		setRightOpenMobile,
 	} = useSidebar()
 	let [openDocumentOpen, setOpenDocumentOpen] = useState(false)
+	let [duplicateOpen, setDuplicateOpen] = useState(false)
 	let [deleteOpen, setDeleteOpen] = useState(false)
 	let [leaveOpen, setLeaveOpen] = useState(false)
 	let [moveOpen, setMoveOpen] = useState(false)
@@ -89,11 +90,11 @@ function DocumentCommands({
 			if (isAdmin) setDeleteOpen(true)
 			else if (me) setLeaveOpen(true)
 		} else if (id === "duplicateDocument") {
-			void makeDuplicate(db, doc, ownerId, spaceId, navigate)()
+			setDuplicateOpen(true)
 		} else if (id === "moveToSpace") {
 			if (me) setMoveSpaceOpen(true)
 		} else if (id === "downloadDocument") {
-			void makeDownload(doc, content)()
+			void makeDownload(db, doc, content)()
 		} else if (id === "timeMachine") {
 			makeOpenTimeMachine(
 				doc,
@@ -141,6 +142,19 @@ function DocumentCommands({
 
 	return (
 		<>
+			<DuplicateDocDialog
+				doc={doc}
+				open={duplicateOpen}
+				onOpenChange={setDuplicateOpen}
+				onDuplicate={(id, destination) => {
+					if (destination)
+						void navigate({
+							to: "/spaces/$spaceId/doc/$id",
+							params: { spaceId: destination.id, id },
+						})
+					else void navigate({ to: "/doc/$id", params: { id } })
+				}}
+			/>
 			{openDocumentOpen && (
 				<QuickJumpDialog
 					open

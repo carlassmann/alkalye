@@ -1,3 +1,5 @@
+import { readAssetBlob } from "@/app/features/assets"
+import { exportComments } from "@/app/features/import-export/lib/comment-format"
 import type { RefObject } from "react"
 import type { useNavigate } from "@tanstack/react-router"
 import { unfoldEffect } from "@codemirror/language"
@@ -217,15 +219,15 @@ function makeTurnIntoPresentation(
 	}
 }
 
-function makeDownload(doc: LoadedDocument, content: string) {
+function makeDownload(db: Database, doc: LoadedDocument, content: string) {
 	return async function handleDownload() {
-		let docAssets = await getExportAssets(doc)
+		let docAssets = await getExportAssets(db, doc)
 		let title = getDocumentTitle(content)
 		await exportDocument(
 			content,
 			title,
 			docAssets.length > 0 ? docAssets : undefined,
-			undefined,
+			await exportComments(db, doc.id),
 		)
 	}
 }
@@ -256,6 +258,13 @@ function makeDuplicate(
 ) {
 	return async function handleDuplicate() {
 		let copy = await createDocument(db, ownerId, addCopyToTitle(doc.content))
+		let { copyDocumentAssets } = await import("@/app/features/assets")
+		let { updateContent } = await import("./library")
+		await updateContent(
+			db,
+			copy,
+			await copyDocumentAssets(db, doc.id, copy.id, copy.content),
+		)
 		void navigate({ to: "/doc/$id", params: { id: copy.id } })
 	}
 }
@@ -299,9 +308,19 @@ function getExistingFolders(documents: LoadedDocument[] = []): string[] {
 	return [...folders].sort()
 }
 
-async function getExportAssets(_doc: LoadedDocument): Promise<ExportAsset[]> {
-	// v2-todo(assets): binary export.
-	return []
+async function getExportAssets(
+	db: Database,
+	doc: LoadedDocument,
+): Promise<ExportAsset[]> {
+	let assets = await db.all(
+		app.assets.where({ documentId: doc.id }).select("id", "name"),
+	)
+	return Promise.all(
+		assets.map(async asset => ({
+			...asset,
+			blob: await readAssetBlob(db, asset.id),
+		})),
+	)
 }
 
 function runWithMobileClose(

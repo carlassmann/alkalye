@@ -170,7 +170,7 @@ Added a development-only Vite plugin rejecting only `/jazz/apps/<id>/ws` upgrade
 The standalone Vite/Jazz reproduction measures admission at 10.372 seconds before and 0.306 after. Its first remote query completes at 10.411 and 0.345 seconds. The draft upstream proposal is explicit HTTP transport selection or concurrent capability discovery. No upstream issue was submitted. Detailed phase tables, source trace, reproduction, temporary instrumentation and measurement harness are in `docs/jazz-v2-issues/auth-transport.md`; numeric results are in `auth-timing.json` beside it.
 
 Validation: `check:types` has zero errors; `check:lint` has zero errors and 67 existing warnings; `check:test` passes 53 files / 630 tests. All four `e2e/auth.spec.ts` cases pass with one worker at the final implementation, retaining source-upload waits, document/URL assertions and the access-denied observer. Complete scenarios take 12.7–19.7 seconds. The measurement builds and final uninstrumented Node build pass. Full `check:format` still flags nine unchanged MCP/OAuth route files from the baseline; changed files pass formatting. Both app environments and the standalone reproduction ran through Work with tailnet HTTPS; stale Classic sync was stopped. No push or PR.
-||||||| 937934c
+
 ## Phase 2: agents, MCP, OAuth and CLI
 
 2026-11-13, branch `t3/mcp-oauth-cli-v2`, based on `937934c`.
@@ -206,7 +206,7 @@ Started with `work setup --tailscale`, then `work up --tailscale`; stopped the s
 - Background browser verification created an account with 24 recovery words, approved the original consent UI and received an authorization code. With the MCP-created document open, an HTTP tool update appeared live in CodeMirror. Disconnecting through Settings removed the rows; the same MCP token then returned HTTP 401. The browser's recovery phrase also restored its document library in the CLI.
 - `bun run qa:mcp <origin>` passes discovery, PKCE metadata, cross-origin token errors, unauthenticated challenge and legal pages. OpenAI domain challenge was skipped because no challenge token was configured. Restoring the original endpoint exposed its missing GET handler; added GET so discovery receives the expected 401 challenge.
 - CLI signup, document creation/listing, phrase login, unauthenticated local Markdown-to-HTML export and Chrome PDF export passed against the running worktree. Browser tab closed after validation. No push, PR or cloud deployment.
-||||||| 937934c
+
 ## Phase 2: comments, time machine, presentation
 
 - 2026-11-13, phase 2 presentation: restored Classic slideshow, teleprompter, laser preview/trails and sidebar links from `8379d4e`; ported transport to v2 latest-history rows, without hub/sender rotation. Commit: `7e00fd7`.
@@ -248,5 +248,71 @@ At code head `e3fb4d8`, `bun run check:types` passes with zero errors; `check:li
 Empty mergeable transactions throw `empty mergeable transaction has no committed unit; roll it back instead`. Asset restore and comment import skip transactions when there is nothing to write. Regression tests cover text-only restore and copies without comments. A live asset row must be updated; `restore` rejects it with `row not deleted`. Deleted rows use `restore`.
 
 The existing Vite/astro-check dependency-hash issue still applies. Restart the dev server after type checks before running browser/e2e validation. One e2e run also hit the existing boot helper's `Execution context was destroyed` navigation race; its assertions were not changed.
+
+written with gpt-6.1-sol in T3 Code (Codex)
+
+## Phase 2: assets, themes, import/export, local files and onboarding
+
+- 2026-11-13, phase 2: restored the Classic screens and widgets for this area and ported their storage to alpha.61. Asset bytes stream into `s.bytes()` and listing queries select metadata. Image uploads retain the Classic 2048-pixel maximum and generate dimensions plus a small PNG thumbnail. Video uploads compress when an encoder exists and otherwise stream the original file. Video playback uses Blob URLs; uploads also derive dimensions and a small sidebar thumbnail without downloading full videos when listing. Whiteboards save immutable revisions with snapshot and light/dark PNG previews. Theme libraries, source workbench, presets, default themes, font assets and portable exports use v2 rows. The workbench uses the v2 CodeMirror binding, including `editedFrom`, and theme edits survived reload. Markdown/ZIP import and export, comment sidecars, asset copies, the duplicate dialog, local filesystem screen, welcome and tutor routes are restored. New account profiles receive a random writer name.
+
+### Contract and merge notes
+
+- Schema change: one optional `assets.thumbnail: s.bytes()` column. No permission changes or migration lenses. This worktree started with a fresh disposable `.jazz` store after the schema change. Reset disposable backend and browser stores when integrating the changed schema.
+- `useDocumentAssets(documentId, content)` exports metadata, sidebar/editor view models and Blob URL preview assets. It reads full image/video bytes only for referenced assets; unused images use their thumbnail. Whiteboard listings load previews, never snapshots. Cleanup revokes URLs.
+- `uploadAsset`, `createTldrawAsset`, `updateTldrawAsset`, `copyDocumentAssets` take the v2 database and document IDs. Streaming handles return an ID, unlike ordinary inserts. Uploads wait for local durability. Compression accepts videos up to 500 MB; the byte-upload guard is 2 GB. ZIPs and Blob playback materialize bytes in memory. Whiteboard backups retain Classic's 32 MB bundle, 8 MB snapshot and 8 MB preview limits.
+- `createDocument` now accepts an optional fourth `spaceId` for creating copies directly in a destination space. It does not reassign existing documents. `handleSaveCopy` takes database, owner ID, document, UI state setter and navigate. The original toolbar gates it on a backed-up account and a public document owned by someone else.
+- Shared UI changes are confined to document asset/rendering/copy/import controls, settings' theme section, barrel exports and the local/welcome/tutor/workbench routes. The presentation barrel additionally exports the restored pure slideshow renderer. Its asset input is `{ id, type, url, lightUrl?, darkUrl?, muteAudio? }`, from `useDocumentAssets().previewAssets`. The presentation agent should use this renderer and pass those assets when restoring the slideshow screen.
+- Comment sidecars retain the Classic export format. Imported anchors are alpha.61 text ranges with `matched`, `before`, `after` and optional positions. Export resolves those ranges against current content. Coordinate the `anchor` JSON shape with the comments agent if its UI wraps ranges in another object.
+- The local-file screen retains directory handles, asset references, conflict/recovery UI and PWA file-handler consumption. `MockDirectoryHandle` gains the optional native-move signature required by its restored tests.
+
+### Checks and commits
+
+`bun run check:types` passes with zero errors. `bun run check:lint` passes with zero errors and 123 style warnings. `bun run check:test` passes all 60 files and 727 tests. Five unchanged-assertion auth/document e2e cases pass together with two workers and a 120-second test timeout, 1.5 minutes. The sidebar auth selector now uses the existing sync-status test ID because restored random writer names replace “Anonymous user.” No assertion was removed. Repository-wide `check:format` still reports nine pre-existing API/discovery files outside this area; changed-area formatting passes.
+
+Code commits: `88b71cc` assets and revisions, `a70cc19` themes and workbench, `91d297b` imports/local files/onboarding. `eb46fa8` adds generated video thumbnails. No push or PR.
+
+### Runtime evidence
+
+Work setup and startup used `--tailscale`; the stale Classic sync process was stopped. Runtime: https://web-t3-port-assets-themes-onboarding-alkalye.cshed.carlassmann.com
+
+Background agent-browser sessions compared exact Classic `8379d4e` with v2. Screenshot pairs and fixtures are in `/tmp/alkalye-v2-phase2/assets-themes/`.
+
+- Fresh account opens “Welcome to Alkalye” with a random writer profile. Markdown tutor creates a document in Tutor and replaces shortcut tokens.
+- Uploaded an image, inserted it, navigated to preview and observed a decoded Blob image. Dispatched real File objects through the editor’s paste and drop handlers; both were handled, created assets and inserted links. Uploaded a video without a browser encoder, toggled mute, inserted it and observed actual playback, `readyState=4` and `muted=true`.
+- Drew and saved a whiteboard, saw its preview, exported/imported it in a ZIP, duplicated the document and reopened the copied whiteboard with its original shape.
+- Edited theme CSS in the original workbench and observed the preview heading change to red. Exported and reimported portable theme Markdown. Imported a theme ZIP containing a font, thumbnail and light/dark presets; the font loaded, and the heading switched between red and green with appearance. Video playback also reached `readyState=4` inside the workbench slideshow renderer. A fresh video upload produced a decoded 128-pixel sidebar thumbnail.
+- Exported the whole library to ZIP and inspected image, video and whiteboard entries. Reimport completed with all three assets visible. The original duplicate dialog created independent asset IDs.
+- Opened a real browser OPFS file handle through the file-picker seam, typed in the original local editor and saved with Ctrl+S. Reading the actual file returned the edited content. This exercises browser filesystem writes without an OS picker.
+
+### Limits and remaining integration
+
+The standalone slideshow route still belongs to the presentation agent; this area restores and exercises its renderer through the workbench. Shared-document access and space routes depend on the sharing/spaces port. Public-theme access policy remains the foundation contract. The installed PWA’s OS launch queue was not manually exercised; its restored route consumes launch files. No cloud deployment, Classic importer, push or PR was attempted. No new confirmed Jazz v2 defect was found. Alpha.61's ID-only streaming handle and Vite's stale dependency hashes were observed; restarting Work after type checks resolved the latter.
+
+written with gpt-6.1-sol in T3 Code (Codex)
+
+## Phase 2C integration into the migration branch
+
+2026-11-13, merged `t3/port-assets-themes-onboarding` at `4ece575` into `jazz-v2-migration` after `8994a88`.
+
+The document editor combines 2B's comments and presentation extensions with 2C's uploads, whiteboards, imports and copies. Preview retains live comments and inherited document access while using 2C's Blob assets and themes. The slideshow renderer follows Classic `8379d4e` with 2C's v2 media/theme access; its screen retains 2B's presentation-line writes, inherited access checks and laser receiver. Settings retains both Themes and MCP Connections. Both feature handoffs above remain intact; stray conflict-base markers from earlier handoffs were removed.
+
+The optional `assets.thumbnail` column now has a generated migration from `8ef72cb0424c` to `35991c834bd8`, shipped through `defineApp`. The existing worktree SQLite store opened successfully without being reset. This supersedes 2C's disposable-store reset instruction for integration. `bun x jazz-tools validate --schema-dir src/jazz` validates all 21 tables. Work setup reinstalled the existing pinned MCP patch; without reinstalling, this checkout's old `node_modules` lacked `forUser` and device-proof support.
+
+Portable comment sidecars and all copy paths use 2B's shared anchor recovery/export implementation. Sidebar duplication now copies comments as well as assets. Copies map anchors across title/frontmatter changes and new asset IDs. A real policy-server regression test covers replies, resolution, independent thread IDs, transformed positions and orphaned exports. Preview verifies mapped text before applying highlight offsets, falling back to quote/context recovery when media segmentation changes rendered offsets.
+
+Validation: `bun run check:types` has zero errors; `check:lint` has zero errors and 142 style warnings; `check:test` passes 69 files / 768 tests. Changed integration files pass Prettier. All five unchanged-assertion cases in `e2e/auth.spec.ts` and `e2e/doc.spec.ts` pass against a stable Work server with two workers and a 120-second timeout.
+
+Work setup/start both used `--tailscale`; the stale Classic `sync` command was stopped. Runtime: https://web-jazz-v2-migration-alkalye.cshed.carlassmann.com
+
+Background agent-browser profiles `merge-2c-a` and `merge-2c-b` exercised:
+
+- Image upload/insert plus a comment created through the selection dialog. Preview decodes the Blob image and highlights the exact quote, including an image immediately before a heading.
+- Settings' Themes section creates a custom theme. Its original workbench saves a heading-color override. Preview and slideshow render `Custom theme 1` with the expected `rgb(190, 30, 60)` heading color. Settings' Connections category displays the MCP connection panel.
+- Recovery into the second independent browser profile. A's teleprompter starts the presentation and changes B's slideshow to slide 2. A's real pointer drag on the laser surface creates a visible red SVG trail in B; the themed slideshow also decodes its image.
+- Time machine browses an earlier edit and restores it through the confirmation dialog. The editor retains its image and comment after returning. The duplicate dialog creates independent asset IDs; its preview still decodes the image, applies the theme and highlights the copied comment correctly.
+
+Screenshots: `/tmp/alkalye-2c-merge-smoke/` (`slideshow-theme-laser.png`, `teleprompter.png`, `copy-preview.png`). Existing Base UI native-button/slider warnings remain. Vite hot reload during integration also invalidated open profiles; restarting Work after type checks and reloading cleared that state. Cloud deployment, the Classic importer and the sharing/spaces branch remain outside this merge. No push or PR.
+
+- 2026-11-13, phase 2C integration: merged assets/themes/onboarding with comments/time-machine/presentation and MCP settings; added the thumbnail migration, shared copy/comment anchor handling and preview highlight recovery; types/lint, 768 tests, five auth/document e2e cases and two-profile browser smoke checks pass. Commit: phase-2C integration merge.
 
 written with gpt-6.1-sol in T3 Code (Codex)

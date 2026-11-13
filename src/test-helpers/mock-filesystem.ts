@@ -351,6 +351,7 @@ function isDirectoryHandle(
 }
 
 class MockDirectoryHandle implements FileSystemDirectoryHandle {
+	move?: (destination: FileSystemDirectoryHandle, name: string) => Promise<void>
 	kind = "directory" as const
 	name: string
 	private children = new Map<string, FileSystemHandle>()

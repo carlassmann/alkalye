@@ -51,9 +51,7 @@ for (let entryPoint of ["sidebar", "settings"]) {
 				await freshPage
 					.getByRole("button", { name: "Documents", exact: true })
 					.click()
-				await freshPage
-					.getByRole("button", { name: "Anonymous user Local only" })
-					.click()
+				await freshPage.getByTestId(testIds.sidebar.syncStatus).click()
 				await freshPage
 					.getByRole("menuitem", { name: "Sign in", exact: true })
 					.click()

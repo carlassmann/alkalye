@@ -1,2 +1,5 @@
-// v2-todo(onboarding): reconnect this feature to src/jazz/schema.ts. Classic implementation remains in git history.
-export { fetchWelcomeContent } from "./lib/welcome-content"
+export {
+	fetchWelcomeContent,
+	getSpaceWelcomeContent,
+} from "./lib/welcome-content"
+export { getRandomWriterName } from "./lib/random-writer-name"

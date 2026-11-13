@@ -66,3 +66,5 @@ export {
 	type CommandId,
 	type DocumentCommandId,
 } from "./widgets/command-palette"
+
+export { setFrontmatterField } from "./lib/frontmatter"

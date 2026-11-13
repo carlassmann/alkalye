@@ -1,56 +1,54 @@
-import type { schema } from "jazz-tools"
-import { app } from "@/jazz/schema"
-export { getDefaultDocumentCss, getSlideshowBaseCss } from "./lib/default-theme"
-export { sanitizeHtml } from "./lib/sanitize"
+export { ThemePreset, ThemeType } from "./lib/schema"
 export {
 	useDocumentTheme,
+	resolveDocumentTheme,
+	getThemePresets,
+	findThemeByName,
+	findThemeById,
+	findPresetByName,
+	findPresetByAppearance,
+	getThemeName,
+	getThemeId,
+	getPresetName,
+	loadThemesForPdf,
+	type ResolvedTheme,
+	type LoadedThemes,
+	type ThemePresetType,
+} from "./lib/document-theme"
+export {
 	tryCachedThemeStylesAsync,
-	ThemePicker,
-	PresetPicker,
-}
-export type { ResolvedTheme, ThemeStyles }
-type ThemeRow = schema.RowOf<typeof app.themes>
-type ResolvedTheme = {
-	theme: ThemeRow | null
-	preset: string | null
-	warning?: string
-}
-type ThemeStyles = {
-	css: string
-	presetVariables: string
-	fontFaceRules: string
-}
-function useDocumentTheme(..._args: unknown[]): ResolvedTheme {
-	// v2-todo(themes): resolve custom themes and presets.
-	return { theme: null, preset: null }
-}
-async function tryCachedThemeStylesAsync(
-	..._args: unknown[]
-): Promise<{ ok: true; styles: ThemeStyles } | { ok: false; error: string }> {
-	return {
-		ok: true,
-		styles: { css: "", presetVariables: "", fontFaceRules: "" },
-	}
-}
-function ThemePicker(_props: {
-	content: string
-	getContent?: () => string
-	onThemeChange?: (content: string) => void
-	onPresetChange?: (content: string) => void
-	disabled?: boolean
-}) {
-	// v2-todo(themes): restore theme picker data.
-	return null
-}
-function PresetPicker(_props: {
-	content: string
-	getContent?: () => string
-	onThemeChange?: (content: string) => void
-	onPresetChange?: (content: string) => void
-	disabled?: boolean
-}) {
-	// v2-todo(themes): restore preset picker data.
-	return null
-}
+	tryRenderTemplateWithContent,
+	scopeThemeCss,
+	type ThemeStyles,
+} from "./lib/renderer"
+export {
+	parseThemeMarkdown,
+	parseThemeZip,
+	type ThemeUploadError,
+} from "./lib/upload"
+export {
+	getDefaultDocumentCss,
+	getDefaultThemeCss,
+	getDefaultThemeSource,
+	getSlideshowBaseCss,
+} from "./lib/default-theme"
+export { exportTheme, serializePortableTheme } from "./lib/export"
+export { sanitizeCss, sanitizeHtml, type SanitizeResult } from "./lib/sanitize"
+export { ThemePicker } from "./widgets/theme-picker"
+export { ThemeWorkbenchScreen } from "./screens/theme-workbench-screen"
+export {
+	parseThemeSource,
+	serializeThemeSource,
+	createThemeSourceDocument,
+	syncThemeFromSource,
+	getThemeSourceId,
+	serializePortableAssetFence,
+	type ThemeSource,
+	type ThemeSourceError,
+} from "./lib/source"
+export { PresetPicker } from "./parts/preset-picker"
 
-export { scopeThemeCss } from "./lib/scope"
+export { createTheme, createDefaultTheme } from "./lib/create"
+
+export { ThemesSection } from "./widgets/themes-settings"
+export type { ThemeRow, ThemeAssetRow } from "./lib/schema"

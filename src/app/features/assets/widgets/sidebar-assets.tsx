@@ -384,7 +384,9 @@ function SidebarAssets({
 													render={
 														<SidebarMenuButton disabled={readOnly} nativeButton>
 															<div className="bg-muted size-8 shrink-0 overflow-hidden rounded">
-																{asset.type === "image" && asset.imageUrl ? (
+																{(asset.type === "image" ||
+																	asset.type === "video") &&
+																asset.imageUrl ? (
 																	<img
 																		src={asset.imageUrl}
 																		alt=""

@@ -1,4 +1,5 @@
 import { schema as s } from "jazz-tools"
+import { migrations } from "./migrations"
 import { EditorSettings } from "./value-types"
 
 export { app }
@@ -149,6 +150,7 @@ let schema = {
 			type: s.enum("image", "video", "tldraw"),
 			name: s.string(),
 			data: s.bytes().optional(),
+			thumbnail: s.bytes().optional(),
 			mimeType: s.string().optional(),
 			muteAudio: s.boolean().default(false),
 			width: s.int().optional(),
@@ -264,6 +266,6 @@ let schema = {
 }
 
 type AppSchema = s.Schema<typeof schema>
-let app: s.App<AppSchema> = s.defineApp(schema, { migrations: "none" })
+let app: s.App<AppSchema> = s.defineApp(schema, { migrations })
 type DocumentRow = s.RowOf<typeof app.documents>
 type UserDocumentRow = s.RowOf<typeof app.userDocuments>

@@ -1,3 +1,4 @@
+import { readStorageMode } from "@/app/lib/storage-mode"
 import { fetchWelcomeContent } from "@/app/features/onboarding"
 import { readLastOpenedDocument } from "../lib/last-opened-document"
 import { useEffect, useRef } from "react"
@@ -10,6 +11,10 @@ function HomeScreen() {
 	let navigate = useNavigate()
 	let creating = useRef(false)
 	useEffect(() => {
+		if (readStorageMode() === "filesystem") {
+			void navigate({ to: "/local", replace: true })
+			return
+		}
 		if (isLoading) return
 		let last = readLastOpenedDocument(ownerId)
 		let doc =

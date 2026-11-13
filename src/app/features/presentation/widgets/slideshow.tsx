@@ -9,8 +9,6 @@ import {
 	useId,
 } from "react"
 import { createPortal } from "react-dom"
-import type { EditorAsset } from "@/app/features/assets"
-import { getSlideshowBaseCss } from "@/app/features/themes"
 import {
 	parsePresentationSize,
 	parsePresentationTheme,
@@ -39,6 +37,7 @@ import { useResolvedTheme } from "@/app/components/appearance"
 import { EllipsisIcon, TriangleAlert } from "lucide-react"
 import {
 	useDocumentTheme,
+	getSlideshowBaseCss,
 	sanitizeHtml,
 	scopeThemeCss,
 	tryCachedThemeStylesAsync,
@@ -65,8 +64,14 @@ let ThemeContext = createContext<PresentationTheme | null>(null)
 let WikilinkContext = createContext<Map<string, ResolvedWikilink>>(new Map())
 let SyntaxThemeContext = createContext<SyntaxTheme>("github-light")
 
-type Asset = EditorAsset
-
+type Asset = {
+	id: string
+	type: "image" | "video" | "tldraw"
+	url: string
+	lightUrl?: string
+	darkUrl?: string
+	muteAudio?: boolean
+}
 let AssetContext = createContext<Asset[] | undefined>(undefined)
 
 type Slide = { slideNumber: number; blocks: VisualBlock[] }
@@ -268,7 +273,8 @@ function SlideshowView({
 											: "flex min-h-0 flex-1 flex-col"
 									}
 								>
-									{themeStylesResult.isLoading ? null : safeSlideTemplate &&
+									{documentTheme.isLoading ||
+									themeStylesResult.isLoading ? null : safeSlideTemplate &&
 									  slideTemplateHasSlot ? (
 										<SlideTemplate
 											key={currentSlideNumber}
@@ -886,11 +892,27 @@ function SlideContentItem({ item }: { item: SlideContent }) {
 
 function SlideImage({ src, alt }: { src: string; alt: string }) {
 	let assets = useContext(AssetContext)
+	let systemTheme = useResolvedTheme()
+	let colorScheme = useContext(ThemeContext) ?? systemTheme
 	let assetId = src.match(/^asset:(.+)$/)?.[1]
 	let asset = assets?.find(asset => asset.id === assetId)
-	if (asset?.type === "video") return <SlideVideo asset={asset} />
-	let url = assetId ? asset?.previewUrl : src
-	if (!url)
+	let url = asset
+		? asset.type === "tldraw"
+			? ((colorScheme === "dark" ? asset.darkUrl : asset.lightUrl) ?? asset.url)
+			: asset.url
+		: src
+	if (asset?.type === "video")
+		return (
+			<video
+				src={url}
+				controls
+				muted={isLaserPreview() || asset.muteAudio}
+				className="slideshow-image"
+				style={{ width: "100%", height: "100%", objectFit: "contain" }}
+				onClick={event => event.stopPropagation()}
+			/>
+		)
+	if (assetId && !asset)
 		return (
 			<div className="slideshow-image-placeholder flex aspect-video items-center justify-center">
 				<span className="text-sm opacity-60">Loading...</span>
@@ -904,77 +926,6 @@ function SlideImage({ src, alt }: { src: string; alt: string }) {
 			style={{ width: "100%", height: "100%", objectFit: "contain" }}
 		/>
 	)
-}
-
-function SlideVideo({ asset }: { asset: Asset }) {
-	let video = asset.video
-	let blobUrl = useVideoUrl(video)
-	let url = asset.videoUrl ?? blobUrl
-
-	if (!url) {
-		return (
-			<div className="slideshow-image-placeholder flex aspect-video items-center justify-center">
-				<span className="text-sm opacity-60">
-					<T k="presentation.slideshow.loadingVideo" />
-				</span>
-			</div>
-		)
-	}
-
-	return (
-		<video
-			src={url}
-			controls
-			muted={isLaserPreview() || asset.muteAudio}
-			className="slideshow-image"
-			style={{ width: "100%", height: "100%", objectFit: "contain" }}
-			onClick={e => e.stopPropagation()}
-		/>
-	)
-}
-
-function useVideoUrl(
-	video: { $isLoaded?: boolean; toBlob?: () => Blob | undefined } | undefined,
-): string | null {
-	let [url, setUrl] = useState<string | null>(null)
-	let [trackedVideo, setTrackedVideo] = useState(video)
-
-	// Reset when video changes (adjust state during render)
-	if (trackedVideo !== video) {
-		setTrackedVideo(video)
-		if (url) {
-			URL.revokeObjectURL(url)
-			setUrl(null)
-		}
-	}
-
-	// Load URL - schedule via rAF to avoid lint error
-	useEffect(() => {
-		if (url) return
-		if (!video?.$isLoaded || !video.toBlob) return
-
-		let cancelled = false
-		requestAnimationFrame(() => {
-			if (cancelled) return
-			let blob = video.toBlob?.()
-			if (!blob) return
-			let objectUrl = URL.createObjectURL(blob)
-			setUrl(objectUrl)
-		})
-
-		return () => {
-			cancelled = true
-		}
-	}, [video, url])
-
-	// Cleanup on unmount
-	useEffect(() => {
-		return () => {
-			if (url) URL.revokeObjectURL(url)
-		}
-	}, [url])
-
-	return url
 }
 
 function HighlightedCode({
@@ -1106,7 +1057,7 @@ function getThemeMeasureKey(
 	styles: ThemeStyles | null,
 ): string {
 	let themeId = documentTheme.theme?.id ?? "__none__"
-	let preset = documentTheme.preset ?? "__none__"
+	let preset = documentTheme.preset?.name ?? "__none__"
 	if (!styles) return `${themeId}:${preset}:__loading__`
 	let stylesKey = hashThemeStyles(styles)
 	return `${themeId}:${preset}:${stylesKey}`

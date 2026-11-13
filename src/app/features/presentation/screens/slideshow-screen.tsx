@@ -2,16 +2,12 @@ import { isLaserPreview } from "../lib/laser-preview"
 import { useNavigate } from "@tanstack/react-router"
 import { useOne, useDb } from "jazz-tools/react"
 import { app } from "@/jazz/schema"
-import {
-	useLibrary,
-	useDocumentAssets,
-	useDocumentAccess,
-} from "@/app/features/documents"
+import { useLibrary, useDocumentAccess } from "@/app/features/documents"
 import { DocumentNotFound } from "@/app/components/error-states"
 import { LaserReceiver } from "../widgets/laser-pointer"
 import { Slideshow, getSlides } from "../widgets/slideshow"
-import { useResolvedTheme } from "@/app/components/appearance"
-import { parsePresentation, parsePresentationTheme } from "../lib/presentation"
+import { useDocumentAssets } from "@/app/features/assets"
+import { parsePresentation } from "../lib/presentation"
 import { useScreenWakeLock } from "../lib/screen-wake-lock"
 export { SlideshowScreen }
 
@@ -20,11 +16,7 @@ function SlideshowScreen({ id }: { id: string }) {
 		db = useDb()
 	let { documents } = useLibrary()
 	let { data: doc, isLoading } = useOne(app.documents.where({ id }))
-	let appearance = useResolvedTheme()
-	let assets = useDocumentAssets(
-		id,
-		parsePresentationTheme(doc?.content ?? "") ?? appearance,
-	)
+	let { previewAssets: assets } = useDocumentAssets(id, doc?.content ?? "")
 	let { canEdit: canEditDoc } = useDocumentAccess(doc)
 	useScreenWakeLock()
 	if (isLoading) return <p role="status">Opening document…</p>
