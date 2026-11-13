@@ -1183,6 +1183,7 @@ function AppSection() {
 }
 
 function ReloadDiagnosticsSection() {
+	let { db, ownerId } = useLibrary()
 	let [entries, setEntries] = useState(readReloadDiagnostics)
 	let [copyState, setCopyState] = useState<
 		"idle" | "preparing" | "copied" | "failed"
@@ -1191,10 +1192,10 @@ function ReloadDiagnosticsSection() {
 
 	async function handleCopy() {
 		setCopyState("preparing")
-		let { collectStartupDiagnosticLabels } =
+		let { collectStartupDiagnostics } =
 			await import("../lib/startup-diagnostic-labels")
-		let labels = await collectStartupDiagnosticLabels()
-		await collectStorageDiagnostics(labels)
+		collectStartupDiagnostics(db, ownerId)
+		await collectStorageDiagnostics()
 		setEntries(readReloadDiagnostics())
 		let copied = await copyText(reloadDiagnosticsReport())
 		setCopyState(copied ? "copied" : "failed")
