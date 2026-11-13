@@ -37,6 +37,12 @@ function writeWorkspaceEnv() {
 				),
 		)
 		.join("\n")
+	if (process.env.WORK_SYNC_WS_URL)
+		envFile = setEnvValue(
+			envFile,
+			"PUBLIC_JAZZ_CLASSIC_SYNC_SERVER",
+			process.env.WORK_SYNC_WS_URL,
+		)
 	envFile = setEnvValue(envFile, "JAZZ_PUBLIC_URL", `${webUrl}/jazz`)
 	envFile = setEnvValue(envFile, "ALKALYE_MCP_BASE_URL", mcpBaseUrl)
 
