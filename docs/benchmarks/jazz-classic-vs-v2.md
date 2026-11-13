@@ -10,10 +10,11 @@ Use the same Chromium version, machine, CPU throttle, dataset pins, edit count a
 server mode for v2. The default uses three independent accounts and browser contexts.
 Services run through `work setup --tailscale` then `work up --tailscale`.
 
+Accounts also retain the app's welcome document; the 52 imported bodies are verified.
 The corpus contains the first 50 sorted Markdown paths from Vite's pinned docs tree.
-Each receives a unique heading for reliable UI lookup. Books are Alice's Adventures
+Each receives explicit title frontmatter and a unique heading for reliable UI lookup. Books are Alice's Adventures
 in Wonderland and Dracula, preserved as plain Markdown paragraphs under a heading.
-Line endings become LF. Source URLs, SHA-256 pins, authors and license references
+Books receive the same title frontmatter. Line endings become LF. Source URLs, SHA-256 pins, authors and license references
 are in `bench/datasets/sources.json`. Downloaded files are ignored by Git. Gutenberg
 licenses remain inside the books. Vite is MIT; the Automerge trace is CC-BY-4.0,
 attributed to Martin Kleppmann and Alastair R. Beresford. The trace contains 259,778
@@ -46,7 +47,8 @@ original document. Full replay also checks upstream's finalText. Default replay 
 the first 200 edits, not the full history or its original timing.
 
 Input-to-paint is a beforeinput timestamp to the second requestAnimationFrame,
-a paint-opportunity estimate rather than a display presentation timestamp. Inserts
+a paint-opportunity estimate rather than a display presentation timestamp. It excludes
+input queueing before beforeinput. Inserts
 and deletions with beforeinput events contribute samples; cursor moves do not.
 The runner waits two frames after each trace edit, so this is paced editing, not
 maximum throughput. Long tasks are PerformanceObserver tasks over 50 ms throughout
@@ -56,7 +58,7 @@ sync pools five samples per run. Raw samples are retained.
 
 Storage uses Chromium's origin estimate usageDetails.indexedDB after import. It is
 an implementation estimate, not a database-file size. Wire metrics count CDP WebSocket
-payload bytes and HTTP request-body bytes during replay plus settling, divided by
+payload bytes and HTTP request-body bytes exposed by CDP during replay plus settling, divided by
 trace edits. They include presence/background traffic, exclude TLS, framing and
 headers, and report received WebSocket payload separately. JS heap comes from CDP
 Runtime.getHeapUsage after replay, without forced GC, and excludes worker heaps.

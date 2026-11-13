@@ -38,7 +38,7 @@ async function loadDatasets(notes: number) {
 			source: `${name}.txt`,
 		})
 	for (let document of documents)
-		document.content = document.content.replace(/\r\n?/g, "\n")
+		document.content = `---\ntitle: ${document.title}\n---\n\n${document.content.replace(/\r\n?/g, "\n")}`
 	let traceSource = await readFile("bench/datasets/trace.js", "utf8")
 	let raw: unknown = runInNewContext(
 		traceSource + ";({edits, finalText})",

@@ -160,6 +160,7 @@ try {
 				start = performance.now()
 				await signIn(other, { passphrase: account.passphrase })
 				for (let doc of seeded) {
+					console.error(`Verifying ${doc.title}`)
 					await waitForEditorBoot(other, { path: `/app/doc/${doc.id}` })
 					await expect
 						.poll(() => readContent(other), { timeout: 120_000 })

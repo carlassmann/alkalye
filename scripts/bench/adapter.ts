@@ -79,6 +79,7 @@ async function resolveDocument(page: Page, title: string) {
 }
 
 async function readContent(page: Page) {
+	await page.bringToFront()
 	await editor(page).click()
 	await page.keyboard.press("ControlOrMeta+A")
 	await page.keyboard.press("ControlOrMeta+C")
