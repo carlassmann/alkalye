@@ -8,7 +8,7 @@
 			"Synced data is no longer end-to-end encrypted. Alkalye's backend and Jazz Cloud can read it.",
 			"Old sharing links no longer work. Create new invite links to share your documents and spaces, and reconnect your MCP clients and agents in Settings."
 		],
-		"pr": 0,
+		"pr": 75,
 		"commit": "f1e6c13"
 	},
 	{
