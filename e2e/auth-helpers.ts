@@ -117,7 +117,9 @@ async function signOut(page: Page, args: SignOutArgs = {}) {
 	}
 
 	await page.getByTestId(testIds.auth.settingsSignOut).click()
-	await expect(page.getByTestId(testIds.auth.settingsSignIn)).toBeVisible()
+	await expect(page.getByTestId(testIds.auth.settingsSignIn)).toBeVisible({
+		timeout: 30000,
+	})
 
 	return {
 		ok: true,

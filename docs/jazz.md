@@ -26,7 +26,7 @@ Use `db.transaction` to create a document together with its personal library ent
 
 `codeMirrorSync` writes every change with `editedFrom` set to the text last shown or written by that editor. It ignores delayed local echoes, applies incoming diffs with `Transaction.addToHistory.of(false)`, maps selections through changes and holds remote text during IME composition. Bindings and undo history are keyed by document. Do not reintroduce save timers, content generations, compaction, caches or workers for saving text.
 
-Wikilinks keep `[[id]]` and `[[id|alias]]` syntax. Backlinks are derived from readable documents instead of rewriting other documents' frontmatter.
+Wikilinks keep `[[id]]` and `[[id|alias]]` syntax. Backlinks preserve the original frontmatter representation: add or remove source IDs in editable targets within the same library. Use the document operations in `features/documents/lib/library.tsx`; do not mutate another editor’s text directly. These writes use `editedFrom` in immediate mergeable transactions.
 
 ## Permissions and tests
 

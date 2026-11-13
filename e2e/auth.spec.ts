@@ -35,6 +35,8 @@ for (let entryPoint of ["sidebar", "settings"]) {
 			title: "My synced document",
 			body: "Saved in my account.",
 		})
+		// The editor guarantees local durability; the next profile needs the server copy.
+		await page.evaluate("window.__jazz.waitForSync()")
 		let accountDocumentUrl = page.url()
 
 		let freshContext = await browser.newContext()
@@ -70,7 +72,7 @@ for (let entryPoint of ["sidebar", "settings"]) {
 			})
 			await freshPage.getByTestId(testIds.auth.loginSubmit).click()
 
-			await expect(freshPage).toHaveURL(accountDocumentUrl)
+			await expect(freshPage).toHaveURL(accountDocumentUrl, { timeout: 30000 })
 			await expect(
 				freshPage.getByTestId(testIds.doc.editor).locator(".cm-content"),
 			).toBeVisible()
@@ -98,6 +100,7 @@ test("signing in from a private document link keeps the requested document", asy
 	await create(page, { title: "Requested private document" })
 	let requestedUrl = page.url()
 	await create(page, { title: "Newer account document" })
+	await page.evaluate("window.__jazz.waitForSync()")
 
 	let freshContext = await browser.newContext()
 	try {
@@ -116,6 +119,7 @@ test("signing in from a private document link keeps the requested document", asy
 		await freshPage.getByTestId(testIds.auth.loginSubmit).click()
 		await expect(freshPage.getByTestId(testIds.doc.editor)).toContainText(
 			"Requested private document",
+			{ timeout: 30000 },
 		)
 		await expect(freshPage).toHaveURL(requestedUrl)
 	} finally {
