@@ -1,3 +1,4 @@
+import { createAccount as createTestAccount } from "../../e2e/auth-helpers"
 import { readFile } from "node:fs/promises"
 import { expect, type Page, type BrowserContext } from "@playwright/test"
 import JSZip from "jszip"
@@ -7,6 +8,7 @@ export {
 	waitForEditorBoot,
 	seed,
 	resolveDocument,
+	waitForDocumentList,
 	readContent,
 	openDocument,
 	replaceContent,
@@ -27,12 +29,7 @@ async function waitForEditorBoot(page: Page, args: { path?: string } = {}) {
 
 async function createAccount(page: Page) {
 	await waitForEditorBoot(page)
-	await page.goto("/app/settings")
-	await page.getByTestId("settings-sign-in").click()
-	await page.getByTestId("auth-initial-create-account").click()
-	await page.getByTestId("auth-create-copy").click()
-	await page.getByTestId("auth-create-submit").click()
-	await expect(page.getByTestId("auth-dialog")).toBeHidden({ timeout: 30_000 })
+	return createTestAccount(page)
 }
 
 function editor(page: Page) {
@@ -94,6 +91,15 @@ async function resolveDocument(page: Page, title: string) {
 	let id = await row.getAttribute("data-doc-id")
 	if (!id) throw new Error(`No document ID for ${title}`)
 	return id
+}
+
+async function waitForDocumentList(page: Page) {
+	await showDocumentList(page)
+	await page.getByTestId("doc-search-input").fill("")
+	await page
+		.getByTestId("doc-list-item")
+		.first()
+		.waitFor({ state: "visible", timeout: 30_000 })
 }
 
 async function readContent(page: Page) {
@@ -193,6 +199,14 @@ async function captureCredentials(context: BrowserContext) {
 		return auth.length ? [{ origin: origin.origin, localStorage: auth }] : []
 	})
 	if (!origins.length) throw new Error("No device authentication secret found")
+	for (let origin of origins)
+		for (let entry of origin.localStorage) {
+			if (
+				entry.name === "jazz-logged-in-secret" &&
+				JSON.parse(entry.value).provider === "anonymous"
+			)
+				throw new Error("Classic account is still anonymous")
+		}
 	return { cookies: [], origins }
 }
 

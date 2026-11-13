@@ -1,4 +1,4 @@
-import { execFileSync } from "node:child_process"
+import { execFileSync, spawnSync } from "node:child_process"
 import { readFile, writeFile } from "node:fs/promises"
 import { z } from "zod"
 import { summary } from "./metrics"
@@ -9,8 +9,13 @@ let head = execFileSync("git", ["rev-parse", "HEAD"], {
 let results: Record<string, Record<string, number[]>> = { classic: {}, v2: {} }
 for (let run = 1; run <= 5; run++) {
 	for (let label of ["classic", "v2"]) {
-		let path = `bench/results/${label}-${run}.json`
 		execFileSync(
+			"work",
+			["restart", label === "classic" ? "sync" : "v2", "--tailscale"],
+			{ cwd: "/tmp/alkalye-bench-production", stdio: "inherit" },
+		)
+		let path = `bench/results/${label}-${run}.json`
+		let execution = spawnSync(
 			"bun",
 			[
 				"scripts/bench/compare.ts",
@@ -33,12 +38,15 @@ for (let run = 1; run <= 5; run++) {
 					BENCH_GIT_HEAD: label === "classic" ? "8379d4e" : head,
 					BENCH_SERVER_NOTE:
 						label === "classic"
-							? "Node production + jazz-run 0.20.19, 16GB heap"
+							? "Node production + jazz-run 0.20.19, 32GB heap"
 							: "Node production + isolated SQLite",
 				},
 			},
 		)
 		let data = JSON.parse(await readFile(path, "utf8"))
+		if (execution.error || data.completedRuns !== 1)
+			throw new Error(`Incomplete ${label} run ${run}`)
+		if (execution.status !== 0) process.exitCode = 1
 		for (let [name, metric] of Object.entries(data.metrics)) {
 			let values = z.object({ samples: z.array(z.number()) }).parse(metric)
 			;(results[label]![name] ??= []).push(...values.samples)
