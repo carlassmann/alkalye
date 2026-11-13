@@ -90,8 +90,16 @@ createServer(async (req, res) => {
 		},
 	)
 	proxy.on("error", () => {
+		if (res.destroyed) return
+		if (res.headersSent) {
+			res.destroy()
+			return
+		}
 		res.writeHead(502)
 		res.end()
+	})
+	res.on("close", () => {
+		if (!res.writableEnded) proxy.destroy()
 	})
 	req.pipe(proxy)
 }).listen(port, "0.0.0.0")
