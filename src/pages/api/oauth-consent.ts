@@ -1,4 +1,28 @@
 import type { APIRoute } from "astro"
-// v2-todo(agents-mcp): restore OAuth routes with v2 sessions.
+import { getMcpConfig } from "@/mcp/config"
+import { consentRequestSchema } from "@/mcp/oauth"
+
+export { GET }
+
 export const prerender = false
-export let ALL: APIRoute = () => new Response("Unavailable during Jazz v2 migration", { status: 503 })
+
+let GET: APIRoute = async ({ request }) => {
+	try {
+		let token = new URL(request.url).searchParams.get("token")
+		if (!token) throw new Error("Missing consent token")
+		let config = getMcpConfig()
+		let consent = await config.tokens.open(
+			"consent",
+			token,
+			consentRequestSchema,
+		)
+		return Response.json(consent, {
+			headers: { "cache-control": "no-store" },
+		})
+	} catch {
+		return Response.json(
+			{ error: "Invalid or expired consent" },
+			{ status: 400 },
+		)
+	}
+}

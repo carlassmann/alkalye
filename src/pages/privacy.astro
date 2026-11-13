@@ -18,7 +18,7 @@ import LegalDoc from "@/layouts/LegalDoc.astro"
     <p>Jazz v2 sync is not end-to-end encrypted. Alkalye's backend and Jazz Cloud can read synced documents, assets and account settings. Access policies control which users can read and edit data. HTTPS protects data in transit.</p>
     <p>Your 24 recovery words restore your device account. Anyone with them can sign in. Keep them private.</p>
     <h2>MCP connections</h2>
-    <p>MCP connections are unavailable during the Jazz v2 migration.</p>
+    <p>When you approve an MCP client, it can read and change data with your account permissions. Your device signs the approval; your recovery phrase and device secret stay on your device. Alkalye stores a revocable grant linked to your account. Tool calls run on the server, which can already read synced data. Tool results are sent to the connected client and its provider. Disconnect a client in Settings to stop future requests; this cannot erase data already disclosed.</p>
 
 	<h2>Optional AI guide</h2>
 	<p>When enabled, Carl's Syntwin, an AI guide, is provided through Syntwin. The guide connects to Syntwin's service and processes conversation messages there. AI conversations are separate from Alkalye's document sync and require an internet connection.</p>

@@ -1,3 +1,4 @@
+import { AgentConnectionsSection } from "@/app/features/agents"
 import type { JazzClient } from "jazz-tools/client"
 import { IconTransition } from "@/app/components/ui/icon-transition"
 import { useState, useRef } from "react"
@@ -190,7 +191,10 @@ function SettingsScreen({ search }: SettingsScreenProps) {
 								</>
 							)}
 							{category === "connections" && (
-								<>{/* v2-todo(agents): restore connection management. */}</>
+								<AgentConnectionsSection
+									isAuthenticated={isAuthenticated}
+									oauth={search.oauth}
+								/>
 							)}
 							{category === "app" && (
 								<>

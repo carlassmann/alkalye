@@ -170,5 +170,41 @@ Added a development-only Vite plugin rejecting only `/jazz/apps/<id>/ws` upgrade
 The standalone Vite/Jazz reproduction measures admission at 10.372 seconds before and 0.306 after. Its first remote query completes at 10.411 and 0.345 seconds. The draft upstream proposal is explicit HTTP transport selection or concurrent capability discovery. No upstream issue was submitted. Detailed phase tables, source trace, reproduction, temporary instrumentation and measurement harness are in `docs/jazz-v2-issues/auth-transport.md`; numeric results are in `auth-timing.json` beside it.
 
 Validation: `check:types` has zero errors; `check:lint` has zero errors and 67 existing warnings; `check:test` passes 53 files / 630 tests. All four `e2e/auth.spec.ts` cases pass with one worker at the final implementation, retaining source-upload waits, document/URL assertions and the access-denied observer. Complete scenarios take 12.7–19.7 seconds. The measurement builds and final uninstrumented Node build pass. Full `check:format` still flags nine unchanged MCP/OAuth route files from the baseline; changed files pass formatting. Both app environments and the standalone reproduction ran through Work with tailnet HTTPS; stale Classic sync was stopped. No push or PR.
+||||||| 937934c
+## Phase 2: agents, MCP, OAuth and CLI
+
+2026-11-13, branch `t3/mcp-oauth-cli-v2`, based on `937934c`.
+
+- Restored the eleven Classic MCP tool definitions, OAuth/discovery endpoints and connection settings UI from `8379d4e`, then replaced their data access with v2. MCP commit: `693850a`.
+- Approval sends a signed Jazz device proof, never the device secret. Grants hold account/client/connection IDs; the database stores only a SHA-256 credential hash. OAuth tokens encrypt the identifiers with the server key. Requests, each tool invocation and token exchanges check revocation. Connection rows are readable by their owner but reject direct client inserts, updates and deletes. Approval and revocation use authenticated backend routes.
+- MCP runs through policy-scoped `jazz.forUser(accountId)`. Content replacements use serializable revision checks and `editedFrom`; comments use `db.textAnchors()` ranges stored directly in `commentThreads.anchor`. The quote is `anchor.matched`; replies include the original comment body. Comment-feature integration must use this same range representation or adapt the shared `src/mcp/comments.ts` reader.
+- Restored CLI command trees/options and print rendering from Classic. Recovery phrases restore the same v2 device account. Keys stay in a mode-0600, origin-bound local auth file; `/api/cli` receives signed proofs and executes with `forReqUser`. Documents, spaces, comments, assets, themes, public flags, invites and guarded moves are implemented. Local file/stdin input and HTML/PDF rendering stay local. Docs and English/German consent copy describe server-readable data and device-local secrets.
+
+### Shared contract and integration
+
+No schema columns changed and no migration lens was added. Only `agentConnections`/`mcpConnections` write policies changed to backend-only. No local store wipe was needed.
+
+`src/cli/sharing.ts` contains guarded backend operations for invites, document moves and leaving memberships. Invite links are `/app/invite?invite=<uuid>#<token>`, tokens are hashed, expire after seven days and redeem once. The resulting grant/member uses the invite UUID as its row ID. Revocation removes that grant/member while preserving other access. The sharing agent must reconcile these helpers and link format with its browser invitation route. This branch does not restore the sharing screen.
+
+The CLI uses an online backend rather than a local replica. `--offline`/`--local` fail explicitly; offline CLI caching remains undone. `--sync-peer` remains accepted for compatibility, but requests use the deployment's `/jazz` authority. Base64 asset uploads remain subject to deployment body limits. Production Jazz Cloud and a deployed provider OAuth registration were not exercised.
+
+### Alpha.61 API gaps and patch
+
+The pinned Bun patch is `patches/jazz-tools@2.0.0-alpha.61.patch`, registered in `package.json`/`bun.lock`.
+
+1. Upstream `createJazz.forReqUser` treats `acceptDeviceAccounts` as signed out. The patch verifies the device proof against the configured audience, checks browser origin and registry admission, then creates a policy-scoped database.
+2. Upstream `createJazz` has no account-scoped `forUser`; its remote trusted-client version only resolves backend identities. The patch adds trusted, in-process `forUser(accountId)` using the existing policy-scoped backend context, with no policy bypass. Both patched paths attribute the user's account with backend identity `jazz:backend`, subject equal to the account UUID. They do not claim the device signed each server-side edit.
+
+Tests cover forged proofs, other-app audiences, foreign origins, policy enforcement and cross-account revocation. Keep the patch until upstream provides these APIs; do not replace it with `withAttribution`.
+
+### Verification
+
+Started with `work setup --tailscale`, then `work up --tailscale`; stopped the stale Classic `sync` process. Runtime: https://web-t3-mcp-oauth-cli-v2-alkalye.cshed.carlassmann.com
+
+- `bun run check:types`: zero errors. `check:lint`: zero errors, 60 style warnings. `check:test`: 55 files, 638 passing tests. New real-backend suites exercise all MCP tools, proof validation, revision conflicts, reader/writer isolation, comments, revocation, CLI CRUD, space moves, one-use invites/revocation, assets and theme sources. Changed TypeScript/Markdown files pass Prettier.
+- `bun run qa:mcp:user <origin>` passed with generated accounts and with an account created through the browser. It verifies approval without secrets, PKCE exchange, document list/read/create/edit/rename, anchored comments/replies/resolution, outsider isolation, shared non-admin writing, archive rejection, connection revocation, refused refresh and an independent surviving connection. `ALKALYE_QA_DEVICE_KEY_FILE` selects a local test-device key; optional `ALKALYE_QA_STATE_FILE` saves the surviving QA access token locally for further tests.
+- Background browser verification created an account with 24 recovery words, approved the original consent UI and received an authorization code. With the MCP-created document open, an HTTP tool update appeared live in CodeMirror. Disconnecting through Settings removed the rows; the same MCP token then returned HTTP 401. The browser's recovery phrase also restored its document library in the CLI.
+- `bun run qa:mcp <origin>` passes discovery, PKCE metadata, cross-origin token errors, unauthenticated challenge and legal pages. OpenAI domain challenge was skipped because no challenge token was configured. Restoring the original endpoint exposed its missing GET handler; added GET so discovery receives the expected 401 challenge.
+- CLI signup, document creation/listing, phrase login, unauthenticated local Markdown-to-HTML export and Chrome PDF export passed against the running worktree. Browser tab closed after validation. No push, PR or cloud deployment.
 
 written with gpt-6.1-sol in T3 Code (Codex)

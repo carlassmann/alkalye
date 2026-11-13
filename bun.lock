@@ -109,6 +109,9 @@
       },
     },
   },
+  "patchedDependencies": {
+    "jazz-tools@2.0.0-alpha.61": "patches/jazz-tools@2.0.0-alpha.61.patch",
+  },
   "overrides": {
     "@codemirror/state": "^6.5.4",
     "@codemirror/view": "^6.39.11",

@@ -1,4 +1,67 @@
 import type { APIRoute } from "astro"
-// v2-todo(agents-mcp): port authenticated endpoints to v2 backend sessions.
+import { z } from "zod"
+import { createUserConnection } from "@/mcp/jazz"
+import { getMcpConfig } from "@/mcp/config"
+import { approveAuthorization, consentRequestSchema } from "@/mcp/oauth"
+
+export { POST }
+
 export const prerender = false
-export let ALL: APIRoute = () => new Response("Unavailable during Jazz v2 migration", { status: 503 })
+
+let requestSchema = z.discriminatedUnion("decision", [
+	z.strictObject({
+		decision: z.literal("approve"),
+		consent: z.string(),
+	}),
+	z.strictObject({ decision: z.literal("deny"), consent: z.string() }),
+])
+
+let POST: APIRoute = async ({ request }) => {
+	try {
+		let body: unknown = await request.json()
+		let input = requestSchema.parse(body)
+		let config = getMcpConfig()
+		let consent = await config.tokens.open(
+			"consent",
+			input.consent,
+			consentRequestSchema,
+		)
+		let resource = new URL("/mcp", config.baseUrl).toString()
+		if (consent.authorization.resource !== resource) {
+			return oauthError("invalid_target", 400)
+		}
+		if (input.decision === "deny") {
+			let redirect = new URL(consent.authorization.redirect_uri)
+			redirect.searchParams.set("error", "access_denied")
+			redirect.searchParams.set("state", consent.authorization.state)
+			return Response.json(
+				{ redirectTo: redirect.toString() },
+				{ headers: { "cache-control": "no-store" } },
+			)
+		}
+		let credential = await createUserConnection(
+			request,
+			{
+				id: consent.authorization.client_id,
+				name: consent.client.name,
+			},
+			config.tokens,
+		)
+		let redirect = await approveAuthorization({
+			tokens: config.tokens,
+			request: consent.authorization,
+			credential,
+			clientValidated: true,
+		})
+		return Response.json(
+			{ redirectTo: redirect.toString() },
+			{ headers: { "cache-control": "no-store" } },
+		)
+	} catch {
+		return oauthError("invalid_request", 400)
+	}
+}
+
+function oauthError(error: string, status: number) {
+	return Response.json({ error }, { status })
+}
