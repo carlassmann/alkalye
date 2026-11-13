@@ -55,7 +55,15 @@ function useDocumentAssets(documentId: string, content = "") {
 	let { data: rows = [] } = useAll(assetQuery.where({ documentId }))
 	let [loaded, setLoaded] = useState<{
 		key: string
-		urls: Map<string, { url?: string; lightUrl?: string; darkUrl?: string }>
+		urls: Map<
+			string,
+			{
+				url?: string
+				thumbnailUrl?: string
+				lightUrl?: string
+				darkUrl?: string
+			}
+		>
 	}>({ key: "", urls: new Map() })
 	let key = JSON.stringify([
 		rows,
@@ -66,7 +74,12 @@ function useDocumentAssets(documentId: string, content = "") {
 		let urls: string[] = []
 		let result = new Map<
 			string,
-			{ url?: string; lightUrl?: string; darkUrl?: string }
+			{
+				url?: string
+				thumbnailUrl?: string
+				lightUrl?: string
+				darkUrl?: string
+			}
 		>()
 		function url(bytes: Uint8Array, mime: string) {
 			let value = URL.createObjectURL(bytesBlob(bytes, mime))
@@ -75,12 +88,14 @@ function useDocumentAssets(documentId: string, content = "") {
 		}
 		void Promise.all(
 			rows.map(async asset => {
-				if (asset.type === "image") {
+				if (asset.type === "image" || asset.type === "video") {
 					let row = await db.one(
 						app.assets.where({ id: asset.id }).select("thumbnail"),
 					)
 					if (row?.thumbnail && !cancelled) {
-						result.set(asset.id, { url: url(row.thumbnail, "image/png") })
+						result.set(asset.id, {
+							thumbnailUrl: url(row.thumbnail, "image/png"),
+						})
 						setLoaded({ key, urls: new Map(result) })
 					}
 				}
@@ -119,11 +134,19 @@ function useDocumentAssets(documentId: string, content = "") {
 	let urls =
 		loaded.key === key
 			? loaded.urls
-			: new Map<string, { url?: string; lightUrl?: string; darkUrl?: string }>()
+			: new Map<
+					string,
+					{
+						url?: string
+						thumbnailUrl?: string
+						lightUrl?: string
+						darkUrl?: string
+					}
+				>()
 	let sidebarAssets = rows.map(asset => ({
 		...asset,
 		tldrawRevisionId: asset.revisionId ?? undefined,
-		imageUrl: urls.get(asset.id)?.url,
+		imageUrl: urls.get(asset.id)?.thumbnailUrl ?? urls.get(asset.id)?.url,
 		lightPreviewUrl: urls.get(asset.id)?.lightUrl,
 		darkPreviewUrl: urls.get(asset.id)?.darkUrl,
 	}))
@@ -131,6 +154,7 @@ function useDocumentAssets(documentId: string, content = "") {
 		...asset,
 		previewUrl:
 			urls.get(asset.id)?.url ??
+			urls.get(asset.id)?.thumbnailUrl ??
 			(appearance === "dark"
 				? urls.get(asset.id)?.darkUrl
 				: urls.get(asset.id)?.lightUrl),
@@ -138,12 +162,12 @@ function useDocumentAssets(documentId: string, content = "") {
 	}))
 	let previewAssets = rows.flatMap(asset => {
 		let value = urls.get(asset.id)
-		return value
+		return value && (asset.type !== "video" || value.url)
 			? [
 					{
 						id: asset.id,
 						type: asset.type,
-						url: value.url ?? value.lightUrl ?? "",
+						url: value.url ?? value.thumbnailUrl ?? value.lightUrl ?? "",
 						lightUrl: value.lightUrl,
 						darkUrl: value.darkUrl,
 						muteAudio: asset.muteAudio,
@@ -205,6 +229,15 @@ async function uploadAsset(
 					}),
 			})
 	}
+	if (type === "video") {
+		let metadata = await videoMetadata(blob).catch(() => undefined)
+		if (metadata) {
+			width = metadata.width
+			height = metadata.height
+			thumbnail = metadata.thumbnail
+		}
+	}
+
 	let size = blob.size
 	let uploaded = 0
 	let stream = blob.stream().pipeThrough(
@@ -290,4 +323,63 @@ async function copyDocumentAssets(
 		content = content.replaceAll(`asset:${asset.id}`, `asset:${write.value.id}`)
 	}
 	return content
+}
+
+function videoMetadata(
+	blob: Blob,
+): Promise<{ width: number; height: number; thumbnail: Uint8Array }> {
+	return new Promise((resolve, reject) => {
+		let video = document.createElement("video")
+		let url = URL.createObjectURL(blob)
+		let timeout = setTimeout(
+			() => finish(new Error("Video metadata is unavailable")),
+			10000,
+		)
+		function finish(error?: Error) {
+			clearTimeout(timeout)
+			video.onloadeddata = null
+			video.onerror = null
+			video.removeAttribute("src")
+			video.load()
+			URL.revokeObjectURL(url)
+			if (error) reject(error)
+		}
+		video.muted = true
+		video.preload = "auto"
+		video.onloadeddata = () => {
+			let width = video.videoWidth
+			let height = video.videoHeight
+			let canvas = document.createElement("canvas")
+			let scale = Math.min(1, 128 / Math.max(width, height))
+			canvas.width = Math.max(1, Math.round(width * scale))
+			canvas.height = Math.max(1, Math.round(height * scale))
+			let context = canvas.getContext("2d")
+			if (!context) {
+				finish(new Error("Video thumbnail is unavailable"))
+				return
+			}
+			context.drawImage(video, 0, 0, canvas.width, canvas.height)
+			canvas.toBlob(thumbnail => {
+				if (!thumbnail) {
+					finish(new Error("Video thumbnail is unavailable"))
+					return
+				}
+				void thumbnail
+					.arrayBuffer()
+					.then(bytes => {
+						finish()
+						resolve({ width, height, thumbnail: new Uint8Array(bytes) })
+					})
+					.catch(error =>
+						finish(
+							error instanceof Error
+								? error
+								: new Error("Video thumbnail is unavailable"),
+						),
+					)
+			}, "image/png")
+		}
+		video.onerror = () => finish(new Error("Video metadata is unavailable"))
+		video.src = url
+	})
 }
