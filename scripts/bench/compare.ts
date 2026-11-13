@@ -76,10 +76,12 @@ let scenarioFailures: {
 let runLoads: { run: number; start: number[]; end?: number[] }[] = []
 let syncDiagnostics: unknown[] = []
 let bundleTransfers: unknown[] = []
+let serviceWorkerDiagnostics: unknown[] = []
 let result = {
 	runLoads,
 	syncDiagnostics,
 	bundleTransfers,
+	serviceWorkerDiagnostics,
 	label: values.label,
 	target,
 	createdAt: new Date().toISOString(),
@@ -110,6 +112,8 @@ let result = {
 		notes,
 		edits: editCount,
 		totalTraceEdits: trace.edits.length,
+		serviceWorkersOnly: values["sw-only"],
+		largeOnly: values["large-only"],
 		automaticPairsAndCompletion: false,
 		replayTimeoutMs,
 	},
@@ -311,15 +315,14 @@ try {
 						await typingContext.close()
 					}
 				}
-
-				console.error("Returning user: service worker and offline reload")
 			}
+			console.error("Returning user: service worker and offline reload")
 
 			let returningStage = "startup"
 			let returningStarted = performance.now()
 			let returning = await newContext(browser, credentials, true)
+			let returningPage = await returning.newPage()
 			try {
-				let returningPage = await returning.newPage()
 				await withDeadline(
 					(async () => {
 						let returningNetwork = await instrument(returningPage, cpu)
@@ -368,6 +371,43 @@ try {
 					elapsedMs: performance.now() - returningStarted,
 					message: `${returningStage}: ${String(error)}`.slice(0, 1000),
 				})
+				serviceWorkerDiagnostics.push({
+					stage: returningStage,
+					ui: await returningPage
+						.locator("body")
+						.innerText({ timeout: 3000 })
+						.then(text => text.slice(0, 1500))
+						.catch(String),
+					controller: await returningPage
+						.evaluate(() => navigator.serviceWorker.controller?.state ?? null)
+						.catch(String),
+				})
+				if (returningStage !== "offlineOpen") {
+					let offlineStart = performance.now()
+					try {
+						await returning.setOffline(true)
+						await withDeadline(
+							(async () => {
+								await waitForEditorBoot(returningPage, {
+									path: `/app/doc/${large.id}`,
+								})
+								await expect(editor(returningPage)).toContainText(
+									"Book dracula",
+								)
+							})(),
+							30_000,
+							"independent offline open",
+						)
+						add("offlineSwLargeOpenMs", performance.now() - offlineStart)
+					} catch (offlineError) {
+						scenarioFailures.push({
+							run: run + 1,
+							scenario: "offlineServiceWorker",
+							elapsedMs: performance.now() - offlineStart,
+							message: String(offlineError).slice(0, 1000),
+						})
+					}
+				}
 			} finally {
 				await returning.close()
 			}
