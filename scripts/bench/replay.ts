@@ -10,6 +10,7 @@ interface ReplayOptions {
 	edits: [number, number, string?][]
 	cpu: number
 	reset: boolean
+	literalNewlines?: boolean
 	finalText?: string
 }
 
@@ -56,10 +57,15 @@ async function measureReplay(page: Page, options: ReplayOptions) {
 			await page.keyboard.press("ArrowLeft")
 			cursor--
 		}
+		if (insert.includes("\n") && options.literalNewlines) {
+			await page.evaluate(text => navigator.clipboard.writeText(text), insert)
+		}
 		let inputStarted = performance.now()
 		for (let i = 0; i < remove; i++) await page.keyboard.press("Delete")
 		if (insert) {
 			if (/^[\x20-\x7e]+$/.test(insert)) await page.keyboard.type(insert)
+			else if (insert.includes("\n") && options.literalNewlines)
+				await page.keyboard.press("ControlOrMeta+Shift+V")
 			else await page.keyboard.insertText(insert)
 		}
 		cursor += insert.length

@@ -43,6 +43,7 @@ let { values } = parseArgs({
 		"large-only": { type: "boolean", default: false },
 		"sw-only": { type: "boolean", default: false },
 		"skip-sw": { type: "boolean", default: false },
+		"literal-newlines": { type: "boolean", default: false },
 	},
 })
 if (!values.target || !values.label || !values.out)
@@ -117,6 +118,7 @@ let result = {
 		totalTraceEdits: trace.edits.length,
 		serviceWorkersOnly: values["sw-only"],
 		largeOnly: values["large-only"],
+		literalNewlines: values["literal-newlines"],
 		automaticPairsAndCompletion: false,
 		replayTimeoutMs,
 	},
@@ -265,6 +267,12 @@ try {
 							sender: { ...sourceNetwork.wire },
 							senderTimeline: sourceNetwork.timeline.slice(-200),
 							receiverTimeline: syncNetwork.timeline.slice(-200),
+							senderLifecycle: sourceNetwork.timeline.filter(event =>
+								event.kind.startsWith("Network."),
+							),
+							receiverLifecycle: syncNetwork.timeline.filter(event =>
+								event.kind.startsWith("Network."),
+							),
 							receiver: { ...syncNetwork.wire },
 						})
 					}
@@ -302,6 +310,7 @@ try {
 								edits: trace.edits.slice(0, editCount),
 								cpu,
 								reset: name === "small",
+								literalNewlines: values["literal-newlines"],
 								finalText:
 									editCount === trace.edits.length
 										? trace.finalText
