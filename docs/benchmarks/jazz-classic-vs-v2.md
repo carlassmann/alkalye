@@ -12,8 +12,9 @@ server mode for v2. Classic uses jazz-run 0.20.19, Node 24.22.1, with
 default 4 GB server heap; the service log and SIGABRT core confirm V8 heap exhaustion.
 During an initial harness run that reloaded the app per document, the server also
 exhausted 16 GB.
-The final harness uses sidebar links to navigate within one Jazz connection, matching
-normal use and the existing responsiveness benchmark. Failed runs are excluded. The default uses three independent accounts and browser contexts.
+The final harness verifies fresh-device hydration using the app's bulk export,
+without reloading for every document. Failed runs are excluded. Before the measured
+baseline, failed-run server storage was archived and a fresh SQLite store started.
 Services run through `work setup --tailscale` then `work up --tailscale`.
 
 Accounts also retain the app's welcome document; the 52 imported bodies are verified.
@@ -37,11 +38,10 @@ inside the visible editor. Warm reload retains IndexedDB and enables HTTP cache.
 Bundle bytes are CDP encoded transfers of JavaScript/Wasm responses through readiness
 plus one second; development module loading makes this different from production.
 
-Fresh-device time includes recovery-phrase sign-in and opening every imported doc,
-using Edit → Copy for its complete editor text and checking exact equality. Native
-clipboard copying can include collaborator cursor labels, so it is not used. It includes sequential
-sidebar search, link navigation and clipboard verification overhead. This proves all bodies arrived, rather than equating a
-populated sidebar with complete account hydration. Sync latency starts before an
+Fresh-device time includes recovery-phrase sign-in, Export all, ZIP download and
+exact equality checks for all 52 imported Markdown files. Export loads every document
+body through the public app. This includes export/verification overhead, rather than
+being a pure transport timer. It proves that all bodies arrived. Sync latency starts before an
 editor insertion and ends when a second isolated client's editor contains the
 marker in its visible editor DOM, polled every 20 ms. The receiver is scrolled
 to the end first; polling never takes keyboard focus from the sender. Each run measures five markers on Corpus 000, a roughly 6 KB note.
@@ -51,7 +51,7 @@ samples and do not establish normal-use sync latency.
 
 Trace edits are replayed through browser text input and Delete keys, using Arrow keys
 to reproduce offsets. No database calls or direct editor-state writes. Each document
-is reset with plain-text paste first. Automatic bracket pairs, marker wrapping and
+is opened by its direct URL and reset with plain-text paste first. Automatic bracket pairs, marker wrapping and
 completion are disabled through Settings, so replay can reproduce literal edits.
 The trace starts at offset zero, with the original document as a
 suffix, so large-document cost is measured without changing the trace's coordinates.
@@ -94,8 +94,9 @@ selectors, recovery-phrase behavior and document routes where possible. If auth
 credentials move out of localStorage, replace credentials-only context creation;
 never copy IndexedDB into cold-load contexts. Keep every content assertion.
 
-written with gpt-6.1-sol in T3 Code (Codex)
+Pages are activated before navigation and measurement. Each editor open uses a
+direct document URL; the adapter avoids virtualized sidebar click geometry and
+post-paint subscription behavior in background tabs. Edit → Copy reads editor text
+without cursor labels; plain-text paste resets documents without browser DOM widgets.
 
-The adapter activates pages before navigation and measurement. Classic defers
-subscriptions until requestAnimationFrame; a background page can otherwise keep
-showing the previous document. This matters when running two headless clients.
+written with gpt-6.1-sol in T3 Code (Codex)

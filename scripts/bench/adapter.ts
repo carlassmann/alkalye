@@ -1,3 +1,4 @@
+import { readFile } from "node:fs/promises"
 import { expect, type Page } from "@playwright/test"
 import JSZip from "jszip"
 import {
@@ -16,6 +17,7 @@ export {
 	openDocument,
 	replaceContent,
 	configureEditor,
+	verifyExport,
 	editor,
 }
 
@@ -94,17 +96,7 @@ async function readContent(page: Page) {
 
 async function openDocument(page: Page, target: { id: string; title: string }) {
 	await page.bringToFront()
-	await resolveDocument(page, target.title)
-	await page
-		.locator(`[data-doc-id="${target.id}"] a`)
-		.first()
-		.dispatchEvent("click")
-	await page.waitForFunction(
-		id =>
-			location.pathname.endsWith(`/doc/${id}`) &&
-			document.body.dataset.alkalyeReady === "true",
-		target.id,
-	)
+	await waitForEditorBoot(page, { path: `/app/doc/${target.id}` })
 	await expect(page).toHaveTitle(target.title, { timeout: 120_000 })
 	await editor(page).waitFor({ state: "visible" })
 }
@@ -130,5 +122,29 @@ async function configureEditor(page: Page) {
 		if ((await toggle.getAttribute("aria-checked")) === "true")
 			await toggle.click()
 		await expect(toggle).toHaveAttribute("aria-checked", "false")
+	}
+}
+
+async function verifyExport(
+	page: Page,
+	documents: { title: string; content: string }[],
+) {
+	await page.bringToFront()
+	await page.getByTestId("doc-search-input").fill("")
+	await page
+		.getByRole("button", { name: "File options", exact: true })
+		.dispatchEvent("click")
+	let downloading = page.waitForEvent("download", { timeout: 180_000 })
+	await page
+		.getByRole("menuitem", { name: "Export all", exact: true })
+		.dispatchEvent("click")
+	let download = await downloading
+	let path = await download.path()
+	if (!path) throw new Error("Export did not produce a local ZIP")
+	let zip = await JSZip.loadAsync(await readFile(path))
+	for (let document of documents) {
+		let file = zip.file(`${document.title}.md`)
+		if (!file) throw new Error(`Export missing ${document.title}`)
+		expect(await file.async("string")).toBe(document.content)
 	}
 }

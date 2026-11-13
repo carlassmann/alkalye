@@ -22,6 +22,7 @@ import {
 	openDocument,
 	replaceContent,
 	configureEditor,
+	verifyExport,
 	editor,
 } from "./adapter"
 import { installObservers, instrument, summary } from "./metrics"
@@ -167,13 +168,7 @@ try {
 				start = performance.now()
 				await signIn(other, { passphrase: account.passphrase })
 				await waitForEditorBoot(other)
-				for (let doc of seeded) {
-					console.error(`Verifying ${doc.title}`)
-					await openDocument(other, doc)
-					await expect
-						.poll(() => readContent(other), { timeout: 120_000 })
-						.toBe(doc.content)
-				}
+				await verifyExport(other, seeded)
 				add("freshDeviceWholeDatasetMs", performance.now() - start)
 				let syncDoc = seeded[0]
 				if (!syncDoc) throw new Error("Small sync note missing")
