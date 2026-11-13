@@ -1,4 +1,39 @@
 import type { APIRoute } from "astro"
-// v2-todo(agents-mcp): restore OAuth routes with v2 sessions.
+import { authorizationRequestSchema, validateClientRedirect } from "@/mcp/oauth"
+import { getMcpConfig } from "@/mcp/config"
+
+export { GET }
+
 export const prerender = false
-export let ALL: APIRoute = () => new Response("Unavailable during Jazz v2 migration", { status: 503 })
+
+let GET: APIRoute = async ({ request }) => {
+	try {
+		let url = new URL(request.url)
+		let parsed = authorizationRequestSchema.parse(
+			Object.fromEntries(url.searchParams),
+		)
+		let config = getMcpConfig()
+		let client = await validateClientRedirect(
+			parsed.client_id,
+			parsed.redirect_uri,
+		)
+		let oauth = await config.tokens.seal(
+			"consent",
+			{
+				authorization: parsed,
+				client: {
+					name: client.client_name,
+					redirectHost: new URL(parsed.redirect_uri).host,
+				},
+			},
+			Date.now() + 10 * 60_000,
+		)
+		return Response.redirect(
+			new URL(`/app/settings?oauth=${oauth}`, config.baseUrl),
+			302,
+		)
+	} catch (error) {
+		console.error("[oauth] authorization request rejected", error)
+		return new Response("Invalid OAuth authorization request", { status: 400 })
+	}
+}

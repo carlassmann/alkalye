@@ -1,4 +1,24 @@
 import type { APIRoute } from "astro"
-// v2-todo(agents-mcp): port authenticated endpoints to v2 backend sessions.
+import { z } from "zod"
+import { revokeUserConnection } from "@/mcp/jazz"
+
+export { DELETE }
 export const prerender = false
-export let ALL: APIRoute = () => new Response("Unavailable during Jazz v2 migration", { status: 503 })
+
+let DELETE: APIRoute = async ({ request }) => {
+	try {
+		let body: unknown = await request.json()
+		let { connectionId } = z.object({ connectionId: z.uuid() }).parse(body)
+		await revokeUserConnection(request, connectionId)
+		return json({ ok: true })
+	} catch {
+		return json({ error: "Could not disconnect agent connection" }, 400)
+	}
+}
+
+function json(body: unknown, status = 200) {
+	return Response.json(body, {
+		status,
+		headers: { "cache-control": "no-store" },
+	})
+}

@@ -1,4 +1,28 @@
 import type { APIRoute } from "astro"
-// v2-todo(agents-mcp): restore discovery after the v2 API port.
+import { getMcpConfig } from "@/mcp/config"
+import { protectedResourceMetadata } from "@/mcp/metadata"
+
+export { GET, OPTIONS }
+
 export const prerender = false
-export let ALL: APIRoute = () => new Response("Unavailable during Jazz v2 migration", { status: 503 })
+
+let GET: APIRoute = () => {
+	let { baseUrl } = getMcpConfig()
+	return metadata(protectedResourceMetadata(baseUrl))
+}
+
+let OPTIONS: APIRoute = () =>
+	new Response(null, { status: 204, headers: cors() })
+
+function metadata(body: unknown) {
+	return new Response(JSON.stringify(body), {
+		headers: { ...cors(), "content-type": "application/json" },
+	})
+}
+
+function cors() {
+	return {
+		"access-control-allow-origin": "*",
+		"access-control-allow-methods": "GET, OPTIONS",
+	}
+}

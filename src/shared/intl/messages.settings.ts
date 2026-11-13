@@ -25,7 +25,7 @@ let baseSettingsMessages = messages({
 	"settings.agents.signIn": "Sign in to authorize an MCP client.",
 	"settings.agents.authorize": "Authorize {$client}",
 	"settings.agents.consent":
-		"This client can read and edit what you can. Alkalye’s server uses your encrypted account credentials to act as you, even while the app is closed. Return destination: {$host}.",
+		"This client can read and edit what you can. Alkalye’s server runs tools with your permissions, even while the app is closed. Your device secret stays on your device. Return destination: {$host}.",
 	"settings.agents.deny": "Deny",
 	"settings.appearance": "Appearance",
 	"settings.appearance.description":
@@ -174,7 +174,7 @@ let deSettingsMessages = translate(baseSettingsMessages, {
 		"Melde dich an, um einen MCP-Client zu autorisieren.",
 	"settings.agents.authorize": "{$client} autorisieren",
 	"settings.agents.consent":
-		"Dieser Client kann lesen und bearbeiten, was du kannst. Alkalyes Server verwendet deine verschlüsselten Kontozugangsdaten, um als du zu handeln, auch bei geschlossener App. Rückkehrziel: {$host}.",
+		"Dieser Client kann lesen und bearbeiten, was du kannst. Alkalyes Server führt Werkzeuge mit deinen Berechtigungen aus, auch bei geschlossener App. Dein Geräteschlüssel bleibt auf deinem Gerät. Rückkehrziel: {$host}.",
 	"settings.agents.deny": "Ablehnen",
 	"settings.appearance": "Erscheinungsbild",
 	"settings.appearance.description":
