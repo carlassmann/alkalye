@@ -40,7 +40,10 @@ UI navigation overhead. This proves all bodies arrived, rather than equating a
 populated sidebar with complete account hydration. Sync latency starts before an
 editor insertion and ends when a second isolated client's editor contains the
 marker in its visible editor DOM, polled every 20 ms. The receiver is scrolled
-to the end first; polling never takes keyboard focus from the sender. Each run measures five markers on the large book.
+to the end first; polling never takes keyboard focus from the sender. Each run measures five markers on Corpus 000, a roughly 6 KB note.
+An exploratory large-book sync attempt exceeded the 120-second deadline even with
+the larger server heap. It is excluded from the small-note sync distribution and
+needs separate investigation; it is not reported as a successful timed sample.
 
 Trace edits are replayed through browser text input and Delete keys, using Arrow keys
 to reproduce offsets. No database calls or direct editor-state writes. Each document

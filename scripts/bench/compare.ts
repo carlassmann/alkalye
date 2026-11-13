@@ -168,10 +168,13 @@ try {
 						.toBe(doc.content)
 				}
 				add("freshDeviceWholeDatasetMs", performance.now() - start)
+				let syncDoc = seeded[0]
+				if (!syncDoc) throw new Error("Small sync note missing")
+				await waitForEditorBoot(other, { path: `/app/doc/${syncDoc.id}` })
 				await editor(other).click()
 				await other.keyboard.press("ControlOrMeta+End")
 				await page.bringToFront()
-				await waitForEditorBoot(page, { path: `/app/doc/${large.id}` })
+				await waitForEditorBoot(page, { path: `/app/doc/${syncDoc.id}` })
 				for (let n = 0; n < 5; n++) {
 					console.error(`Sync marker ${n + 1}/5`)
 					let marker = ` sync-${run}-${n}`
@@ -267,6 +270,9 @@ try {
 			await context.close()
 		}
 	}
+} catch (error) {
+	await save()
+	throw error
 } finally {
 	await browser.close()
 }
@@ -295,6 +301,7 @@ function positive(value: string) {
 	return n
 }
 function add(name: string, value: number) {
+	console.error(`${name}: ${value.toFixed(2)}`)
 	;(samples[name] ??= []).push(value)
 }
 async function save() {
