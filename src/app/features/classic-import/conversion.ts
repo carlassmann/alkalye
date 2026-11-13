@@ -29,12 +29,6 @@ async function unpackBytes(value: { base64: string; sha256: string }) {
 		throw new Error("Classic asset checksum mismatch")
 	return data
 }
-async function byteHash(data: Uint8Array<ArrayBuffer>) {
-	let hash = await crypto.subtle.digest("SHA-256", data)
-	return Array.from(new Uint8Array(hash), byte =>
-		byte.toString(16).padStart(2, "0"),
-	).join("")
-}
 function groupHistory<
 	T extends { createdAt: Date; authorId: string; content: string },
 >(versions: T[], limit = 200, maxBytes = 8 * 1024 * 1024) {
@@ -112,4 +106,11 @@ async function rewriteReferences(content: string) {
 		content = rewritten + content.slice(frontmatter[0].length)
 	}
 	return content
+}
+
+async function byteHash(data: Uint8Array<ArrayBuffer>) {
+	let hash = await crypto.subtle.digest("SHA-256", data)
+	return Array.from(new Uint8Array(hash), byte =>
+		byte.toString(16).padStart(2, "0"),
+	).join("")
 }

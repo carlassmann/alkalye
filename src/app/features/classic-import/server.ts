@@ -77,11 +77,19 @@ async function claimClassicAccount(accountId: string, input: unknown) {
 				.parse(verified.role)
 			await grantAccess(accountId, access.resourceId, access.kind, role)
 			if (verified.ownerClassicId === proof.classicId && role === "admin") {
-				if (imported.kind === "document")
+				if (
+					imported.kind === "document" &&
+					(await jazz.db.one(app.documents.where({ id: imported.v2Id })))
+						?.ownerId === (await stableId(`owner:${imported.classicId}`))
+				)
 					await jazz.db
 						.update(app.documents, imported.v2Id, { ownerId: accountId })
 						.wait({ tier: "global" })
-				if (imported.kind === "space")
+				if (
+					imported.kind === "space" &&
+					(await jazz.db.one(app.spaces.where({ id: imported.v2Id })))
+						?.ownerId === (await stableId(`owner:${imported.classicId}`))
+				)
 					await jazz.db
 						.update(app.spaces, imported.v2Id, { ownerId: accountId })
 						.wait({ tier: "global" })
@@ -95,6 +103,19 @@ async function claimClassicAccount(accountId: string, input: unknown) {
 		}
 	}
 
+	let originalAuthor = await stableId(`author:${proof.classicId}`)
+	for (let thread of await jazz.db.all(
+		app.commentThreads.where({ authorId: originalAuthor }),
+	))
+		await jazz.db
+			.update(app.commentThreads, thread.id, { authorId: accountId })
+			.wait({ tier: "global" })
+	for (let reply of await jazz.db.all(
+		app.commentReplies.where({ authorId: originalAuthor }),
+	))
+		await jazz.db
+			.update(app.commentReplies, reply.id, { authorId: accountId })
+			.wait({ tier: "global" })
 	return { classicId: proof.classicId }
 }
 async function importClassicItem(accountId: string, input: unknown) {
@@ -123,6 +144,36 @@ async function importClassicItem(accountId: string, input: unknown) {
 		throw new Error("Account mismatch")
 	if (item.kind === "theme" && access?.role !== "admin")
 		throw new Error("Only Classic theme admins can import themes")
+	if (previous && previous.kind !== item.kind)
+		throw new Error("Classic value already mapped to another kind")
+	if (!previous) {
+		let collision =
+			item.kind === "document"
+				? await jazz.db.one(app.documents.where({ id }).includeDeleted())
+				: item.kind === "space"
+					? await jazz.db.one(app.spaces.where({ id }).includeDeleted())
+					: item.kind === "theme"
+						? await jazz.db.one(app.themes.where({ id }).includeDeleted())
+						: null
+		if (collision)
+			throw new Error("Classic import ID collides with an existing row")
+	}
+	let spaceGroupId: string | undefined
+	if (item.kind === "document" && item.spaceId) {
+		let space = await jazz.db.one(
+			app.classicImports.where({ id: await stableId(`map:${item.spaceId}`) }),
+		)
+		if (
+			!space ||
+			space.kind !== "space" ||
+			!space.importedAt ||
+			!space.baseContent
+		)
+			throw new Error("Import the Classic space before its documents")
+		if (!access?.groupIds.includes(space.baseContent))
+			throw new Error("Classic document does not belong to this space")
+		spaceGroupId = space.baseContent
+	}
 	let importOwner = previous?.ownerId ?? accountId
 	if (access) {
 		// An importer never becomes owner merely by being first. All access follows verified Classic roles.
@@ -132,7 +183,12 @@ async function importClassicItem(accountId: string, input: unknown) {
 				)
 			: null
 		importOwner = owner?.ownerId ?? (await stableId(`owner:${item.classicId}`))
-		for (let member of access.members) {
+		let members = spaceGroupId
+			? access.groupId === spaceGroupId
+				? []
+				: access.directMembers
+			: access.members
+		for (let member of members) {
 			let role = z
 				.enum(["reader", "writer", "manager", "admin"])
 				.parse(member.role)
@@ -172,6 +228,14 @@ async function importClassicItem(accountId: string, input: unknown) {
 		previous.status !== "complete" ||
 		(item.kind !== "account" && (!access || access.role !== "reader"))
 	try {
+		if (writesSnapshot && item.kind === "document" && previous?.importedAt) {
+			let scoped = await jazz.forUser(accountId)
+			let visible = await scoped.one(app.documents.where({ id }))
+			if (!visible) throw new Error("V2 document access was revoked")
+			await scoped
+				.update(app.documents, id, { updatedAt: visible.updatedAt })
+				.wait({ tier: "global" })
+		}
 		if (writesSnapshot)
 			await writeItem(
 				item,
@@ -180,6 +244,7 @@ async function importClassicItem(accountId: string, input: unknown) {
 				accountId,
 				previous?.baseContent ?? undefined,
 				access?.publicRead ?? false,
+				identity.classicId,
 			)
 		if (access && item.kind !== "theme") {
 			for (let pending of await jazz.db.all(
@@ -199,7 +264,9 @@ async function importClassicItem(accountId: string, input: unknown) {
 				error: null,
 				...(item.kind === "document" && writesSnapshot
 					? { baseContent: await rewriteReferences(item.content) }
-					: {}),
+					: item.kind === "space" && access
+						? { baseContent: access.groupId }
+						: {}),
 			})
 			.wait({ tier: "global" })
 		if (item.kind === "document" && !item.spaceId)
@@ -259,6 +326,17 @@ async function uploadChunk(accountId: string, input: unknown) {
 			.wait({ tier: "global" })
 	return { id }
 }
+async function importStagedItem(accountId: string, input: unknown) {
+	let staged = z
+		.object({ uploadId: z.string(), sha256: z.string() })
+		.parse(input)
+	let bytes = await readBytes(accountId, staged)
+	let value: unknown = JSON.parse(new TextDecoder().decode(bytes))
+	let result = await importClassicItem(accountId, value)
+	await discardChunks(accountId, staged)
+	return result
+}
+
 async function readBytes(
 	accountId: string,
 	value: { base64?: string; uploadId?: string; sha256: string },
@@ -294,33 +372,45 @@ async function grantAccess(
 	role: "reader" | "writer" | "manager" | "admin",
 ) {
 	let id = await stableId(`grant:${resourceId}:${accountId}`)
+	let activationId = await stableId(`membership:${id}`)
+	if (await jazz.db.one(app.classicImports.where({ id: activationId }))) return
 	if (kind === "space") {
-		let previous = await jazz.db.one(app.spaceMembers.where({ id }))
+		let previous = await jazz.db.one(
+			app.spaceMembers.where({ id }).includeDeleted(),
+		)
 		let values = { accountId, spaceId: resourceId, role }
-		if (previous)
-			await jazz.db
-				.update(app.spaceMembers, id, values)
-				.wait({ tier: "global" })
-		else
+		if (!previous)
 			await jazz.db
 				.insert(app.spaceMembers, values, { id })
 				.wait({ tier: "global" })
 	} else {
-		let previous = await jazz.db.one(app.documentGrants.where({ id }))
+		let previous = await jazz.db.one(
+			app.documentGrants.where({ id }).includeDeleted(),
+		)
 		let values = {
 			accountId,
 			documentId: resourceId,
 			role: role === "manager" ? "writer" : role,
 		}
-		if (previous)
-			await jazz.db
-				.update(app.documentGrants, id, values)
-				.wait({ tier: "global" })
-		else
+		if (!previous)
 			await jazz.db
 				.insert(app.documentGrants, values, { id })
 				.wait({ tier: "global" })
 	}
+	await jazz.db
+		.insert(
+			app.classicImports,
+			{
+				ownerId: accountId,
+				classicId: `membership:${resourceId}:${accountId}`,
+				v2Id: id,
+				kind: "membership",
+				status: "complete",
+				importedAt: new Date(),
+			},
+			{ id: activationId },
+		)
+		.wait({ tier: "global" })
 }
 async function writeItem(
 	item: ImportItem,
@@ -329,6 +419,7 @@ async function writeItem(
 	accountId: string,
 	baseContent: string | undefined,
 	publicRead: boolean,
+	classicAccountId: string,
 ) {
 	let db = jazz.db
 	if (item.kind === "document") {
@@ -349,8 +440,18 @@ async function writeItem(
 			updatedAt: item.updatedAt,
 			deletedAt: item.deletedAt,
 		}
+		if (
+			existing &&
+			baseContent === undefined &&
+			existing.ownerId !== ownerId &&
+			existing.ownerId !== (await stableId(`owner:${item.classicId}`))
+		)
+			throw new Error("object already exists: Classic owner binding collision")
 		if (existing) {
-			if (existing.ownerId !== ownerId)
+			if (
+				existing.ownerId === (await stableId(`owner:${item.classicId}`)) &&
+				existing.ownerId !== ownerId
+			)
 				await db.update(app.documents, id, { ownerId }).wait({ tier: "global" })
 			if (baseContent !== content) {
 				// The last imported Classic text is the common ancestor; v2 edits remain a separate branch.
@@ -367,9 +468,21 @@ async function writeItem(
 			}
 		} else
 			await db.insert(app.documents, values, { id }).wait({ tier: "global" })
+		await db
+			.update(app.classicImports, await stableId(`map:${item.classicId}`), {
+				baseContent: content,
+			})
+			.wait({ tier: "global" })
 		for (let version of item.versions) {
-			let versionId = await stableId(`version:${version.classicId}`)
-			if (!(await db.one(app.documentVersions.where({ id: versionId }))))
+			let versionId = await stableId(`version:${id}:${version.classicId}`)
+			if (
+				!(await db.one(
+					app.documentVersions.where({
+						documentId: id,
+						classicId: version.classicId,
+					}),
+				))
+			)
 				await db
 					.insert(
 						app.documentVersions,
@@ -383,7 +496,16 @@ async function writeItem(
 					.wait({ tier: "global" })
 		}
 		for (let asset of item.assets) {
+			await verifyChild(item.classicId, asset.classicId, classicAccountId)
 			for (let revision of asset.revisions) {
+				await verifyChild(item.classicId, revision.classicId, classicAccountId)
+				let previousRevision = await db.one(
+					app.tldrawRevisions
+						.where({ id: await stableId(revision.classicId) })
+						.includeDeleted(),
+				)
+				if (previousRevision && previousRevision.documentId !== id)
+					throw new Error("Classic revision belongs to another document")
 				let revisionId = await stableId(revision.classicId)
 				if (!(await db.one(app.tldrawRevisions.where({ id: revisionId }))))
 					await db
@@ -401,6 +523,21 @@ async function writeItem(
 						.wait({ tier: "global" })
 			}
 			let assetId = await stableId(asset.classicId)
+			let revisionId = asset.revisionId
+				? await stableId(asset.revisionId)
+				: undefined
+			if (revisionId) {
+				let revision = await db.one(
+					app.tldrawRevisions.where({ id: revisionId }),
+				)
+				if (!revision || revision.documentId !== id)
+					throw new Error("Classic revision does not belong to this document")
+			}
+			let previousAsset = await db.one(
+				app.assets.where({ id: assetId }).includeDeleted(),
+			)
+			if (previousAsset && previousAsset.documentId !== id)
+				throw new Error("Classic asset belongs to another document")
 			let assetMapId = await stableId(`asset-map:${asset.classicId}`)
 			let sourceState = JSON.stringify({
 				...asset,
@@ -418,9 +555,7 @@ async function writeItem(
 				muteAudio: asset.muteAudio,
 				width: asset.width,
 				height: asset.height,
-				revisionId: asset.revisionId
-					? await stableId(asset.revisionId)
-					: undefined,
+				revisionId,
 				createdAt: asset.createdAt,
 			}
 			if (!(await db.one(app.assets.where({ id: assetId }))))
@@ -454,10 +589,18 @@ async function writeItem(
 		let current = await db.one(app.documents.where({ id }))
 		if (!current) throw new Error("Imported document missing")
 		for (let thread of item.comments) {
+			await verifyChild(
+				item.classicId,
+				thread.classicId,
+				classicAccountId,
+				thread.authorId,
+			)
 			let threadId = await stableId(thread.classicId)
 			let existingThread = await db.one(
 				app.commentThreads.where({ id: threadId }),
 			)
+			if (existingThread && existingThread.documentId !== id)
+				throw new Error("Classic thread belongs to another document")
 			let originalRange = resolveClassicAnchor(
 				item.content,
 				thread.anchor,
@@ -500,7 +643,20 @@ async function writeItem(
 						{ id: threadId },
 					)
 					.wait({ tier: "global" })
-			for (let reply of thread.replies)
+			for (let reply of thread.replies) {
+				await verifyChild(
+					thread.classicId,
+					reply.classicId,
+					classicAccountId,
+					reply.authorId,
+				)
+				let previousReply = await db.one(
+					app.commentReplies
+						.where({ id: await stableId(reply.classicId) })
+						.includeDeleted(),
+				)
+				if (previousReply && previousReply.threadId !== threadId)
+					throw new Error("Classic reply belongs to another thread")
 				if (
 					!(await db.one(
 						app.commentReplies.where({ id: await stableId(reply.classicId) }),
@@ -521,9 +677,18 @@ async function writeItem(
 							{ id: await stableId(reply.classicId) },
 						)
 						.wait({ tier: "global" })
+			}
 		}
 	} else if (item.kind === "space") {
-		if (!(await db.one(app.spaces.where({ id }))))
+		let existing = await db.one(app.spaces.where({ id }))
+		if (
+			existing &&
+			baseContent === undefined &&
+			existing.ownerId !== ownerId &&
+			existing.ownerId !== (await stableId(`owner:${item.classicId}`))
+		)
+			throw new Error("object already exists: Classic owner binding collision")
+		if (!existing)
 			await db
 				.insert(
 					app.spaces,
@@ -560,12 +725,14 @@ async function writeItem(
 			editor: item.editor,
 			language: item.language,
 			syntaxTheme: item.syntaxTheme,
-			defaultPreviewTheme: item.defaultPreviewTheme
-				? await stableId(item.defaultPreviewTheme)
-				: undefined,
-			defaultSlideshowTheme: item.defaultSlideshowTheme
-				? await stableId(item.defaultSlideshowTheme)
-				: undefined,
+			defaultPreviewTheme: await importedTheme(
+				item.defaultPreviewTheme,
+				accountId,
+			),
+			defaultSlideshowTheme: await importedTheme(
+				item.defaultSlideshowTheme,
+				accountId,
+			),
 		}
 		if (settings[0])
 			await db
@@ -588,9 +755,13 @@ async function writeItem(
 						author: item.author,
 						description: item.description,
 						type: item.type,
-						css: item.css,
-						template: item.template,
-						slideTemplate: item.slideTemplate,
+						css: await rewriteReferences(item.css),
+						template: item.template
+							? await rewriteReferences(item.template)
+							: undefined,
+						slideTemplate: item.slideTemplate
+							? await rewriteReferences(item.slideTemplate)
+							: undefined,
 						sourceDocId: item.sourceDocId
 							? await stableId(item.sourceDocId)
 							: undefined,
@@ -606,7 +777,13 @@ async function writeItem(
 				)
 				.wait({ tier: "global" })
 		for (let asset of item.assets) {
+			await verifyChild(item.classicId, asset.classicId, classicAccountId)
 			let assetId = await stableId(asset.classicId)
+			let existing = await db.one(
+				app.themeAssets.where({ id: assetId }).includeDeleted(),
+			)
+			if (existing && existing.themeId !== id)
+				throw new Error("Classic asset belongs to another theme")
 			if (!(await db.one(app.themeAssets.where({ id: assetId }))))
 				await db
 					.insert(
@@ -623,6 +800,14 @@ async function writeItem(
 					.wait({ tier: "global" })
 		}
 	}
+}
+async function importedTheme(classicId: string | undefined, ownerId: string) {
+	if (!classicId) return undefined
+	let id = await stableId(classicId)
+	let theme = await jazz.db.one(app.themes.where({ id }))
+	if (!theme || theme.ownerId !== ownerId)
+		throw new Error("Import the Classic default theme before account settings")
+	return id
 }
 async function authorAccount(classicId: string, fallback: string) {
 	let account = await jazz.db.one(app.classicAccounts.where({ classicId }))
@@ -686,13 +871,18 @@ async function discardChunks(accountId: string, value: unknown): Promise<void> {
 	for (let child of Object.values(value)) await discardChunks(accountId, child)
 }
 
-async function importStagedItem(accountId: string, input: unknown) {
-	let staged = z
-		.object({ uploadId: z.string(), sha256: z.string() })
-		.parse(input)
-	let bytes = await readBytes(accountId, staged)
-	let value: unknown = JSON.parse(new TextDecoder().decode(bytes))
-	let result = await importClassicItem(accountId, value)
-	await discardChunks(accountId, staged)
-	return result
+async function verifyChild(
+	parentId: string,
+	childId: string,
+	classicAccountId: string,
+	authorId?: string,
+) {
+	let [parent, child] = await Promise.all([
+		readClassicAccess(parentId, classicAccountId),
+		readClassicAccess(childId, classicAccountId),
+	])
+	if (!child.groupIds.includes(parent.groupId))
+		throw new Error("Classic child has an unrelated owner group")
+	if (authorId !== undefined && authorId !== (child.createdBy ?? ""))
+		throw new Error("Classic author does not match signed history")
 }
