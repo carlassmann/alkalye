@@ -87,3 +87,35 @@ test("diff keeps separate edits small and preserves Unicode", () => {
 	sync.apply("B 👩🏽‍💻 Q")
 	expect(view.state.doc.toString()).toBe("B 👩🏽‍💻 Q")
 })
+
+test("applies sequential UTF-16 splices and preserves the selected text", () => {
+	let { view, sync, write } = editor("A 👩🏽‍💻 middle Z")
+	let previous = view.state.doc.toString()
+	let start = previous.indexOf("middle")
+	view.dispatch({ selection: EditorSelection.range(start, start + 6) })
+	sync.apply("new A 👩🏽‍💻 middle! Z", {
+		previous,
+		splices: [
+			{ at: 0, delete: 0, insert: "new " },
+			{ at: start + 10, delete: 0, insert: "!" },
+		],
+	})
+	expect(view.state.doc.toString()).toBe("new A 👩🏽‍💻 middle! Z")
+	expect(
+		view.state.sliceDoc(
+			view.state.selection.main.from,
+			view.state.selection.main.to,
+		),
+	).toBe("middle")
+	expect(write).not.toHaveBeenCalled()
+	expect(undo(view)).toBe(false)
+})
+
+test("falls back to a diff when a render skipped a subscription update", () => {
+	let { view, sync } = editor("middle")
+	sync.apply("new middle!", {
+		previous: "new middle",
+		splices: [{ at: 10, delete: 0, insert: "!" }],
+	})
+	expect(view.state.doc.toString()).toBe("new middle!")
+})

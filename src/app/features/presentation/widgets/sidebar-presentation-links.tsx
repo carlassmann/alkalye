@@ -7,7 +7,7 @@ import { T } from "@/shared/intl/setup"
 
 export { SidebarPresentationLinks }
 
-type LoadedDocument = LibraryDocument
+type LoadedDocument = LibraryDocument & { content: string }
 
 interface SidebarPresentationLinksProps {
 	doc: LoadedDocument

@@ -1,21 +1,20 @@
 import { getRandomWriterName } from "@/app/features/onboarding/lib/random-writer-name"
 import type { JazzClient } from "jazz-tools/client"
 import { toast } from "sonner"
-import { createContext, useContext, useEffect } from "react"
+import { createContext, useContext, useEffect, useState } from "react"
 import { useAll, useDb, useSession, useJazzSession } from "jazz-tools/react"
 import { schema } from "jazz-tools"
 import { app, type DocumentRow } from "@/jazz/schema"
 import { DEFAULT_EDITOR_SETTINGS } from "@/jazz/value-types"
 import {
 	getPath,
-	getTags,
 	parseFrontmatter,
 	addBacklink,
 	removeBacklink,
 	togglePinned,
 } from "@/app/features/editor/lib/frontmatter"
 import { parseWikiLinks } from "@/app/features/editor/lib/wikilink-parser"
-import { getDocumentTitle } from "./title"
+import { documentMetadata } from "./metadata"
 import { watchWrite } from "./writes"
 
 export {
@@ -25,6 +24,8 @@ export {
 	createDocument,
 	updateContent,
 	setPinned,
+	readDocument,
+	documentMetadata,
 	canEdit,
 	canAdmin,
 }
@@ -32,7 +33,7 @@ export type { Database, LibraryDocument, SettingsRow }
 
 type Database = ReturnType<typeof useDb>
 type SettingsRow = schema.RowOf<typeof app.settings>
-type LibraryDocument = Omit<DocumentRow, "deletedAt"> & {
+type LibraryDocument = Omit<DocumentRow, "deletedAt" | "content"> & {
 	deletedAt?: Date
 	path: string | null
 	pinned: boolean
@@ -71,10 +72,28 @@ function useLibraryData() {
 	}, [db, auth])
 	let ownerId = useSession()?.user
 	if (!ownerId) throw new Error("Account missing")
-	let { data: rows = [], isLoading } = useAll(app.documents)
+	let documentSummaries = app.documents.select(
+		"ownerId",
+		"spaceId",
+		"title",
+		"tags",
+		"path",
+		"frontmatterPinned",
+		"isPresentation",
+		"publicRead",
+		"commentsDisabled",
+		"presentationLine",
+		"highlightRange",
+		"createdAt",
+		"updatedAt",
+		"deletedAt",
+	)
+	let { data: rows = [], isLoading } = useAll(documentSummaries)
 	let { data: entries = [] } = useAll(app.userDocuments.where({ ownerId }))
 	let { data: linkedRows = [] } = useAll(
-		app.documents.where({ id: { in: entries.map(entry => entry.documentId) } }),
+		documentSummaries.where({
+			id: { in: entries.map(entry => entry.documentId) },
+		}),
 	)
 	let { data: folderRows = [] } = useAll(app.folders.where({ ownerId }))
 	let { data: preferences = [], isLoading: settingsLoading } = useAll(
@@ -115,6 +134,31 @@ function useLibraryData() {
 		}
 		return names.length ? names.join("/") : null
 	}
+	let [legacyMetadata, setLegacyMetadata] = useState<
+		Record<string, ReturnType<typeof documentMetadata>>
+	>({})
+	useEffect(() => {
+		let active = true
+		async function load() {
+			let missing = visibleRows.filter(
+				row => row.frontmatterPinned === null && !legacyMetadata[row.id],
+			)
+			for (let row of missing) {
+				let body = await db.one(
+					app.documents.where({ id: row.id }).select("content"),
+				)
+				if (!active) return
+				if (!body) continue
+				let metadata = documentMetadata(body.content)
+				setLegacyMetadata(current => ({ ...current, [row.id]: metadata }))
+			}
+		}
+		void load().catch(console.error)
+		return () => {
+			active = false
+		}
+	}, [db, visibleRows, legacyMetadata])
+
 	let documents: LibraryDocument[] = visibleRows
 		.filter(
 			row =>
@@ -163,10 +207,14 @@ function useLibraryData() {
 						grant.role === "admin",
 				),
 			deletedAt: row.deletedAt ?? undefined,
-			path: getPath(row.content) ?? (!row.spaceId ? folderPath(row.id) : null),
+			path:
+				(row.frontmatterPinned === null
+					? (legacyMetadata[row.id]?.path ?? row.path)
+					: row.path) ?? (!row.spaceId ? folderPath(row.id) : null),
 			pinned:
 				entries.find(entry => entry.documentId === row.id)?.pinned ??
-				parseFrontmatter(row.content).frontmatter?.pinned === true,
+				(row.frontmatterPinned ?? legacyMetadata[row.id]?.frontmatterPinned) ===
+					true,
 		}))
 	useEffect(() => {
 		if (
@@ -207,8 +255,7 @@ async function createDocument(
 			ownerId,
 			spaceId,
 			content,
-			title: getDocumentTitle(content),
-			tags: getTags(content),
+			...documentMetadata(content),
 			createdAt: now,
 			updatedAt: now,
 		})
@@ -236,19 +283,20 @@ async function updateContent(
 	db: Database,
 	doc: DocumentRow | LibraryDocument,
 	content: string,
-	editedFrom = doc.content,
+	editedFrom?: string,
 ) {
+	editedFrom ??= (await readDocument(db, doc.id)).content
+	let original = editedFrom
 	let write = await db.transaction(tx =>
 		tx.update(
 			app.documents,
 			doc.id,
 			{
 				content,
-				title: getDocumentTitle(content),
-				tags: getTags(content),
+				...documentMetadata(content),
 				updatedAt: new Date(),
 			},
-			{ editedFrom: { content: editedFrom } },
+			{ editedFrom: { content: original } },
 		),
 	)
 	watchWrite(write)
@@ -280,11 +328,21 @@ async function updateContent(
 	if ([...before].every(id => after.has(id)) && before.size === after.size)
 		return
 	await enqueueBacklinks(db, doc.id, async () => {
-		let targets = await db.all(app.documents)
+		let targets = await Promise.all(
+			[...new Set([...before, ...after])]
+				.filter(
+					id =>
+						/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+							id,
+						) && before.has(id) !== after.has(id),
+				)
+				.map(id => db.one(app.documents.where({ id }))),
+		)
 		let entries = await db.all(app.userDocuments)
 		let personalIds = new Set(entries.map(entry => entry.documentId))
 		for (let target of targets) {
 			if (
+				!target ||
 				target.id === doc.id ||
 				target.deletedAt ||
 				target.spaceId !== doc.spaceId ||
@@ -331,9 +389,11 @@ async function setPinned(
 				pinned,
 			}),
 		)
-	let currentPinned = parseFrontmatter(doc.content).frontmatter?.pinned === true
+	let loaded = await readDocument(db, doc.id)
+	let currentPinned =
+		parseFrontmatter(loaded.content).frontmatter?.pinned === true
 	if (currentPinned !== pinned)
-		await updateContent(db, doc, togglePinned(doc.content))
+		await updateContent(db, loaded, togglePinned(loaded.content))
 }
 
 async function ensureFolder(
@@ -384,4 +444,10 @@ function enqueueBacklinks(
 		})
 		.catch(() => {})
 	return next
+}
+
+async function readDocument(db: Database, id: string) {
+	let doc = await db.one(app.documents.where({ id }))
+	if (!doc) throw new Error("Document unavailable")
+	return doc
 }

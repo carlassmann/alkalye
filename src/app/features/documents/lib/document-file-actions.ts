@@ -19,6 +19,7 @@ import { exportDocument, type ExportAsset } from "@/app/features/import-export"
 import {
 	app,
 	createDocument,
+	readDocument,
 	setPinned,
 	type Database,
 	type LibraryDocument,
@@ -270,7 +271,8 @@ function makeDuplicate(
 	navigate: ReturnType<typeof useNavigate>,
 ) {
 	return async function handleDuplicate() {
-		let content = addCopyToTitle(doc.content)
+		let loaded = await readDocument(db, doc.id)
+		let content = addCopyToTitle(loaded.content)
 		let copy = spaceId
 			? await createSpaceDocument(db, ownerId, spaceId, content)
 			: await createDocument(db, ownerId, content)
@@ -286,7 +288,7 @@ function makeDuplicate(
 			copy.id,
 			ownerId,
 			await exportComments(db, doc.id),
-			doc.content,
+			loaded.content,
 		)
 		void (spaceId
 			? navigate({

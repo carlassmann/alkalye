@@ -1,5 +1,16 @@
 [
 	{
+		"id": 169,
+		"date": "2026-11-13",
+		"title": "Open documents faster with new sync",
+		"notes": [
+			"Documents open faster and edits sync immediately through our new sync system. Existing users do not need to do anything: documents and settings move automatically, and your existing recovery words still work.",
+			"Synced data is no longer end-to-end encrypted. Alkalye's backend and Jazz Cloud can read it."
+		],
+		"pr": 0,
+		"commit": "f1e6c13"
+	},
+	{
 		"id": 168,
 		"date": "2026-11-12",
 		"title": "See Alkalye in action and ask Carl's Syntwin",

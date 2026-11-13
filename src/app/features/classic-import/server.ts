@@ -1,6 +1,7 @@
 import { WasmCrypto } from "cojson/crypto/WasmCrypto"
 import { app } from "@/jazz/schema"
 import { jazz } from "@/jazz/server"
+import { documentMetadata } from "@/app/features/documents/lib/metadata"
 import { importItemSchema, proofSchema, type ImportItem } from "./contract"
 import { verifyClassicProof, readClassicAccess } from "./verification"
 import {
@@ -430,6 +431,9 @@ async function writeItem(
 			spaceId: item.spaceId ? await stableId(item.spaceId) : undefined,
 			title: item.title,
 			content,
+			path: documentMetadata(content).path ?? item.path,
+			frontmatterPinned:
+				documentMetadata(content).frontmatterPinned || item.pinned,
 			tags: item.tags,
 			isPresentation: item.isPresentation,
 			publicRead,
@@ -465,6 +469,11 @@ async function writeItem(
 						),
 					)
 					.then(write => write.wait({ tier: "global" }))
+				let merged = await db.one(app.documents.where({ id }))
+				if (!merged) throw new Error("Imported document missing after merge")
+				await db
+					.update(app.documents, id, documentMetadata(merged.content))
+					.wait({ tier: "global" })
 			}
 		} else
 			await db.insert(app.documents, values, { id }).wait({ tier: "global" })

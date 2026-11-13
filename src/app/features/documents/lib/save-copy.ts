@@ -13,7 +13,7 @@ export { handleSaveCopy }
 async function handleSaveCopy(
 	db: Database,
 	ownerId: string,
-	doc: LibraryDocument,
+	doc: LibraryDocument & { content: string },
 	setState: (state: "idle" | "saving" | "saved") => void,
 	navigate: ReturnType<typeof useNavigate>,
 ) {

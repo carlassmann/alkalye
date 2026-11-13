@@ -37,7 +37,6 @@ import {
 	type Collaborator,
 } from "../lib/document-sharing"
 import { testIds } from "@/app/lib/test-ids"
-import { getDocumentTitle } from "@/app/features/documents"
 import { NativeShareIcon } from "@/app/components/native-share-icon"
 
 export { ShareDialog }
@@ -134,7 +133,7 @@ function ShareDialog({
 
 		try {
 			await navigator.share({
-				title: getDocumentTitle(currentDoc.content?.toString() ?? ""),
+				title: currentDoc.title,
 				url: inviteLink,
 			})
 		} catch (error) {

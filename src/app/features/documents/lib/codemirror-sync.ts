@@ -1,9 +1,19 @@
-import { Annotation, Transaction, type Extension } from "@codemirror/state"
+import {
+	Annotation,
+	ChangeSet,
+	Transaction,
+	type Extension,
+} from "@codemirror/state"
 import { EditorView } from "@codemirror/view"
 import { diff } from "fast-myers-diff"
 
 export { codeMirrorSync, minimalChanges }
-export type { MarkdownSync }
+export type { MarkdownSync, TextUpdate }
+
+type TextUpdate = {
+	previous: string
+	splices: readonly { at: number; delete: number; insert: string }[]
+}
 
 type MarkdownSync = ReturnType<typeof codeMirrorSync>
 let remoteChange = Annotation.define<boolean>()
@@ -34,7 +44,7 @@ function codeMirrorSync(
 		held = null
 	}
 
-	function apply(value: string) {
+	function apply(value: string, update?: TextUpdate) {
 		if (!view) return
 		if (composing || view.composing) {
 			held = value
@@ -55,7 +65,10 @@ function codeMirrorSync(
 		base = value
 		if (value === shown) return
 		view.dispatch({
-			changes: minimalChanges(shown, value),
+			changes:
+				update?.previous === shown
+					? spliceChanges(shown.length, update.splices)
+					: minimalChanges(shown, value),
 			annotations: [remoteChange.of(true), Transaction.addToHistory.of(false)],
 		})
 	}
@@ -108,4 +121,16 @@ function minimalChanges(before: string, after: string) {
 		to,
 		insert: after.slice(start, end),
 	}))
+}
+
+function spliceChanges(length: number, splices: TextUpdate["splices"]) {
+	let changes = ChangeSet.empty(length)
+	for (let splice of splices) {
+		let next = ChangeSet.of(
+			{ from: splice.at, to: splice.at + splice.delete, insert: splice.insert },
+			changes.newLength,
+		)
+		changes = changes.compose(next)
+	}
+	return changes
 }

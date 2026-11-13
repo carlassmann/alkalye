@@ -245,7 +245,6 @@ async function main() {
 		])
 
 		if (!process.env.CI_BASE_URL?.trim()) {
-			run("Restart local sync", ["work", "restart", "sync"])
 			run("Restart local web", ["work", "restart", "web"])
 		}
 		let url = previewUrl()

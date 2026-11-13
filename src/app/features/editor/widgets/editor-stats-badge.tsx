@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react"
 import { useDb } from "jazz-tools/react"
 import { app, type SettingsRow, type Database } from "@/app/features/documents"
 import {
@@ -26,9 +27,6 @@ interface EditorStatsBadgeProps {
 	settings: SettingsCoMap | null | undefined
 }
 
-let FRONTMATTER_RE = /^---\r?\n[\s\S]*?\r?\n---\r?\n?/
-let TASK_RE = /^\s*[-*+]\s\[([ xX])\]/gm
-
 function EditorStatsBadge({
 	content,
 	settings,
@@ -38,7 +36,7 @@ function EditorStatsBadge({
 	let t = useIntl()
 	let { leftOpen, isMobile } = useSidebar()
 	let editorSettings = { ...DEFAULT_EDITOR_SETTINGS, ...settings?.editor }
-	let stats = getStats(content)
+	let stats = useStats(content, editorSettings.showStatsBadge)
 	let unitLabels: { value: StatsUnit; label: string }[] = [
 		{ value: "words", label: t("editor.stats.words") },
 		{ value: "sentences", label: t("editor.stats.sentences") },
@@ -131,51 +129,6 @@ function isStatsUnit(value: string): value is StatsUnit {
 	return value === "words" || value === "sentences" || value === "tasks"
 }
 
-function stripFrontmatter(content: string): string {
-	return content.replace(FRONTMATTER_RE, "")
-}
-
-function countWords(text: string): number {
-	let stripped = stripFrontmatter(text)
-	let words = stripped.split(/\s+/).filter(Boolean)
-	return words.length
-}
-
-function countSentences(text: string): number {
-	let stripped = stripFrontmatter(text)
-	let cleaned = stripped
-		.replace(/```[\s\S]*?```/g, "")
-		.replace(/`[^`]+`/g, "")
-		.replace(/!\[.*?\]\(.*?\)/g, "")
-		.replace(/\[([^\]]+)\]\(.*?\)/g, "$1")
-		.replace(/^#+\s*/gm, "")
-	let sentences = cleaned.split(/[.!?]+(?:\s|$)/).filter(s => s.trim())
-	return sentences.length
-}
-
-function countTasks(text: string): { done: number; total: number } {
-	let done = 0
-	let total = 0
-	let match: RegExpExecArray | null
-	TASK_RE.lastIndex = 0
-	while ((match = TASK_RE.exec(text)) !== null) {
-		total++
-		if (match[1] !== " ") done++
-	}
-	return { done, total }
-}
-
-function getStats(content: string): Record<StatsUnit, string> {
-	let words = countWords(content)
-	let sentences = countSentences(content)
-	let { done, total } = countTasks(content)
-	return {
-		words: `${words}`,
-		sentences: `${sentences}`,
-		tasks: `${done} / ${total}`,
-	}
-}
-
 function formatMenuStat(
 	unit: StatsUnit,
 	stats: Record<StatsUnit, string>,
@@ -196,4 +149,32 @@ function formatStat(
 		case "tasks":
 			return `${stats.tasks} ${t("editor.stats.tasks").toLowerCase()}`
 	}
+}
+
+function useStats(content: string, enabled: boolean) {
+	let worker = useRef<Worker | null>(null)
+	let [stats, setStats] = useState<Record<StatsUnit, string>>({
+		words: "…",
+		sentences: "…",
+		tasks: "…",
+	})
+	useEffect(() => {
+		if (!enabled) return
+		let counter = new Worker(
+			new URL("../lib/stats-worker.ts", import.meta.url),
+			{ type: "module" },
+		)
+		worker.current = counter
+		counter.onmessage = (event: MessageEvent<Record<StatsUnit, string>>) =>
+			setStats(event.data)
+		return () => {
+			counter.terminate()
+			worker.current = null
+		}
+	}, [enabled])
+	useEffect(() => {
+		let timer = setTimeout(() => worker.current?.postMessage(content), 150)
+		return () => clearTimeout(timer)
+	}, [content, enabled])
+	return stats
 }

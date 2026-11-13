@@ -34,7 +34,16 @@ function createTraffic() {
 		issues,
 		timeline: new Array<{ at: number; kind: string; bytes?: number }>(),
 		bundleRequests: new Set<string>(),
-		bundleTransfers: new Map<string, { url: string; bytes: number }>(),
+		bundleTransfers: new Map<
+			string,
+			{
+				url: string
+				bytes: number
+				fromDiskCache?: boolean
+				fromServiceWorker?: boolean
+				encoding?: string
+			}
+		>(),
 		resources: new Map<string, number>(),
 		requests: new Set<string>(),
 		websocketOwners: new Map<string, string>(),
@@ -104,6 +113,11 @@ async function createCapture(browser: Browser) {
 			state.bundleRequests.add(event.requestId)
 			state.bundleTransfers.set(event.requestId, {
 				url: event.response.url,
+				fromDiskCache: event.response.fromDiskCache,
+				fromServiceWorker: event.response.fromServiceWorker,
+				encoding: String(
+					event.response.headers["content-encoding"] ?? "identity",
+				),
 				bytes: state.resources.get(event.requestId) ?? 0,
 			})
 		}

@@ -1,4 +1,9 @@
-import { type Database, type LibraryDocument, updateContent } from "./library"
+import {
+	readDocument,
+	type Database,
+	type LibraryDocument,
+	updateContent,
+} from "./library"
 import { getPath, parseFrontmatter } from "@/app/features/editor"
 import { canEdit } from "@/app/features/sharing"
 import { tryCatch } from "@/app/lib/try-catch"
@@ -50,11 +55,11 @@ async function moveDocumentToFolder(
 	doc: LibraryDocument,
 	newPath: string | null,
 ): Promise<boolean> {
-	let content = doc.content.toString()
+	let content = (await readDocument(db, doc.id)).content
 	let newContent = applyFolderPathToContent(content, newPath)
 	if (newContent === content) return false
 
-	await updateContent(db, doc, newContent)
+	await updateContent(db, doc, newContent, content)
 	return true
 }
 

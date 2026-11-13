@@ -24,6 +24,20 @@
 				"nullable": false
 			},
 			{
+				"name": "path",
+				"column_type": {
+					"type": "Text"
+				},
+				"nullable": true
+			},
+			{
+				"name": "frontmatterPinned",
+				"column_type": {
+					"type": "Boolean"
+				},
+				"nullable": true
+			},
+			{
 				"name": "content",
 				"column_type": {
 					"type": "Text"

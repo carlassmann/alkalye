@@ -241,7 +241,9 @@ type DuplicateOptions = {
 async function duplicateDocument(options: DuplicateOptions): Promise<string> {
 	let { db, ownerId, doc, destination, newName } = options
 	options.onProgress?.({ total: 1, copied: 0, status: "copying" })
-	let content = setFrontmatterField(doc.content, "title", newName)
+	let loaded = await db.one(app.documents.where({ id: doc.id }))
+	if (!loaded) throw new Error("Document unavailable")
+	let content = setFrontmatterField(loaded.content, "title", newName)
 	let copy = await createDocument(db, ownerId, content, destination?.id)
 	content = await copyDocumentAssets(db, doc.id, copy.id, content)
 	await updateContent(db, copy, content)
@@ -251,7 +253,7 @@ async function duplicateDocument(options: DuplicateOptions): Promise<string> {
 			copy.id,
 			ownerId,
 			await exportComments(db, doc.id),
-			doc.content,
+			loaded.content,
 		)
 	options.onProgress?.({ total: 1, copied: 1, status: "done" })
 	return copy.id

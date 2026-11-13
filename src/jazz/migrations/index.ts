@@ -8,7 +8,7 @@ import type { ClientMigrations } from "jazz-tools"
 export const migrations: ClientMigrations = {
   "schemas": [
     {
-      "hash": "1f98249fc7a28abf6262734c86c81f7063cda5f73ccdca73bafb2be665593469",
+      "hash": "b7b44e9a8d51194a876477c504c3a08fa8c179908a53f1e23643e6abe278b44e",
       "schema": {
         "tables": {
           "documents": {
@@ -34,6 +34,20 @@ export const migrations: ClientMigrations = {
                   "type": "Text"
                 },
                 "nullable": false
+              },
+              {
+                "name": "path",
+                "column_type": {
+                  "type": "Text"
+                },
+                "nullable": true
+              },
+              {
+                "name": "frontmatterPinned",
+                "column_type": {
+                  "type": "Boolean"
+                },
+                "nullable": true
               },
               {
                 "name": "content",

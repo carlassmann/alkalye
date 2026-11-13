@@ -85,6 +85,9 @@ async function inspectClassicMigration() {
 			documents: documents.map(doc => ({
 				id: doc.id,
 				title: doc.title,
+				tags: doc.tags,
+				path: doc.path,
+				frontmatterPinned: doc.frontmatterPinned,
 				ownerId: doc.ownerId,
 				spaceId: doc.spaceId,
 				publicRead: doc.publicRead,

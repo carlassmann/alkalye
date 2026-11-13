@@ -99,7 +99,16 @@ function prepare() {
 function inspect(profile: string) {
 	return z
 		.object({
-			documents: z.array(z.object({ id: z.string(), content: z.string() })),
+			documents: z.array(
+				z.object({
+					id: z.string(),
+					content: z.string(),
+					title: z.string(),
+					tags: z.array(z.string()),
+					path: z.string().nullable(),
+					frontmatterPinned: z.boolean(),
+				}),
+			),
 			folders: z.array(z.object({ name: z.string() })),
 			settings: z.array(
 				z.object({ editor: z.object({ fontSize: z.number() }) }),
@@ -143,6 +152,16 @@ function verify() {
 	let doc = a.documents.find(doc => doc.content.includes("# Classic migration"))
 	if (!doc || !b.documents.some(item => item.id === doc.id))
 		throw new Error("Shared document missing or duplicated")
+	for (let profile of [a, b]) {
+		let imported = profile.documents.find(item => item.id === doc.id)
+		if (
+			!imported ||
+			imported.title !== "Classic migration" ||
+			imported.path !== "Migration/Notes" ||
+			!imported.frontmatterPinned
+		)
+			throw new Error("Imported library metadata missing")
+	}
 	if (!a.anchors.some(anchor => anchor.quote === "anchored quotation"))
 		throw new Error("Comment anchor missing")
 	if (!a.versions.some(version => version.documentId === doc.id))

@@ -67,7 +67,7 @@ export default {
  commands: {
   classic: { run: 'node ${serving}/classic-server.mjs', route: true },
   sync: { run: 'cd ${classic} && ulimit -c 0; NODE_OPTIONS=--max-old-space-size=32768 bunx jazz-run@0.20.19 sync --port "$PORT" --host "$HOST"', route: true },
-  v2: { run: 'cd ${serving} && ALKALYE_LOCAL_PREVIEW=1 WORK_WEB_URL=https://v2-main-alkalye-bench.cshed.carlassmann.com JAZZ_PUBLIC_URL=https://v2-main-alkalye-bench.cshed.carlassmann.com/jazz HOST=0.0.0.0 node --env-file=${root}/.env ${root}/dist/server/entry.mjs', route: true }
+  v2: { run: 'cd ${serving} && ALKALYE_LOCAL_PREVIEW=1 WORK_WEB_URL=https://v2-main-alkalye-bench.cshed.carlassmann.com JAZZ_PUBLIC_URL=https://v2-main-alkalye-bench.cshed.carlassmann.com/jazz HOST=0.0.0.0 BENCH_BUILD_ROOT=${root} bun ${root}/scripts/bench/serve-production.ts', route: true }
  }
 }
 `,

@@ -503,5 +503,18 @@ The inherited importer limits remain: historical removed assets are not exhausti
 written with gpt-6.1-sol in T3 Code (Codex)
 
 - 2026-11-13, phase 3 integration: merged the seamless importer with spaces/sharing and benchmarks; generated a clean combined schema after alpha.61 rejected the divergent lens graph; preserved personal-library and space behavior. Full check, 798 tests, 13 e2e cases, same-origin Classic cutover and imported-space/v2-invite browser checks pass. Commit: phase-3 integration merge.
+- 2026-11-13, v2 performance follow-up: metadata-only library subscriptions, body reads on demand, editor TEXT splices with safe `editedFrom` writes, background stats, one emitted Wasm asset and a deduplicated Wasm/broker-worker precache, and compressed production benchmark preview. Five-run large typing improves from 118/148 to 83/102 ms; the 1.5× Classic/no-long-task target remains unmet inside alpha.61. First-load JS/Wasm is 3.45 MB with Brotli versus 20.86 MB raw. Final five document/collaboration e2e tests pass; two browser profiles converge, preserve selection on remote edits and reload offline. Nullable `documents.path`/`frontmatterPinned` require the generated `9864f7adaa62 → 9e60aeadee67` migration; coordinate its graph with the concurrent importer merge. Implementation commits `425a28e`, `5c7d9ba`, `1ec31d7`; report and issue drafts under `docs/benchmarks/` and `docs/jazz-v2-issues/`.
+
+written with gpt-6.1-sol in T3 Code (Codex)
+
+## Performance/importer integration
+
+2026-11-13, merged `t3/optimize-v2-typing-load` at `aada366` with `git merge --no-ff` into the importer integration at `f1e6c13`.
+
+The final schema is `b7b44e9a8d51`, all 25 tables plus saved `documents.path` and `frontmatterPinned`. There is no production v2 data. Regenerated one clean snapshot and an empty migration graph, replacing both the importer's `1f98249fc7a2` snapshot and the optimization branch's older `9864f7adaa62 → 9e60aeadee67` lens. Disposable v2 stores from either branch must reset; Classic data and credentials stay intact. The discarded graph is preserved locally in `/tmp/alkalye-perf-import-schema-backup/`. `jazz-tools validate` accepts the combined contract.
+
+Both broad and personal-entry document subscriptions select metadata only. Private folders, pins, archived entries and space permissions survive the merge. New Classic imports save the metadata columns immediately. Late Classic text imports retain three-way `editedFrom` merging and refresh metadata from the merged text. A backend regression reads imported summaries without selecting content. The cutover verifier also checks saved metadata for both profiles.
+
+Editor content splices, immediate writes, async stats, on-demand body reads, Wasm/precache deduplication and compressed benchmark previews remain. The benchmark report leads with the final Classic/original-v2/optimized-v2 comparison; large-document typing still regresses versus Classic. Local CI restarts only the web service, which now hosts Jazz, instead of the removed separate sync service.
 
 written with gpt-6.1-sol in T3 Code (Codex)

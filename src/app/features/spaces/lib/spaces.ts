@@ -1,6 +1,10 @@
 import { decodeLocalDrawing } from "./local-drawing-copy"
 import { getDocumentTitle } from "@/app/features/documents/lib/title"
-import { getTags } from "@/app/features/editor/lib/frontmatter"
+import {
+	getTags,
+	getPath,
+	parseFrontmatter,
+} from "@/app/features/editor/lib/frontmatter"
 import { schema } from "jazz-tools"
 import { useLibrary, type Database } from "@/app/features/documents"
 import { app } from "@/jazz/schema"
@@ -104,6 +108,8 @@ This is your new shared space. Documents here are shared with all space members.
 			spaceId: space.id,
 			content,
 			title: getDocumentTitle(content),
+			path: getPath(content),
+			frontmatterPinned: parseFrontmatter(content).frontmatter?.pinned === true,
 			tags: [],
 			createdAt: new Date(),
 			updatedAt: new Date(),
@@ -126,6 +132,8 @@ async function createSpaceDocument(
 		spaceId,
 		content,
 		title: getDocumentTitle(content),
+		path: getPath(content),
+		frontmatterPinned: parseFrontmatter(content).frontmatter?.pinned === true,
 		tags: getTags(content),
 		createdAt: new Date(),
 		updatedAt: new Date(),
@@ -275,6 +283,9 @@ async function copyToSynced(
 			spaceId,
 			content: copiedContent,
 			title: getDocumentTitle(copiedContent),
+			path: getPath(copiedContent),
+			frontmatterPinned:
+				parseFrontmatter(copiedContent).frontmatter?.pinned === true,
 			tags: getTags(copiedContent),
 			createdAt: new Date(),
 			updatedAt: new Date(),

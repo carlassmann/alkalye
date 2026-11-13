@@ -117,6 +117,18 @@ test("imports once, resumes failed items, and three-way merges late Classic edit
 	)
 	if (!importedGrant) throw new Error("Imported grant missing")
 	expect(importedGrant.inviteId).toBeNull()
+	let summary = await state.jazz!.db.one(
+		app.documents
+			.where({ id: first.id })
+			.select("title", "tags", "path", "frontmatterPinned"),
+	)
+	expect(summary).toMatchObject({
+		title: "Original",
+		tags: [],
+		path: "Work/Notes",
+		frontmatterPinned: true,
+	})
+	expect(summary).not.toHaveProperty("content")
 	await state
 		.jazz!.db.update(app.documentGrants, importedGrant.id, { role: "reader" })
 		.wait({ tier: "global" })
@@ -156,6 +168,8 @@ test("imports once, resumes failed items, and three-way merges late Classic edit
 	let result = await state.jazz!.db.one(app.documents.where({ id: first.id }))
 	expect(result?.content).toContain("V2 edit")
 	expect(result?.content).toContain("Classic offline edit")
+	expect(result?.title).toBe("Classic offline edit")
+	expect(result?.frontmatterPinned).toBe(false)
 	await importClassicItem(accountId, {
 		challengeId,
 		item: { ...item, classicId: "co_z12B" },

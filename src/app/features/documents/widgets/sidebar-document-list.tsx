@@ -19,8 +19,13 @@ import {
 import { createPortal } from "react-dom"
 import { Link } from "@tanstack/react-router"
 import { useVirtualizer } from "@tanstack/react-virtual"
-import { useDb } from "jazz-tools/react"
-import { type LibraryDocument, useLibrary, app } from "../lib/library"
+import { useDb, useOne } from "jazz-tools/react"
+import {
+	type LibraryDocument,
+	useLibrary,
+	readDocument,
+	app,
+} from "../lib/library"
 import { formatRelativeDate } from "../lib/title"
 import { setPinned } from "../lib/library"
 import {
@@ -1397,7 +1402,8 @@ function LeaveDocumentDialog({
 }
 
 function LeaveDocumentPreview({ doc }: { doc: SidebarDoc }) {
-	let content = doc.content
+	let { data } = useOne(app.documents.where({ id: doc.id }).select("content"))
+	let content = data?.content
 	if (!content) return null
 
 	return (
@@ -1584,7 +1590,7 @@ function makeTogglePin(
 function makeDownloadDocument(db: Database, doc: SidebarDoc, title: string) {
 	return async () =>
 		exportDocument(
-			doc.content,
+			(await readDocument(db, doc.id)).content,
 			title,
 			await getExportAssets(db, doc),
 			await exportComments(db, doc.id),
@@ -1593,7 +1599,7 @@ function makeDownloadDocument(db: Database, doc: SidebarDoc, title: string) {
 function makeShareDocument(db: Database, doc: SidebarDoc, title: string) {
 	return async () =>
 		shareDocument(
-			doc.content,
+			(await readDocument(db, doc.id)).content,
 			title,
 			await getExportAssets(db, doc),
 			await exportComments(db, doc.id),

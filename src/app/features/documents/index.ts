@@ -13,6 +13,7 @@ export {
 	app,
 	createDocument,
 	updateContent,
+	readDocument,
 	canEdit,
 	canAdmin,
 } from "./lib/library"

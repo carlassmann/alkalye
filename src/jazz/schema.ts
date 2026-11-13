@@ -11,6 +11,8 @@ let schema = {
 			ownerId: s.uuid(),
 			spaceId: s.uuid().optional(),
 			title: s.string(),
+			path: s.string().optional(),
+			frontmatterPinned: s.boolean().optional(),
 			content: s.string().merge("markdown"),
 			tags: s.array(s.string()).default([]),
 			isPresentation: s.boolean().default(false),

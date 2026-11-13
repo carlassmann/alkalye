@@ -40,6 +40,8 @@ let { values } = parseArgs({
 		notes: { type: "string", default: "50" },
 		edits: { type: "string", default: "200" },
 		"replay-timeout-ms": { type: "string" },
+		"load-only": { type: "boolean", default: false },
+		"performance-only": { type: "boolean", default: false },
 		"large-only": { type: "boolean", default: false },
 		"sw-only": { type: "boolean", default: false },
 		"skip-sw": { type: "boolean", default: false },
@@ -118,6 +120,9 @@ let result = {
 		totalTraceEdits: trace.edits.length,
 		serviceWorkersOnly: values["sw-only"],
 		largeOnly: values["large-only"],
+		performanceOnly: values["performance-only"],
+		loadOnly: values["load-only"],
+		firstVisitHttpCache: "fresh context, enabled",
 		literalNewlines: values["literal-newlines"],
 		automaticPairsAndCompletion: false,
 		replayTimeoutMs,
@@ -173,6 +178,7 @@ try {
 					try {
 						let cold = await fresh.newPage()
 						let network = await instrument(cold, cpu)
+						await network.setCacheDisabled(false)
 						start = performance.now()
 						if (scenario === "coldListMs") {
 							await cold.goto("/app", { waitUntil: "domcontentloaded" })
@@ -202,100 +208,108 @@ try {
 				await resolveDocument(page, large.title)
 				add("warmListMs", performance.now() - start)
 
-				console.error(
-					"Fresh device: credentials-only restore and verified bulk export",
-				)
-				let receiver = await newContext(browser, credentials)
-				start = performance.now()
-				try {
-					let other = await receiver.newPage()
-					await instrument(other, cpu)
-					await waitForEditorBoot(other)
-					console.error("Fresh device ready; exporting all bodies")
-					await verifyExport(other, seeded)
-					add("freshDeviceWholeDatasetMs", performance.now() - start)
-				} catch (error) {
-					let message = error instanceof Error ? error.message : String(error)
-					scenarioFailures.push({
-						run: run + 1,
-						scenario: "freshDeviceWholeDatasetMs",
-						elapsedMs: performance.now() - start,
-						message: message.slice(0, 1000),
-					})
-					console.error(`Fresh-device failure: ${message.slice(0, 200)}`)
-				} finally {
-					await receiver.close()
-				}
-				console.error("Sync: independent second client on the small note")
-				let syncReceiver = await newContext(browser, credentials)
-				try {
-					let other = await syncReceiver.newPage()
-					let syncNetwork = await instrument(other, cpu)
-					let syncDoc = seeded[0]
-					if (!syncDoc) throw new Error("Small sync note missing")
-					await openDocument(other, syncDoc)
-					await editor(other).focus()
-					await other.keyboard.press("ControlOrMeta+End")
-					await openDocument(page, syncDoc)
-					if (process.env.BENCH_SYNC_PROFILE_DIR) {
-						await sourceNetwork.cdp.send("Profiler.enable")
-						await sourceNetwork.cdp.send("Profiler.start")
-						await syncNetwork.cdp.send("Profiler.enable")
-						await syncNetwork.cdp.send("Profiler.start")
-					}
-					for (let n = 0; n < 5; n++) {
-						console.error(`Sync marker ${n + 1}/5`)
-						let marker = ` sync-${run}-${n}`
-						await editor(page).focus()
-						await page.keyboard.press("ControlOrMeta+End")
-						start = performance.now()
-						await page.keyboard.insertText(marker)
-						await expect
-							.poll(() => editor(other).innerText(), {
-								timeout: 120_000,
-								intervals: [20],
-							})
-							.toContain(marker)
-						let elapsedMs = performance.now() - start
-						add("syncEditMs", elapsedMs)
-						syncDiagnostics.push({
-							marker,
-							startedAt: start,
-							endedAt: performance.now(),
-							elapsedMs,
-							load: loadavg(),
-							sender: { ...sourceNetwork.wire },
-							senderTimeline: sourceNetwork.timeline.slice(-200),
-							receiverTimeline: syncNetwork.timeline.slice(-200),
-							senderLifecycle: sourceNetwork.timeline.filter(event =>
-								event.kind.startsWith("Network."),
-							),
-							receiverLifecycle: syncNetwork.timeline.filter(event =>
-								event.kind.startsWith("Network."),
-							),
-							receiver: { ...syncNetwork.wire },
+				if (!values["performance-only"]) {
+					console.error(
+						"Fresh device: credentials-only restore and verified bulk export",
+					)
+					let receiver = await newContext(browser, credentials)
+					start = performance.now()
+					try {
+						let other = await receiver.newPage()
+						await instrument(other, cpu)
+						await waitForEditorBoot(other)
+						console.error("Fresh device ready; exporting all bodies")
+						await verifyExport(other, seeded)
+						add("freshDeviceWholeDatasetMs", performance.now() - start)
+					} catch (error) {
+						let message = error instanceof Error ? error.message : String(error)
+						scenarioFailures.push({
+							run: run + 1,
+							scenario: "freshDeviceWholeDatasetMs",
+							elapsedMs: performance.now() - start,
+							message: message.slice(0, 1000),
 						})
+						console.error(`Fresh-device failure: ${message.slice(0, 200)}`)
+					} finally {
+						await receiver.close()
 					}
-					if (process.env.BENCH_SYNC_PROFILE_DIR) {
-						await mkdir(process.env.BENCH_SYNC_PROFILE_DIR, { recursive: true })
-						for (let [name, cdp] of [
-							["sender", sourceNetwork.cdp],
-							["receiver", syncNetwork.cdp],
-						] satisfies [string, typeof sourceNetwork.cdp][]) {
-							let { profile } = await cdp.send("Profiler.stop")
-							await writeFile(
-								`${process.env.BENCH_SYNC_PROFILE_DIR}/${name}.cpuprofile`,
-								JSON.stringify(profile),
-							)
+					console.error("Sync: independent second client on the small note")
+					let syncReceiver = await newContext(browser, credentials)
+					try {
+						let other = await syncReceiver.newPage()
+						let syncNetwork = await instrument(other, cpu)
+						let syncDoc = seeded[0]
+						if (!syncDoc) throw new Error("Small sync note missing")
+						await openDocument(other, syncDoc)
+						await editor(other).focus()
+						await other.keyboard.press("ControlOrMeta+End")
+						await openDocument(page, syncDoc)
+						if (process.env.BENCH_SYNC_PROFILE_DIR) {
+							await sourceNetwork.cdp.send("Profiler.enable")
+							await sourceNetwork.cdp.send("Profiler.start")
+							await syncNetwork.cdp.send("Profiler.enable")
+							await syncNetwork.cdp.send("Profiler.start")
 						}
+						for (let n = 0; n < 5; n++) {
+							console.error(`Sync marker ${n + 1}/5`)
+							let marker = ` sync-${run}-${n}`
+							await editor(page).focus()
+							await page.keyboard.press("ControlOrMeta+End")
+							start = performance.now()
+							await page.keyboard.insertText(marker)
+							await expect
+								.poll(() => editor(other).innerText(), {
+									timeout: 120_000,
+									intervals: [20],
+								})
+								.toContain(marker)
+							let elapsedMs = performance.now() - start
+							add("syncEditMs", elapsedMs)
+							syncDiagnostics.push({
+								marker,
+								startedAt: start,
+								endedAt: performance.now(),
+								elapsedMs,
+								load: loadavg(),
+								sender: { ...sourceNetwork.wire },
+								senderTimeline: sourceNetwork.timeline.slice(-200),
+								receiverTimeline: syncNetwork.timeline.slice(-200),
+								senderLifecycle: sourceNetwork.timeline.filter(event =>
+									event.kind.startsWith("Network."),
+								),
+								receiverLifecycle: syncNetwork.timeline.filter(event =>
+									event.kind.startsWith("Network."),
+								),
+								receiver: { ...syncNetwork.wire },
+							})
+						}
+						if (process.env.BENCH_SYNC_PROFILE_DIR) {
+							await mkdir(process.env.BENCH_SYNC_PROFILE_DIR, {
+								recursive: true,
+							})
+							for (let [name, cdp] of [
+								["sender", sourceNetwork.cdp],
+								["receiver", syncNetwork.cdp],
+							] satisfies [string, typeof sourceNetwork.cdp][]) {
+								let { profile } = await cdp.send("Profiler.stop")
+								await writeFile(
+									`${process.env.BENCH_SYNC_PROFILE_DIR}/${name}.cpuprofile`,
+									JSON.stringify(profile),
+								)
+							}
+						}
+					} finally {
+						await syncReceiver.close()
 					}
-				} finally {
-					await syncReceiver.close()
 				}
 
-				for (let doc of values["large-only"]
-					? [large]
-					: [seeded[0], medium, large]) {
+				for (let doc of values["load-only"]
+					? []
+					: values["large-only"]
+						? [large]
+						: values["performance-only"]
+							? [seeded[0], large]
+							: [seeded[0], medium, large]) {
 					if (!doc) throw new Error("Small note missing")
 					let name =
 						doc === large ? "large" : doc === medium ? "medium" : "small"
