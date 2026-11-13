@@ -31,7 +31,7 @@
 		"preview": "astro preview",
 		"format": "prettier --write .",
 		"test": "vitest",
-		"prepare": "effect-language-service patch",
+		"prepare": "effect-language-service patch && bun scripts/install-jazz-runtime.ts",
 		"bench:compare": "bun scripts/bench/compare.ts",
 		"bench:fetch": "bun scripts/bench/fetch.ts",
 		"bench:verify-network": "bun scripts/bench/verify-network.ts"
@@ -151,7 +151,8 @@
 		"ws": "^8.23.0",
 		"@types/chrome-remote-interface": "^0.34.1",
 		"@types/ws": "^8.18.2",
-		"chrome-remote-interface": "^0.34.0"
+		"chrome-remote-interface": "^0.34.0",
+		"esbuild": "0.25.12"
 	},
 	"patchedDependencies": {
 		"jazz-tools@2.0.0-alpha.61": "patches/jazz-tools@2.0.0-alpha.61.patch"

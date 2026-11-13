@@ -1,0 +1,223 @@
+diff --git i/crates/jazz/layers/db/src/large.rs w/crates/jazz/layers/db/src/large.rs
+index 98bf0d882..12000c1b8 100644
+--- i/crates/jazz/layers/db/src/large.rs
++++ w/crates/jazz/layers/db/src/large.rs
+@@ -538,6 +538,7 @@ static NEXT_BATCH: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::
+ 
+ struct State {
+     nodes: HashMap<[u8; 32], Cached>,
++    materialized: Option<(LargeValueRef, Vec<u8>)>,
+     /// Epochs read or written here, by id. An epoch only grows, so a cached
+     /// copy answers every cell that names a prefix it holds.
+     epochs: HashMap<i64, CachedEpoch>,
+@@ -632,6 +633,7 @@ impl Chunks {
+         let chunks = Arc::new(Self {
+             state: Mutex::new(State {
+                 nodes: HashMap::new(),
++                materialized: None,
+                 epochs: HashMap::new(),
+                 bytes: 0,
+                 budget: path.map(|_| CACHE_BYTES),
+@@ -1179,11 +1181,32 @@ impl Chunks {
+ 
+     /// The whole logical value of a descriptor.
+     pub(crate) fn value_bytes(&self, value: &LargeValueRef) -> Result<Vec<u8>, Error> {
++        {
++            let mut state = self.state.lock().expect("chunk cache");
++            if let Some((previous, bytes)) = &state.materialized {
++                if value == previous {
++                    return Ok(bytes.clone());
++                }
++                if let Some(bytes) =
++                    lv::materialize_from_previous(value, previous, bytes).map_err(corrupt)?
++                {
++                    state.materialized =
++                        (bytes.len() <= CACHE_BYTES).then(|| (value.clone(), bytes.clone()));
++                    return Ok(bytes);
++                }
++            }
++        }
+         #[cfg(feature = "testing")]
+         FULL_MATERIALIZATIONS.with(|count| count.set(count.get() + 1));
+-        self.run_range(value, 0..value.byte_length, |inputs| {
++        let bytes = self.run_range(value, 0..value.byte_length, |inputs| {
+             lv::materialize_attempt(value, inputs)
+-        })
++        })?;
++        // One bounded entry cannot retain an entire library or trust recycled cell ids.
++        if bytes.len() <= CACHE_BYTES {
++            self.state.lock().expect("chunk cache").materialized =
++                Some((value.clone(), bytes.clone()));
++        }
++        Ok(bytes)
+     }
+ }
+ 
+diff --git i/crates/jazz/layers/types/src/large_values/mod.rs w/crates/jazz/layers/types/src/large_values/mod.rs
+index b02c0e7a3..71115eb2b 100644
+--- i/crates/jazz/layers/types/src/large_values/mod.rs
++++ w/crates/jazz/layers/types/src/large_values/mod.rs
+@@ -3925,6 +3925,66 @@ pub fn full_materializations_for_test() -> u64 {
+     FULL_MATERIALIZATIONS.with(std::cell::Cell::get)
+ }
+ 
++/// Reuse validated logical bytes when an immutable base has only gained edits.
++/// The caller must supply bytes previously returned for `previous`.
++pub fn materialize_from_previous(
++    value: &LargeValueRef,
++    previous: &LargeValueRef,
++    bytes: &[u8],
++) -> Result<Option<Vec<u8>>, Error> {
++    if value.kind != previous.kind
++        || value.format_version != previous.format_version
++        || value.root != previous.root
++        || value.logical_hash != previous.logical_hash
++        || !value.edit_tail.starts_with(&previous.edit_tail)
++    {
++        return Ok(None);
++    }
++    validate_descriptor(value)?;
++    let mut bytes = bytes.to_vec();
++    let suffix = &value.edit_tail[previous.edit_tail.len()..];
++    let actual = if value.kind == LargeValueKind::String {
++        let mut utf16 = previous.utf16_length.ok_or(Error::MalformedScalar)?;
++        for edit in suffix {
++            let start = usize::try_from(edit.offset).map_err(|_| Error::MetricOverflow)?;
++            let end = start
++                .checked_add(
++                    usize::try_from(edit.delete_length).map_err(|_| Error::MetricOverflow)?,
++                )
++                .ok_or(Error::MetricOverflow)?;
++            if end > bytes.len() {
++                return Err(Error::MalformedNode);
++            }
++            // Cached text is valid UTF-8. Boundary-preserving edits keep it valid.
++            let boundary = |at: usize| at == bytes.len() || bytes[at] & 0xc0 != 0x80;
++            if !boundary(start) || !boundary(end) {
++                return Ok(None);
++            }
++            let deleted = std::str::from_utf8(&bytes[start..end])
++                .map_err(|_| Error::InvalidUtf8)?
++                .encode_utf16()
++                .count() as u64;
++            utf16 = utf16
++                .checked_sub(deleted)
++                .and_then(|n| n.checked_add(edit.insert_utf16_length))
++                .ok_or(Error::MetricOverflow)?;
++            apply_edits(&mut bytes, std::slice::from_ref(edit))?;
++        }
++        NodeMetrics {
++            byte_length: bytes.len() as u64,
++            utf16_length: Some(utf16),
++        }
++    } else {
++        apply_edits(&mut bytes, suffix)?;
++        validate_logical(value.kind, &bytes)?;
++        metrics(value.kind, &bytes)?
++    };
++    if actual.byte_length != value.byte_length || actual.utf16_length != value.utf16_length {
++        return Err(Error::DescriptorMismatch);
++    }
++    Ok(Some(bytes))
++}
++
+ fn apply_edits(bytes: &mut Vec<u8>, edits: &[ReplaceEdit]) -> Result<(), Error> {
+     for edit in edits {
+         let start = usize::try_from(edit.offset).map_err(|_| Error::MetricOverflow)?;
+@@ -5082,6 +5142,96 @@ pub fn shared_child_dag_fixture() -> PreparedLargeValue {
+ mod tests {
+     use super::*;
+ 
++    #[test]
++    fn materialization_cache_requires_same_base_and_append_only_tail() {
++        let prepared = prepare(LargeValueKind::String, b"hello").unwrap();
++        let previous = prepared.value_ref;
++        let mut next = previous.clone();
++        next.byte_length += 1;
++        next.utf16_length = Some(6);
++        next.edit_tail.push(ReplaceEdit {
++            offset: 5,
++            delete_length: 0,
++            insert_bytes: b"!".to_vec(),
++            utf16_offset: 5,
++            delete_utf16_length: 0,
++            insert_utf16_length: 1,
++        });
++        assert_eq!(
++            materialize_from_previous(&next, &previous, b"hello").unwrap(),
++            Some(b"hello!".to_vec())
++        );
++        assert_eq!(
++            materialize_from_previous(&previous, &next, b"hello!").unwrap(),
++            None
++        );
++        let mut divergent = next.clone();
++        divergent.edit_tail[0].insert_bytes = b"?".to_vec();
++        assert_eq!(
++            materialize_from_previous(&divergent, &next, b"hello!").unwrap(),
++            None
++        );
++        let mut forged = next.clone();
++        forged.byte_length += 1;
++        assert!(materialize_from_previous(&forged, &previous, b"hello").is_err());
++        forged = next.clone();
++        forged.logical_hash.0[0] ^= 1;
++        assert_eq!(
++            materialize_from_previous(&forged, &previous, b"hello").unwrap(),
++            None
++        );
++    }
++
++    #[test]
++    fn materialization_cache_counts_astral_text_and_falls_back_at_split_boundaries() {
++        let base = prepare(LargeValueKind::String, b"hello").unwrap().value_ref;
++        let mut next = base.clone();
++        next.byte_length = 9;
++        next.utf16_length = Some(7);
++        next.edit_tail.push(ReplaceEdit {
++            offset: 5,
++            delete_length: 0,
++            insert_bytes: "😀".as_bytes().to_vec(),
++            utf16_offset: 5,
++            delete_utf16_length: 0,
++            insert_utf16_length: 2,
++        });
++        let bytes = materialize_from_previous(&next, &base, b"hello")
++            .unwrap()
++            .unwrap();
++        assert_eq!(bytes, "hello😀".as_bytes());
++        let mut deleted = next.clone();
++        deleted.byte_length = 5;
++        deleted.utf16_length = Some(5);
++        deleted.edit_tail.push(ReplaceEdit {
++            offset: 5,
++            delete_length: 4,
++            insert_bytes: Vec::new(),
++            utf16_offset: 5,
++            delete_utf16_length: 2,
++            insert_utf16_length: 0,
++        });
++        assert_eq!(
++            materialize_from_previous(&deleted, &next, &bytes).unwrap(),
++            Some(b"hello".to_vec())
++        );
++        let mut split = next.clone();
++        split.byte_length += 1;
++        split.utf16_length = Some(8);
++        split.edit_tail.push(ReplaceEdit {
++            offset: 6,
++            delete_length: 0,
++            insert_bytes: b"!".to_vec(),
++            utf16_offset: 5,
++            delete_utf16_length: 0,
++            insert_utf16_length: 1,
++        });
++        assert_eq!(
++            materialize_from_previous(&split, &next, &bytes).unwrap(),
++            None
++        );
++    }
++
+     #[test]
+     fn node_ref_codec_reuses_the_stored_scalar_root_record() {
+         let node_ref = NodeRef {

@@ -48,3 +48,39 @@ index ecbef2226b7941d6e12934bd8e59fa27706c9b6c..8c50b9b225a979c2c8f8936886c833b5
          forReqUser: async (request) => (await use()).forReqUser(request),
          withAttribution: async (request) => (await use()).withAttribution(request),
          accountFor: async (request) => (await use()).accountFor(request),
+diff --git a/dist/subscriptions-orchestrator.js b/dist/subscriptions-orchestrator.js
+--- a/dist/subscriptions-orchestrator.js
++++ b/dist/subscriptions-orchestrator.js
+@@ -293,6 +293,8 @@
+                     const wasPending = entry.state.status === "pending";
+                     const data = entry.state.status === "fulfilled" ? [...entry.state.data] : [];
+                     applySubscriptionDelta(data, delta);
++                    // Native row invalidation can leave the selected projection unchanged.
++                    if (!wasPending && !delta.reset && entry.state.status === "fulfilled" && queryValuesEqual(entry.state.data, data)) return;
+                     entry.state = {
+                         status: "fulfilled",
+                         data,
+@@ -426,4 +428,21 @@
+             .map((name) => [name, encodeBranchSelector(qualified[name])]),
+     ];
+ }
+-//# sourceMappingURL=subscriptions-orchestrator.js.map
+\ No newline at end of file
++//# sourceMappingURL=subscriptions-orchestrator.js.map
++function queryValuesEqual(left, right) {
++  if (Object.is(left, right)) return true;
++  if (left === null || right === null || typeof left !== "object" || typeof right !== "object") return false;
++  if (left instanceof Date && right instanceof Date) return Object.is(left.getTime(), right.getTime());
++  if (left instanceof Uint8Array && right instanceof Uint8Array) {
++    return left.length === right.length && left.every((byte, index) => byte === right[index]);
++  }
++  if (Array.isArray(left) !== Array.isArray(right)) return false;
++  if (Array.isArray(left) && Array.isArray(right) && left.length !== right.length) return false;
++  let prototype = Object.getPrototypeOf(left);
++  if (prototype !== Object.getPrototypeOf(right)) return false;
++  if (!Array.isArray(left) && prototype !== Object.prototype && prototype !== null) return false;
++  let keys = Object.keys(left);
++  return keys.length === Object.keys(right).length && keys.every(key =>
++    Object.hasOwn(right, key) && queryValuesEqual(Reflect.get(left, key), Reflect.get(right, key))
++  );
++}
