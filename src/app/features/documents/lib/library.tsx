@@ -59,7 +59,7 @@ function useLibraryData() {
 	let db = useDb()
 	let ownerId = useSession()?.user
 	if (!ownerId) throw new Error("Account missing")
-	let { data: rows = [], isLoading } = useAll(app.documents)
+	let { data: rows = [], isLoading } = useAll(app.documents.where({ ownerId }))
 	let { data: entries = [] } = useAll(app.userDocuments.where({ ownerId }))
 	let { data: preferences = [], isLoading: settingsLoading } = useAll(
 		app.settings.where({ ownerId }),

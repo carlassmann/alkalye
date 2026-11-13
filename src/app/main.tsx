@@ -1,9 +1,14 @@
-import { JazzProvider } from "jazz-tools/react"
-import { AuthForm } from "@/app/features/auth"
-import { DocumentLibrary } from "@/app/features/documents"
+import { AccountRoutingContext } from "./lib/account-routing"
+import { useEffect, useState } from "react"
+import { JazzProvider, useSession, useSyncStatus } from "jazz-tools/react"
+import { createRouter, RouterProvider } from "@tanstack/react-router"
+import { AuthForm, markAccountBackedUp } from "@/app/features/auth"
+import { LibraryProvider, useLibrary, app } from "@/app/features/documents"
 import { IntlProvider } from "@/shared/intl/setup"
-import { usePWAProvider } from "@/app/lib/pwa"
+import { messagesDe } from "@/shared/intl/messages"
+import { PWAContext, usePWAProvider, PWAInstallHint } from "@/app/lib/pwa"
 import { Toaster } from "sonner"
+import { routeTree } from "./routeTree.gen"
 
 export { PWA }
 
@@ -14,18 +19,21 @@ let config = {
 	client: () => import("jazz-tools/local-first"),
 } satisfies import("jazz-tools/client").JazzClientConfig
 
+let router = createRouter({
+	basepath: "/app",
+	routeTree,
+	context: { ownerId: null },
+	defaultPreload: "intent",
+})
+declare module "@tanstack/react-router" {
+	interface Register {
+		router: typeof router
+	}
+}
+
 function PWA() {
 	return (
 		<IntlProvider>
-			<Application />
-		</IntlProvider>
-	)
-}
-
-function Application() {
-	usePWAProvider()
-	return (
-		<>
 			<JazzProvider
 				config={config}
 				signedOut={
@@ -36,9 +44,90 @@ function Application() {
 				}
 				loading={<p role="status">Opening your library…</p>}
 			>
-				<DocumentLibrary />
+				<AccountApp />
 			</JazzProvider>
+		</IntlProvider>
+	)
+}
+function AccountApp() {
+	let user = useSession()?.user
+	return (
+		<LibraryProvider key={user}>
+			<Application />
+		</LibraryProvider>
+	)
+}
+function Application() {
+	let { ownerId, settings } = useLibrary()
+	let locale = settings?.language ?? "en"
+	return locale === "de" ? (
+		<IntlProvider locale="de" messages={messagesDe}>
+			<AppRouter ownerId={ownerId} />
+		</IntlProvider>
+	) : (
+		<IntlProvider>
+			<AppRouter ownerId={ownerId} />
+		</IntlProvider>
+	)
+}
+let routedOwnerId: string | null = null
+function AppRouter({ ownerId }: { ownerId: string }) {
+	let pwa = usePWAProvider()
+	let { db } = useLibrary()
+	let sync = useSyncStatus()
+	let [ready, setReady] = useState(false)
+	useEffect(() => {
+		let restoring = sessionStorage.getItem("alkalye-restoring-account")
+		if (ready || (restoring && sync.link.state !== "connected")) return
+		let cancelled = false
+		async function routeAccount() {
+			let documents = restoring
+				? await db.all(app.documents.where({ ownerId }), { tier: "remote" })
+				: []
+			if (cancelled) return
+			router.update({ context: { ownerId } })
+			let switched = routedOwnerId !== null && routedOwnerId !== ownerId
+			let requestedId = sessionStorage.getItem("alkalye-requested-document")
+			if (restoring) {
+				sessionStorage.removeItem("alkalye-restoring-account")
+				sessionStorage.removeItem("alkalye-requested-document")
+				markAccountBackedUp(ownerId)
+				let requested = documents.find(
+					doc => doc.id === requestedId && !doc.deletedAt,
+				)
+				let latest = documents
+					.filter(doc => !doc.deletedAt)
+					.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())[0]
+				let target = requested ?? latest
+				router.clearCache()
+				if (target)
+					await router.navigate({
+						to: "/doc/$id",
+						params: { id: target.id },
+						replace: true,
+					})
+				else await router.navigate({ to: "/", replace: true })
+			} else if (switched) {
+				router.clearCache()
+				if (!window.location.pathname.endsWith("/settings"))
+					await router.navigate({ to: "/", replace: true })
+			}
+			routedOwnerId = ownerId
+			if (!cancelled) setReady(true)
+		}
+		void routeAccount()
+		return () => {
+			cancelled = true
+		}
+	}, [db, ownerId, sync.link.state, ready])
+
+	return (
+		<PWAContext.Provider value={pwa}>
+			<AccountRoutingContext.Provider value={ready}>
+				<RouterProvider router={router} context={{ ownerId }} />
+			</AccountRoutingContext.Provider>
+			<PWAInstallHint />
 			<Toaster />
-		</>
+		</PWAContext.Provider>
 	)
 }

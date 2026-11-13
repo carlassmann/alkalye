@@ -3,6 +3,7 @@ import react from "@astrojs/react"
 import vercel from "@astrojs/vercel"
 import node from "@astrojs/node"
 import pwa from "@vite-pwa/astro"
+import { tanstackRouter } from "@tanstack/router-plugin/vite"
 import tailwindcss from "@tailwindcss/vite"
 import { criticalAppPreload } from "./scripts/critical-app-preload"
 
@@ -46,7 +47,15 @@ export default defineConfig({
 				},
 			},
 		},
-		plugins: [tailwindcss()] as any,
+		plugins: [
+			tanstackRouter({
+				target: "react",
+				routesDirectory: "./src/app/routes",
+				generatedRouteTree: "./src/app/routeTree.gen.ts",
+				autoCodeSplitting: true,
+			}),
+			tailwindcss(),
+		] as any,
 		resolve: {
 			dedupe: [
 				"prosemirror-model",

@@ -1,3 +1,5 @@
+import type { JazzClient } from "jazz-tools/client"
+import { markAccountBackedUp } from "../lib/backup-state"
 import { IconTransition } from "@/app/components/ui/icon-transition"
 import { useState } from "react"
 import { useJazzSession } from "jazz-tools/react"
@@ -61,7 +63,7 @@ function AuthDialog({
 
 function AuthForm({ onSuccess }: AuthFormProps) {
 	let t = useIntl()
-	let auth = useJazzSession()
+	let auth = useJazzSession<JazzClient>()
 	let [step, setStep] = useState<"initial" | "create" | "login">("initial")
 	let [loginPassphrase, setLoginPassphrase] = useState("")
 	let [isCopied, setIsCopied] = useState(false)
@@ -103,6 +105,7 @@ function AuthForm({ onSuccess }: AuthFormProps) {
 					RecoveryPhrase.toSecret(currentPassphrase),
 				)
 			await navigator.storage?.persist()
+			markAccountBackedUp(auth.user?.accountId ?? "")
 			onSuccess?.()
 		} catch (e) {
 			setError(
@@ -114,8 +117,9 @@ function AuthForm({ onSuccess }: AuthFormProps) {
 	async function handleLogin() {
 		try {
 			setError("")
-			await auth.restoreDeviceAccount(RecoveryPhrase.toSecret(loginPassphrase))
-			onSuccess?.()
+			let secret = RecoveryPhrase.toSecret(loginPassphrase)
+			sessionStorage.setItem("alkalye-restoring-account", "true")
+			await auth.restoreDeviceAccount(secret)
 		} catch (e) {
 			setError(
 				e instanceof Error
