@@ -51,7 +51,10 @@ async function measureReplay(page: Page, options: ReplayOptions) {
 		}
 		let inputStarted = performance.now()
 		for (let i = 0; i < remove; i++) await page.keyboard.press("Delete")
-		if (insert) await page.keyboard.insertText(insert)
+		if (insert) {
+			if (/^[\x20-\x7e]+$/.test(insert)) await page.keyboard.type(insert)
+			else await page.keyboard.insertText(insert)
+		}
 		cursor += insert.length
 		expected.splice(position, remove, ...insert)
 		await page.evaluate(

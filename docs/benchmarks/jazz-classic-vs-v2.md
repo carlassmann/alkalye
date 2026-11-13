@@ -1,119 +1,118 @@
 # Jazz Classic vs v2
 
-Classic baseline in progress. v2 remains TBD until the migration is ready.
-Raw samples and environment are recorded in `bench/results/classic.json`.
+Classic baseline pending the final run. v2 remains TBD.
+Raw samples: `bench/results/classic.json`.
+
+## Reproduce
+
+```sh
+bun run bench:fetch
+work setup --tailscale
+NODE_OPTIONS=--max-old-space-size=16384 work up --tailscale
+work urls
+bun run bench:compare -- --target <web-url> --label classic --out bench/results/classic.json
+```
+
+Run from the checkout serving the target. Package and Git metadata describe that
+checkout. For v2, use its URL, `--label v2 --out bench/results/v2.json`, and identical
+machine, browser, options and server mode. Default: three independent accounts,
+50 notes plus two books, 200 trace edits per typing case, no CPU slowdown.
+`--cpu 4` throttles page execution; workers and the server are not throttled.
+`--edits full` attempts all edits. Deadlines scale with edit count and can be
+changed with `--replay-timeout-ms`. Full replay can take hours.
+
+## Datasets
+
+| Dataset       | Selection                                                                           | License / attribution                                           |
+| ------------- | ----------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| Notes         | First 50 sorted Markdown paths from pinned Vite docs                                | MIT; VoidZero Inc. and Vite contributors                        |
+| Medium book   | Alice's Adventures in Wonderland, 170,590 bytes                                     | Lewis Carroll; public domain in USA, Gutenberg license retained |
+| Large book    | Dracula, 874,540 bytes                                                              | Bram Stoker; public domain in USA, Gutenberg license retained   |
+| Editing trace | Automerge's LaTeX paper trace: 259,778 insert/delete edits; baseline uses first 200 | CC-BY-4.0; Martin Kleppmann and Alastair R. Beresford           |
+
+`bench/datasets/sources.json` records complete source URLs, licenses and SHA-256
+checksums. Fetching fails on changed content. Large downloads are ignored by Git.
+Fixtures normalize line endings to LF and add a unique title heading and explicit
+title frontmatter. Original text remains intact. Books are plain Markdown paragraphs.
+The account also retains its welcome document. The small typing/sync note is
+Corpus 000, 6,218 bytes.
 
 ## Method
 
-Run `bun run bench:compare -- --target <url> --label classic --out bench/results/classic.json`.
-Use the same Chromium version, machine, CPU throttle, dataset pins, edit count and
-server mode for v2. Classic uses jazz-run 0.20.19, Node 24.22.1, with
-`NODE_OPTIONS=--max-old-space-size=16384`. Failed exploratory runs exhausted the
-default 4 GB server heap; the service log and SIGABRT core confirm V8 heap exhaustion.
-During an initial harness run that reloaded the app per document, the server also
-exhausted 16 GB.
-The final harness verifies fresh-device hydration using the app's bulk export,
-without reloading for every document. Failed runs are excluded. Before the measured
-baseline, failed-run server storage was archived and a fresh SQLite store started.
-Services run through `work setup --tailscale` then `work up --tailscale`.
+Seeding reuses the e2e account helper and imports a ZIP through the app. IDs come
+from sidebar search results, with no Jazz schema/storage calls. Settings disable
+automatic pairs, marker wrapping and completion, allowing literal trace replay.
+Storage is sampled five seconds after import.
 
-Accounts also retain the app's welcome document; the 52 imported bodies are verified.
-The corpus contains the first 50 sorted Markdown paths from Vite's pinned docs tree.
-Each receives explicit title frontmatter and a unique heading for reliable UI lookup. Books are Alice's Adventures
-in Wonderland and Dracula, preserved as plain Markdown paragraphs under a heading.
-Books receive the same title frontmatter. Line endings become LF. Source URLs, SHA-256 pins, authors and license references
-are in `bench/datasets/sources.json`. Downloaded files are ignored by Git. Gutenberg
-licenses remain inside the books. Vite is MIT; the Automerge trace is CC-BY-4.0,
-attributed to Martin Kleppmann and Alastair R. Beresford. The trace contains 259,778
-insert/delete edits; cursor-only events were removed upstream.
+Fresh contexts receive only the Classic auth-secret entry, with empty IndexedDB,
+no cookies, blocked service workers and disabled HTTP cache. Session IDs and other
+localStorage caches are deliberately excluded: Classic stores session leases in
+localStorage, and cloning those into isolated clients can reuse a session ID.
+Cold-list time ends when the search input accepts a click and finds the large book.
+Cold large-open time ends at the app's ready signal plus the visible book heading.
+Warm reload keeps IndexedDB and enables HTTP cache, ending at usable sidebar search.
 
-Seeding creates an account with the existing auth helper and imports a ZIP through
-the app's file input. Imported IDs come from document-list search results. No Jazz
-schema or storage API is used. A five-second settling window follows import.
+Whole-dataset loading starts before navigation in a fresh authenticated context.
+The app's Export all command must download a ZIP containing all 52 original files
+with exact content equality. This includes startup, export and verification costs;
+it is not a pure transport timer. Export has a 60-second deadline after startup.
+Sync measures five small-note insertions per run, from sender dispatch until a
+second client's editor DOM contains the marker, polled every 20 ms.
 
-Cold measurements use a new browser context carrying only localStorage credentials,
-with empty IndexedDB, blocked service workers and disabled HTTP cache. The list must
-be usable and able to find the large book. Large-document open waits for its heading
-inside the visible editor. Warm reload retains IndexedDB and enables HTTP cache.
-Bundle bytes are CDP encoded transfers of JavaScript/Wasm responses through readiness
-plus one second; development module loading makes this different from production.
+Each typing case uses its own browser context. Full original content is verified
+before editing; only the small note needs reset after sync markers, using plain-text
+paste. Reads use Edit → Copy, which avoids collaborator labels in native DOM copies.
+Direct document URLs avoid virtualized-sidebar click geometry. Pages are activated
+before navigation and recording.
 
-Fresh-device time starts with credentials-only restore into empty IndexedDB, then
-Export all, ZIP download and
-exact equality checks for all 52 imported Markdown files. Export loads every document
-body through the public app. This includes export/verification overhead, rather than
-being a pure transport timer. It proves that all bodies arrived. Export has a 60-second deadline after startup.
-Failed scenarios are recorded with elapsed time and error, not converted into exact
-latency samples; the remaining scenarios continue and the command exits nonzero. Sync latency starts before an
-editor insertion and ends when a second isolated client's editor contains the
-marker in its visible editor DOM, polled every 20 ms. The receiver is scrolled
-to the end first; polling never takes keyboard focus from the sender. Each run measures five markers on Corpus 000, a roughly 6 KB note.
-Discarded exploratory sync attempts exceeded 120 seconds while using the earlier
-clipboard/reload drivers, including server exhaustion. These are not successful
-samples and do not establish normal-use sync latency.
+Trace cursor positions are reproduced with Arrow keys. Printable text uses keyboard
+events, control characters use text insertion, deletions use Delete. No direct
+editor-state writes. The trace is inserted before the original document, preserving
+trace coordinates while exercising the document's full size. After replay, content
+must equal independently replayed edits plus the original document. Full replay
+also checks the upstream finalText.
 
-Trace edits are replayed through browser text input and Delete keys, using Arrow keys
-to reproduce offsets. No database calls or direct editor-state writes. Each document
-is opened by its direct URL and reset with plain-text paste first. Automatic bracket pairs, marker wrapping and
-completion are disabled through Settings, so replay can reproduce literal edits.
-The trace starts at offset zero, with the original document as a
-suffix, so large-document cost is measured without changing the trace's coordinates.
-The resulting full content must equal independently replayed trace text plus the
-original document. Full replay also checks upstream's finalText. Default replay uses
-the first 200 edits, not the full history or its original timing.
+Dispatch-to-paint starts before input dispatch and ends after a double
+requestAnimationFrame response, including input queueing and automation/IPC overhead.
+This paced estimate has a roughly 33 ms floor at 60 Hz; it is not a hardware display
+measurement. A separate beforeinput-to-double-rAF proxy remains in JSON when emitted.
+Long tasks are tasks over 50 ms during replay and its three-second settling window.
+Typing percentiles pool successful edit samples; other percentiles use run samples,
+except sync, which pools five markers per run. Percentiles use nearest rank.
 
-Typing cases use independent fresh browser contexts, with full original content
-verified before replay. Only the small note needs reset after sync markers. This
-avoids carrying an earlier editor or save worker into the next typing case. Each
-case has a deadline, default two minutes for the short slice, scaling for full replay.
+CDP captures pages, iframes, dedicated workers and SharedWorkers before worker code
+resumes. `bun run bench:verify-network` verifies exact binary HTTP/WebSocket byte
+counts and Wasm transfers in both worker kinds. Bundle bytes are encoded JS/Wasm
+transfers through first usable list plus one second. Wire metrics divide outgoing
+WebSocket payload and HTTP request-body bytes by edits; received WebSocket payload
+is separate. The window includes replay, settling and final verification. These
+include background sync/hydration and are not marginal protocol costs or a packet
+capture: transport compression, TLS and framing are excluded.
 
-Dispatch-to-paint starts before the Playwright insertion/deletion call and ends
-after a double requestAnimationFrame response. It includes input queueing and
-automation/IPC overhead. It is the primary typing latency estimate.
-
-The additional input-to-paint proxy is a beforeinput timestamp to the second requestAnimationFrame,
-a paint-opportunity estimate rather than a display presentation timestamp. It excludes
-input queueing before beforeinput. Inserts
-and deletions with beforeinput events contribute samples; cursor moves do not.
-The runner waits two frames after each trace edit, so this is paced editing, not
-maximum throughput. Long tasks are PerformanceObserver tasks over 50 ms throughout
-the replay and its three-second settling window. Typing percentiles pool input
-samples across runs. Other metrics use nearest-rank percentiles of run samples;
-sync pools five samples per run. Raw samples are retained.
-
-Storage uses Chromium's origin estimate usageDetails.indexedDB after import. It is
-an implementation estimate, not a database-file size. Network capture attaches to pages, iframes, dedicated workers and SharedWorkers
-before worker code resumes. The loopback integration fixture checks Wasm transfers
-and exact binary HTTP/WebSocket byte counts inside both worker kinds.
-Wire metrics count CDP WebSocket
-payload bytes and HTTP request-body bytes exposed by CDP during replay, settling and the final verification, divided by
-trace edits. They include presence/background traffic, exclude transport compression, TLS, framing and
-headers, and report received WebSocket payload separately. JS heap comes from CDP
-Runtime.getHeapUsage after replay, without forced GC. It excludes worker heaps, native allocations and
-Wasm linear memory.
+Storage uses Chromium's IndexedDB usage estimate, not database-file size. Heap is
+main-page JS used size after replay, without forced GC; workers, native allocations
+and Wasm linear memory are excluded. It cannot establish total-memory improvement
+when v2 moves work into a SharedWorker.
 
 ## Results
 
-Pending baseline completion. v2: TBD.
+<!-- results -->
 
-## Caveats
+## Limits and v2 adapter
 
-These are development-server measurements over a local tailnet proxy, without
-network shaping. CPU throttling applies to page targets, not a whole-machine
-low-end-device simulation. Server caches persist between accounts. Browser JIT,
-background processes, sync batching and garbage collection add noise. Classic debounces saves; v2 writes
-each change immediately, so payload comparisons include that shipped behavior. Three runs
-only give a coarse p95. Repeat on an idle machine before making product claims.
-Service-worker offline startup and production CDN compression need separate runs.
+Development server over a local tailnet proxy, no network shaping. Keep production
+bundle/CDN claims separate. Three runs give a coarse p95; inspect raw samples and
+retain outliers. Background work, garbage collection and sync batching add variance.
+Classic debounces saves while v2 writes immediately; payload totals include that
+shipped behavior. Earlier experiments exhausted server heaps; final runs use a
+16 GB server limit. Failed exploratory runs are excluded.
 
-For v2, adapt `scripts/bench/adapter.ts` if auth/import UI changes. Preserve public
-selectors, recovery-phrase behavior and document routes where possible. If auth
-credentials move out of localStorage, replace credentials-only context creation;
-never copy IndexedDB into cold-load contexts. Keep every content assertion.
-
-Pages are activated before navigation and measurement. Each editor open uses a
-direct document URL; the adapter avoids virtualized sidebar click geometry and
-post-paint subscription behavior in background tabs. Edit → Copy reads editor text
-without cursor labels; plain-text paste resets documents without browser DOM widgets.
+`adapter.ts` owns account creation, settings, ZIP import/export, editor copy/paste,
+direct opens and credential capture. Adapt these public UI bindings for v2. In
+particular, replace `captureCredentials` with v2's device-auth-only bootstrap if
+credentials move to IndexedDB/worker storage. Never copy a document database or
+session leases into cold contexts. Preserve content assertions and test IDs.
+Scenario failures retain elapsed time/error in JSON, continue independent cases,
+and cause a nonzero exit; they are never converted into exact latency samples.
 
 written with gpt-6.1-sol in T3 Code (Codex)

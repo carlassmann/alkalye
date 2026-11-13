@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises"
-import { expect, type Page } from "@playwright/test"
+import { expect, type Page, type BrowserContext } from "@playwright/test"
 import JSZip from "jszip"
 import {
 	createAccount as createTestAccount,
@@ -17,6 +17,7 @@ export {
 	openDocument,
 	replaceContent,
 	configureEditor,
+	captureCredentials,
 	verifyExport,
 	editor,
 }
@@ -152,4 +153,19 @@ async function verifyExport(
 		if (!file) throw new Error(`Export missing ${document.title}`)
 		expect(await file.async("string")).toBe(document.content)
 	}
+}
+
+async function captureCredentials(context: BrowserContext) {
+	let storage = await context.storageState({ indexedDB: false })
+	let origins = storage.origins.flatMap(origin => {
+		let auth = origin.localStorage.filter(
+			entry => entry.name === "jazz-logged-in-secret",
+		)
+		return auth.length ? [{ origin: origin.origin, localStorage: auth }] : []
+	})
+	if (!origins.length)
+		throw new Error(
+			"No Classic auth credentials found; adapt captureCredentials for this build",
+		)
+	return { cookies: [], origins }
 }

@@ -21,6 +21,7 @@ import {
 	resolveDocument,
 	openDocument,
 	configureEditor,
+	captureCredentials,
 	verifyExport,
 	editor,
 } from "./adapter"
@@ -137,7 +138,7 @@ try {
 					.object({ usageDetails: z.object({ indexedDB: z.number() }) })
 					.parse(storage).usageDetails.indexedDB,
 			)
-			let credentials = await context.storageState()
+			let credentials = await captureCredentials(context)
 			let large = seeded.find(doc => doc.title === "Book dracula")
 			let medium = seeded.find(doc => doc.title === "Book alice")
 			if (!large || !medium) throw new Error("Books missing")
@@ -149,15 +150,16 @@ try {
 					let cold = await fresh.newPage()
 					let network = await instrument(cold, cpu)
 					start = performance.now()
-					await waitForEditorBoot(cold, {
-						path: scenario === "coldListMs" ? "/app" : `/app/doc/${large.id}`,
-					})
-					if (scenario === "coldListMs")
+					if (scenario === "coldListMs") {
+						await cold.goto("/app", { waitUntil: "domcontentloaded" })
+						await cold.getByTestId("doc-search-input").click()
 						await resolveDocument(cold, large.title)
-					else
+					} else {
+						await waitForEditorBoot(cold, { path: `/app/doc/${large.id}` })
 						await expect(editor(cold)).toContainText("Book dracula", {
 							timeout: 120_000,
 						})
+					}
 					add(scenario, performance.now() - start)
 					await cold.waitForTimeout(1000)
 					network.ensureHealthy()
@@ -172,9 +174,7 @@ try {
 			await waitForEditorBoot(page)
 			start = performance.now()
 			await page.reload({ waitUntil: "domcontentloaded" })
-			await page.waitForFunction(
-				() => document.body.dataset.alkalyeReady === "true",
-			)
+			await page.getByTestId("doc-search-input").click()
 			await resolveDocument(page, large.title)
 			add("warmListMs", performance.now() - start)
 
