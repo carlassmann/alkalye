@@ -51,9 +51,9 @@ test("owners create; outsiders cannot read, edit, delete or forge ownership", as
 	)
 })
 
-test.each(["reader", "writer", "admin"])(
+test.each(["reader", "writer", "admin"] as const)(
 	"document %s grants stay scoped and protect administration",
-	async role => {
+	async (role: "reader" | "writer" | "admin") => {
 		let doc = await fixture.seed(db => db.insert(app.documents, note()))
 		let other = await fixture.seed(db => db.insert(app.documents, note()))
 		await fixture.seed(db =>
@@ -95,9 +95,9 @@ test.each(["reader", "writer", "admin"])(
 	},
 )
 
-test.each(["reader", "writer", "manager", "admin"])(
+test.each(["reader", "writer", "manager", "admin"] as const)(
 	"space %s inherits document access without granting access to other spaces",
-	async role => {
+	async (role: "reader" | "writer" | "manager" | "admin") => {
 		let space = await fixture.seed(db =>
 			db.insert(app.spaces, {
 				ownerId: aliceId,
@@ -161,9 +161,9 @@ test("public reads grant no document writes; credentials and imports stay privat
 	)
 })
 
-test.each(["reader", "writer", "manager", "admin"])(
+test.each(["reader", "writer", "manager", "admin"] as const)(
 	"only writing members can create documents in their space (%s)",
-	async role => {
+	async (role: "reader" | "writer" | "manager" | "admin") => {
 		let space = await fixture.seed(db =>
 			db.insert(app.spaces, {
 				ownerId: aliceId,
@@ -363,4 +363,57 @@ test("comments inherit document permissions and honor the disabled flag", async 
 			createdAt: new Date(),
 		}),
 	)
+})
+
+test("presence updates cannot take another device row or move between documents", async () => {
+	let doc = await fixture.seed(db =>
+		db.insert(app.documents, { ...note(), publicRead: true }),
+	)
+	let other = await fixture.seed(db =>
+		db.insert(app.documents, { ...note(), publicRead: true }),
+	)
+	let presence = await fixture.seed(db =>
+		db.insert(app.presence, {
+			documentId: doc.id,
+			accountId: aliceId,
+			deviceId: "alice-device",
+			updatedAt: new Date(),
+		}),
+	)
+	await actor(bobId).expectDenied(db =>
+		db.update(app.presence, presence.id, { accountId: bobId }),
+	)
+	await actor(aliceId).expectDenied(db =>
+		db.update(app.presence, presence.id, { documentId: other.id }),
+	)
+	await actor(aliceId)
+		.update(app.presence, presence.id, {
+			cursor: { position: 2 },
+			updatedAt: new Date(),
+		})
+		.wait({ tier: "global" })
+})
+
+test("documents created for a space owner stop being readable when membership ends", async () => {
+	let space = await fixture.seed(db =>
+		db.insert(app.spaces, {
+			ownerId: aliceId,
+			name: "Team",
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		}),
+	)
+	let membership = await fixture.seed(db =>
+		db.insert(app.spaceMembers, {
+			spaceId: space.id,
+			accountId: bobId,
+			role: "writer",
+		}),
+	)
+	let bob = actor(bobId)
+	let doc = await bob
+		.insert(app.documents, { ...note(aliceId), spaceId: space.id })
+		.wait({ tier: "global" })
+	await fixture.seed(db => db.delete(app.spaceMembers, membership.id))
+	expect(await bob.all(app.documents.where({ id: doc.id }))).toHaveLength(0)
 })

@@ -34,22 +34,18 @@ interface SignOutArgs {
 async function waitForEditorBoot(page: Page, args: WaitForEditorBootArgs = {}) {
 	let path = args.path ?? "/app"
 	await page.goto(path)
-	await expect
-		.poll(
-			async () => {
-				return page.evaluate(() => {
-					return document.body.getAttribute("data-alkalye-ready")
-				})
-			},
-			{ timeout: 10_000 },
+	let route: string | null = null
+	await expect(async () => {
+		await expect(page.locator("body")).toHaveAttribute(
+			"data-alkalye-ready",
+			"true",
 		)
-		.toBe("true")
-
-	let route = await page.evaluate(() => {
-		return (
-			(window as { __alkalyeReadyRoute?: string }).__alkalyeReadyRoute ?? null
-		)
-	})
+		route = await page.evaluate(() => {
+			return (
+				(window as { __alkalyeReadyRoute?: string }).__alkalyeReadyRoute ?? null
+			)
+		})
+	}).toPass({ timeout: 10_000 })
 
 	return {
 		ok: true,

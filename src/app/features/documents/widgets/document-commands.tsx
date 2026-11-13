@@ -202,7 +202,7 @@ function DocumentCommands({
 				description={t("doc.leaveDialog.description")}
 				confirmLabel={t("doc.leaveDialog.confirm")}
 				variant="destructive"
-				onConfirm={makeLeave(doc, me, doc, navigate)}
+				onConfirm={makeLeave(db, doc, navigate)}
 			/>
 			{moveSpaceOpen && (
 				<MoveToSpaceDialog

@@ -29,13 +29,13 @@ async function createInvite(
 			...target,
 			ownerId: accountId,
 			tokenHash: hashToken(token),
+			singleUse: true,
 			role,
 			expiresAt: new Date(Date.now() + 7 * 86400_000),
 		})
 		.wait({ tier: "global" })
 	let url = new URL("/app/invite", baseUrl)
-	url.searchParams.set("invite", invite.id)
-	url.hash = token
+	url.hash = `/${"documentId" in target ? "doc/" + target.documentId : "space/" + target.spaceId}/invite/${invite.id}/${token}`
 	return { ...target, inviteGroupId: invite.id, role, link: url.href }
 }
 async function revokeInvite(
@@ -48,23 +48,15 @@ async function revokeInvite(
 	if (!invite) throw new Error("Invite not found")
 	let write = await jazz.db.serializableTransaction(async tx => {
 		tx.update(app.invites, invite.id, { revokedAt: new Date() })
-		if (
-			invite.documentId &&
-			(await tx.one(
-				app.documentGrants.where({
-					id: invite.id,
-					documentId: invite.documentId,
-				}),
-			))
-		)
-			tx.delete(app.documentGrants, invite.id)
-		if (
-			invite.spaceId &&
-			(await tx.one(
-				app.spaceMembers.where({ id: invite.id, spaceId: invite.spaceId }),
-			))
-		)
-			tx.delete(app.spaceMembers, invite.id)
+
+		for (let grant of await tx.all(app.documentGrants)) {
+			if (grant.inviteId === invite.id || grant.id === invite.id)
+				tx.delete(app.documentGrants, grant.id)
+		}
+		for (let member of await tx.all(app.spaceMembers)) {
+			if (member.inviteId === invite.id || member.id === invite.id)
+				tx.delete(app.spaceMembers, member.id)
+		}
 	})
 	await write.wait()
 	return { ...target, inviteGroupId: invite.id, revoked: true }
@@ -75,8 +67,11 @@ async function invitationCommand(
 	link: string,
 ) {
 	let url = new URL(link)
-	let id = z.uuid().parse(url.searchParams.get("invite"))
-	let token = url.hash.slice(1)
+	let parts = url.hash.match(
+		/^#\/(?:doc|space)\/[^/]+\/invite\/([^/]+)\/([^/]+)$/,
+	)
+	let id = z.uuid().parse(parts?.[1] ?? url.searchParams.get("invite"))
+	let token = parts?.[2] ?? url.hash.slice(1)
 	let write = await jazz.db.serializableTransaction(async tx => {
 		let invite = await tx.one(app.invites.where({ id }))
 		if (
@@ -105,7 +100,7 @@ async function invitationCommand(
 			let role = z.enum(["reader", "writer", "admin"]).parse(invite.role)
 			tx.insert(
 				app.documentGrants,
-				{ documentId: invite.documentId, accountId, role },
+				{ documentId: invite.documentId, accountId, role, inviteId: invite.id },
 				{ id: invite.id },
 			)
 			let entry = await tx.one(
@@ -123,7 +118,12 @@ async function invitationCommand(
 		} else if (invite.spaceId) {
 			tx.insert(
 				app.spaceMembers,
-				{ spaceId: invite.spaceId, accountId, role: invite.role },
+				{
+					spaceId: invite.spaceId,
+					accountId,
+					role: invite.role,
+					inviteId: invite.id,
+				},
 				{ id: invite.id },
 			)
 		}

@@ -4,6 +4,7 @@ import { createJazz, memory, type Jazz } from "jazz-tools/backend"
 import { app } from "@/jazz/schema"
 import { permissions } from "@/jazz/permissions"
 import { executeServerCommand } from "./server"
+import { sharingOperation } from "@/jazz/sharing/operations"
 
 let state: { jazz?: Jazz } = vi.hoisted(() => ({}))
 vi.mock("@/jazz/server", () => ({
@@ -146,4 +147,53 @@ test("asset references, comment anchors and theme sources use v2 rows", async ()
 		css: "h1 { color: blue; }",
 	})
 	await expect(run("theme.get", { themeId }, bob)).rejects.toThrow()
+})
+
+test("CLI invitations open in the browser and browser revocation removes CLI redemptions", async () => {
+	let invite = await run("doc.share.create", {
+		docId: documentId,
+		role: "reader",
+	})
+	let link = new URL(field(invite, "link"))
+	let parts = link.hash.split("/")
+	expect(parts.slice(0, 4)).toEqual(["#", "doc", documentId, "invite"])
+	let inviteId = field(invite, "inviteGroupId")
+	let carol = "00000000-0000-4000-8000-000000000003"
+	await sharingOperation(
+		state.jazz!,
+		carol,
+		"redeem",
+		{ inviteId, secret: parts[5] },
+		origin,
+	)
+	expect(await run("doc.content", { docId: documentId }, carol)).toContain(
+		"Quote",
+	)
+	await run("doc.share.revoke", { docId: documentId, inviteGroupId: inviteId })
+	await expect(
+		run("doc.content", { docId: documentId }, carol),
+	).rejects.toThrow()
+
+	let browser = await sharingOperation(
+		state.jazz!,
+		alice,
+		"create-invite",
+		{
+			documentId,
+			role: "reader",
+			singleUse: true,
+		},
+		origin,
+	)
+	await run("invite.accept", { link: browser.link }, carol)
+	await sharingOperation(
+		state.jazz!,
+		alice,
+		"revoke",
+		{ inviteId: browser.id },
+		origin,
+	)
+	await expect(
+		run("doc.content", { docId: documentId }, carol),
+	).rejects.toThrow()
 })

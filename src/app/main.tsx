@@ -86,6 +86,7 @@ function AppRouter({ ownerId }: { ownerId: string }) {
 				: []
 			if (cancelled) return
 			router.update({ context: { ownerId } })
+			let acceptingInvite = window.location.pathname.endsWith("/invite")
 			let switched = routedOwnerId !== null && routedOwnerId !== ownerId
 			let requestedId = sessionStorage.getItem("alkalye-requested-document")
 			if (restoring) {
@@ -100,7 +101,13 @@ function AppRouter({ ownerId }: { ownerId: string }) {
 					.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())[0]
 				let target = requested ?? latest
 				router.clearCache()
-				if (target)
+				if (acceptingInvite)
+					await router.navigate({
+						to: "/invite",
+						hash: window.location.hash.slice(1),
+						replace: true,
+					})
+				else if (target)
 					await router.navigate({
 						to: "/doc/$id",
 						params: { id: target.id },
@@ -109,7 +116,7 @@ function AppRouter({ ownerId }: { ownerId: string }) {
 				else await router.navigate({ to: "/", replace: true })
 			} else if (switched) {
 				router.clearCache()
-				if (!window.location.pathname.endsWith("/settings"))
+				if (!acceptingInvite && !window.location.pathname.endsWith("/settings"))
 					await router.navigate({ to: "/", replace: true })
 			}
 			routedOwnerId = ownerId

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { z } from "zod"
-import { DeferredScreen } from "@/app/components/deferred-screen"
+import { DocScreen } from "@/app/features/documents"
 export { Route }
 let Route = createFileRoute("/spaces/$spaceId/doc/$id/")({
 	validateSearch: z.object({
@@ -11,5 +11,6 @@ let Route = createFileRoute("/spaces/$spaceId/doc/$id/")({
 	component: Screen,
 })
 function Screen() {
-	return <DeferredScreen area="spaces" />
+	let { spaceId, id } = Route.useParams()
+	return <DocScreen id={id} spaceId={spaceId} />
 }

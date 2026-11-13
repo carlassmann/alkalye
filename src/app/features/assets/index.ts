@@ -44,3 +44,9 @@ export {
 } from "./lib/local-assets"
 export { loadTldrawCanvas } from "./widgets/load-tldraw-canvas"
 export type { TldrawCanvasHandle } from "./widgets/tldraw-canvas"
+
+export { validateDrawingSnapshot }
+async function validateDrawingSnapshot(snapshot: string) {
+	let { validateTldrawFile } = await import("./lib/tldraw-file")
+	validateTldrawFile(snapshot)
+}

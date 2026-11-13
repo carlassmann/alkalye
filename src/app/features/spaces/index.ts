@@ -1,16 +1,7 @@
-export { MoveToSpaceDialog }
-function MoveToSpaceDialog(_props: {
-	doc?: unknown
-	docs?: unknown
-	me?: unknown
-	open?: boolean
-	onOpenChange?: (open: boolean) => void
-	currentSpaceId?: string
-	onMove?: (destination: { id: string; name: string } | null) => void
-	onMoved?: () => void
-}) {
-	// v2-todo(spaces): trusted space reassignment.
-	return null
-}
-
+export * from "./lib/spaces"
 export { SpaceSelector } from "./widgets/space-selector"
+export { MoveToSpaceDialog } from "./widgets/move-to-space-dialog"
+export { CopyToSyncedDialog } from "./widgets/copy-to-synced-dialog"
+
+export { SpaceListScreen } from "./screens/space-list-screen"
+export { SpaceSettingsScreen } from "./screens/space-settings-screen"

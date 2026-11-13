@@ -195,7 +195,7 @@ The pinned Bun patch is `patches/jazz-tools@2.0.0-alpha.61.patch`, registered in
 1. Upstream `createJazz.forReqUser` treats `acceptDeviceAccounts` as signed out. The patch verifies the device proof against the configured audience, checks browser origin and registry admission, then creates a policy-scoped database.
 2. Upstream `createJazz` has no account-scoped `forUser`; its remote trusted-client version only resolves backend identities. The patch adds trusted, in-process `forUser(accountId)` using the existing policy-scoped backend context, with no policy bypass. Both patched paths attribute the user's account with backend identity `jazz:backend`, subject equal to the account UUID. They do not claim the device signed each server-side edit.
 
-Tests cover forged proofs, other-app audiences, foreign origins, policy enforcement and cross-account revocation. Keep the patch until upstream provides these APIs; do not replace it with `withAttribution`.
+Tests cover forged proofs, other-app audiences, foreign origins, policy enforcement and cross-account revocation. Remove when upstream supports device proofs on custom backend routes and in-process account delegation. Keep the patch until upstream provides these APIs; do not replace it with `withAttribution`.
 
 ### Verification
 
@@ -314,5 +314,92 @@ Background agent-browser profiles `merge-2c-a` and `merge-2c-b` exercised:
 Screenshots: `/tmp/alkalye-2c-merge-smoke/` (`slideshow-theme-laser.png`, `teleprompter.png`, `copy-preview.png`). Existing Base UI native-button/slider warnings remain. Vite hot reload during integration also invalidated open profiles; restarting Work after type checks and reloading cleared that state. Cloud deployment, the Classic importer and the sharing/spaces branch remain outside this merge. No push or PR.
 
 - 2026-11-13, phase 2C integration: merged assets/themes/onboarding with comments/time-machine/presentation and MCP settings; added the thumbnail migration, shared copy/comment anchor handling and preview highlight recovery; types/lint, 768 tests, five auth/document e2e cases and two-profile browser smoke checks pass. Commit: phase-2C integration merge.
+
+## Phase 2 handoff: spaces, sharing, invites, public documents, presence
+
+- 2026-11-13, phase 2 spaces/sharing: restored Classic screens and dialogs from `8379d4e`, v2 space membership and document grants, backend invite redemption and ownership changes, public read links, and latest-history editor cursors. Commits: `d638bbc`, `892939a`, `ecc91fc`, `f40bd05`.
+
+### Implementation
+
+Space creation includes the original welcome document. Selector, space document sidebar, settings, avatar crop/upload/removal, members, role editing, leave and permanent deletion use v2 rows. Managers can edit nonadmin memberships; the last admin cannot leave. A departing owner transfers ownership and space-owned documents to another admin. Documents created by space writers belong to the space owner so removing their membership removes inherited access.
+
+The original document and space share dialogs, invite screen and move/copy dialogs are restored. Public reads grant no write access. Trusted `/api/sharing/[action]` operations create/redeem/revoke invites, manage members, leave, move documents and delete spaces. Redemption reads the token hash, inserts scoped membership and consumes a single-use invite in one serializable transaction. Links default to multi-use, matching Classic. Secrets stay in URL fragments; only SHA-256 hashes enter Jazz. Revoking a link removes memberships granted through it. Removing an invited collaborator invalidates the originating link too.
+
+Moves preserve document IDs and content while changing owner/space and personal library entries through the backend. Local-to-synced copies rewrite asset references and copy image/video bytes or validated drawing snapshots plus both previews in the document transaction. The assets barrel adds a lazy drawing validator; rendering and local-file screen integration remain with that feature's agent.
+
+Presence uses one latest-history row per mounted editor/device, cursor/selection updates, a two-second heartbeat and the Classic ten-second stale cutoff. The existing CodeMirror cursor decorations remain. Private documents now return the sidebar's original `none` sharing status, fixing the stray people icon. Restoring an account from an invite preserves its route and fragment.
+
+### Schema and merge notes
+
+Three additive fields were edited in place: `spaceMembers.inviteId?: uuid`, `documentGrants.inviteId?: uuid`, and `invites.singleUse: boolean = false`. No lenses were added under the phase-2 disposable-data rule. This worktree started with an empty isolated `.jazz` store. Combine schema edits before regenerating the shared snapshot and clearing local stores.
+
+Shared-file changes include document library queries/permission derivation, the document editor's presence binding and space sidebar, `/new` space handling, personal-root navigation, invitation account routing in `main.tsx`, feature barrels and the three space routes plus invite route. No Classic runtime or Group inheritance machinery was restored. No push or PR.
+
+### Verification
+
+- `bun run check:types`: zero errors. `bun run check:lint`: zero errors, 79 existing/style warnings. `bun run check:test`: 56 files, 642 tests pass. Changed TypeScript files pass Prettier checking.
+- All eight existing cases in `e2e/space.spec.ts` and `e2e/document-collab.spec.ts` pass with `--workers=1 --timeout=120000` in 4.7 minutes. The two invitation CRUD cases pass again after the final revoke changes. Assertions remain intact. Helpers accept v2 UUIDs and await invitation rows; the rollback observer excludes cursor label decorations from document text.
+- Background agent-browser sessions `phase2-spaces-one` and `phase2-spaces-two` used independent browser profiles. Verified space creation, avatar cropping, member role changes, blocked reader edits, two-profile text sync, remote cursor and selection decorations, public document read-only access and denial after making it private. A third profile restored an existing recovery phrase while accepting an invite, reached the document, then lost access when removed. Its original link was rejected after revocation.
+- The trusted move dialog moved the same document ID and text from personal documents into the space and back. Policy/server tests cover foreign-space ownership transfer, single-use redemption races, hashed/revoked/replayed links, manager boundaries, owner handoff, space deletion, membership removal and presence impersonation. Copy tests cover asset bytes, rewritten IDs, missing assets, space ownership and drawing revisions/previews.
+- Runtime: https://web-t3-spaces-sharing-presence-alkalye.cshed.carlassmann.com . Started with `work setup --tailscale` and `work up --tailscale`; stopped the stale Classic sync command. Classic reference: https://web-v2-ui-classic-baseline-alkalye.cshed.carlassmann.com .
+- Screenshots: `/tmp/alkalye-v2-phase2/spaces-sharing-presence/`. Classic/v2 pairs cover home/sidebar, space documents, space settings, space sharing, document sharing and invite screens. Additional v2 evidence covers avatar upload, cursors/selections, restored-account acceptance, public revocation and the move dialog. The Classic home image is copied from the prior exact-baseline comparison.
+
+### Alpha.61 findings and remaining integration
+
+- `accountFor` and `withAttribution` authenticate external users, not device accounts. The backend verifies Jazz's Ed25519 device proof, audience, expiry and key-bound subject, then derives the endpoint-scoped founding account. No account ID supplied by the client is trusted. The browser account-handle path omits the seed used by `getLocalFirstIdentityProof`; the library initializes it from the exported device key without taking over token refresh.
+- A backend operation can race recovered client writes after reload. Invitation creation first waits for a fresh resource update at global durability; dialog refreshes after backend operations use authoritative queries. This adds online waiting to sharing, while document/space creation remains locally durable.
+- Serializable transactions cannot query latest-history tables in alpha.61 (`reading latest-only table presence at a snapshot is not supported yet`). Space deletion leaves presence rows inaccessible through their deleted documents; editor cleanup and the stale cutoff handle their display.
+- Public-space **Add to my spaces** bookmarks are not restored. The shared schema has no private per-user space-list table; direct public space access works. The copy dialog/helper is ready for the local-files screen to wire up, but that entry point is still the other feature area's placeholder in this checkout. Full local-file runtime verification therefore remains integration work.
+
+written with gpt-6.1-sol in T3 Code (Codex)
+
+## Phase 2A integration into the migration branch
+
+2026-11-13, merged `t3/spaces-sharing-presence` at `0151d11` into `jazz-v2-migration` after `20f0c71`.
+
+### Resolutions
+
+All earlier handoffs remain above. The editor combines comments, presentation and presence extensions, retaining uploads, whiteboards and the original sidebars. Space routes use inherited roles, space-scoped commands and document creation. Duplicates retain assets and comments and navigate within their destination space. Profile subscriptions include collaborators while profile creation checks the current account. Laser access and immutable sender rules remain alongside the new presence rules. Moving a document remounts its editor binding when its space changes, preserving subsequent edits and correctly scoped backlinks.
+
+The additive invite fields have a generated migration from `35991c834bd8` to `9864f7adaa62`, included in the migration graph. The existing SQLite store opened without a reset. This supersedes 2A's instruction to clear disposable stores. All 21 tables validate.
+
+### One device authentication path
+
+Sharing now calls the same patched `jazz.forReqUser(request)` as MCP approval and CLI requests, then reads the authenticated account ID from that database's session. Trusted sharing transactions use that verified ID with backend authority. The hand-written JWT/EdDSA verifier, UUID derivation and their tests were deleted. No patch extension was necessary.
+
+The existing small `patches/jazz-tools@2.0.0-alpha.61.patch` remains unchanged. It uses Jazz's `verifyLocalFirstToken`, configured audience, browser-origin checks and device-account admission before resolving the founding account. **Remove when upstream supports** device proofs on custom backend routes and in-process account delegation. `withAttribution` is not a replacement.
+
+New real-backend tests invoke both actual HTTP route handlers. Valid approval and sharing writes use the same admitted account. Forged, expired, foreign-audience and foreign-origin proofs fail before either route creates privileged rows. Existing MCP policy and revocation tests remain.
+
+CLI-generated invitations now use the browser's fragment format and explicitly retain single-use semantics. CLI acceptance still recognizes its earlier query-string format. CLI grants record invite provenance; revocation handles grants created through either surface. A real-backend interoperability test redeems CLI links through browser operations and browser links through CLI operations, then verifies revocation in both directions.
+
+### Runtime fixes
+
+The sidebar footer previously treated recovery backup status as connection status. It now subscribes to v2 `useSyncStatus`: connected and caught up shows "Synced", pending uploads/connection shows "Syncing", and offline/local-only follow the actual link state. Backup state still controls account actions.
+
+Remote cursor names now use CSS-generated labels with an accessible name. Their appearance is unchanged, and they no longer interrupt document text when copied or inspected. This fixed the concurrent-writing e2e assertion without changing it. The boot helper retries readiness across navigation; all spec assertions remain intact.
+
+### Validation
+
+- `bun run check:types`: zero errors. `check:lint`: zero errors, 155 style warnings. `check:test`: 72 files, 785 tests pass.
+- All 13 cases in `e2e/auth.spec.ts`, `doc.spec.ts`, `space.spec.ts` and `document-collab.spec.ts` pass together with one worker and a 120-second timeout, 3.8 minutes. Earlier runs exposed cursor-label text pollution, the boot helper's navigation race, cold-server startup delays and a missed transient invitation success screen. The final warm-server run passes without weakening assertions.
+- `bun run qa:mcp:user <origin>` passes approval/PKCE, CRUD/revision conflicts, anchored comments/replies/resolution, outsider isolation, shared writing, archive rejection, revocation and refresh refusal. Work setup had copied an empty MCP token key; a random local QA key was generated in ignored `.env` for this runtime check.
+
+Work setup/start used `--tailscale`; the stale Classic `sync` command was stopped. Runtime: https://web-jazz-v2-migration-alkalye.cshed.carlassmann.com
+
+Background agent-browser sessions `merge-2a-a` and `merge-2a-b`, independent profiles, exercised:
+
+- Create a space, create a writer link through its share dialog, redeem it in B, synchronize B's text and display A's remote cursor. Change B to reader through member settings and attempt insertion; the document stays unchanged.
+- Create a comment through the selection shortcut/dialog. B's preview displays its highlighted quote and comment. Upload a real PNG through the original file-input handler, insert it and verify a decoded Blob image in B's preview.
+- Start A's teleprompter with B's slideshow open. Both show slide 1 with the decoded image; a real pointer drag on A's laser surface produces an SVG trail in B.
+- Move a personal document into the space through the original dialog. Its UUID and text remain unchanged. Further typing saves after the move.
+- Make that document public, sign B out, and open its public URL. B's guest account sees the text read-only.
+- Open the original MCP consent panel in A, authorize the QA client and receive an authorization code with the expected state.
+
+Screenshots: `/tmp/alkalye-2a-merge-smoke/comments-image.png`, `slideshow-laser.png`, `public-signed-out.png`.
+
+The inherited limits still apply: public-space bookmarks lack a schema table; Classic import, cloud deployment and OS PWA launch validation remain separate work. No push or PR.
+
+- 2026-11-13, phase 2A integration: merged spaces/sharing/presence with all existing feature ports, unified device-request authentication, migrated invite fields, reconciled CLI invite links, fixed sync status and cursor text pollution; types/lint, 785 tests, 13 e2e cases and requested browser smoke checks pass. Commit: phase-2A integration merge.
 
 written with gpt-6.1-sol in T3 Code (Codex)

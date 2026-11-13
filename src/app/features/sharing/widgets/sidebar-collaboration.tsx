@@ -14,14 +14,12 @@ import {
 	ContextMenuTrigger,
 } from "@/app/components/ui/context-menu"
 import { Globe, Lock, Trash2, UserCog, Users } from "lucide-react"
-import { ShareDialog } from "../index"
-type Collaborator = {
-	id: string
-	name: string
-	role: string
-	inviteGroupId: string
-}
-
+import { ShareDialog } from "./share-dialog"
+import {
+	getDocumentGroup,
+	revokeDocumentInvite,
+	type Collaborator,
+} from "../lib/document-sharing"
 import { testIds } from "@/app/lib/test-ids"
 import { useHasFinePointer } from "@/app/hooks/use-fine-pointer"
 import { useIntl, T } from "@/shared/intl/setup"
@@ -40,24 +38,29 @@ function SidebarCollaboration({
 	let t = useIntl()
 	let hasFinePointer = useHasFinePointer()
 	let [shareOpen, setShareOpen] = useState(false)
-	let [collaborators, setCollaborators] = useState<Collaborator[]>([])
 
-	let { documents, ownerId } = useLibrary()
+	let { db, documents, ownerId, grants, profiles } = useLibrary()
 	let doc = documents.find(doc => doc.id === docId)
 	let isPublic = doc?.publicRead ?? false
 	let currentUserId = ownerId
-	// v2-todo(sharing): load collaborators and redeem verified invitations.
+	let collaborators = grants
+		.filter(grant => grant.documentId === docId)
+		.map(grant => ({
+			id: grant.accountId,
+			name:
+				profiles.find(profile => profile.ownerId === grant.accountId)?.name ??
+				t("common.anonymous"),
+			role: grant.role,
+			inviteGroupId: grant.id,
+		}))
 
 	let otherCollaborators = collaborators.filter(c => c.id !== currentUserId)
 	let hasCollaborators = otherCollaborators.length > 0 || isPublic
-	let isAdmin = doc?.canAdmin
+	let isAdmin = doc && getDocumentGroup(doc)?.myRole() === "admin"
 
 	function removeCollaborator(collaborator: Collaborator) {
 		if (!doc || !isAdmin) return
-		// v2-todo(sharing): revoke collaborator access.
-		setCollaborators(current =>
-			current.filter(item => item.id !== collaborator.id),
-		)
+		void revokeDocumentInvite(db, doc, collaborator.inviteGroupId)
 	}
 
 	return (
@@ -70,7 +73,6 @@ function SidebarCollaboration({
 					{!hasCollaborators && !isPublic && (
 						<SidebarMenuItem>
 							<SidebarMenuButton
-								disabled
 								onClick={() => setShareOpen(true)}
 								className="gap-2"
 								nativeButton
@@ -87,7 +89,6 @@ function SidebarCollaboration({
 					{hasCollaborators && (
 						<SidebarMenuItem>
 							<SidebarMenuButton
-								disabled
 								onClick={() => setShareOpen(true)}
 								className="gap-2"
 								nativeButton
@@ -117,7 +118,7 @@ function SidebarCollaboration({
 								}
 							/>
 							<ContextMenuContent>
-								<ContextMenuItem disabled onClick={() => setShareOpen(true)}>
+								<ContextMenuItem onClick={() => setShareOpen(true)}>
 									<UserCog />
 									{t("sharing.sidebar.manage")}
 								</ContextMenuItem>
@@ -137,7 +138,6 @@ function SidebarCollaboration({
 					{isPublic && (
 						<SidebarMenuItem>
 							<SidebarMenuButton
-								disabled
 								onClick={() => setShareOpen(true)}
 								className="gap-2"
 								nativeButton

@@ -1,4 +1,4 @@
-import { useLibrary } from "@/app/features/documents/lib/library"
+import { useLibrary } from "@/app/features/documents"
 import type { ThemeInput } from "shiki/core"
 import {
 	parseFrontmatter,

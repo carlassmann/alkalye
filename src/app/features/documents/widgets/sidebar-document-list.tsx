@@ -1,6 +1,7 @@
 import { getExportAssets } from "../lib/document-file-actions"
 import { exportComments } from "@/app/features/import-export"
 import type { Database } from "../lib/library"
+import { leavePersonalDocument } from "@/app/features/sharing"
 import {
 	useState,
 	useRef,
@@ -1379,7 +1380,7 @@ function LeaveDocumentDialog({
 	onOpenChange: (open: boolean) => void
 	t: ReturnType<typeof useIntl>
 }) {
-	useLibrary()
+	let { db } = useLibrary()
 	return (
 		<ConfirmDialog
 			open={open}
@@ -1388,7 +1389,7 @@ function LeaveDocumentDialog({
 			description={t("doc.leaveDialog.description")}
 			confirmLabel={t("doc.leaveDialog.confirm")}
 			variant="destructive"
-			onConfirm={makeLeaveDocument(doc)}
+			onConfirm={makeLeaveDocument(db, doc)}
 		>
 			<LeaveDocumentPreview doc={doc} />
 		</ConfirmDialog>
@@ -1598,9 +1599,8 @@ function makeShareDocument(db: Database, doc: SidebarDoc, title: string) {
 			await exportComments(db, doc.id),
 		)
 }
-function makeLeaveDocument(_doc: SidebarDoc) {
-	// v2-todo(sharing): trusted leave operation.
-	return () => {}
+function makeLeaveDocument(db: ReturnType<typeof useDb>, doc: SidebarDoc) {
+	return () => leavePersonalDocument(db, doc)
 }
 
 function buildListItems(

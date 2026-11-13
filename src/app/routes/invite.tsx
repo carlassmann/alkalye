@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { z } from "zod"
-import { DeferredScreen } from "@/app/components/deferred-screen"
+import { InviteScreen } from "@/app/features/sharing"
 export { Route }
 let Route = createFileRoute("/invite")({
 	validateSearch: z.object({
@@ -11,5 +11,5 @@ let Route = createFileRoute("/invite")({
 	component: Screen,
 })
 function Screen() {
-	return <DeferredScreen area="invite" />
+	return <InviteScreen />
 }

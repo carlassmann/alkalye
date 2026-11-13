@@ -7,5 +7,6 @@ let Route = createFileRoute("/")({
 	component: Screen,
 })
 function Screen() {
-	return <HomeScreen />
+	let { personal } = Route.useSearch()
+	return <HomeScreen personal={personal} />
 }

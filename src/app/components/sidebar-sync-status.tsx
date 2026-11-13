@@ -2,7 +2,7 @@ import { testIds } from "@/app/lib/test-ids"
 import type { JazzClient } from "jazz-tools/client"
 import { useState } from "react"
 import { useLocation, useNavigate } from "@tanstack/react-router"
-import { useJazzSession } from "jazz-tools/react"
+import { useJazzSession, useSyncStatus } from "jazz-tools/react"
 import { useLibrary, app } from "@/app/features/documents"
 import { Button } from "@/app/components/ui/button"
 import {
@@ -20,7 +20,6 @@ import {
 import { AuthDialog, useIsBackedUp } from "@/app/features/auth"
 import { ThemeSubmenu, useTheme } from "@/app/components/appearance"
 import { usePWA } from "@/app/lib/pwa"
-import { useIsOnline } from "@/app/hooks/use-online"
 import {
 	ChevronUp,
 	Cloud,
@@ -48,35 +47,33 @@ function SidebarSyncStatus() {
 	let isAuthenticated = useIsBackedUp()
 	let { db, settings, profile } = useLibrary()
 	let [authOpen, setAuthOpen] = useState(false)
-	let isOnline = useIsOnline()
+	let { link, synced } = useSyncStatus()
+	let isConnected = link.state === "connected"
+	let isLocalOnly = link.state === "local-only"
 	let { theme, setTheme } = useTheme()
 	let { needRefresh } = usePWA()
 	let t = useIntl()
 
 	let rawName = profile?.name.trim() || "Anonymous user"
 	let name = rawName === "Anonymous user" ? t("common.anonymousUser") : rawName
-	let statusLabel = isAuthenticated
-		? isOnline
-			? t("sync.syncing")
-			: t("sync.offline")
-		: t("sync.localOnly")
-	let accountLabel = isFilesystem
-		? "File System Mode"
-		: (name ?? (isAuthenticated ? t("sync.signedIn") : t("sync.localOnly")))
+	let statusLabel = isLocalOnly
+		? t("sync.localOnly")
+		: link.state === "offline"
+			? t("sync.offline")
+			: synced
+				? t("sync.synced")
+				: t("sync.syncing")
+	let accountLabel = isFilesystem ? "File System Mode" : name
 	let StatusIcon = isFilesystem
 		? HardDrive
-		: isAuthenticated
-			? isOnline
-				? Cloud
-				: WifiOff
-			: CloudOff
-	let statusIconClassName = isFilesystem
-		? "text-muted-foreground"
-		: isAuthenticated
-			? isOnline
-				? "text-green-600 dark:text-green-400"
-				: "text-muted-foreground"
-			: "text-destructive"
+		: isLocalOnly
+			? CloudOff
+			: link.state === "offline"
+				? WifiOff
+				: Cloud
+	let statusIconClassName = isConnected
+		? "text-green-600 dark:text-green-400"
+		: "text-muted-foreground"
 
 	return (
 		<DropdownMenu>

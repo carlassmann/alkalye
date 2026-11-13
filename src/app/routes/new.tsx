@@ -7,5 +7,6 @@ let Route = createFileRoute("/new")({
 	component: Screen,
 })
 function Screen() {
-	return <NewDocScreen />
+	let { spaceId } = Route.useSearch()
+	return <NewDocScreen spaceId={spaceId} />
 }
