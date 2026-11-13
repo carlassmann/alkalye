@@ -351,6 +351,11 @@ try {
 							await waitForEditorBoot(returningPage)
 							returningStage = "initialLibrary"
 							await waitForDocumentList(returningPage)
+							if (values["sw-only"]) {
+								returningStage = "verifiedHydration"
+								await verifyExport(returningPage, seeded)
+								await returningPage.waitForTimeout(5000)
+							}
 							returningStage = "largeOpen"
 							await waitForEditorBoot(returningPage, {
 								path: `/app/doc/${large.id}`,
@@ -382,7 +387,7 @@ try {
 							await expect(editor(returningPage)).toContainText("Book dracula")
 							add("offlineSwLargeOpenMs", performance.now() - start)
 						})(),
-						90_000,
+						150_000,
 						"returning SW case",
 					)
 				} catch (error) {

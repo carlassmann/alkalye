@@ -78,13 +78,8 @@ async function measureReplay(page: Page, options: ReplayOptions) {
 	}
 	await page.waitForTimeout(3000)
 	let metrics = await page.evaluate(() => window.__bench)
-	if ((await readContent(page)) !== expected.join("") + document.content)
-		throw new Error(`Trace replay diverged: ${document.title}`)
-	if (
-		options.finalText !== undefined &&
-		expected.join("") !== options.finalText
-	)
-		throw new Error("Full trace differs from upstream finalText")
+	let actualContent = await readContent(page)
+	let expectedContent = expected.join("") + document.content
 	if (profileDirectory) {
 		let { profile } = await cdp.send("Profiler.stop")
 		await mkdir(profileDirectory, { recursive: true })
@@ -93,6 +88,27 @@ async function measureReplay(page: Page, options: ReplayOptions) {
 			JSON.stringify(profile),
 		)
 	}
+	if (actualContent !== expectedContent) {
+		let offset = 0
+		while (
+			offset < Math.min(actualContent.length, expectedContent.length) &&
+			actualContent[offset] === expectedContent[offset]
+		)
+			offset++
+		if (profileDirectory) {
+			await writeFile(`${profileDirectory}/actual.txt`, actualContent)
+			await writeFile(`${profileDirectory}/expected.txt`, expectedContent)
+		}
+		throw new Error(
+			`Trace replay diverged: ${document.title}, offset ${offset}, lengths ${actualContent.length}/${expectedContent.length}, actual ${JSON.stringify(actualContent.slice(Math.max(0, offset - 40), offset + 80))}, expected ${JSON.stringify(expectedContent.slice(Math.max(0, offset - 40), offset + 80))}`,
+		)
+	}
+	if (
+		options.finalText !== undefined &&
+		expected.join("") !== options.finalText
+	)
+		throw new Error("Full trace differs from upstream finalText")
+
 	let heap = await cdp.send("Runtime.getHeapUsage")
 	ensureHealthy()
 	return {

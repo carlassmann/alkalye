@@ -104,30 +104,39 @@ Install Chromium once with `bunx playwright install chromium` if needed:
 
 ```sh
 bun run bench:fetch
-work setup --tailscale
-NODE_OPTIONS=--max-old-space-size=16384 work up --tailscale
-work urls
-bun run bench:compare -- --target <web-url> --label classic --out bench/results/classic.json
+bun scripts/bench/production.ts
+bun scripts/bench/interleaved.ts
 ```
 
-Run from the checkout serving the target; package and Git metadata come from that checkout.
-`bun run bench:verify-network` checks worker HTTP, binary WebSocket and Wasm capture.
-For v2, run the same command against its services with `--label v2 --out bench/results/v2.json`.
-Keep the machine, server build mode and options identical. Classic's sync server
-exhausted its default 4 GB heap during repeated imports; use the 16 GB limit above.
-Set `BENCH_SERVER_NOTE` to record the server version and heap limit in results. Defaults: three independent
-accounts, 50 Vite Markdown documents, two Gutenberg books, 200 Automerge trace edits
-per document. Use `--cpu 4` for CPU throttling, `--edits full` for all 259,778 edits,
-or `--notes 20 --edits 50` for a shorter smoke run. Full replay uses UI cursor moves
-and can take hours. Replay deadlines scale with edit count; override with
-`--replay-timeout-ms <ms>`. Scenario failures remain in JSON and produce exit code 1. No fixed performance threshold runs in CI.
+Run from the migration checkout. The provisioner builds Classic `8379d4e` in a
+temporary worktree with the Node adapter and an external SPA history fallback;
+app source stays unchanged. It builds v2 with `ALKALYE_LOCAL_PREVIEW=1` and
+isolated SQLite. Work setup/start use `--tailscale`. This setup uses the local
+cshed tailnet domain and a 32 GB Classic sync-server heap cap.
 
-Only `scripts/bench/adapter.ts` depends on account, sign-in and import UI conventions.
-It reuses `e2e/auth-helpers.ts`; change these bindings if v2 changes the UI. Scenarios
-never call Jazz APIs. Credentials stay in memory and are never written to results.
-Classic restores only its authentication secret into fresh contexts. If v2 stores
-device credentials in IndexedDB or a worker, adapt `captureCredentials` to restore
-authentication only; leave document caches and session leases empty.
+The runner alternates five Classic/v2 core pairs, then five separate pairs for
+service-worker reload and offline reopening. Backends restart before each
+account. Raw results retain load averages, exact-content checks and scenario
+failures. Failures produce exit code 1; independent cases still run.
+No fixed performance threshold runs in CI.
+
+`bun run bench:verify-network` checks worker HTTP, binary WebSocket and Wasm
+capture. For individual runs use `bun run bench:compare -- --target <url>
+--label classic|v2 --out <path>`. Set `BENCH_JAZZ`, `BENCH_GIT_HEAD` and
+`BENCH_SERVER_NOTE` when the served app differs from the harness checkout.
+
+Defaults: three accounts, 50 Vite Markdown notes, two Gutenberg books and 200
+Automerge trace edits per document. Use `--cpu 4` for page CPU throttling or
+`--notes 20 --edits 50` for a smoke run. The full 259,778-edit trace exceeds two
+hours at the frame-pacing floor alone. `--edits 5000 --large-only` runs a longer
+large-document slice; `--replay-timeout-ms <ms>` sets its deadline.
+`BENCH_PROFILE_DIR` captures main-page CPU profiles. `--sw-only` measures a
+hydrated returning user; `--skip-sw` excludes that case for diagnostics.
+
+Only `scripts/bench/adapter.ts` binds account, import/export and editor UI.
+Scenarios never call Jazz APIs. Credentials stay in memory and out of results.
+Fresh contexts receive Classic's auth secret or v2's selected device root,
+without document databases, cookies, other account roots or session leases.
 See `docs/benchmarks/jazz-classic-vs-v2.md` for measurement definitions and limitations.
 
 written with gpt-6.1-sol in T3 Code (Codex)

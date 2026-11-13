@@ -36,7 +36,7 @@ await writeFile(
 )
 await cp(resolve(root, ".env"), resolve(classic, ".env"))
 run("bun", ["install"], classic)
-run("git", ["init", "-q"], serving)
+run("git", ["init", "-q", "--initial-branch=main"], serving)
 await writeFile(
 	resolve(serving, "classic-server.mjs"),
 	`
