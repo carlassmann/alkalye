@@ -10,7 +10,9 @@ async function setOffline(page: Page, offline: boolean) {
 			return?: Fiber | null
 			memoizedProps?: { value?: { db?: Database } }
 		}
-		let editor = document.querySelector('[data-testid="doc-editor"]')
+		let editor = document.querySelector(
+			'[data-testid="doc-editor"], [data-testid="sidebar-sync-status"]',
+		)
 		if (!editor) throw new Error("Document editor missing")
 		let key = Object.keys(editor).find(name => name.startsWith("__reactFiber$"))
 		if (!key) throw new Error("React editor root missing")

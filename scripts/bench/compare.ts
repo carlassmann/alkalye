@@ -1,3 +1,4 @@
+import { setOffline } from "../../e2e/network-helpers"
 import { benchmarkBrowserArgs } from "./network"
 import { measureReplay, withDeadline } from "./replay"
 import { execFileSync } from "node:child_process"
@@ -9,6 +10,7 @@ import {
 	expect,
 	type Browser,
 	type BrowserContext,
+	type Page,
 } from "@playwright/test"
 import { parseArgs } from "node:util"
 import { cpus, platform, release, loadavg } from "node:os"
@@ -419,7 +421,7 @@ try {
 							await waitForDocumentList(returningPage)
 							add("returningSwListMs", performance.now() - start)
 							returningStage = "offlineOpen"
-							await returning.setOffline(true)
+							await disconnectForOffline(returningPage)
 							start = performance.now()
 							await waitForEditorBoot(returningPage, {
 								path: `/app/doc/${large.id}`,
@@ -460,7 +462,7 @@ try {
 					if (returningStage !== "offlineOpen") {
 						let offlineStart = performance.now()
 						try {
-							await returning.setOffline(true)
+							await disconnectForOffline(returningPage)
 							await withDeadline(
 								(async () => {
 									await waitForEditorBoot(returningPage, {
@@ -555,3 +557,35 @@ async function save() {
 }
 
 if (scenarioFailures.length > 0) process.exitCode = 1
+
+async function disconnectForOffline(page: Page) {
+	if (values.label === "v2") {
+		await setOffline(page, true)
+		return
+	}
+	await page.context().setOffline(true)
+	let session = await page.context().newCDPSession(page)
+	try {
+		let { result: prototype } = await session.send("Runtime.evaluate", {
+			expression: "WebSocket.prototype",
+			objectGroup: "offline-transport",
+		})
+		if (!prototype.objectId) throw new Error("WebSocket prototype missing")
+		let { objects } = await session.send("Runtime.queryObjects", {
+			prototypeObjectId: prototype.objectId,
+			objectGroup: "offline-transport",
+		})
+		if (!objects.objectId) throw new Error("WebSocket instances missing")
+		// Context emulation does not terminate an already-open Classic socket.
+		await session.send("Runtime.callFunctionOn", {
+			objectId: objects.objectId,
+			functionDeclaration:
+				"function() { for (let socket of this) socket.close() }",
+		})
+		await session.send("Runtime.releaseObjectGroup", {
+			objectGroup: "offline-transport",
+		})
+	} finally {
+		await session.detach()
+	}
+}
