@@ -171,6 +171,7 @@ async function applyGuestTransfer(
 		(!settings || targetSettings) &&
 		themes.every(theme => existingThemes.has(required(theme.id)))
 	) {
+		await restoreCommentSettings(db, documents, required)
 		void db
 			.waitForSync()
 			.then(() => del(key))
@@ -222,6 +223,8 @@ async function applyGuestTransfer(
 					...columns(doc),
 					ownerId,
 					publicRead: false,
+					// The policy admits comment inserts only while comments are enabled.
+					commentsDisabled: false,
 					content: rewrite(doc.content),
 				},
 				{ id: required(doc.id) },
@@ -264,9 +267,9 @@ async function applyGuestTransfer(
 						documentId: required(doc.id),
 						authorId: ownerId,
 						anchor: {
-							quote: comment.quote,
-							contextBefore: comment.contextBefore,
-							contextAfter: comment.contextAfter,
+							quote: rewrite(comment.quote),
+							contextBefore: rewrite(comment.contextBefore),
+							contextAfter: rewrite(comment.contextAfter),
 						},
 						createdAt: new Date(comment.createdAt),
 						updatedAt: new Date(comment.updatedAt),
@@ -290,6 +293,7 @@ async function applyGuestTransfer(
 		}
 	})
 	await write.wait({ tier: "local" })
+	await restoreCommentSettings(db, documents, required)
 	// Keep the snapshot until the backend accepts the replay, including across offline reloads.
 	void write
 		.wait({ tier: "global" })
@@ -314,4 +318,21 @@ function mergeRows<T extends { id: string }>(previous: T[], current: T[]) {
 	return [
 		...new Map([...previous, ...current].map(row => [row.id, row])).values(),
 	]
+}
+
+async function restoreCommentSettings(
+	db: Database,
+	documents: GuestSnapshot["documents"],
+	mapped: (id: string) => string,
+) {
+	for (let doc of documents) {
+		if (!doc.commentsDisabled) continue
+		let copy = await db.one(
+			app.documents.where({ id: mapped(doc.id) }).select("commentsDisabled"),
+		)
+		if (copy && !copy.commentsDisabled)
+			await db
+				.update(app.documents, mapped(doc.id), { commentsDisabled: true })
+				.wait({ tier: "local" })
+	}
 }

@@ -120,12 +120,16 @@ test("guest transfer retries without duplicates and preserves folders, deleted n
 			createdAt: now,
 		})
 		.wait({ tier: "global" })
+	await guest
+		.update(app.documents, doc.id, { commentsDisabled: true })
+		.wait({ tier: "global" })
 	await transfer(guest, target)
 	let copies = await target.all(app.documents.where({ ownerId: targetId }))
 	expect(copies).toHaveLength(1)
 	let copy = copies[0]!
 	expect(copy.id).not.toBe(doc.id)
 	expect(copy.deletedAt).toEqual(now)
+	expect(copy.commentsDisabled).toBe(true)
 	let assets = await target.all(app.assets.where({ documentId: copy.id }))
 	expect(assets[0]?.data).toEqual(new Uint8Array([1, 2, 3]))
 	expect(copy.content).toContain(`asset:${assets[0]?.id}`)

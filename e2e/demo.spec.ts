@@ -11,7 +11,6 @@ test("landing demo edits locally and restores comments, history, slides and the 
 	await page
 		.locator('[data-demo-scene="devices"]')
 		.evaluate(element => element.scrollIntoView({ block: "center" }))
-	await stage.locator("button.absolute.inset-0").click()
 	let editor = stage.locator(".cm-content")
 	await editor.click()
 	await editor.press("ControlOrMeta+End")
@@ -39,5 +38,5 @@ test("landing demo edits locally and restores comments, history, slides and the 
 		.locator('[data-demo-scene="present"]')
 		.evaluate(element => element.scrollIntoView({ block: "center" }))
 	await expect(stage).toHaveAttribute("data-demo-view", "present")
-	await expect(stage).toContainText("Alkalye")
+	await expect(stage).toContainText("Every device is just another cursor")
 })

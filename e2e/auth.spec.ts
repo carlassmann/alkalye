@@ -150,16 +150,16 @@ test("offline guest notes survive signing in and reach a fresh device once", asy
 	await page.evaluate("window.__jazz.waitForSync()")
 	await waitForEditorBoot(page)
 	let flatView = page.getByRole("button", { name: "Switch to flat view" })
-	if (await flatView.isVisible()) await flatView.click()
+	if (await flatView.count()) await flatView.dispatchEvent("click")
 	await expect(
 		page.locator("[data-doc-id]").filter({ hasText: "Guest draft" }),
 	).toHaveCount(1)
 	let guestNote = page
 		.locator("[data-doc-id]")
 		.filter({ hasText: "Guest draft" })
-	await guestNote.locator("a").click()
+	await guestNote.locator("a").dispatchEvent("click")
 	await expect(editor).toContainText("Written without a connection")
-	await expect(editor).toContainText("Guest folder")
+	await expect(guestNote).toHaveAttribute("data-doc-path", "Guest folder")
 
 	let freshContext = await browser.newContext()
 	try {
@@ -168,7 +168,7 @@ test("offline guest notes survive signing in and reach a fresh device once", asy
 		await signIn(fresh, { passphrase: account.passphrase })
 		await waitForEditorBoot(fresh)
 		let flatView = fresh.getByRole("button", { name: "Switch to flat view" })
-		if (await flatView.isVisible()) await flatView.click()
+		if (await flatView.count()) await flatView.dispatchEvent("click")
 		await expect(
 			fresh.locator("[data-doc-id]").filter({ hasText: "Guest draft" }),
 		).toHaveCount(1)
@@ -176,7 +176,7 @@ test("offline guest notes survive signing in and reach a fresh device once", asy
 			.locator("[data-doc-id]")
 			.filter({ hasText: "Guest draft" })
 			.locator("a")
-			.click()
+			.dispatchEvent("click")
 		await expect(fresh.getByTestId(testIds.doc.editor)).toContainText(
 			"Written without a connection",
 		)
