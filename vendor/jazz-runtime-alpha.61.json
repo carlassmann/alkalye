@@ -1,5 +1,6 @@
 {
 	"source": "397c8b810d99dc9a20440f17decb2c63ddaf0cf6",
 	"enginePatchSha256": "de4dc377bce888ae0680dec4b764f22bc80e2d0b7f54a006efc6c6b379523866",
-	"archiveSha256": "8b98eb05ae8699da3d773f7b617e9b3970b14e39cdeb07606135d77216a1ef55"
+	"wasmOpt": "wasm-opt version 132 (version_132)",
+	"archiveSha256": "f26e00f5212e5503b4fd2af16a3754e236af933156f7e538519739b0662d5adc"
 }

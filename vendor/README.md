@@ -35,7 +35,9 @@ bun scripts/install-jazz-runtime.ts
 
 The rebuild script applies the patch, builds `jazz-wasm` with the pinned lockfile,
 generates both binding files, and rebuilds the broker worker against that same
-glue with esbuild 0.25.12. Its fingerprint is the SHA-256 of the patch. It preserves
+glue with esbuild 0.25.12. The release build matches Jazz: fat LTO, one codegen
+unit, the Wasm crate at `opt-level="s"`, Binaryen 132.0.0 with
+`-O -g --low-memory-unused`, then upstream symbol-hash cleanup. Its fingerprint is the SHA-256 of the patch. It preserves
 the original native-server ABI fingerprint and replaces only the browser one.
 Paths in Rust symbols and esbuild comments may differ across rebuild directories;
 the committed archive pins the deployment artifact.

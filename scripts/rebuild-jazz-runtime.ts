@@ -39,12 +39,19 @@ run(
 	[
 		"+1.93.1",
 		"build",
+		"--lib",
 		"--locked",
 		"--release",
 		"--target",
 		"wasm32-unknown-unknown",
 		"-p",
 		"jazz-wasm",
+		"--config",
+		'profile.release.lto="fat"',
+		"--config",
+		"profile.release.codegen-units=1",
+		"--config",
+		'profile.release.package.jazz-wasm.opt-level="s"',
 	],
 	source,
 	{ JAZZ_NATIVE_ARTIFACT_FINGERPRINT: fingerprint },
@@ -63,6 +70,26 @@ run(
 		"web",
 		"--out-dir",
 		pkg,
+	],
+	source,
+)
+run(
+	join(root, "node_modules/.bin/wasm-opt"),
+	[
+		join(pkg, "jazz_wasm_bg.wasm"),
+		"-O",
+		"-g",
+		"--low-memory-unused",
+		"-o",
+		join(pkg, "jazz_wasm_bg.wasm"),
+	],
+	source,
+)
+run(
+	"node",
+	[
+		join(source, "dev/artifacts/wasm-names.mjs"),
+		join(pkg, "jazz_wasm_bg.wasm"),
 	],
 	source,
 )
@@ -124,6 +151,11 @@ await writeFile(
 		{
 			source: revision,
 			enginePatchSha256: fingerprint,
+			wasmOpt: run(
+				join(root, "node_modules/.bin/wasm-opt"),
+				["--version"],
+				root,
+			).trim(),
 			archiveSha256: createHash("sha256")
 				.update(
 					await readFile(join(root, "vendor/jazz-runtime-alpha.61.tar.gz")),
