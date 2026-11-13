@@ -10,7 +10,8 @@ Use the same Chromium version, machine, CPU throttle, dataset pins, edit count a
 server mode for v2. Classic uses jazz-run 0.20.19, Node 24.22.1, with
 `NODE_OPTIONS=--max-old-space-size=16384`. Failed exploratory runs exhausted the
 default 4 GB server heap; the service log and SIGABRT core confirm V8 heap exhaustion.
-An initial harness also reloaded the app per document and exhausted 16 GB.
+During an initial harness run that reloaded the app per document, the server also
+exhausted 16 GB.
 The final harness uses sidebar links to navigate within one Jazz connection, matching
 normal use and the existing responsiveness benchmark. Failed runs are excluded. The default uses three independent accounts and browser contexts.
 Services run through `work setup --tailscale` then `work up --tailscale`.
@@ -37,19 +38,22 @@ Bundle bytes are CDP encoded transfers of JavaScript/Wasm responses through read
 plus one second; development module loading makes this different from production.
 
 Fresh-device time includes recovery-phrase sign-in and opening every imported doc,
-copying its complete editor text and checking exact equality. It includes sequential
+using Edit → Copy for its complete editor text and checking exact equality. Native
+clipboard copying can include collaborator cursor labels, so it is not used. It includes sequential
 sidebar search, link navigation and clipboard verification overhead. This proves all bodies arrived, rather than equating a
 populated sidebar with complete account hydration. Sync latency starts before an
 editor insertion and ends when a second isolated client's editor contains the
 marker in its visible editor DOM, polled every 20 ms. The receiver is scrolled
 to the end first; polling never takes keyboard focus from the sender. Each run measures five markers on Corpus 000, a roughly 6 KB note.
-An exploratory large-book sync attempt exceeded the 120-second deadline even with
-the larger server heap. It is excluded from the small-note sync distribution and
-needs separate investigation; it is not reported as a successful timed sample.
+Discarded exploratory sync attempts exceeded 120 seconds while using the earlier
+clipboard/reload drivers, including server exhaustion. These are not successful
+samples and do not establish normal-use sync latency.
 
 Trace edits are replayed through browser text input and Delete keys, using Arrow keys
 to reproduce offsets. No database calls or direct editor-state writes. Each document
-is reset first. The trace starts at offset zero, with the original document as a
+is reset with plain-text paste first. Automatic bracket pairs, marker wrapping and
+completion are disabled through Settings, so replay can reproduce literal edits.
+The trace starts at offset zero, with the original document as a
 suffix, so large-document cost is measured without changing the trace's coordinates.
 The resulting full content must equal independently replayed trace text plus the
 original document. Full replay also checks upstream's finalText. Default replay uses

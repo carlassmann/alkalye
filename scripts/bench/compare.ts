@@ -20,6 +20,8 @@ import {
 	resolveDocument,
 	readContent,
 	openDocument,
+	replaceContent,
+	configureEditor,
 	editor,
 } from "./adapter"
 import { installObservers, instrument, summary } from "./metrics"
@@ -78,6 +80,7 @@ let result = {
 		notes,
 		edits: editCount,
 		totalTraceEdits: trace.edits.length,
+		automaticPairsAndCompletion: false,
 	},
 	sources,
 	datasets: documents.map(doc => ({
@@ -103,6 +106,7 @@ try {
 				if (message.type() === "error") console.error(message.text())
 			})
 			let account = await createAccount(page)
+			await configureEditor(page)
 			console.error("Account ready; importing ZIP")
 			let start = performance.now()
 			let seeded = await seed(page, documents)
@@ -173,14 +177,14 @@ try {
 				let syncDoc = seeded[0]
 				if (!syncDoc) throw new Error("Small sync note missing")
 				await openDocument(other, syncDoc)
-				await editor(other).click()
+				await editor(other).focus()
 				await other.keyboard.press("ControlOrMeta+End")
 				await page.bringToFront()
 				await openDocument(page, syncDoc)
 				for (let n = 0; n < 5; n++) {
 					console.error(`Sync marker ${n + 1}/5`)
 					let marker = ` sync-${run}-${n}`
-					await editor(page).click()
+					await editor(page).focus()
 					await page.keyboard.press("ControlOrMeta+End")
 					start = performance.now()
 					await page.keyboard.insertText(marker)
@@ -201,10 +205,7 @@ try {
 				let name = doc === large ? "large" : doc === medium ? "medium" : "small"
 				console.error(`Replay ${editCount} trace edits on ${name}`)
 				await openDocument(page, doc)
-				await editor(page).click()
-				await page.keyboard.press("ControlOrMeta+A")
-				await page.keyboard.insertText(doc.content)
-				await page.keyboard.press("ControlOrMeta+Home")
+				await replaceContent(page, doc.content)
 				await page.waitForTimeout(3000)
 				await page.evaluate(() => {
 					window.__bench.paint = []
