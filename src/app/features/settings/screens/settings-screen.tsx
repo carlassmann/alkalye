@@ -1,3 +1,4 @@
+import { ThemesSection } from "@/app/features/themes"
 import type { JazzClient } from "jazz-tools/client"
 import { IconTransition } from "@/app/components/ui/icon-transition"
 import { useState, useRef } from "react"
@@ -87,7 +88,6 @@ import {
 	SettingsGroupLabel,
 	SettingsStatus,
 	SettingsActions,
-	SettingsEmpty,
 } from "@/app/components/ui/settings-layout"
 
 export { SettingsScreen }
@@ -480,25 +480,7 @@ function LanguageSetting() {
 	)
 }
 
-function ThemesSection() {
-	// v2-todo(themes): restore theme library management.
-	return (
-		<SettingsSection title={<T k="settings.themes" />}>
-			<SettingsPanel>
-				<SettingsEmpty
-					title="Themes"
-					description="Themes are being migrated."
-				/>
-			</SettingsPanel>
-		</SettingsSection>
-	)
-}
-
-interface SyncSectionProps {
-	isAuthenticated: boolean
-}
-
-function SyncSection({ isAuthenticated }: SyncSectionProps) {
+function SyncSection({ isAuthenticated }: { isAuthenticated: boolean }) {
 	if (isAuthenticated) {
 		return <SignedInView />
 	}
