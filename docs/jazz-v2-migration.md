@@ -144,3 +144,31 @@ Auth admission remains slow in alpha.61. Final complete auth flows took 31–44 
 - 2026-11-13, restoration validation: 630 tests, zero type/lint errors, five unchanged-assertion auth/document e2e cases, screenshot pairs and final-build offline reload verified. Deferred original feature-screen restoration remains incomplete. Commit: validation handoff.
 
 written with gpt-6.1-sol in T3 Code (Codex)
+
+## Auth latency investigation
+
+2026-11-13, research follow-up from `937934c`, branch `t3/diagnose-auth-admission`.
+
+The 31–44 second handoff figure was a complete e2e scenario duration. The delay comes from Vite leaving Jazz WebSocket upgrades unanswered. Jazz alpha.61 waits its 10-second socket deadline before probing and selecting HTTP streaming. Restoring immediately in a fresh profile can pay it twice: guest uploads must finish before the account switch, then the restored replica discovers its transport. Local data already opens promptly; removing recovery's authoritative query would not fix this and would break account routing.
+
+Representative seconds, fresh browser contexts and warm Vite transforms:
+
+| Flow / milestone               | Dev before → after | Node build before → after |
+| ------------------------------ | -----------------: | ------------------------: |
+| First visit, local editor      |      1.423 → 1.489 |             0.878 → 0.907 |
+| First visit, backend admission |     11.125 → 1.139 |             0.906 → 0.924 |
+| Signup, show words             |      0.178 → 0.151 |             0.165 → 0.149 |
+| Signup, finish backup          |      0.097 → 0.107 |             0.109 → 0.123 |
+| Fresh-profile recovery, editor |     20.348 → 0.622 |             0.536 → 0.657 |
+| Reload, local editor           |      0.777 → 0.854 |             0.347 → 0.395 |
+| Reload, backend admission      |     10.666 → 0.861 |             0.356 → 0.409 |
+
+Production preview uses `ALKALYE_LOCAL_PREVIEW=1 bun x astro build` and local SQLite, not Jazz Cloud/Vercel. Its auth was already fast. Cold dev compilation remains a separate cost: editor/admission at 8.331/17.992 seconds before, 8.136/8.160 after. These are diagnostic samples, not percentiles.
+
+Added a development-only Vite plugin rejecting only `/jazz/apps/<id>/ws` upgrades. Jazz then immediately uses its supported HTTP stream fallback; HMR remains operational. No app UI or account-data gate changed. All auth helper/spec waits return from 30 to 10 seconds.
+
+The standalone Vite/Jazz reproduction measures admission at 10.372 seconds before and 0.306 after. Its first remote query completes at 10.411 and 0.345 seconds. The draft upstream proposal is explicit HTTP transport selection or concurrent capability discovery. No upstream issue was submitted. Detailed phase tables, source trace, reproduction, temporary instrumentation and measurement harness are in `docs/jazz-v2-issues/auth-transport.md`; numeric results are in `auth-timing.json` beside it.
+
+Validation: `check:types` has zero errors; `check:lint` has zero errors and 67 existing warnings; `check:test` passes 53 files / 630 tests. All four `e2e/auth.spec.ts` cases pass with one worker at the final implementation, retaining source-upload waits, document/URL assertions and the access-denied observer. Complete scenarios take 12.7–19.7 seconds. The measurement builds and final uninstrumented Node build pass. Full `check:format` still flags nine unchanged MCP/OAuth route files from the baseline; changed files pass formatting. Both app environments and the standalone reproduction ran through Work with tailnet HTTPS; stale Classic sync was stopped. No push or PR.
+
+written with gpt-6.1-sol in T3 Code (Codex)

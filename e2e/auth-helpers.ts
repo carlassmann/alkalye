@@ -41,7 +41,7 @@ async function waitForEditorBoot(page: Page, args: WaitForEditorBootArgs = {}) {
 					return document.body.getAttribute("data-alkalye-ready")
 				})
 			},
-			{ timeout: 30_000 },
+			{ timeout: 10_000 },
 		)
 		.toBe("true")
 
@@ -101,7 +101,7 @@ async function createAccount(page: Page, args: CreateAccountArgs = {}) {
 	await waitForAuthNavigation(page)
 	await openSettings(page)
 	await expect(page.getByTestId(testIds.auth.settingsSignOut)).toBeVisible({
-		timeout: 30_000,
+		timeout: 10_000,
 	})
 
 	return {
@@ -118,7 +118,7 @@ async function signOut(page: Page, args: SignOutArgs = {}) {
 
 	await page.getByTestId(testIds.auth.settingsSignOut).click()
 	await expect(page.getByTestId(testIds.auth.settingsSignIn)).toBeVisible({
-		timeout: 30000,
+		timeout: 10_000,
 	})
 
 	return {
@@ -155,7 +155,7 @@ async function signIn(page: Page, args: SignInArgs) {
 	await waitForAuthNavigation(page)
 	await openSettings(page)
 	await expect(page.getByTestId(testIds.auth.settingsSignOut)).toBeVisible({
-		timeout: 30_000,
+		timeout: 10_000,
 	})
 
 	return {
@@ -167,7 +167,7 @@ async function signIn(page: Page, args: SignInArgs) {
 async function waitForAuthNavigation(page: Page) {
 	await page.waitForURL(
 		url => url.pathname.startsWith("/app") && url.pathname !== "/app/settings",
-		{ timeout: 30_000 },
+		{ timeout: 10_000 },
 	)
 	await waitForEditorBoot(page)
 }

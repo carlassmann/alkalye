@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+	<title>Jazz alpha.61 auth transport timing</title>
+	<p id="state">Starting</p>
+	<script type="module">
+		import { schema as s } from "jazz-tools"
+		import { createJazzClient } from "jazz-tools/client"
+
+		let app = s.defineApp(
+			{ notes: s.table({ text: s.string() }, {}) },
+			{ migrations: "none" },
+		)
+		let start = performance.now()
+		let session = await createJazzClient({
+			serverUrl: "/jazz",
+			initial: "device",
+			localFirst: "now",
+			client: () => import("jazz-tools/local-first"),
+		})
+		console.log("client-ready", performance.now() - start)
+		void session.db
+			.all(app.notes, { tier: "remote" })
+			.then(() => console.log("query-ready", performance.now() - start))
+		let timer = setInterval(() => {
+			if (session.db.getSyncStatus().link.state !== "connected") return
+			let elapsed = performance.now() - start
+			console.log("admitted", elapsed)
+			document.querySelector("#state").textContent = String(elapsed)
+			clearInterval(timer)
+		}, 5)
+	</script>
+</html>

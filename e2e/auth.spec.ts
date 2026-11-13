@@ -72,7 +72,7 @@ for (let entryPoint of ["sidebar", "settings"]) {
 			})
 			await freshPage.getByTestId(testIds.auth.loginSubmit).click()
 
-			await expect(freshPage).toHaveURL(accountDocumentUrl, { timeout: 30000 })
+			await expect(freshPage).toHaveURL(accountDocumentUrl, { timeout: 10_000 })
 			await expect(
 				freshPage.getByTestId(testIds.doc.editor).locator(".cm-content"),
 			).toBeVisible()
@@ -84,7 +84,7 @@ for (let entryPoint of ["sidebar", "settings"]) {
 			await freshPage.reload()
 			await expect(
 				freshPage.getByTestId(testIds.doc.editor).locator(".cm-content"),
-			).toBeVisible({ timeout: 30_000 })
+			).toBeVisible({ timeout: 10_000 })
 		} finally {
 			await freshContext.close()
 		}
@@ -119,7 +119,7 @@ test("signing in from a private document link keeps the requested document", asy
 		await freshPage.getByTestId(testIds.auth.loginSubmit).click()
 		await expect(freshPage.getByTestId(testIds.doc.editor)).toContainText(
 			"Requested private document",
-			{ timeout: 30000 },
+			{ timeout: 10_000 },
 		)
 		await expect(freshPage).toHaveURL(requestedUrl)
 	} finally {
