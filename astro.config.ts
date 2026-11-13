@@ -5,6 +5,7 @@ import node from "@astrojs/node"
 import pwa from "@vite-pwa/astro"
 import { tanstackRouter } from "@tanstack/router-plugin/vite"
 import tailwindcss from "@tailwindcss/vite"
+import { jazzDevTransport } from "./scripts/jazz-dev-transport"
 import { criticalAppPreload } from "./scripts/critical-app-preload"
 
 export default defineConfig({
@@ -48,6 +49,7 @@ export default defineConfig({
 			},
 		},
 		plugins: [
+			jazzDevTransport(),
 			tanstackRouter({
 				target: "react",
 				routesDirectory: "./src/app/routes",
