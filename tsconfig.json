@@ -36,5 +36,5 @@
 		]
 	},
 	"include": [".astro/types.d.ts", "**/*"],
-	"exclude": ["dist", ".reference"]
+	"exclude": ["dist", ".reference", "bench/datasets"]
 }

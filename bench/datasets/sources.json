@@ -1,0 +1,34 @@
+[
+	{
+		"file": "vite.tar.gz",
+		"url": "https://codeload.github.com/vitejs/vite/tar.gz/4d21dc4ebcabecc13a35d73ef7dcac704cdbc817",
+		"sha256": "e3bd67ccafd837066cf8d263f871089424da7eabb87c48e7d29f9d52f2c69291",
+		"license": "MIT",
+		"attribution": "Vite contributors",
+		"licenseUrl": "https://github.com/vitejs/vite/blob/4d21dc4ebcabecc13a35d73ef7dcac704cdbc817/LICENSE"
+	},
+	{
+		"file": "trace.js",
+		"url": "https://raw.githubusercontent.com/automerge/automerge-perf/da212e984c777d31ee7d888f82637288aa4c61d3/edit-by-index/editing-trace.js",
+		"sha256": "23116070719243e2950c310006dd50b3d80744be7542a86c62e7d5c2ed7326d0",
+		"license": "CC-BY-4.0",
+		"attribution": "Martin Kleppmann and Alastair R. Beresford, A Conflict-Free Replicated JSON Datatype",
+		"licenseUrl": "https://github.com/automerge/automerge-perf/blob/da212e984c777d31ee7d888f82637288aa4c61d3/README.md#license"
+	},
+	{
+		"file": "alice.txt",
+		"url": "https://www.gutenberg.org/ebooks/11.txt.utf-8",
+		"sha256": "01b38ea4c710a84bc18d0bd41271a5a1a92b94e97b2812f4dece97d4a694725e",
+		"license": "Public domain in USA; Project Gutenberg license retained in text",
+		"attribution": "Lewis Carroll, Alice's Adventures in Wonderland; Project Gutenberg",
+		"licenseUrl": "https://www.gutenberg.org/policy/license.html"
+	},
+	{
+		"file": "dracula.txt",
+		"url": "https://www.gutenberg.org/ebooks/345.txt.utf-8",
+		"sha256": "96cd16eacdbfebae8fdda5591f66e0cc8ee76be18e0cd1aca02bc00615782d28",
+		"license": "Public domain in USA; Project Gutenberg license retained in text",
+		"attribution": "Bram Stoker, Dracula; Project Gutenberg",
+		"licenseUrl": "https://www.gutenberg.org/policy/license.html"
+	}
+]

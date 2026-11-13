@@ -31,7 +31,10 @@
 		"preview": "astro preview",
 		"format": "prettier --write .",
 		"test": "vitest",
-		"prepare": "effect-language-service patch"
+		"prepare": "effect-language-service patch",
+		"bench:compare": "bun scripts/bench/compare.ts",
+		"bench:fetch": "bun scripts/bench/fetch.ts",
+		"bench:verify-network": "bun scripts/bench/verify-network.ts"
 	},
 	"dependencies": {
 		"@base-ui/react": "^1.1.0",
@@ -142,7 +145,8 @@
 		"typescript": "~5.9.3",
 		"vite": "^7.3.1",
 		"vitest": "^4.0.18",
-		"workbox-window": "^7.4.0"
+		"workbox-window": "^7.4.0",
+		"ws": "^8.23.0"
 	},
 	"patchedDependencies": {
 		"jazz-tools@2.0.0-alpha.61": "patches/jazz-tools@2.0.0-alpha.61.patch"

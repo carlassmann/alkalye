@@ -96,3 +96,38 @@ restarting the `work` services.
 [MIT](./LICENSE)
 
 © 2025 Carl Assmann
+
+## Jazz benchmarks
+
+Fetch checksum-pinned datasets, start this checkout's services, then run headless Chromium.
+Install Chromium once with `bunx playwright install chromium` if needed:
+
+```sh
+bun run bench:fetch
+work setup --tailscale
+NODE_OPTIONS=--max-old-space-size=16384 work up --tailscale
+work urls
+bun run bench:compare -- --target <web-url> --label classic --out bench/results/classic.json
+```
+
+Run from the checkout serving the target; package and Git metadata come from that checkout.
+`bun run bench:verify-network` checks worker HTTP, binary WebSocket and Wasm capture.
+For v2, run the same command against its services with `--label v2 --out bench/results/v2.json`.
+Keep the machine, server build mode and options identical. Classic's sync server
+exhausted its default 4 GB heap during repeated imports; use the 16 GB limit above.
+Set `BENCH_SERVER_NOTE` to record the server version and heap limit in results. Defaults: three independent
+accounts, 50 Vite Markdown documents, two Gutenberg books, 200 Automerge trace edits
+per document. Use `--cpu 4` for CPU throttling, `--edits full` for all 259,778 edits,
+or `--notes 20 --edits 50` for a shorter smoke run. Full replay uses UI cursor moves
+and can take hours. Replay deadlines scale with edit count; override with
+`--replay-timeout-ms <ms>`. Scenario failures remain in JSON and produce exit code 1. No fixed performance threshold runs in CI.
+
+Only `scripts/bench/adapter.ts` depends on account, sign-in and import UI conventions.
+It reuses `e2e/auth-helpers.ts`; change these bindings if v2 changes the UI. Scenarios
+never call Jazz APIs. Credentials stay in memory and are never written to results.
+Classic restores only its authentication secret into fresh contexts. If v2 stores
+device credentials in IndexedDB or a worker, adapt `captureCredentials` to restore
+authentication only; leave document caches and session leases empty.
+See `docs/benchmarks/jazz-classic-vs-v2.md` for measurement definitions and limitations.
+
+written with gpt-6.1-sol in T3 Code (Codex)

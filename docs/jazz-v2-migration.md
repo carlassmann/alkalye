@@ -403,3 +403,7 @@ The inherited limits still apply: public-space bookmarks lack a schema table; Cl
 - 2026-11-13, phase 2A integration: merged spaces/sharing/presence with all existing feature ports, unified device-request authentication, migrated invite fields, reconciled CLI invite links, fixed sync status and cursor text pollution; types/lint, 785 tests, 13 e2e cases and requested browser smoke checks pass. Commit: phase-2A integration merge.
 
 written with gpt-6.1-sol in T3 Code (Codex)
+
+
+
+- 2026-11-13, phase 1: UI benchmark harness and Classic baseline; three runs, zero scenario failures, v2 pending. Harness commit `262baf5`; results in `bench/results/classic.json`.

@@ -13,3 +13,6 @@ example
 tsconfig.tsbuildinfo
 
 .jazz/
+
+/bench/datasets/*
+!/bench/datasets/sources.json
