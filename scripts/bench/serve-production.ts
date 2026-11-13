@@ -80,7 +80,12 @@ createServer(async (req, res) => {
 		{
 			hostname: "127.0.0.1",
 			port: upstream,
-			path: req.url,
+			path:
+				process.env.BENCH_HISTORY_FALLBACK === "1" &&
+				path.startsWith("/app/") &&
+				!path.includes(".")
+					? "/app"
+					: req.url,
 			method: req.method,
 			headers: req.headers,
 		},

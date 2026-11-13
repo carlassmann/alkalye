@@ -1,6 +1,6 @@
 import CDP from "chrome-remote-interface"
 import type { Browser, CDPSession, Page } from "@playwright/test"
-import { readFile } from "node:fs/promises"
+import { mkdir, readFile, writeFile } from "node:fs/promises"
 import { join } from "node:path"
 
 export { benchmarkBrowserArgs, captureNetwork }
@@ -261,6 +261,30 @@ async function createCapture(browser: Browser) {
 					throw new Error(
 						`Worker network capture failed: ${current.issues.join("; ") || "CDP disconnected"}`,
 					)
+			},
+			async profileWorkers() {
+				let workers = []
+				for (let [id, owner] of sessions) {
+					if (owner !== current) continue
+					let { targetInfo } = await client.Target.getTargetInfo({}, id)
+					if (!["shared_worker", "worker"].includes(targetInfo.type)) continue
+					await client.Profiler.enable(id)
+					await client.Profiler.start(id)
+					workers.push({ id, targetInfo })
+				}
+				return async (directory: string, label: string) => {
+					await mkdir(directory, { recursive: true })
+					for (let [index, worker] of workers.entries()) {
+						let { profile } = await client.Profiler.stop(worker.id)
+						await writeFile(
+							join(
+								directory,
+								`${label}-${worker.targetInfo.type}-${index}.cpuprofile`,
+							),
+							JSON.stringify(profile),
+						)
+					}
+				}
 			},
 			async setCacheDisabled(disabled: boolean) {
 				current.cacheDisabled = disabled

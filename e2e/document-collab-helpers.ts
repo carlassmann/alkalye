@@ -198,8 +198,21 @@ function parseDocIdFromInviteLink(link: string) {
 async function waitForInviteSuccess(invitePage: Page) {
 	let success = invitePage.getByTestId(testIds.invite.successState)
 	let error = invitePage.getByTestId(testIds.invite.errorState)
-	let didSucceed = await expect(success)
-		.toBeVisible({ timeout: 30_000 })
+	let didSucceed = await expect
+		.poll(
+			async () => {
+				if (await success.isVisible()) return true
+				return (
+					/\/app\/doc\/[0-9a-f-]+$/.test(new URL(invitePage.url()).pathname) &&
+					(await invitePage
+						.getByTestId(testIds.doc.editor)
+						.locator(".cm-content")
+						.isVisible())
+				)
+			},
+			{ timeout: 30_000 },
+		)
+		.toBe(true)
 		.then(() => true)
 		.catch(() => false)
 

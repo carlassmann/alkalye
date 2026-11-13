@@ -16,7 +16,7 @@ interface ReplayOptions {
 
 async function measureReplay(page: Page, options: ReplayOptions) {
 	let { document, edits, cpu } = options
-	let { cdp, wire, ensureHealthy } = await instrument(page, cpu)
+	let { cdp, wire, ensureHealthy, profileWorkers } = await instrument(page, cpu)
 	await openDocument(page, document)
 	if (options.reset) {
 		await expect
@@ -40,6 +40,7 @@ async function measureReplay(page: Page, options: ReplayOptions) {
 		window.__bench.longTasks = []
 	})
 	let profileDirectory = process.env.BENCH_PROFILE_DIR
+	let stopWorkerProfiles = profileDirectory ? await profileWorkers() : undefined
 	if (profileDirectory) {
 		await cdp.send("Profiler.enable")
 		await cdp.send("Profiler.start")
@@ -87,6 +88,7 @@ async function measureReplay(page: Page, options: ReplayOptions) {
 	let actualContent = await readContent(page)
 	let expectedContent = expected.join("") + document.content
 	if (profileDirectory) {
+		await stopWorkerProfiles?.(profileDirectory, document.title)
 		let { profile } = await cdp.send("Profiler.stop")
 		await mkdir(profileDirectory, { recursive: true })
 		await writeFile(
