@@ -69,7 +69,7 @@ test("CLI account, document CRUD, archive/restore, space movement preserve conte
 	expect(await run("doc.list", {})).toMatchObject([{ documentId }])
 })
 
-test("one-use invites, writer edit, reader rejection and revoke remove just that grant", async () => {
+test("reusable invites, writer edit, reader rejection and revoke remove just that grant", async () => {
 	let invite = await run("doc.share.create", {
 		docId: documentId,
 		role: "writer",
@@ -78,7 +78,10 @@ test("one-use invites, writer edit, reader rejection and revoke remove just that
 	expect(await run("invite.accept", { link }, bob)).toMatchObject({
 		accepted: true,
 	})
-	await expect(run("invite.accept", { link }, bob)).rejects.toThrow()
+	expect(await run("invite.accept", { link }, bob)).toMatchObject({
+		accepted: true,
+	})
+	await run("invite.accept", { link }, "00000000-0000-4000-8000-000000000003")
 	await run(
 		"doc.update",
 		{ docId: documentId, content: "# Shared writer" },

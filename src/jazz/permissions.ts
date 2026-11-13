@@ -34,21 +34,9 @@ export let permissions = s.definePermissions(
 		)
 		policy.spaces.allowDelete.where(spaceAdmin)
 		policy.spaceMembers.allowRead.where(allowedTo.read("space"))
-		policy.spaceMembers.allowInsert.where(allowedTo.update("space"))
-		policy.spaceMembers.allowUpdate.where(member =>
-			allOf([
-				allowedTo.update("space"),
-				policy.spaceMembers.exists.where({
-					id: member.id,
-					spaceId: member.spaceId,
-					accountId: member.accountId,
-					inviteId: member.inviteId,
-				}),
-			]),
-		)
-		policy.spaceMembers.allowDelete.where(
-			anyOf([{ accountId: session.user }, allowedTo.update("space")]),
-		)
+		policy.spaceMembers.allowInsert.never()
+		policy.spaceMembers.allowUpdate.never()
+		policy.spaceMembers.allowDelete.never()
 
 		function documentAdmin(doc: RowContext<DocumentRow>) {
 			return anyOf([
@@ -135,24 +123,10 @@ export let permissions = s.definePermissions(
 		)
 		policy.documents.allowDelete.where(documentAdmin)
 		policy.documentGrants.allowRead.where(allowedTo.read("document"))
-		for (let operation of [
-			policy.documentGrants.allowInsert,
-			policy.documentGrants.allowDelete,
-		]) {
-			operation.where(allowedTo.delete("document"))
-		}
+		policy.documentGrants.allowInsert.never()
+		policy.documentGrants.allowUpdate.never()
+		policy.documentGrants.allowDelete.never()
 
-		policy.documentGrants.allowUpdate.where(grant =>
-			allOf([
-				allowedTo.delete("document"),
-				policy.documentGrants.exists.where({
-					id: grant.id,
-					documentId: grant.documentId,
-					accountId: grant.accountId,
-					inviteId: grant.inviteId,
-				}),
-			]),
-		)
 		policy.folders.allowRead.where(owned)
 		policy.folders.allowInsert.where(owned)
 		policy.folders.allowUpdate.where(owned)

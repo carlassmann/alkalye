@@ -279,3 +279,130 @@ test("space deletion removes its documents and memberships atomically", async ()
 		await jazz.db.all(app.spaceMembers.where({ spaceId: space.id })),
 	).toHaveLength(0)
 })
+
+test.each(["remove-member", "member-role"])(
+	"%s invalidates the member's space and document invites",
+	async action => {
+		let space = await jazz.db
+			.insert(app.spaces, {
+				ownerId: alice,
+				name: "Team",
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			})
+			.wait({ tier: "global" })
+		let member = await jazz.db
+			.insert(app.spaceMembers, {
+				spaceId: space.id,
+				accountId: bob,
+				role: "admin",
+			})
+			.wait({ tier: "global" })
+		let doc = await document()
+		await jazz.db
+			.update(app.documents, doc.id, { spaceId: space.id })
+			.wait({ tier: "global" })
+		let invites = []
+		for (let target of [{ spaceId: space.id }, { documentId: doc.id }]) {
+			let result = await sharingOperation(
+				jazz,
+				bob,
+				"create-invite",
+				{ ...target, role: "admin" },
+				"https://app.test",
+			)
+			invites.push({
+				inviteId: result.id,
+				secret: result.link?.split("/").at(-1),
+			})
+		}
+		await sharingOperation(
+			jazz,
+			alice,
+			action,
+			{ spaceId: space.id, memberId: member.id, role: "writer" },
+			"",
+		)
+		for (let data of invites) {
+			await expect(
+				sharingOperation(jazz, bob, "redeem", data, ""),
+			).rejects.toThrow()
+			expect(
+				await jazz.db.one(app.invites.where({ id: data.inviteId })),
+			).toMatchObject({ revokedAt: expect.any(Date) })
+		}
+	},
+)
+test("redemption rechecks current grantor authority within the transaction", async () => {
+	let doc = await document()
+	let grant = await jazz.db
+		.insert(app.documentGrants, {
+			documentId: doc.id,
+			accountId: bob,
+			role: "admin",
+		})
+		.wait({ tier: "global" })
+	let result = await sharingOperation(
+		jazz,
+		bob,
+		"create-invite",
+		{ documentId: doc.id, role: "admin" },
+		"https://app.test",
+	)
+	await jazz.db
+		.update(app.documentGrants, grant.id, { role: "writer" })
+		.wait({ tier: "global" })
+	await expect(
+		sharingOperation(
+			jazz,
+			carol,
+			"redeem",
+			{ inviteId: result.id, secret: result.link?.split("/").at(-1) },
+			"",
+		),
+	).rejects.toThrow()
+})
+
+test.each(["remove-grant", "grant-role"])(
+	"%s permanently invalidates the grantor's outstanding document invites",
+	async action => {
+		let doc = await document()
+		let grant = await jazz.db
+			.insert(app.documentGrants, {
+				documentId: doc.id,
+				accountId: bob,
+				role: "admin",
+			})
+			.wait({ tier: "global" })
+		let result = await sharingOperation(
+			jazz,
+			bob,
+			"create-invite",
+			{ documentId: doc.id, role: "reader" },
+			"https://app.test",
+		)
+		await sharingOperation(
+			jazz,
+			alice,
+			action,
+			{ documentId: doc.id, memberId: grant.id, role: "writer" },
+			"",
+		)
+		await jazz.db
+			.insert(app.documentGrants, {
+				documentId: doc.id,
+				accountId: bob,
+				role: "admin",
+			})
+			.wait({ tier: "global" })
+		await expect(
+			sharingOperation(
+				jazz,
+				carol,
+				"redeem",
+				{ inviteId: result.id, secret: result.link?.split("/").at(-1) },
+				"",
+			),
+		).rejects.toThrow("revoked")
+	},
+)

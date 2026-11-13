@@ -1,8 +1,7 @@
-import { createHash, randomBytes } from "node:crypto"
 import { z } from "zod"
 import type { Db } from "jazz-tools/backend"
-import { app } from "@/jazz/schema"
 import { jazz } from "@/jazz/server"
+import { sharingOperation } from "@/jazz/sharing/operations"
 
 export {
 	invitationCommand,
@@ -14,52 +13,34 @@ export {
 }
 
 async function createInvite(
-	db: Db,
+	_db: Db,
 	accountId: string,
 	target: { documentId: string } | { spaceId: string },
 	role: "reader" | "writer" | "manager" | "admin",
 	baseUrl: string,
 ) {
-	await requireAdmin(db, target)
-	if ("documentId" in target && role === "manager")
-		throw new Error("Invalid document role")
-	let token = randomBytes(32).toString("base64url")
-	let invite = await jazz.db
-		.insert(app.invites, {
-			...target,
-			ownerId: accountId,
-			tokenHash: hashToken(token),
-			singleUse: true,
-			role,
-			expiresAt: new Date(Date.now() + 7 * 86400_000),
-		})
-		.wait({ tier: "global" })
-	let url = new URL("/app/invite", baseUrl)
-	url.hash = `/${"documentId" in target ? "doc/" + target.documentId : "space/" + target.spaceId}/invite/${invite.id}/${token}`
-	return { ...target, inviteGroupId: invite.id, role, link: url.href }
+	let result = await sharingOperation(
+		jazz,
+		accountId,
+		"create-invite",
+		{ ...target, role },
+		baseUrl,
+	)
+	return { ...target, inviteGroupId: result.id, role, link: result.link }
 }
 async function revokeInvite(
 	db: Db,
 	target: { documentId: string } | { spaceId: string },
 	inviteId: string,
 ) {
-	await requireAdmin(db, target)
-	let invite = await jazz.db.one(app.invites.where({ id: inviteId, ...target }))
-	if (!invite) throw new Error("Invite not found")
-	let write = await jazz.db.serializableTransaction(async tx => {
-		tx.update(app.invites, invite.id, { revokedAt: new Date() })
-
-		for (let grant of await tx.all(app.documentGrants)) {
-			if (grant.inviteId === invite.id || grant.id === invite.id)
-				tx.delete(app.documentGrants, grant.id)
-		}
-		for (let member of await tx.all(app.spaceMembers)) {
-			if (member.inviteId === invite.id || member.id === invite.id)
-				tx.delete(app.spaceMembers, member.id)
-		}
-	})
-	await write.wait()
-	return { ...target, inviteGroupId: invite.id, revoked: true }
+	await sharingOperation(
+		jazz,
+		userId(db),
+		"revoke",
+		{ ...target, inviteId },
+		"",
+	)
+	return { ...target, inviteGroupId: inviteId, revoked: true }
 }
 async function invitationCommand(
 	accountId: string,
@@ -70,147 +51,41 @@ async function invitationCommand(
 	let parts = url.hash.match(
 		/^#\/(?:doc|space)\/[^/]+\/invite\/([^/]+)\/([^/]+)$/,
 	)
-	let id = z.uuid().parse(parts?.[1] ?? url.searchParams.get("invite"))
-	let token = parts?.[2] ?? url.hash.slice(1)
-	let write = await jazz.db.serializableTransaction(async tx => {
-		let invite = await tx.one(app.invites.where({ id }))
-		if (
-			!invite ||
-			invite.revokedAt ||
-			invite.redeemedAt ||
-			(invite.expiresAt && invite.expiresAt.getTime() <= Date.now()) ||
-			hashToken(token) !== invite.tokenHash
-		)
-			throw new Error("Invite is unavailable")
-		let result = {
-			documentId: invite.documentId,
-			spaceId: invite.spaceId,
-			role: invite.role,
-		}
-		if (command === "invite.inspect") return result
-		// Revoking an owner's access invalidates their outstanding invitations too.
-		let grantor = await jazz.forUser(invite.ownerId)
-		await requireAdmin(
-			grantor,
-			invite.documentId
-				? { documentId: invite.documentId }
-				: { spaceId: z.uuid().parse(invite.spaceId) },
-		)
-		if (invite.documentId) {
-			let role = z.enum(["reader", "writer", "admin"]).parse(invite.role)
-			tx.insert(
-				app.documentGrants,
-				{ documentId: invite.documentId, accountId, role, inviteId: invite.id },
-				{ id: invite.id },
-			)
-			let entry = await tx.one(
-				app.userDocuments.where({
-					ownerId: accountId,
-					documentId: invite.documentId,
-				}),
-			)
-			if (!entry)
-				tx.insert(app.userDocuments, {
-					ownerId: accountId,
-					documentId: invite.documentId,
-					rank: Date.now(),
-				})
-		} else if (invite.spaceId) {
-			tx.insert(
-				app.spaceMembers,
-				{
-					spaceId: invite.spaceId,
-					accountId,
-					role: invite.role,
-					inviteId: invite.id,
-				},
-				{ id: invite.id },
-			)
-		}
-		tx.update(app.invites, id, { redeemedAt: new Date() })
-		return { ...result, accepted: true }
-	})
-	await write.wait()
-	return write.value
+	let inviteId = z.uuid().parse(parts?.[1] ?? url.searchParams.get("invite"))
+	let secret = parts?.[2] ?? url.hash.slice(1)
+	let result = await sharingOperation(
+		jazz,
+		accountId,
+		command === "invite.inspect" ? "inspect-invite" : "redeem",
+		{ inviteId, secret },
+		"",
+	)
+	return {
+		...result,
+		...(command === "invite.inspect" ? {} : { accepted: true }),
+	}
 }
 async function moveDocument(
-	db: Db,
+	_db: Db,
 	accountId: string,
 	documentId: string,
 	scope: string,
 ) {
-	let doc = await db.one(app.documents.where({ id: documentId }))
-	if (!doc) throw new Error("Document not found")
-	await requireAdmin(db, { documentId })
 	let spaceId =
 		scope === "personal" ? null : z.uuid().parse(scope.replace(/^space:/, ""))
-	if (spaceId) {
-		let space = await db.one(app.spaces.where({ id: spaceId }))
-		if (!space) throw new Error("Space not found")
-		let advice = await db.canInsert(app.documents, {
-			ownerId: accountId,
-			spaceId,
-			content: doc.content,
-			title: doc.title,
-			createdAt: doc.createdAt,
-			updatedAt: new Date(),
-		})
-		if (advice !== "allowed") throw new Error("You do not have write access")
-	}
-	let write = await jazz.db.transaction(async tx => {
-		tx.update(app.documents, doc.id, { spaceId, updatedAt: new Date() })
-		if (
-			!spaceId &&
-			!(await tx.one(
-				app.userDocuments.where({ documentId: doc.id, ownerId: accountId }),
-			))
-		)
-			tx.insert(app.userDocuments, {
-				documentId: doc.id,
-				ownerId: accountId,
-				rank: Date.now(),
-			})
-	})
-	await write.wait({ tier: "global" })
+	await sharingOperation(jazz, accountId, "move", { documentId, spaceId }, "")
 	return { documentId, spaceId }
 }
-async function leaveSpace(db: Db, accountId: string, spaceId: string) {
-	let space = await db.one(app.spaces.where({ id: spaceId }))
-	if (!space || space.ownerId === accountId)
-		throw new Error("Cannot leave this space")
-	let members = await db.all(app.spaceMembers.where({ spaceId, accountId }))
-	for (let member of members)
-		await jazz.db.delete(app.spaceMembers, member.id).wait({ tier: "global" })
+async function leaveSpace(_db: Db, accountId: string, spaceId: string) {
+	await sharingOperation(jazz, accountId, "leave", { spaceId }, "")
 	return { spaceId, left: true }
 }
-async function leaveDocument(db: Db, accountId: string, documentId: string) {
-	let doc = await db.one(app.documents.where({ id: documentId }))
-	if (!doc || doc.ownerId === accountId)
-		throw new Error("Cannot leave this document")
-	let write = await jazz.db.transaction(async tx => {
-		for (let grant of await tx.all(
-			app.documentGrants.where({ documentId, accountId }),
-		))
-			tx.delete(app.documentGrants, grant.id)
-		for (let entry of await tx.all(
-			app.userDocuments.where({ documentId, ownerId: accountId }),
-		))
-			tx.delete(app.userDocuments, entry.id)
-	})
-	await write.wait({ tier: "global" })
+async function leaveDocument(_db: Db, accountId: string, documentId: string) {
+	await sharingOperation(jazz, accountId, "leave", { documentId }, "")
 	return { documentId, left: true }
 }
-async function requireAdmin(
-	db: Db,
-	target: { documentId: string } | { spaceId: string },
-) {
-	let advice =
-		"documentId" in target
-			? await db.canDelete(app.documents, target.documentId)
-			: await db.canDelete(app.spaces, target.spaceId)
-	if (advice !== "allowed") throw new Error("You do not have admin access")
-}
-
-function hashToken(token: string) {
-	return createHash("sha256").update(token).digest("hex")
+function userId(db: Db) {
+	let user = db.getAuthState().session?.user
+	if (!user) throw new Error("Account required")
+	return user
 }

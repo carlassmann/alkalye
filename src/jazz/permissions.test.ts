@@ -417,3 +417,20 @@ test("documents created for a space owner stop being readable when membership en
 	await fixture.seed(db => db.delete(app.spaceMembers, membership.id))
 	expect(await bob.all(app.documents.where({ id: doc.id }))).toHaveLength(0)
 })
+
+test("membership administration requires backend operations even for admins", async () => {
+	let doc = await fixture.seed(db => db.insert(app.documents, note()))
+	let member = await fixture.seed(db =>
+		db.insert(app.documentGrants, {
+			documentId: doc.id,
+			accountId: bobId,
+			role: "admin",
+		}),
+	)
+	await actor(aliceId).expectDenied(db =>
+		db.update(app.documentGrants, member.id, { role: "reader" }),
+	)
+	await actor(aliceId).expectDenied(db =>
+		db.delete(app.documentGrants, member.id),
+	)
+})

@@ -35,15 +35,47 @@ async function sharingOperation(
 			if (doc.spaceId && (await spaceRole(doc.spaceId)) === "admin") return doc
 			throw new Error("Document admin required")
 		}
-		async function spaceRole(id: string) {
+		async function spaceRole(id: string, userId = accountId) {
 			let space = await tx.one(app.spaces.where({ id }))
 			if (!space) return null
-			if (space.ownerId === accountId) return "admin"
+			if (space.ownerId === userId) return "admin"
 			return (
-				(await tx.one(app.spaceMembers.where({ spaceId: id, accountId })))
-					?.role ?? null
+				(
+					await tx.one(
+						app.spaceMembers.where({ spaceId: id, accountId: userId }),
+					)
+				)?.role ?? null
 			)
 		}
+		async function documentRole(id: string, userId: string) {
+			let doc = await tx.one(app.documents.where({ id }))
+			if (!doc || doc.deletedAt) return null
+			if (doc.ownerId === userId) return "admin"
+			let grant = await tx.one(
+				app.documentGrants.where({ documentId: id, accountId: userId }),
+			)
+			let inherited = doc.spaceId ? await spaceRole(doc.spaceId, userId) : null
+			return rank(grant?.role) >= rank(inherited) ? grant?.role : inherited
+		}
+		async function invalidateInvites(
+			userId: string,
+			documentId: string | null,
+			spaceId: string | null,
+		) {
+			let documentIds = new Set(documentId ? [documentId] : [])
+			if (spaceId)
+				for (let doc of await tx.all(app.documents.where({ spaceId })))
+					documentIds.add(doc.id)
+			for (let invite of await tx.all(app.invites.where({ ownerId: userId }))) {
+				if (
+					!invite.revokedAt &&
+					((spaceId && invite.spaceId === spaceId) ||
+						(invite.documentId && documentIds.has(invite.documentId)))
+				)
+					tx.update(app.invites, invite.id, { revokedAt: new Date() })
+			}
+		}
+
 		async function requireAdmin(
 			documentId: string | null,
 			spaceId: string | null,
@@ -72,7 +104,7 @@ async function sharingOperation(
 				link: `${origin}/app/invite#/${data.documentId ? "doc/" + data.documentId : "space/" + data.spaceId}/invite/${invite.id}/${secret}`,
 			}
 		}
-		if (action === "redeem") {
+		if (action === "redeem" || action === "inspect-invite") {
 			let invite = data.inviteId
 				? await tx.one(app.invites.where({ id: data.inviteId }))
 				: null
@@ -84,6 +116,23 @@ async function sharingOperation(
 				(invite.expiresAt && invite.expiresAt.getTime() < Date.now())
 			)
 				throw new Error("Invite revoked or invalid")
+			let grantorRole = invite.documentId
+				? await documentRole(invite.documentId, invite.ownerId)
+				: invite.spaceId
+					? await spaceRole(invite.spaceId, invite.ownerId)
+					: null
+			if (!grantorRole || rank(grantorRole) < rank(invite.role))
+				throw new Error("Invite creator no longer authorized")
+			if (action === "inspect-invite") {
+				if (invite.singleUse && invite.redeemedAt)
+					throw new Error("Invite already used")
+				return {
+					documentId: invite.documentId,
+					spaceId: invite.spaceId,
+					role: invite.role,
+				}
+			}
+
 			if (invite.documentId) {
 				let doc = await tx.one(app.documents.where({ id: invite.documentId }))
 				if (!doc || doc.deletedAt) throw new Error("Document not found")
@@ -130,23 +179,36 @@ async function sharingOperation(
 			} else throw new Error("Invalid invite")
 			if (!invite.redeemedAt)
 				tx.update(app.invites, invite.id, { redeemedAt: new Date() })
-			return {}
+			return {
+				documentId: invite.documentId,
+				spaceId: invite.spaceId,
+				role: invite.role,
+			}
 		}
 		if (action === "revoke") {
 			let invite = data.inviteId
 				? await tx.one(app.invites.where({ id: data.inviteId }))
 				: null
-			if (!invite) throw new Error("Invite not found")
+			if (
+				!invite ||
+				(data.documentId && invite.documentId !== data.documentId) ||
+				(data.spaceId && invite.spaceId !== data.spaceId)
+			)
+				throw new Error("Invite not found")
 			await requireAdmin(invite.documentId, invite.spaceId)
 			tx.update(app.invites, invite.id, { revokedAt: new Date() })
 			for (let grant of await tx.all(
 				app.documentGrants.where({ inviteId: invite.id }),
-			))
+			)) {
+				await invalidateInvites(grant.accountId, grant.documentId, null)
 				tx.delete(app.documentGrants, grant.id)
+			}
 			for (let member of await tx.all(
 				app.spaceMembers.where({ inviteId: invite.id }),
-			))
+			)) {
+				await invalidateInvites(member.accountId, null, member.spaceId)
 				tx.delete(app.spaceMembers, member.id)
+			}
 			return {}
 		}
 		if (
@@ -165,11 +227,41 @@ async function sharingOperation(
 				(member.role === "admin" || data.role === "admin")
 			)
 				throw new Error("Admin role required")
+			if (
+				action === "remove-member" ||
+				(data.role && rank(data.role) < rank(member.role))
+			)
+				await invalidateInvites(member.accountId, null, member.spaceId)
 			if (action === "remove-member") tx.delete(app.spaceMembers, member.id)
 			else if (data.role)
 				tx.update(app.spaceMembers, member.id, { role: data.role })
 			return {}
 		}
+		if (
+			(action === "grant-role" || action === "remove-grant") &&
+			data.documentId &&
+			data.memberId
+		) {
+			await documentAdmin(data.documentId)
+			let grant = await tx.one(
+				app.documentGrants.where({
+					id: data.memberId,
+					documentId: data.documentId,
+				}),
+			)
+			if (!grant) throw new Error("Collaborator not found")
+			if (
+				action === "remove-grant" ||
+				(data.role && rank(data.role) < rank(grant.role))
+			)
+				await invalidateInvites(grant.accountId, grant.documentId, null)
+			if (action === "remove-grant") tx.delete(app.documentGrants, grant.id)
+			else if (data.role && data.role !== "manager")
+				tx.update(app.documentGrants, grant.id, { role: data.role })
+			else throw new Error("Invalid document role")
+			return {}
+		}
+
 		if (action === "delete-space" && data.spaceId) {
 			if ((await spaceRole(data.spaceId)) !== "admin")
 				throw new Error("Space admin required")
@@ -202,6 +294,11 @@ async function sharingOperation(
 			return {}
 		}
 		if (action === "leave") {
+			await invalidateInvites(
+				accountId,
+				data.documentId ?? null,
+				data.spaceId ?? null,
+			)
 			if (data.documentId) {
 				for (let grant of await tx.all(
 					app.documentGrants.where({ documentId: data.documentId, accountId }),
@@ -273,4 +370,16 @@ async function sharingOperation(
 }
 function hash(secret: string) {
 	return createHash("sha256").update(secret).digest("hex")
+}
+
+function rank(role: string | null | undefined) {
+	return role === "admin"
+		? 4
+		: role === "manager"
+			? 3
+			: role === "writer"
+				? 2
+				: role === "reader"
+					? 1
+					: 0
 }
