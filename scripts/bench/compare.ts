@@ -62,6 +62,7 @@ let result = {
 		cores: cpus().length,
 		browser: browser.version(),
 		cpuThrottle: cpu,
+		serverRuntime: process.env.BENCH_SERVER_NOTE ?? "unspecified",
 		jazz: JSON.parse(await readFile("package.json", "utf8")).dependencies[
 			"jazz-tools"
 		],

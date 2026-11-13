@@ -7,7 +7,10 @@ Raw samples and environment are recorded in `bench/results/classic.json`.
 
 Run `bun run bench:compare -- --target <url> --label classic --out bench/results/classic.json`.
 Use the same Chromium version, machine, CPU throttle, dataset pins, edit count and
-server mode for v2. The default uses three independent accounts and browser contexts.
+server mode for v2. Classic uses jazz-run 0.20.19, Node 24.22.1, with
+`NODE_OPTIONS=--max-old-space-size=16384`. Failed exploratory runs exhausted the
+default 4 GB server heap; the service log and SIGABRT core confirm V8 heap exhaustion.
+Those failed runs are excluded. The default uses three independent accounts and browser contexts.
 Services run through `work setup --tailscale` then `work up --tailscale`.
 
 Accounts also retain the app's welcome document; the 52 imported bodies are verified.

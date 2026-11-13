@@ -104,13 +104,15 @@ Fetch checksum-pinned datasets, start this checkout's services, then run headles
 ```sh
 bun run bench:fetch
 work setup --tailscale
-work up --tailscale
+NODE_OPTIONS=--max-old-space-size=16384 work up --tailscale
 work urls
 bun run bench:compare -- --target <web-url> --label classic --out bench/results/classic.json
 ```
 
 For v2, run the same command against its services with `--label v2 --out bench/results/v2.json`.
-Keep the machine, server build mode and options identical. Defaults: three independent
+Keep the machine, server build mode and options identical. Classic's sync server
+exhausted its default 4 GB heap during repeated imports; use the 16 GB limit above.
+Set `BENCH_SERVER_NOTE` to record the server version and heap limit in results. Defaults: three independent
 accounts, 50 Vite Markdown documents, two Gutenberg books, 200 Automerge trace edits
 per document. Use `--cpu 4` for CPU throttling, `--edits full` for all 259,778 edits,
 or `--notes 20 --edits 50` for a shorter smoke run. Full replay uses UI cursor moves
