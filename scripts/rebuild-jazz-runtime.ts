@@ -25,12 +25,15 @@ if (run("git", ["rev-parse", "HEAD"], source).trim() !== revision)
 	throw new Error(`Expected Jazz ${revision}`)
 let patch = await readFile(join(root, "patches/jazz-engine-alpha.61.patch"))
 let fingerprint = createHash("sha256").update(patch).digest("hex")
-run(
-	"git",
-	["apply", "--check", join(root, "patches/jazz-engine-alpha.61.patch")],
-	source,
-)
-run("git", ["apply", join(root, "patches/jazz-engine-alpha.61.patch")], source)
+for (let name of [
+	"jazz-engine-alpha.61.patch",
+	"jazz-query-snapshots-alpha.61.patch",
+	"jazz-text-bridge-alpha.61.patch",
+]) {
+	let path = join(root, "patches", name)
+	run("git", ["apply", "--check", path], source)
+	run("git", ["apply", path], source)
+}
 run(
 	"cargo",
 	[
@@ -52,7 +55,10 @@ await mkdir(pkg, { recursive: true })
 run(
 	process.env.WASM_BINDGEN ?? "wasm-bindgen",
 	[
-		join(source, "target/wasm32-unknown-unknown/release/jazz_wasm.wasm"),
+		join(
+			resolve(source, process.env.CARGO_TARGET_DIR ?? "target"),
+			"wasm32-unknown-unknown/release/jazz_wasm.wasm",
+		),
 		"--target",
 		"web",
 		"--out-dir",

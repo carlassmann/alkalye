@@ -49,9 +49,10 @@ index ecbef2226b7941d6e12934bd8e59fa27706c9b6c..8c50b9b225a979c2c8f8936886c833b5
          withAttribution: async (request) => (await use()).withAttribution(request),
          accountFor: async (request) => (await use()).accountFor(request),
 diff --git a/dist/subscriptions-orchestrator.js b/dist/subscriptions-orchestrator.js
+index 8febd3879063b6ab976187cd67d734b5615cdfee..5ad5c8497aac3d549de098510f410564d1b3534a 100644
 --- a/dist/subscriptions-orchestrator.js
 +++ b/dist/subscriptions-orchestrator.js
-@@ -293,6 +293,8 @@
+@@ -293,6 +293,8 @@ export class SubscriptionsOrchestrator {
                      const wasPending = entry.state.status === "pending";
                      const data = entry.state.status === "fulfilled" ? [...entry.state.data] : [];
                      applySubscriptionDelta(data, delta);
@@ -60,7 +61,7 @@ diff --git a/dist/subscriptions-orchestrator.js b/dist/subscriptions-orchestrato
                      entry.state = {
                          status: "fulfilled",
                          data,
-@@ -426,4 +428,21 @@
+@@ -426,4 +428,21 @@ function encodeBranchSelector(selector) {
              .map((name) => [name, encodeBranchSelector(qualified[name])]),
      ];
  }
@@ -84,3 +85,29 @@ diff --git a/dist/subscriptions-orchestrator.js b/dist/subscriptions-orchestrato
 +    Object.hasOwn(right, key) && queryValuesEqual(Reflect.get(left, key), Reflect.get(right, key))
 +  );
 +}
+diff --git a/dist/runtime/db.js b/dist/runtime/db.js
+index 3c8abb8b1c55d710cf0d71e35ae75f1fb127794e..43dd2b92745cebc350c2a8682bcbb07daeda38a6 100644
+--- a/dist/runtime/db.js
++++ b/dist/runtime/db.js
+@@ -396,7 +396,7 @@ function lowerUpdate(table, data, options) {
+         }
+         delete replacements[column];
+         edited.push(column);
+-        descriptors.push({ kind: "text_edit", column, text, edited_from: from });
++        descriptors.push({ kind: "text_edit", column, text, edited_from: from, text_splice: options?.editedSplices?.[column] });
+     }
+     rejectIncompleteDependencies(table, replacements, [
+         ...Object.keys(options?.applyDiffs ?? {}),
+diff --git a/dist/runtime/db.d.ts b/dist/runtime/db.d.ts
+index fd2dd31ef84266d82ddb9bbda5a55fd6dfd71197..c38adffdfeacb508b79e8bcdcf5f7b4278f074e7 100644
+--- a/dist/runtime/db.d.ts
++++ b/dist/runtime/db.d.ts
+@@ -225,6 +225,8 @@ export type UpdateEditOptions<TReplacements extends object> = UpdateOptions & {
+     editedFrom?: {
+         readonly [TColumn in keyof TReplacements]?: string;
+     };
++    /** Optional UTF-16 replacement against editedFrom; verified before using it. */
++    editedSplices?: { readonly [TColumn in keyof TReplacements]?: { from: number; to: number; insert: string } };
+ };
+ type TypedUpdateOptionsWithDiffs<TReplacements extends object, TDiffs> = UpdateEditOptions<TReplacements> & {
+     applyDiffs?: TDiffs & {

@@ -1,3 +1,172 @@
+diff --git i/crates/jazz-wasm/src/lib.rs w/crates/jazz-wasm/src/lib.rs
+index 5c43d6824..01853bdca 100644
+--- i/crates/jazz-wasm/src/lib.rs
++++ w/crates/jazz-wasm/src/lib.rs
+@@ -2080,12 +2080,105 @@ fn wasm_read_or_pending(future: WasmReadFuture) -> Result<JsValue, JsValue> {
+     }
+ }
+ 
+-fn large_value_updates(mutations: JsValue) -> Result<Vec<LargeValueUpdate>, JsValue> {
+-    serde_wasm_bindgen::from_value(mutations).map_err(|error| {
+-        JsValue::from_str(&format!("invalid partial-value update descriptor: {error}"))
++#[derive(serde::Deserialize)]
++struct TextEditSplice {
++    from: u32,
++    to: u32,
++    insert: String,
++}
++
++fn text_edit_from_splice(mutation: &JsValue) -> Option<LargeValueUpdate> {
++    let get = |key: &str| js_sys::Reflect::get(mutation, &JsValue::from_str(key)).ok();
++    if get("kind")?.as_string()?.as_str() != "text_edit" {
++        return None;
++    }
++    let splice: TextEditSplice = serde_wasm_bindgen::from_value(get("text_splice")?).ok()?;
++    let source = get("edited_from")?.dyn_into::<js_sys::JsString>().ok()?;
++    let replacement = get("text")?.dyn_into::<js_sys::JsString>().ok()?;
++    let length = source.length();
++    if splice.from > splice.to || splice.to > length {
++        return None;
++    }
++    let inserted = u32::try_from(splice.insert.encode_utf16().count()).ok()?;
++    let new_end = splice.from.checked_add(inserted)?;
++    if splits_js_surrogate(&replacement, splice.from) || splits_js_surrogate(&replacement, new_end)
++    {
++        return None;
++    }
++    // Validate the advisory delta in JS, avoiding another whole-value UTF-8 copy.
++    let expected = source
++        .slice(0, splice.from)
++        .concat(&JsValue::from_str(&splice.insert))
++        .concat(source.slice(splice.to, length).as_ref());
++    if !js_sys::Object::is(expected.as_ref(), replacement.as_ref()) {
++        return None;
++    }
++    let edited_from = source.as_string()?;
++    let from = text_byte_offset(&edited_from, splice.from, length)?;
++    let to = text_byte_offset(&edited_from, splice.to, length)?;
++    let mut text = edited_from.clone();
++    text.replace_range(from..to, &splice.insert);
++    Some(LargeValueUpdate::TextEdit {
++        column: get("column")?.as_string()?,
++        text,
++        edited_from,
+     })
+ }
+ 
++fn splits_js_surrogate(text: &js_sys::JsString, position: u32) -> bool {
++    if position == 0 || position >= text.length() {
++        return false;
++    }
++    (0xd800 as f64..=0xdbff as f64).contains(&text.char_code_at(position - 1))
++        && (0xdc00 as f64..=0xdfff as f64).contains(&text.char_code_at(position))
++}
++
++fn text_byte_offset(text: &str, position: u32, length: u32) -> Option<usize> {
++    if position > length {
++        return None;
++    }
++    if position <= length / 2 {
++        let mut remaining = position;
++        for (offset, character) in text.char_indices() {
++            if remaining == 0 {
++                return Some(offset);
++            }
++            remaining = remaining.checked_sub(character.len_utf16() as u32)?;
++        }
++        (remaining == 0).then_some(text.len())
++    } else {
++        let mut remaining = length - position;
++        let mut offset = text.len();
++        for character in text.chars().rev() {
++            if remaining == 0 {
++                return Some(offset);
++            }
++            remaining = remaining.checked_sub(character.len_utf16() as u32)?;
++            offset -= character.len_utf8();
++        }
++        (remaining == 0).then_some(offset)
++    }
++}
++
++fn large_value_updates(mutations: JsValue) -> Result<Vec<LargeValueUpdate>, JsValue> {
++    if !js_sys::Array::is_array(&mutations) {
++        return Err(JsValue::from_str(
++            "invalid partial-value update descriptor: expected an array",
++        ));
++    }
++    js_sys::Array::from(&mutations)
++        .iter()
++        .map(|mutation| {
++            if let Some(update) = text_edit_from_splice(&mutation) {
++                return Ok(update);
++            }
++            serde_wasm_bindgen::from_value(mutation).map_err(|error| {
++                JsValue::from_str(&format!("invalid partial-value update descriptor: {error}"))
++            })
++        })
++        .collect()
++}
++
+ fn present(value: Option<JsValue>) -> Option<JsValue> {
+     value.filter(|value| !value.is_null() && !value.is_undefined())
+ }
+@@ -2304,6 +2397,55 @@ fn bytes_to_js(bytes: Vec<u8>) -> Result<JsValue, JsValue> {
+ 
+ #[cfg(test)]
+ mod tests {
++
++    /// Alice's bridge offsets must preserve scalar boundaries in either direction.
++    /// This unit test checks invalid UTF-16 boundaries the public SDK does not emit.
++    #[test]
++    fn text_edit_splice_offsets_match_utf16_boundaries_in_both_directions() {
++        let text = "a😀é👩🏽‍💻z".repeat(4);
++        let length = text.encode_utf16().count() as u32;
++        for position in 0..=length {
++            let expected = text
++                .char_indices()
++                .map(|(offset, _)| offset)
++                .chain(std::iter::once(text.len()))
++                .find(|offset| text[..*offset].encode_utf16().count() == position as usize);
++            assert_eq!(super::text_byte_offset(&text, position, length), expected);
++        }
++    }
++
++    /// Alice's advisory hint must reconstruct her exact replacement or fall back.
++    /// The boundary test injects malformed hints unavailable through the public SDK.
++    #[cfg(target_arch = "wasm32")]
++    #[wasm_bindgen_test::wasm_bindgen_test]
++    fn text_edit_splice_validates_hints_and_keeps_the_original_base() {
++        for (from, text, start, end, insert) in [
++            ("a😀z", "a😁z", 1, 3, "😁"),
++            ("a😀z", "xa😀z", 0, 0, "x"),
++            ("a😀z", "a😀zx", 4, 4, "x"),
++            ("a😀z", "correct replacement", 0, 0, "invalid hint"),
++            ("a😀z", "correct replacement", 2, 3, "split surrogate"),
++        ] {
++            let descriptor = serde_json::json!([{
++                "kind": "text_edit", "column": "content", "text": text,
++                "edited_from": from,
++                "text_splice": { "from": start, "to": end, "insert": insert }
++            }]);
++            let decoded =
++                super::large_value_updates(serde_wasm_bindgen::to_value(&descriptor).unwrap())
++                    .unwrap();
++            let super::LargeValueUpdate::TextEdit {
++                text: actual,
++                edited_from,
++                ..
++            } = &decoded[0]
++            else {
++                panic!("expected text edit")
++            };
++            assert_eq!(actual, text);
++            assert_eq!(edited_from, from);
++        }
++    }
+     /// Every ordinary write option shares `write_timestamp_option`, so this
+     /// boundary test protects insert, update, upsert, delete, and restore from
+     /// JavaScript's lossy number-to-u64 coercions.
 diff --git i/crates/jazz/layers/db/src/large.rs w/crates/jazz/layers/db/src/large.rs
 index 98bf0d882..12000c1b8 100644
 --- i/crates/jazz/layers/db/src/large.rs
@@ -54,7 +223,7 @@ index 98bf0d882..12000c1b8 100644
  }
  
 diff --git i/crates/jazz/layers/types/src/large_values/mod.rs w/crates/jazz/layers/types/src/large_values/mod.rs
-index b02c0e7a3..71115eb2b 100644
+index b02c0e7a3..8b64b722a 100644
 --- i/crates/jazz/layers/types/src/large_values/mod.rs
 +++ w/crates/jazz/layers/types/src/large_values/mod.rs
 @@ -3925,6 +3925,66 @@ pub fn full_materializations_for_test() -> u64 {
@@ -124,10 +293,12 @@ index b02c0e7a3..71115eb2b 100644
  fn apply_edits(bytes: &mut Vec<u8>, edits: &[ReplaceEdit]) -> Result<(), Error> {
      for edit in edits {
          let start = usize::try_from(edit.offset).map_err(|_| Error::MetricOverflow)?;
-@@ -5082,6 +5142,96 @@ pub fn shared_child_dag_fixture() -> PreparedLargeValue {
+@@ -5082,6 +5142,100 @@ pub fn shared_child_dag_fixture() -> PreparedLargeValue {
  mod tests {
      use super::*;
  
++    /// Alice's cached base must never authorize Bob's divergent or forged descriptor.
++    /// This unit test injects descriptors that public write APIs cannot construct.
 +    #[test]
 +    fn materialization_cache_requires_same_base_and_append_only_tail() {
 +        let prepared = prepare(LargeValueKind::String, b"hello").unwrap();
@@ -168,6 +339,8 @@ index b02c0e7a3..71115eb2b 100644
 +        );
 +    }
 +
++    /// Alice's cache must retain exact astral metrics and fall back at split boundaries.
++    /// Direct descriptor construction isolates cache validation from public text encoding.
 +    #[test]
 +    fn materialization_cache_counts_astral_text_and_falls_back_at_split_boundaries() {
 +        let base = prepare(LargeValueKind::String, b"hello").unwrap().value_ref;

@@ -12,8 +12,17 @@ The source change is `patches/jazz-engine-alpha.61.patch`. It caches one validat
 logical scalar per database, keyed by the complete immutable descriptor. A tail
 extension reuses the validated prefix and updates UTF-16 metrics from the edited
 fragments. Exact descriptor hits only copy their validated bytes. A different root, kind, format, hash or
-divergent tail takes the original authenticated materialization path. The patch
-does not change the wire format, text merge algorithm or write API.
+divergent tail takes the original authenticated materialization path. The patch preserves the stored/sync format and text merge algorithm.
+
+The Wasm bridge accepts an advisory `text_splice` alongside the full replacement
+and `edited_from`. It checks the replacement against the original JS strings and
+reconstructs its Rust string from one decoded base. Invalid hints, including
+surrogate splits, use the original full-string decoder. It still creates a
+normal `LargeValueUpdate::TextEdit`; stale-base handling stays in the core.
+`patches/jazz-text-bridge-alpha.61.patch` adds the optional `editedSplices` SDK
+option. The existing Bun patch carries its compiled JS and declarations.
+`patches/jazz-query-snapshots-alpha.61.patch` preserves unchanged query snapshots
+and notification counts. Both source patches are applied by the rebuild script.
 
 To rebuild, use Linux, GNU tar, Clang and a clean checkout of that exact commit:
 
@@ -31,10 +40,13 @@ the original native-server ABI fingerprint and replaces only the browser one.
 Paths in Rust symbols and esbuild comments may differ across rebuild directories;
 the committed archive pins the deployment artifact.
 
-Run the engine checks in the patched checkout:
+`CARGO_TARGET_DIR` is honored when reusing an existing Cargo build cache.
+Run the engine checks in the patched checkout (the runner ships with the pinned
+wasm-bindgen CLI):
 
 ```sh
-cargo +1.93.1 test --locked -p jazz-types -p jazz-db
+cargo +1.93.1 test --locked -p jazz-types -p jazz-db -p jazz-wasm
+CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUNNER=wasm-bindgen-test-runner cargo +1.93.1 test --locked --target wasm32-unknown-unknown -p jazz-wasm text_edit_splice_validates
 ```
 
 written with gpt-6.1-sol in T3 Code (Codex)

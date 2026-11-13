@@ -1,0 +1,40 @@
+diff --git i/packages/jazz-tools/src/runtime/db.ts w/packages/jazz-tools/src/runtime/db.ts
+index 3148406e8..bb61479a9 100644
+--- i/packages/jazz-tools/src/runtime/db.ts
++++ w/packages/jazz-tools/src/runtime/db.ts
+@@ -477,6 +477,10 @@ export type UpdateEditOptions<TReplacements extends object> = UpdateOptions & {
+    * left `undefined` here is written as usual.
+    */
+   editedFrom?: { readonly [TColumn in keyof TReplacements]?: string };
++  /** Optional UTF-16 replacement against editedFrom; verified before using it. */
++  editedSplices?: {
++    readonly [TColumn in keyof TReplacements]?: { from: number; to: number; insert: string };
++  };
+ };
+ 
+ type TypedUpdateOptionsWithDiffs<
+@@ -490,6 +494,7 @@ type TypedUpdateOptionsWithDiffs<
+ type LoweredUpdateOptions = UpdateOptions & {
+   applyDiffs?: object;
+   editedFrom?: { readonly [column: string]: string | undefined };
++  editedSplices?: { readonly [column: string]: { from: number; to: number; insert: string } | undefined };
+ };
+ 
+ export interface DeleteOptions extends TimestampOverrideOptions {
+@@ -822,6 +827,7 @@ type WireLargeValueUpdate =
+       column: string;
+       text: string;
+       edited_from: string;
++      text_splice?: { from: number; to: number; insert: string };
+     };
+ 
+ function isPartialLargeValueUpdate(value: unknown): value is Record<string, unknown> {
+@@ -885,7 +891,7 @@ function lowerUpdate(
+     }
+     delete replacements[column];
+     edited.push(column);
+-    descriptors.push({ kind: "text_edit", column, text, edited_from: from });
++    descriptors.push({ kind: "text_edit", column, text, edited_from: from, text_splice: options?.editedSplices?.[column] });
+   }
+   rejectIncompleteDependencies(table, replacements, [
+     ...Object.keys(options?.applyDiffs ?? {}),
