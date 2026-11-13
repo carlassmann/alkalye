@@ -19,6 +19,7 @@ import {
 	seed,
 	resolveDocument,
 	readContent,
+	openDocument,
 	editor,
 } from "./adapter"
 import { installObservers, instrument, summary } from "./metrics"
@@ -160,9 +161,10 @@ try {
 				await instrument(other, cpu)
 				start = performance.now()
 				await signIn(other, { passphrase: account.passphrase })
+				await waitForEditorBoot(other)
 				for (let doc of seeded) {
 					console.error(`Verifying ${doc.title}`)
-					await waitForEditorBoot(other, { path: `/app/doc/${doc.id}` })
+					await openDocument(other, doc)
 					await expect
 						.poll(() => readContent(other), { timeout: 120_000 })
 						.toBe(doc.content)
@@ -170,11 +172,11 @@ try {
 				add("freshDeviceWholeDatasetMs", performance.now() - start)
 				let syncDoc = seeded[0]
 				if (!syncDoc) throw new Error("Small sync note missing")
-				await waitForEditorBoot(other, { path: `/app/doc/${syncDoc.id}` })
+				await openDocument(other, syncDoc)
 				await editor(other).click()
 				await other.keyboard.press("ControlOrMeta+End")
 				await page.bringToFront()
-				await waitForEditorBoot(page, { path: `/app/doc/${syncDoc.id}` })
+				await openDocument(page, syncDoc)
 				for (let n = 0; n < 5; n++) {
 					console.error(`Sync marker ${n + 1}/5`)
 					let marker = ` sync-${run}-${n}`
@@ -198,7 +200,7 @@ try {
 				if (!doc) throw new Error("Small note missing")
 				let name = doc === large ? "large" : doc === medium ? "medium" : "small"
 				console.error(`Replay ${editCount} trace edits on ${name}`)
-				await waitForEditorBoot(page, { path: `/app/doc/${doc.id}` })
+				await openDocument(page, doc)
 				await editor(page).click()
 				await page.keyboard.press("ControlOrMeta+A")
 				await page.keyboard.insertText(doc.content)

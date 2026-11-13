@@ -13,6 +13,7 @@ export {
 	seed,
 	resolveDocument,
 	readContent,
+	openDocument,
 	editor,
 }
 
@@ -84,4 +85,17 @@ async function readContent(page: Page) {
 	await page.keyboard.press("ControlOrMeta+A")
 	await page.keyboard.press("ControlOrMeta+C")
 	return page.evaluate(() => navigator.clipboard.readText())
+}
+
+async function openDocument(page: Page, target: { id: string; title: string }) {
+	await resolveDocument(page, target.title)
+	await page.locator(`[data-doc-id="${target.id}"] a`).first().click()
+	await page.waitForFunction(
+		id =>
+			location.pathname.endsWith(`/doc/${id}`) &&
+			document.body.dataset.alkalyeReady === "true",
+		target.id,
+	)
+	await expect(page).toHaveTitle(target.title)
+	await editor(page).waitFor({ state: "visible" })
 }

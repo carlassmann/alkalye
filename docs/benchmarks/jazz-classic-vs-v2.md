@@ -10,7 +10,9 @@ Use the same Chromium version, machine, CPU throttle, dataset pins, edit count a
 server mode for v2. Classic uses jazz-run 0.20.19, Node 24.22.1, with
 `NODE_OPTIONS=--max-old-space-size=16384`. Failed exploratory runs exhausted the
 default 4 GB server heap; the service log and SIGABRT core confirm V8 heap exhaustion.
-Those failed runs are excluded. The default uses three independent accounts and browser contexts.
+An initial harness also reloaded the app per document and exhausted 16 GB.
+The final harness uses sidebar links to navigate within one Jazz connection, matching
+normal use and the existing responsiveness benchmark. Failed runs are excluded. The default uses three independent accounts and browser contexts.
 Services run through `work setup --tailscale` then `work up --tailscale`.
 
 Accounts also retain the app's welcome document; the 52 imported bodies are verified.
@@ -36,7 +38,7 @@ plus one second; development module loading makes this different from production
 
 Fresh-device time includes recovery-phrase sign-in and opening every imported doc,
 copying its complete editor text and checking exact equality. It includes sequential
-UI navigation overhead. This proves all bodies arrived, rather than equating a
+sidebar search, link navigation and clipboard verification overhead. This proves all bodies arrived, rather than equating a
 populated sidebar with complete account hydration. Sync latency starts before an
 editor insertion and ends when a second isolated client's editor contains the
 marker in its visible editor DOM, polled every 20 ms. The receiver is scrolled
