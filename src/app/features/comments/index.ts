@@ -1,2 +1,11 @@
-// v2-todo(comments): reconnect this feature to src/jazz/schema.ts. Classic implementation remains in git history.
-export {}
+export * from "./lib/comments"
+export {
+	SidebarComments,
+	CommentsPanel,
+	CommentThreadCard,
+} from "./widgets/sidebar-comments"
+export {
+	commentsExtension,
+	setCommentDecorationsEffect,
+	scrollEditorCommentIntoView,
+} from "./lib/editor-extension"

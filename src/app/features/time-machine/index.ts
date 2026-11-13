@@ -1,2 +1,6 @@
-// v2-todo(time-machine): reconnect this feature to src/jazz/schema.ts. Classic implementation remains in git history.
-export {}
+export { TimeMachineScreen } from "./screens/time-machine-screen"
+export type { ViewMode } from "./screens/time-machine-screen"
+export {
+	TimeMachineBottomBar,
+	TimeMachineToolbar,
+} from "./widgets/time-machine-bars"

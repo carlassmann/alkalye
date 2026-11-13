@@ -206,5 +206,47 @@ Started with `work setup --tailscale`, then `work up --tailscale`; stopped the s
 - Background browser verification created an account with 24 recovery words, approved the original consent UI and received an authorization code. With the MCP-created document open, an HTTP tool update appeared live in CodeMirror. Disconnecting through Settings removed the rows; the same MCP token then returned HTTP 401. The browser's recovery phrase also restored its document library in the CLI.
 - `bun run qa:mcp <origin>` passes discovery, PKCE metadata, cross-origin token errors, unauthenticated challenge and legal pages. OpenAI domain challenge was skipped because no challenge token was configured. Restoring the original endpoint exposed its missing GET handler; added GET so discovery receives the expected 401 challenge.
 - CLI signup, document creation/listing, phrase login, unauthenticated local Markdown-to-HTML export and Chrome PDF export passed against the running worktree. Browser tab closed after validation. No push, PR or cloud deployment.
+||||||| 937934c
+## Phase 2: comments, time machine, presentation
+
+- 2026-11-13, phase 2 presentation: restored Classic slideshow, teleprompter, laser preview/trails and sidebar links from `8379d4e`; ported transport to v2 latest-history rows, without hub/sender rotation. Commit: `7e00fd7`.
+- 2026-11-13, phase 2 comments: restored Classic sidebar, selection dialog, preview highlighting, replies and thread actions. Anchors use `db.textAnchors().captureRange/resolveRange`; quote/context recovery rejects ambiguous matches and shows deleted text as orphaned. Commit: `d896715`.
+- 2026-11-13, phase 2 time machine: restored Classic route, screen and bars; accepted v2 history merges chronologically with `documentVersions`. Restore writes ordinary document content. Historical copies retain comments, asset bytes and cloned whiteboard revisions. Commit: `74976f9`.
+- 2026-11-13, phase 2 access review: inherited space ownership/membership now enables preview comments, slideshow controls, teleprompter and time machine. Browser profile B opened a space-only writer document without a document grant. Commit: `e3fb4d8`.
+
+### Data contract and integration
+
+No schema changes or migration lenses. The worktree started without a `.jazz` store. Permissions changed: laser readers inherit document access; publishers still own their rows and cannot change their document/sender identity. Comment threads cannot be moved to another document by updating their foreign key. Existing permission tests now expect document readers to see laser messages.
+
+The new `useDocumentAccess` hook covers document grants and inherited space roles for preview, slideshow, teleprompter and time machine. The editor/library and shared-space routing still belong to the sharing/spaces area. Shared files changed here are the documents barrel, two document screens, three feature routes, the themes barrel export for existing slideshow CSS, and the permission rules/tests. `useDocumentAssets` and `assetViews` convert v2 asset rows to the existing editor asset view model; the assets agent can reuse them.
+
+`useComments(doc)` supplies the sidebar/highlight view model. Non-React import/export callers use `await loadCommentDocument(db, documentRow)` before `getExportComments` or `getExportCommentsForContent`. `ExportComment` retains the Classic JSON format. `await restoreExportedComments(commentDocument, exported, sourceContent?)` restores it with new v2 thread/reply IDs. Export includes existing comments when comments are disabled.
+
+Time machine subscribes to `app.$history.documents`, explicitly selecting author metadata, acceptance time and transaction ID. It removes adjacent versions with unchanged text, so laser/presentation/sharing changes do not fill the text timeline. Imported versions use their original dates and author names. Attribution uses `$updatedBy.account`; a local-first device's `identity.subject` differs from the owning account.
+
+V2 historical asset preview/restore recovers bytes, metadata and whiteboard revision references. Copy creates new asset IDs and independent whiteboard revision rows. Imported Classic asset history is not available in this schema yet: restoring an imported text version preserves current assets, while copies/previews cannot reconstruct pre-import assets. Asset deletion-only events are absent from v2 content history; current deletion metadata handles a single deletion, but repeated delete/restore intervals cannot be reconstructed exactly.
+
+### Browser evidence
+
+Work setup/start both used `--tailscale`; the stale Classic sync service was stopped. Runtime: https://web-t3-comments-timemachine-presentation-alkalye.cshed.carlassmann.com
+
+Background agent-browser profiles `phase2-a` and `phase2-b` used different device accounts. A granted B document write access with the ordinary v2 database API because the sharing UI is another phase-2 area.
+
+- A created a comment through the editor selection shortcut/dialog. B received its highlighted quote in preview. Inserting text before the quote preserved both highlights. B replied; resolve/reopen changed the count and editor decoration. Disabling/re-enabling comments synchronized. Deleting the selected words displayed "Original text deleted"; restoring the words recovered the anchor.
+- B wrote document text through its v2 database. Time machine displayed B's version as "Profile B" and A's earlier version as "you". The restore confirmation returned to the editor and B's preview received the older content. The restored version remained in history as a normal new write.
+- A's teleprompter controlled B's slideshow. Starting, selecting the second slide and presentation-line updates synchronized. A drew a laser trail on the preview; B displayed the red trail. A screenshot captured it before fading.
+- Classic `8379d4e` and v2 screenshot pairs for comments/editor, comments/preview, time machine, teleprompter and slideshow are under `/tmp/alkalye-v2-phase2/comments-time-machine-presentation/`. Extra v2 screenshots show resolved/orphaned comments and the viewer's laser trail. These are layout evidence, not pixel-diff assertions.
+
+### Final validation
+
+At code head `e3fb4d8`, `bun run check:types` passes with zero errors; `check:lint` passes with zero errors and 93 style warnings; `check:test` passes all 60 files / 662 tests. Changed files pass Prettier. All five existing auth/document e2e cases pass in one final stable-server run, 2.9 minutes, with their assertions unchanged. The checks include real policy-server tests for comments/export/restore, author attribution, imported chronology, historical asset restore/copy, and cross-author laser transport, plus the restored laser widget/protocol tests.
+
+- 2026-11-13, phase 2 validation: two-profile browser checks, Classic/v2 screenshots, inherited space-writer access, 662 tests and five unchanged-assertion e2e cases pass. No push or PR. Commit: phase-2 validation handoff.
+
+### Alpha.61 findings
+
+Empty mergeable transactions throw `empty mergeable transaction has no committed unit; roll it back instead`. Asset restore and comment import skip transactions when there is nothing to write. Regression tests cover text-only restore and copies without comments. A live asset row must be updated; `restore` rejects it with `row not deleted`. Deleted rows use `restore`.
+
+The existing Vite/astro-check dependency-hash issue still applies. Restart the dev server after type checks before running browser/e2e validation. One e2e run also hit the existing boot helper's `Execution context was destroyed` navigation race; its assertions were not changed.
 
 written with gpt-6.1-sol in T3 Code (Codex)

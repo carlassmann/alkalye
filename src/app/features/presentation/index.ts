@@ -1,3 +1,25 @@
-// v2-todo(presentation): reconnect this feature to src/jazz/schema.ts. Classic implementation remains in git history.
-export {}
-export { getPresentationMode } from "./lib/presentation"
+export {
+	parsePresentation,
+	getPresentationMode,
+	parsePresentationSize,
+	parsePresentationTheme,
+} from "./lib/presentation"
+export type {
+	PresentationItem,
+	VisualBlock,
+	SlideContent,
+	PresentationSize,
+	PresentationTheme,
+	TextSegment,
+} from "./lib/presentation"
+export { useScreenWakeLock } from "./lib/screen-wake-lock"
+export { presentationExtensions } from "./lib/editor-extension"
+export { Slideshow, SlideshowView, getSlides } from "./widgets/slideshow"
+export type { Slide } from "./widgets/slideshow"
+export { Teleprompter, groupBySlide } from "./widgets/teleprompter"
+export type { SlideGroup } from "./widgets/teleprompter"
+export { TeleprompterTopBar } from "./widgets/teleprompter-top-bar"
+export { SidebarPresentationLinks } from "./widgets/sidebar-presentation-links"
+export { SlideshowScreen } from "./screens/slideshow-screen"
+export { TeleprompterScreen } from "./screens/teleprompter-screen"
+export { isLaserPreview } from "./lib/laser-preview"
