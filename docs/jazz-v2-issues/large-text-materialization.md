@@ -35,6 +35,19 @@ fatal. `window` selects only the first 128 UTF-16 units, not a full editor body.
 Run cases separately or give browser evaluation a sufficiently long timeout.
 These diagnostics are separate from the production benchmark.
 
+Hardened diagnostic results for a 918,761-byte synthetic note, one 200-edit run
+per case, with 201 successful subscription deliveries where enabled:
+
+| Read mode               | Write mode                  |   Median / p95 |
+| ----------------------- | --------------------------- | -------------: |
+| Whole text              | `editedFrom`                | 50.0 / 66.9 ms |
+| Whole text plus splices | `editedFrom`                | 50.0 / 66.8 ms |
+| No subscription         | `editedFrom`                | 33.3 / 50.1 ms |
+| Whole text              | `applyDiffs`, single writer | 33.4 / 50.2 ms |
+
+These are development-module diagnostics with a double-rAF floor, not production
+app timings or concurrent-write validation. Raw results: `bench/results/v2-text-repro.json`.
+
 ## Relevant source at the pinned tag
 
 - `packages/jazz-tools/src/runtime/db.ts`: `editedFrom` lowers to a `text_edit`

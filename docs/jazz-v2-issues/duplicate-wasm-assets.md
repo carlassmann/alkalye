@@ -1,6 +1,6 @@
 # Draft: Vite emits the Jazz Wasm twice across page and worker builds
 
-Status: issue draft, not submitted. Jazz `2.0.0-alpha.61`, Astro 5, Vite 7.
+Status: upstream issue draft, not submitted; app bundling/compression workaround verified. Jazz `2.0.0-alpha.61`, Astro 5, Vite 7.
 
 Alkalye's production first-load capture downloads two 8,812,317-byte binaries:
 `jazz_wasm_bg-BazWJnU4.wasm` and `jazz_wasm_bg.BazWJnU4.wasm`.
@@ -29,10 +29,14 @@ then reference one Wasm asset. Exclude the
 unused dotted broker worker asset from the PWA precache; keep the actual
 hyphenated worker chunk and the single Wasm asset.
 
-A separate capture still records two uncached transfers of the now-identical
-URL, one per realm. Serial page initialization did not eliminate this. URL and
-precache deduplication therefore do not by themselves reduce encoded first-load
-bytes. This SDK startup behavior remains unresolved.
+The uncompressed Node control still records two uncached transfers of the
+now-identical URL, one per realm. In the compressed preview, the capture records
+one Brotli transfer and one disk-cache read with zero encoded bytes in each
+of five runs. Total JS/Wasm falls from 20.84 MB in the original raw preview to
+3.45 MB with the production-like Brotli preview. The final uncompressed control
+remains 20.86 MB. No compiled
+module override or startup warmup is needed. This distinction matters when using
+a local uncompressed preview to predict CDN transfer size.
 
 First-load measurements use a fresh isolated browser context with HTTP caching
 enabled and service workers blocked. The original harness disabled caching on

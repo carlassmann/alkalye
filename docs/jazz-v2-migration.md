@@ -405,3 +405,7 @@ The inherited limits still apply: public-space bookmarks lack a schema table; Cl
 written with gpt-6.1-sol in T3 Code (Codex)
 
 - 2026-11-13, phase 1: UI benchmark harness and Classic baseline; three runs, zero scenario failures, v2 pending. Harness commit `262baf5`; results in `bench/results/classic.json`.
+
+- 2026-11-13, v2 performance follow-up: metadata-only library subscriptions, body reads on demand, editor TEXT splices with safe `editedFrom` writes, background stats, one emitted Wasm asset and a deduplicated Wasm/broker-worker precache, and compressed production benchmark preview. Five-run large typing improves from 118/148 to 83/102 ms; the 1.5× Classic/no-long-task target remains unmet inside alpha.61. First-load JS/Wasm is 3.45 MB with Brotli versus 20.86 MB raw. Final five document/collaboration e2e tests pass; two browser profiles converge, preserve selection on remote edits and reload offline. Nullable `documents.path`/`frontmatterPinned` require the generated `9864f7adaa62 → 9e60aeadee67` migration; coordinate its graph with the concurrent importer merge. Implementation commits `425a28e`, `5c7d9ba`, `1ec31d7`; report and issue drafts under `docs/benchmarks/` and `docs/jazz-v2-issues/`.
+
+written with gpt-6.1-sol in T3 Code (Codex)

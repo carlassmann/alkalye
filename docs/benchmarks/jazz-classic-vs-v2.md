@@ -5,6 +5,137 @@ Production comparison on 2026-11-13. Five alternating runs per implementation,
 `bench/results/classic.json` and `v2.json`; the superseded development baseline is
 `classic-dev.json`. Each production JSON embeds its individual runs.
 
+## Optimization follow-up, 2026-11-13
+
+The historical comparison below remains unchanged. New production measurements
+use the same datasets, machine, Chromium, 200-edit trace and exact-content
+assertions. Five runs of each typing size pass. The large-document target is
+**not met**: 83/102 ms is 2.5×/3.0× Classic's 33/34 ms, and there are still
+roughly 196 long tasks per 200 edits. App overhead is reduced; the remaining
+native TEXT cost is documented in an issue draft.
+
+| Metric, median / p95                  |        Original v2 |      Optimized v2 |
+| ------------------------------------- | -----------------: | ----------------: |
+| Small typing, dispatch → double-rAF   |   51.43 / 67.70 ms |  50.14 / 66.95 ms |
+| Dracula typing, dispatch → double-rAF | 117.74 / 148.46 ms | 83.45 / 101.91 ms |
+| Dracula Event Timing processing       |    0.30 / 88.20 ms |   0.30 / 57.00 ms |
+| Dracula long-task count / 200 edits   |    200.00 / 200.00 |   196.00 / 199.00 |
+| Dracula long-task total / 200 edits   |    15.78 / 17.79 s |   10.69 / 10.87 s |
+
+The Event Timing row includes censored slow events, as in the original report.
+Its median remains 0.3 ms; compare its p95, 88.2 → 57.0 ms. The long-task totals
+are case totals, not per-edit latency. Small-document median/p95 remains about
+50/67 ms versus 51/68 ms before; no small-document regression is observed.
+
+### What changed
+
+The library subscribed to every complete document, and the document route
+subscribed to another full row. Library summaries now select saved scalar
+metadata only. New writes save path/frontmatter pin metadata alongside existing
+title/tags; the generated migration adds nullable columns. Legacy rows derive
+only missing metadata once. Actions such as export, duplicate and folder moves
+read their current bodies on demand. Wikilink titles use saved titles; backlink
+updates fetch only affected targets. Presence and comments subscribe to their
+own tables, with comment anchors using the active editor body.
+
+The active editor subscribes only to content with Jazz's `splices` option. The
+binding applies sequential UTF-16 splices when their base matches, retaining
+selection mapping and undo behavior. Skipped renders, local echoes and IME use
+the existing safe fallback. Word/sentence/task counting runs in a worker after
+a short quiet period, using the same counting rules; hidden stats do no work.
+Title derivation stops after its first useful line instead of splitting the
+entire document.
+
+Immediate writes retain `editedFrom`. Jazz alpha.61 still materializes the
+current scalar on that write path and full query results on subscription ticks.
+Public splices do not remove that native cost. `applyDiffs` is faster in a
+single-writer repro but lacks the stale-base protection needed for concurrent
+editor writes. Oversized range selects terminate rather than clamp and cannot
+replace a whole-document subscription. No experimental range or partial editor
+write workaround ships.
+
+### Assets and compression
+
+Vite's worker asset names now match Astro's dotted asset names, emitting one
+8,812,317-byte Wasm at one public URL. The page package and Jazz's bundled
+worker previously emitted identical bytes under different names. The unused
+raw broker worker asset is excluded from precache; the executing worker remains.
+Build precache size falls from 28,369.66 to 18,910.14 KiB. Real CacheStorage
+inspection found exactly one Wasm and one executing broker worker.
+
+| First-load JS/Wasm, median / p95 | Encoded transfer |
+| -------------------------------- | ---------------: |
+| Original v2, uncompressed        | 20.84 / 20.84 MB |
+| Final v2, uncompressed control   | 20.86 / 20.86 MB |
+| Final v2, Brotli preview         |   3.45 / 3.45 MB |
+
+Each final mode has five successful runs. The uncompressed control still
+records two uncached fetches of the same Wasm URL. In all five Brotli runs,
+one Wasm transfer is about 2.518 MB including headers and the worker's read is
+`fromDiskCache: true` with zero encoded bytes. Its response body is 2,516,679
+bytes with `Content-Encoding: br`; gzip negotiation returns 3,154,403 bytes.
+Both retain `Content-Type: application/wasm`. Thus naming deduplication plus
+production-like compression yields one binary wire transfer. The raw Node
+preview alone would miss this result. `v2-wasm-cache-diagnostic.json` retains
+the uncached control; final per-request cache/encoding flags are in the load JSON.
+
+Vercel explicitly lists `application/wasm` for automatic Brotli/gzip negotiation:
+https://vercel.com/docs/how-vercel-cdn-works/compression
+This verifies documented behavior, not a deployed Alkalye Vercel response. The
+local wrapper uses Brotli quality 6, whose exact encoded size is not a prediction
+of Vercel's compression level. JS/CSS/Wasm keep their MIME types, immutable
+caching and `Vary: Accept-Encoding`; Jazz streams pass through unchanged.
+`serve-production.ts` is now used by the production provisioner. The original
+Classic measurements used uncompressed local assets, so 3.45 MB compressed v2
+versus 5.78 MB uncompressed Classic is not a CDN-to-CDN comparison.
+
+### Evidence and reproduction
+
+- `bench/results/v2-optimized.json`: five typing runs, implementation `425a28e`.
+- `v2-optimized-load.json` and `v2-optimized-brotli.json`: five final-code first-load
+  runs per response mode at `5c7d9ba` and `1ec31d7`, respectively. Editor/data code is identical across these revisions. `5c7d9ba` removes an
+  ineffective startup warmup; `1ec31d7` guards proxy disconnects.
+- `v2-opt-before-profile.json`, `v2-opt-metadata-profile.json`, `v2-opt-after-profile.json` and
+  `profiles/optimization-*.cpuprofile.gz`: separate diagnostic runs, excluded
+  from the five-run distributions. Fresh paired profiles reduce sampled main-page Wasm from 12.76 to 8.21 seconds. The metadata-only intermediate profile is also retained.
+- `v2-text-repro.json`: hardened local-only TEXT repro, with terminal subscription
+  errors made fatal. Whole TEXT and splices both deliver 201 updates and take
+  50/67 ms; no subscription and single-writer partial writes take 33/50 ms.
+  These use a 918,761-byte synthetic note through Vite, without React/editor or
+  a backend; they are not production app timings.
+
+After building an immutable local production snapshot, use:
+
+```sh
+bun run bench:compare --target https://web-main-alkalye-opt-preview.cshed.carlassmann.com --label v2 --out bench/results/v2-optimized.json --runs 5 --edits 200 --performance-only --skip-sw
+bun run bench:compare --target https://web-main-alkalye-opt-preview.cshed.carlassmann.com --label v2 --out bench/results/v2-optimized-load.json --runs 5 --performance-only --load-only --skip-sw
+bun run bench:compare --target https://web-main-alkalye-opt-compressed.cshed.carlassmann.com --label v2 --out bench/results/v2-optimized-brotli.json --runs 5 --performance-only --load-only --skip-sw
+```
+
+Both Work projects were set up and started with `--tailscale`. The compressed
+project runs `scripts/bench/serve-production.ts` with `BENCH_BUILD_ROOT` pointing
+to this checkout; `BENCH_COMPRESSION=identity` selects its raw control. No app
+build or backend restart occurs during a measurement campaign. Campaigns run
+sequentially; unrelated machine workloads remain a limitation. New first visits
+use a fresh context with HTTP caching enabled, so page/worker reuse can occur;
+the original harness disabled it. Service workers remain blocked for these
+first visits. All raw metadata records the conditions. Interrupted exploratory
+campaigns and invalid range experiments are excluded. A compressed-preview
+attempt crashed when a stream disconnected after headers were sent; its partial
+JSON is preserved under `exploratory/v2-brotli-proxy-disconnect.json`. The guarded
+proxy completes all five replacement runs.
+
+Validation on the final document/editor implementation: `e2e/doc.spec.ts` and
+`e2e/document-collab.spec.ts` pass all five tests, including simultaneous writers
+and reload persistence. Background agent-browser profiles converged to the same
+text after simultaneous edits. A selected “middle” stayed selected after a remote
+prefix. Offline reload preserved both writers' markers with an active service
+worker. `bun run check` passes lint, types, formatting and all 787 tests across 72 files.
+
+Issue drafts, not submitted:
+`docs/jazz-v2-issues/large-text-materialization.md` and
+`docs/jazz-v2-issues/duplicate-wasm-assets.md`.
+
 ## Method and environment
 
 Classic app source is exactly `8379d4e`, jazz-tools 0.20.18. Only its build
