@@ -108,11 +108,13 @@ let deletedOption = Options.boolean("deleted").pipe(
 )
 let offlineOption = Options.boolean("offline").pipe(
 	Options.withDescription(
-		"Use cached local data without remote freshness checks.",
+		"Unavailable on Jazz v2 alpha.61: Node/Bun client replicas do not persist. Use the browser for offline edits.",
 	),
 )
 let localOption = Options.boolean("local").pipe(
-	Options.withDescription("Alias for --offline."),
+	Options.withDescription(
+		"Alias for --offline; unavailable on Jazz v2 alpha.61.",
+	),
 )
 let staleOkOption = Options.boolean("stale-ok").pipe(
 	Options.withDescription("Allow cached data if remote sync is incomplete."),
