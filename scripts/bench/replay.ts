@@ -35,7 +35,6 @@ async function measureReplay(page: Page, options: ReplayOptions) {
 	await page.waitForTimeout(3000)
 	await page.evaluate(() => {
 		window.__bench.paint = []
-		window.__bench.handler = []
 		window.__bench.events = []
 		window.__bench.longTasks = []
 	})
@@ -98,7 +97,6 @@ async function measureReplay(page: Page, options: ReplayOptions) {
 	ensureHealthy()
 	return {
 		paint: metrics.paint,
-		handler: metrics.handler,
 		events: metrics.events,
 		dispatchToPaint,
 		longTaskCount: metrics.longTasks.length,

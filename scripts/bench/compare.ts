@@ -275,7 +275,6 @@ try {
 						replayTimeoutMs,
 						`${name} replay`,
 					)
-					for (let value of metrics.handler) add(`${name}InputHandlerMs`, value)
 					for (let event of metrics.events) {
 						add(`${name}EventDurationMs`, event.duration)
 						add(`${name}EventInputDelayMs`, event.inputDelay)

@@ -10,7 +10,6 @@ declare global {
 			paint: number[]
 			longTasks: number[]
 			inputAt: number | null
-			handler: number[]
 			events: {
 				name: string
 				duration: number
@@ -29,7 +28,6 @@ async function installObservers(context: BrowserContext) {
 			paint: [],
 			longTasks: [],
 			inputAt: null,
-			handler: [],
 			events: [],
 		}
 		new PerformanceObserver(list => {
@@ -57,9 +55,6 @@ async function installObservers(context: BrowserContext) {
 			() => {
 				let start = performance.now()
 				window.__bench.inputAt = start
-				queueMicrotask(() =>
-					window.__bench.handler.push(performance.now() - start),
-				)
 				requestAnimationFrame(() =>
 					requestAnimationFrame(() =>
 						window.__bench.paint.push(performance.now() - start),
