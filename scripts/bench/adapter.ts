@@ -36,28 +36,26 @@ async function seed(
 	documents: { title: string; content: string }[],
 ) {
 	await waitForEditorBoot(page)
+	await showDocumentList(page)
+	await expect
+		.poll(() => page.getByTestId("doc-list-item").count(), { timeout: 60_000 })
+		.toBeGreaterThan(0)
 	let zip = new JSZip()
 	for (let document of documents)
 		zip.file(`${document.title}.md`, document.content)
-	await page
-		.locator('input[type="file"][accept*=".zip"]')
-		.first()
-		.setInputFiles({
-			name: "benchmark.zip",
-			mimeType: "application/zip",
-			buffer: await zip.generateAsync({
-				type: "nodebuffer",
-				compression: "DEFLATE",
-			}),
-		})
-	await page.waitForFunction(
-		() =>
-			document.querySelector<HTMLInputElement>(
-				'input[type="file"][accept*=".zip"]',
-			)?.value === "",
-		undefined,
-		{ timeout: 300_000 },
+	let input = page.locator(
+		'input[type="file"][accept*=".markdown"][accept*=".comments.json"][accept*=".zip"]',
 	)
+	await input.setInputFiles({
+		name: "benchmark.zip",
+		mimeType: "application/zip",
+		buffer: await zip.generateAsync({
+			type: "nodebuffer",
+			compression: "DEFLATE",
+		}),
+	})
+	await expect.poll(() => input.inputValue(), { timeout: 300_000 }).toBe("")
+
 	console.error("ZIP import completed; resolving documents")
 	let result: { id: string; title: string; content: string }[] = []
 	for (let document of documents) {
