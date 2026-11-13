@@ -104,13 +104,26 @@ async function waitForDocumentList(page: Page) {
 
 async function readContent(page: Page) {
 	await page.bringToFront()
+	let pendingCopy = `benchmark-copy-${crypto.randomUUID()}`
+	await page.evaluate(text => navigator.clipboard.writeText(text), pendingCopy)
 	await editor(page).focus()
 	await page.keyboard.press("ControlOrMeta+A")
 	await page
 		.getByRole("button", { name: "Edit", exact: true })
 		.dispatchEvent("click")
 	await page.getByRole("menuitem", { name: /^Copy(?:\s|$)/ }).click()
-	return page.evaluate(() => navigator.clipboard.readText())
+	let content = pendingCopy
+	// The menu click can finish before its asynchronous clipboard write.
+	await expect
+		.poll(
+			async () => {
+				content = await page.evaluate(() => navigator.clipboard.readText())
+				return content
+			},
+			{ timeout: 30_000 },
+		)
+		.not.toBe(pendingCopy)
+	return content
 }
 
 async function openDocument(page: Page, target: { id: string; title: string }) {

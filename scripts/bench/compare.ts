@@ -107,6 +107,7 @@ let result = {
 				encoding: "utf8",
 			}).trim(),
 		server:
+			process.env.BENCH_SERVER_MODE ??
 			"production Node adapter; local store; first visit SW blocked, returning SW installed",
 	},
 	config: {
@@ -333,7 +334,17 @@ try {
 						})
 						console.error(`${name} replay failure: ${message.slice(0, 200)}`)
 					} finally {
-						await typingContext.close()
+						await withDeadline(
+							typingContext.close(),
+							10_000,
+							"closing typing context",
+						).catch(async () => {
+							await withDeadline(
+								browser.close(),
+								10_000,
+								"closing stalled browser",
+							).catch(() => {})
+						})
 					}
 				}
 			}
@@ -359,13 +370,13 @@ try {
 							await expect(editor(returningPage)).toContainText("Book dracula")
 							if (values["sw-only"]) {
 								returningStage = "verifiedHydration"
-								await expect
-									.poll(() => readContent(returningPage), { timeout: 60_000 })
-									.toBe(large.content)
 								await expect(() => verifyExport(returningPage, seeded)).toPass({
 									timeout: 60_000,
 									intervals: [2000],
 								})
+								await expect
+									.poll(() => readContent(returningPage), { timeout: 60_000 })
+									.toBe(large.content)
 								await returningPage.waitForTimeout(5000)
 							}
 							returningStage = "serviceWorkerReady"
@@ -416,9 +427,13 @@ try {
 							.innerText({ timeout: 3000 })
 							.then(text => text.slice(0, 1500))
 							.catch(String),
-						controller: await returningPage
-							.evaluate(() => navigator.serviceWorker.controller?.state ?? null)
-							.catch(String),
+						controller: await withDeadline(
+							returningPage.evaluate(
+								() => navigator.serviceWorker.controller?.state ?? null,
+							),
+							3000,
+							"SW diagnostic",
+						).catch(String),
 					})
 					if (returningStage !== "offlineOpen") {
 						let offlineStart = performance.now()
@@ -452,7 +467,17 @@ try {
 						}
 					}
 				} finally {
-					await returning.close()
+					await withDeadline(
+						returning.close(),
+						10_000,
+						"closing returning context",
+					).catch(async () => {
+						await withDeadline(
+							browser.close(),
+							10_000,
+							"closing stalled browser",
+						).catch(() => {})
+					})
 				}
 			}
 
