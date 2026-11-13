@@ -11,3 +11,5 @@ example
 .vercel
 /agents
 tsconfig.tsbuildinfo
+/bench/datasets/*
+!/bench/datasets/sources.json
