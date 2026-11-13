@@ -1,3 +1,4 @@
+import { renderCustomHelp } from "./help"
 // @vitest-environment node
 import { expect, test, vi } from "vitest"
 import { executeCommand } from "./runtime"
@@ -19,5 +20,14 @@ test.each(["offline", "local"])(
 		} finally {
 			fetch.mockRestore()
 		}
+	},
+)
+
+test.each(["get", "content", "export"])(
+	"doc %s help explains unavailable offline replicas",
+	command => {
+		expect(renderCustomHelp(["doc", command, "--help"], "test")).toContain(
+			"Unavailable: Node/Bun replicas do not persist on Jazz v2 alpha.61",
+		)
 	},
 )
