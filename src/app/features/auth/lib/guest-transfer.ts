@@ -51,12 +51,24 @@ function restoreGuestTransfer(
 }
 
 async function captureGuest(db: Database, ownerId: string) {
-	let documents = (await db.all(app.documents.where({ ownerId }))).filter(
-		doc =>
-			!doc.spaceId &&
-			(!isWelcomeDoc(doc.content) ||
-				doc.updatedAt.getTime() !== doc.createdAt.getTime()),
+	let personal = (await db.all(app.documents.where({ ownerId }))).filter(
+		doc => !doc.spaceId,
 	)
+	let documents: typeof personal = []
+	for (let doc of personal) {
+		let untouchedWelcome =
+			isWelcomeDoc(doc.content) &&
+			doc.updatedAt.getTime() === doc.createdAt.getTime()
+		if (untouchedWelcome) {
+			let [asset, comment, theme] = await Promise.all([
+				db.one(app.assets.where({ documentId: doc.id }).select("id")),
+				db.one(app.commentThreads.where({ documentId: doc.id }).select("id")),
+				db.one(app.themes.where({ sourceDocId: doc.id }).select("id")),
+			])
+			if (!asset && !comment && !theme) continue
+		}
+		documents.push(doc)
+	}
 	let documentIds = documents.map(doc => doc.id)
 	let folders = await db.all(app.folders.where({ ownerId }))
 	let entries = await db.all(

@@ -164,6 +164,24 @@ test("guest transfer retries without duplicates and preserves folders, deleted n
 	expect(await guest.one(app.documents.where({ id: doc.id }))).not.toBeNull()
 })
 
+test("welcome notes with attachments survive even without a text edit", async () => {
+	let guest = actor(guestId)
+	let target = actor(targetId)
+	let doc = await createDocument(guest, guestId, "# Welcome to Alkalye")
+	await guest
+		.insert(app.assets, {
+			documentId: doc.id,
+			name: "Keep photo",
+			type: "image",
+			data: new Uint8Array([9]),
+			createdAt: new Date(),
+		})
+		.wait({ tier: "global" })
+	await transfer(guest, target)
+	expect(await target.all(app.documents)).toHaveLength(1)
+	expect((await target.all(app.assets))[0]?.data).toEqual(new Uint8Array([9]))
+})
+
 async function transfer(guest: Database, target: Database) {
 	let key = `test-${crypto.randomUUID()}`
 	await saveGuestTransfer(guest, guestId, key)
