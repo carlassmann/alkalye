@@ -1,2 +1,4 @@
-// v2-todo(assets): reconnect this feature to src/jazz/schema.ts. Classic implementation remains in git history.
-export {}
+// v2-todo(assets): binary loading and upload are disabled.
+export { imageExtensions } from "./lib/editor-extension"
+export type { EditorAsset } from "./lib/asset-view-models"
+export { SidebarAssets } from "./widgets/sidebar-assets"
