@@ -3,7 +3,11 @@ import { z } from "zod"
 import type { Jazz } from "jazz-tools/backend"
 import { app } from "../schema"
 
-export { sharingOperation }
+export { sharingOperation, invalidateInvites, rank }
+
+type SharingTransaction = Parameters<
+	Parameters<Jazz["db"]["serializableTransaction"]>[0]
+>[0]
 
 let inputSchema = z.object({
 	documentId: z.string().uuid().optional(),
@@ -56,24 +60,6 @@ async function sharingOperation(
 			)
 			let inherited = doc.spaceId ? await spaceRole(doc.spaceId, userId) : null
 			return rank(grant?.role) >= rank(inherited) ? grant?.role : inherited
-		}
-		async function invalidateInvites(
-			userId: string,
-			documentId: string | null,
-			spaceId: string | null,
-		) {
-			let documentIds = new Set(documentId ? [documentId] : [])
-			if (spaceId)
-				for (let doc of await tx.all(app.documents.where({ spaceId })))
-					documentIds.add(doc.id)
-			for (let invite of await tx.all(app.invites.where({ ownerId: userId }))) {
-				if (
-					!invite.revokedAt &&
-					((spaceId && invite.spaceId === spaceId) ||
-						(invite.documentId && documentIds.has(invite.documentId)))
-				)
-					tx.update(app.invites, invite.id, { revokedAt: new Date() })
-			}
 		}
 
 		async function requireAdmin(
@@ -200,13 +186,13 @@ async function sharingOperation(
 			for (let grant of await tx.all(
 				app.documentGrants.where({ inviteId: invite.id }),
 			)) {
-				await invalidateInvites(grant.accountId, grant.documentId, null)
+				await invalidateInvites(tx, grant.accountId, grant.documentId, null)
 				tx.delete(app.documentGrants, grant.id)
 			}
 			for (let member of await tx.all(
 				app.spaceMembers.where({ inviteId: invite.id }),
 			)) {
-				await invalidateInvites(member.accountId, null, member.spaceId)
+				await invalidateInvites(tx, member.accountId, null, member.spaceId)
 				tx.delete(app.spaceMembers, member.id)
 			}
 			return {}
@@ -231,7 +217,7 @@ async function sharingOperation(
 				action === "remove-member" ||
 				(data.role && rank(data.role) < rank(member.role))
 			)
-				await invalidateInvites(member.accountId, null, member.spaceId)
+				await invalidateInvites(tx, member.accountId, null, member.spaceId)
 			if (action === "remove-member") tx.delete(app.spaceMembers, member.id)
 			else if (data.role)
 				tx.update(app.spaceMembers, member.id, { role: data.role })
@@ -254,7 +240,7 @@ async function sharingOperation(
 				action === "remove-grant" ||
 				(data.role && rank(data.role) < rank(grant.role))
 			)
-				await invalidateInvites(grant.accountId, grant.documentId, null)
+				await invalidateInvites(tx, grant.accountId, grant.documentId, null)
 			if (action === "remove-grant") tx.delete(app.documentGrants, grant.id)
 			else if (data.role && data.role !== "manager")
 				tx.update(app.documentGrants, grant.id, { role: data.role })
@@ -295,6 +281,7 @@ async function sharingOperation(
 		}
 		if (action === "leave") {
 			await invalidateInvites(
+				tx,
 				accountId,
 				data.documentId ?? null,
 				data.spaceId ?? null,
@@ -370,6 +357,26 @@ async function sharingOperation(
 }
 function hash(secret: string) {
 	return createHash("sha256").update(secret).digest("hex")
+}
+
+async function invalidateInvites(
+	tx: SharingTransaction,
+	userId: string,
+	documentId: string | null,
+	spaceId: string | null,
+) {
+	let documentIds = new Set(documentId ? [documentId] : [])
+	if (spaceId)
+		for (let doc of await tx.all(app.documents.where({ spaceId })))
+			documentIds.add(doc.id)
+	for (let invite of await tx.all(app.invites.where({ ownerId: userId }))) {
+		if (
+			!invite.revokedAt &&
+			((spaceId && invite.spaceId === spaceId) ||
+				(invite.documentId && documentIds.has(invite.documentId)))
+		)
+			tx.update(app.invites, invite.id, { revokedAt: new Date() })
+	}
 }
 
 function rank(role: string | null | undefined) {

@@ -12,6 +12,7 @@ import { verifyClassicProof, readClassicAccess } from "./verification"
 import { stableId, rewriteReferences, resolveClassicAnchor } from "./conversion"
 import { z } from "zod"
 import { verifiedIdentity, authorizeSnapshot } from "./authorization"
+import { reconcileClassicAccess, activateVerifiedAccess } from "./access"
 import {
 	uploadChunk,
 	readBytes,
@@ -201,41 +202,13 @@ async function importClassicItem(accountId: string, input: unknown) {
 				? []
 				: access.directMembers
 			: access.members
-		for (let stale of await jazz.db.all(
-			app.classicAccess.where({ resourceId: id }),
-		))
-			if (!members.some(member => member.id === stale.classicId))
-				await jazz.db
-					.delete(app.classicAccess, stale.id)
-					.wait({ tier: "global" })
-		for (let member of members) {
-			let role = z
-				.enum(["reader", "writer", "manager", "admin"])
-				.parse(member.role)
-			let kind: "space" | "document" =
-				item.kind === "space" ? "space" : "document"
-			if (item.kind === "theme") continue
-			let grantId = await stableId(`pending:${item.classicId}:${member.id}`)
-			let existing = await jazz.db.one(
-				app.classicAccess
-					.where({ id: grantId })
-					.includeDeleted()
-					.select("*", "$deletedAt"),
+		if (item.kind !== "theme")
+			await reconcileClassicAccess(
+				item.classicId,
+				id,
+				item.kind === "space" ? "space" : "document",
+				members,
 			)
-			let values = { classicId: member.id, resourceId: id, kind, role }
-			if (existing?.$deletedAt)
-				await jazz.db
-					.restore(app.classicAccess, grantId, values)
-					.wait({ tier: "global" })
-			else if (existing)
-				await jazz.db
-					.update(app.classicAccess, grantId, values)
-					.wait({ tier: "global" })
-			else
-				await jazz.db
-					.insert(app.classicAccess, values, { id: grantId })
-					.wait({ tier: "global" })
-		}
 	}
 	if (!previous)
 		await jazz.db
@@ -432,30 +405,6 @@ async function lookupClassicItem(accountId: string, input: unknown) {
 				: await scoped.one(app.themes.where({ id: previous.v2Id }))
 	return { id: visible ? previous.v2Id : null }
 }
-async function activateVerifiedAccess(
-	accountId: string,
-	classicId: string,
-	pending: {
-		classicId: string
-		resourceId: string
-		kind: "document" | "space"
-	},
-) {
-	try {
-		let access = await readClassicAccess(classicId, pending.classicId)
-		if (!access.members.some(member => member.id === pending.classicId)) return
-		let role = z
-			.enum(["reader", "writer", "manager", "admin"])
-			.parse(access.role)
-		await grantAccess(accountId, pending.resourceId, pending.kind, role)
-	} catch (error) {
-		if (
-			!(error instanceof Error) ||
-			error.message !== "Classic read access denied"
-		)
-			throw error
-	}
-}
 async function importStatus(
 	accountId: string,
 	item: { classicId: string; kind: string },
@@ -477,53 +426,6 @@ async function importStatus(
 		await jazz.db
 			.insert(app.classicImportStatus, values, { id })
 			.wait({ tier: "global" })
-}
-async function grantAccess(
-	accountId: string,
-	resourceId: string,
-	kind: "document" | "space",
-	role: "reader" | "writer" | "manager" | "admin",
-) {
-	let id = await stableId(`grant:${resourceId}:${accountId}`)
-	let activationId = await stableId(`membership:${id}`)
-	if (await jazz.db.one(app.classicImports.where({ id: activationId }))) return
-	if (kind === "space") {
-		let previous = await jazz.db.one(
-			app.spaceMembers.where({ id }).includeDeleted(),
-		)
-		let values = { accountId, spaceId: resourceId, role }
-		if (!previous)
-			await jazz.db
-				.insert(app.spaceMembers, values, { id })
-				.wait({ tier: "global" })
-	} else {
-		let previous = await jazz.db.one(
-			app.documentGrants.where({ id }).includeDeleted(),
-		)
-		let values = {
-			accountId,
-			documentId: resourceId,
-			role: role === "manager" ? "writer" : role,
-		}
-		if (!previous)
-			await jazz.db
-				.insert(app.documentGrants, values, { id })
-				.wait({ tier: "global" })
-	}
-	await jazz.db
-		.insert(
-			app.classicImports,
-			{
-				ownerId: accountId,
-				classicId: `membership:${resourceId}:${accountId}`,
-				v2Id: id,
-				kind: "membership",
-				status: "complete",
-				importedAt: new Date(),
-			},
-			{ id: activationId },
-		)
-		.wait({ tier: "global" })
 }
 async function writeItem(
 	item: ImportItem,
