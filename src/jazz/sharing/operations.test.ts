@@ -202,3 +202,80 @@ test("managers change nonadmin roles without promoting or removing admins", asyn
 		),
 	).rejects.toThrow("Admin")
 })
+
+test("the departing owner transfers the space and its documents to another admin", async () => {
+	let space = await jazz.db
+		.insert(app.spaces, {
+			ownerId: alice,
+			name: "Team",
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		})
+		.wait({ tier: "global" })
+	let doc = await jazz.db
+		.insert(app.documents, {
+			ownerId: alice,
+			spaceId: space.id,
+			title: "Team",
+			content: "Team notes",
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		})
+		.wait({ tier: "global" })
+	await expect(
+		sharingOperation(jazz, alice, "leave", { spaceId: space.id }, ""),
+	).rejects.toThrow("last admin")
+	await jazz.db
+		.insert(app.spaceMembers, {
+			spaceId: space.id,
+			accountId: bob,
+			role: "admin",
+		})
+		.wait({ tier: "global" })
+	await sharingOperation(jazz, alice, "leave", { spaceId: space.id }, "")
+	expect(await jazz.db.one(app.spaces.where({ id: space.id }))).toMatchObject({
+		ownerId: bob,
+	})
+	expect(await jazz.db.one(app.documents.where({ id: doc.id }))).toMatchObject({
+		ownerId: bob,
+	})
+})
+
+test("space deletion removes its documents and memberships atomically", async () => {
+	let space = await jazz.db
+		.insert(app.spaces, {
+			ownerId: alice,
+			name: "Team",
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		})
+		.wait({ tier: "global" })
+	await jazz.db
+		.insert(app.documents, {
+			ownerId: alice,
+			spaceId: space.id,
+			title: "Team",
+			content: "Team notes",
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		})
+		.wait({ tier: "global" })
+	await jazz.db
+		.insert(app.spaceMembers, {
+			spaceId: space.id,
+			accountId: bob,
+			role: "writer",
+		})
+		.wait({ tier: "global" })
+	await expect(
+		sharingOperation(jazz, bob, "delete-space", { spaceId: space.id }, ""),
+	).rejects.toThrow("admin")
+	await sharingOperation(jazz, alice, "delete-space", { spaceId: space.id }, "")
+	expect(await jazz.db.one(app.spaces.where({ id: space.id }))).toBeNull()
+	expect(
+		await jazz.db.all(app.documents.where({ spaceId: space.id })),
+	).toHaveLength(0)
+	expect(
+		await jazz.db.all(app.spaceMembers.where({ spaceId: space.id })),
+	).toHaveLength(0)
+})

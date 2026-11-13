@@ -95,7 +95,10 @@ export let permissions = s.definePermissions(
 		)
 		policy.documents.allowInsert.where(doc =>
 			allOf([
-				owned,
+				anyOf([
+					owned,
+					policy.spaces.exists.where({ id: doc.spaceId, ownerId: doc.ownerId }),
+				]),
 				anyOf([
 					{ spaceId: null },
 					policy.spaces.exists.where({

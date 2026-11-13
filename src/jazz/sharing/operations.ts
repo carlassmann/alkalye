@@ -170,6 +170,37 @@ async function sharingOperation(
 				tx.update(app.spaceMembers, member.id, { role: data.role })
 			return {}
 		}
+		if (action === "delete-space" && data.spaceId) {
+			if ((await spaceRole(data.spaceId)) !== "admin")
+				throw new Error("Space admin required")
+			for (let doc of await tx.all(
+				app.documents.where({ spaceId: data.spaceId }),
+			)) {
+				for (let entry of await tx.all(
+					app.userDocuments.where({ documentId: doc.id }),
+				))
+					tx.delete(app.userDocuments, entry.id)
+				for (let grant of await tx.all(
+					app.documentGrants.where({ documentId: doc.id }),
+				))
+					tx.delete(app.documentGrants, grant.id)
+				for (let asset of await tx.all(
+					app.assets.where({ documentId: doc.id }),
+				))
+					tx.delete(app.assets, asset.id)
+				tx.delete(app.documents, doc.id)
+			}
+			for (let member of await tx.all(
+				app.spaceMembers.where({ spaceId: data.spaceId }),
+			))
+				tx.delete(app.spaceMembers, member.id)
+			for (let invite of await tx.all(
+				app.invites.where({ spaceId: data.spaceId }),
+			))
+				tx.delete(app.invites, invite.id)
+			tx.delete(app.spaces, data.spaceId)
+			return {}
+		}
 		if (action === "leave") {
 			if (data.documentId) {
 				for (let grant of await tx.all(
@@ -184,6 +215,22 @@ async function sharingOperation(
 				))
 					tx.delete(app.userDocuments, entry.id)
 			} else if (data.spaceId) {
+				let space = await tx.one(app.spaces.where({ id: data.spaceId }))
+				if (space?.ownerId === accountId) {
+					let successor = await tx.one(
+						app.spaceMembers.where({ spaceId: space.id, role: "admin" }),
+					)
+					if (!successor) throw new Error("The last admin cannot leave")
+					tx.update(app.spaces, space.id, {
+						ownerId: successor.accountId,
+						updatedAt: new Date(),
+					})
+					for (let doc of await tx.all(
+						app.documents.where({ spaceId: space.id, ownerId: accountId }),
+					))
+						tx.update(app.documents, doc.id, { ownerId: successor.accountId })
+				}
+
 				for (let member of await tx.all(
 					app.spaceMembers.where({ spaceId: data.spaceId, accountId }),
 				))

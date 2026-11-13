@@ -393,3 +393,27 @@ test("presence updates cannot take another device row or move between documents"
 		})
 		.wait({ tier: "global" })
 })
+
+test("documents created for a space owner stop being readable when membership ends", async () => {
+	let space = await fixture.seed(db =>
+		db.insert(app.spaces, {
+			ownerId: aliceId,
+			name: "Team",
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		}),
+	)
+	let membership = await fixture.seed(db =>
+		db.insert(app.spaceMembers, {
+			spaceId: space.id,
+			accountId: bobId,
+			role: "writer",
+		}),
+	)
+	let bob = actor(bobId)
+	let doc = await bob
+		.insert(app.documents, { ...note(aliceId), spaceId: space.id })
+		.wait({ tier: "global" })
+	await fixture.seed(db => db.delete(app.spaceMembers, membership.id))
+	expect(await bob.all(app.documents.where({ id: doc.id }))).toHaveLength(0)
+})
