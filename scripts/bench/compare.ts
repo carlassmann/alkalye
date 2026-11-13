@@ -40,6 +40,7 @@ let { values } = parseArgs({
 		edits: { type: "string", default: "200" },
 		"replay-timeout-ms": { type: "string" },
 		"large-only": { type: "boolean", default: false },
+		"sw-only": { type: "boolean", default: false },
 	},
 })
 if (!values.target || !values.label || !values.out)
@@ -74,9 +75,11 @@ let scenarioFailures: {
 }[] = []
 let runLoads: { run: number; start: number[]; end?: number[] }[] = []
 let syncDiagnostics: unknown[] = []
+let bundleTransfers: unknown[] = []
 let result = {
 	runLoads,
 	syncDiagnostics,
+	bundleTransfers,
 	label: values.label,
 	target,
 	createdAt: new Date().toISOString(),
@@ -154,156 +157,164 @@ try {
 			let medium = seeded.find(doc => doc.title === "Book alice")
 			if (!large || !medium) throw new Error("Books missing")
 
-			console.error("Cold list and large-document open")
-			for (let scenario of ["coldListMs", "coldLargeOpenMs"]) {
-				let fresh = await newContext(browser, credentials)
-				try {
-					let cold = await fresh.newPage()
-					let network = await instrument(cold, cpu)
-					start = performance.now()
-					if (scenario === "coldListMs") {
-						await cold.goto("/app", { waitUntil: "domcontentloaded" })
-						await resolveDocument(cold, large.title)
-					} else {
-						await waitForEditorBoot(cold, { path: `/app/doc/${large.id}` })
-						await expect(editor(cold)).toContainText("Book dracula", {
-							timeout: 120_000,
-						})
+			if (!values["sw-only"]) {
+				console.error("Cold list and large-document open")
+				for (let scenario of ["coldListMs", "coldLargeOpenMs"]) {
+					let fresh = await newContext(browser, credentials)
+					try {
+						let cold = await fresh.newPage()
+						let network = await instrument(cold, cpu)
+						start = performance.now()
+						if (scenario === "coldListMs") {
+							await cold.goto("/app", { waitUntil: "domcontentloaded" })
+							await resolveDocument(cold, large.title)
+						} else {
+							await waitForEditorBoot(cold, { path: `/app/doc/${large.id}` })
+							await expect(editor(cold)).toContainText("Book dracula", {
+								timeout: 120_000,
+							})
+						}
+						add(scenario, performance.now() - start)
+						await cold.waitForTimeout(1000)
+						network.ensureHealthy()
+						if (scenario === "coldListMs") {
+							add("firstLoadJsWasmBytes", network.wire.bundle)
+							bundleTransfers.push(...network.bundleTransfers.values())
+						}
+					} finally {
+						await fresh.close()
 					}
-					add(scenario, performance.now() - start)
-					await cold.waitForTimeout(1000)
-					network.ensureHealthy()
-					if (scenario === "coldListMs")
-						add("firstLoadJsWasmBytes", network.wire.bundle)
-				} finally {
-					await fresh.close()
 				}
-			}
-			await page.bringToFront()
-			await sourceNetwork.setCacheDisabled(false)
-			await waitForEditorBoot(page)
-			start = performance.now()
-			await page.reload({ waitUntil: "domcontentloaded" })
-			await resolveDocument(page, large.title)
-			add("warmListMs", performance.now() - start)
+				await page.bringToFront()
+				await sourceNetwork.setCacheDisabled(false)
+				await waitForEditorBoot(page)
+				start = performance.now()
+				await page.reload({ waitUntil: "domcontentloaded" })
+				await resolveDocument(page, large.title)
+				add("warmListMs", performance.now() - start)
 
-			console.error(
-				"Fresh device: credentials-only restore and verified bulk export",
-			)
-			let receiver = await newContext(browser, credentials)
-			start = performance.now()
-			try {
-				let other = await receiver.newPage()
-				await instrument(other, cpu)
-				await waitForEditorBoot(other)
-				console.error("Fresh device ready; exporting all bodies")
-				await verifyExport(other, seeded)
-				add("freshDeviceWholeDatasetMs", performance.now() - start)
-			} catch (error) {
-				let message = error instanceof Error ? error.message : String(error)
-				scenarioFailures.push({
-					run: run + 1,
-					scenario: "freshDeviceWholeDatasetMs",
-					elapsedMs: performance.now() - start,
-					message: message.slice(0, 1000),
-				})
-				console.error(`Fresh-device failure: ${message.slice(0, 200)}`)
-			} finally {
-				await receiver.close()
-			}
-			console.error("Sync: independent second client on the small note")
-			let syncReceiver = await newContext(browser, credentials)
-			try {
-				let other = await syncReceiver.newPage()
-				let syncNetwork = await instrument(other, cpu)
-				let syncDoc = seeded[0]
-				if (!syncDoc) throw new Error("Small sync note missing")
-				await openDocument(other, syncDoc)
-				await editor(other).focus()
-				await other.keyboard.press("ControlOrMeta+End")
-				await openDocument(page, syncDoc)
-				for (let n = 0; n < 5; n++) {
-					console.error(`Sync marker ${n + 1}/5`)
-					let marker = ` sync-${run}-${n}`
-					await editor(page).focus()
-					await page.keyboard.press("ControlOrMeta+End")
-					start = performance.now()
-					await page.keyboard.insertText(marker)
-					await expect
-						.poll(() => editor(other).innerText(), {
-							timeout: 120_000,
-							intervals: [20],
-						})
-						.toContain(marker)
-					let elapsedMs = performance.now() - start
-					add("syncEditMs", elapsedMs)
-					syncDiagnostics.push({
-						marker,
-						startedAt: start,
-						endedAt: performance.now(),
-						elapsedMs,
-						load: loadavg(),
-						sender: { ...sourceNetwork.wire },
-						senderTimeline: sourceNetwork.timeline.slice(-200),
-						receiverTimeline: syncNetwork.timeline.slice(-200),
-						receiver: { ...syncNetwork.wire },
-					})
-				}
-			} finally {
-				await syncReceiver.close()
-			}
-
-			for (let doc of values["large-only"]
-				? [large]
-				: [seeded[0], medium, large]) {
-				if (!doc) throw new Error("Small note missing")
-				let name = doc === large ? "large" : doc === medium ? "medium" : "small"
-				console.error(`Replay ${editCount} edits in isolated ${name} context`)
-				let typingContext = await newContext(browser, credentials)
-				let replayStarted = performance.now()
+				console.error(
+					"Fresh device: credentials-only restore and verified bulk export",
+				)
+				let receiver = await newContext(browser, credentials)
+				start = performance.now()
 				try {
-					let typingPage = await typingContext.newPage()
-					let metrics = await withDeadline(
-						measureReplay(typingPage, {
-							document: doc,
-							edits: trace.edits.slice(0, editCount),
-							cpu,
-							reset: name === "small",
-							finalText:
-								editCount === trace.edits.length ? trace.finalText : undefined,
-						}),
-						replayTimeoutMs,
-						`${name} replay`,
-					)
-					for (let event of metrics.events) {
-						add(`${name}EventDurationMs`, event.duration)
-						add(`${name}EventInputDelayMs`, event.inputDelay)
-						add(`${name}EventProcessingMs`, event.processing)
-						add(`${name}EventPresentationMs`, event.presentation)
-					}
-					for (let value of metrics.paint) add(`${name}InputToPaintMs`, value)
-					for (let value of metrics.dispatchToPaint)
-						add(`${name}DispatchToPaintMs`, value)
-					add(`${name}LongTaskCount`, metrics.longTaskCount)
-					add(`${name}LongTaskTotalMs`, metrics.longTaskTotalMs)
-					add(`${name}SentBytesPerEdit`, metrics.sentBytesPerEdit)
-					add(`${name}ReceivedWsBytesPerEdit`, metrics.receivedWsBytesPerEdit)
-					add(`${name}JsHeapBytes`, metrics.jsHeapBytes)
+					let other = await receiver.newPage()
+					await instrument(other, cpu)
+					await waitForEditorBoot(other)
+					console.error("Fresh device ready; exporting all bodies")
+					await verifyExport(other, seeded)
+					add("freshDeviceWholeDatasetMs", performance.now() - start)
 				} catch (error) {
 					let message = error instanceof Error ? error.message : String(error)
 					scenarioFailures.push({
 						run: run + 1,
-						scenario: `${name}Replay`,
-						elapsedMs: performance.now() - replayStarted,
+						scenario: "freshDeviceWholeDatasetMs",
+						elapsedMs: performance.now() - start,
 						message: message.slice(0, 1000),
 					})
-					console.error(`${name} replay failure: ${message.slice(0, 200)}`)
+					console.error(`Fresh-device failure: ${message.slice(0, 200)}`)
 				} finally {
-					await typingContext.close()
+					await receiver.close()
 				}
+				console.error("Sync: independent second client on the small note")
+				let syncReceiver = await newContext(browser, credentials)
+				try {
+					let other = await syncReceiver.newPage()
+					let syncNetwork = await instrument(other, cpu)
+					let syncDoc = seeded[0]
+					if (!syncDoc) throw new Error("Small sync note missing")
+					await openDocument(other, syncDoc)
+					await editor(other).focus()
+					await other.keyboard.press("ControlOrMeta+End")
+					await openDocument(page, syncDoc)
+					for (let n = 0; n < 5; n++) {
+						console.error(`Sync marker ${n + 1}/5`)
+						let marker = ` sync-${run}-${n}`
+						await editor(page).focus()
+						await page.keyboard.press("ControlOrMeta+End")
+						start = performance.now()
+						await page.keyboard.insertText(marker)
+						await expect
+							.poll(() => editor(other).innerText(), {
+								timeout: 120_000,
+								intervals: [20],
+							})
+							.toContain(marker)
+						let elapsedMs = performance.now() - start
+						add("syncEditMs", elapsedMs)
+						syncDiagnostics.push({
+							marker,
+							startedAt: start,
+							endedAt: performance.now(),
+							elapsedMs,
+							load: loadavg(),
+							sender: { ...sourceNetwork.wire },
+							senderTimeline: sourceNetwork.timeline.slice(-200),
+							receiverTimeline: syncNetwork.timeline.slice(-200),
+							receiver: { ...syncNetwork.wire },
+						})
+					}
+				} finally {
+					await syncReceiver.close()
+				}
+
+				for (let doc of values["large-only"]
+					? [large]
+					: [seeded[0], medium, large]) {
+					if (!doc) throw new Error("Small note missing")
+					let name =
+						doc === large ? "large" : doc === medium ? "medium" : "small"
+					console.error(`Replay ${editCount} edits in isolated ${name} context`)
+					let typingContext = await newContext(browser, credentials)
+					let replayStarted = performance.now()
+					try {
+						let typingPage = await typingContext.newPage()
+						let metrics = await withDeadline(
+							measureReplay(typingPage, {
+								document: doc,
+								edits: trace.edits.slice(0, editCount),
+								cpu,
+								reset: name === "small",
+								finalText:
+									editCount === trace.edits.length
+										? trace.finalText
+										: undefined,
+							}),
+							replayTimeoutMs,
+							`${name} replay`,
+						)
+						for (let event of metrics.events) {
+							add(`${name}EventDurationMs`, event.duration)
+							add(`${name}EventInputDelayMs`, event.inputDelay)
+							add(`${name}EventProcessingMs`, event.processing)
+							add(`${name}EventPresentationMs`, event.presentation)
+						}
+						for (let value of metrics.paint) add(`${name}InputToPaintMs`, value)
+						for (let value of metrics.dispatchToPaint)
+							add(`${name}DispatchToPaintMs`, value)
+						add(`${name}LongTaskCount`, metrics.longTaskCount)
+						add(`${name}LongTaskTotalMs`, metrics.longTaskTotalMs)
+						add(`${name}SentBytesPerEdit`, metrics.sentBytesPerEdit)
+						add(`${name}ReceivedWsBytesPerEdit`, metrics.receivedWsBytesPerEdit)
+						add(`${name}JsHeapBytes`, metrics.jsHeapBytes)
+					} catch (error) {
+						let message = error instanceof Error ? error.message : String(error)
+						scenarioFailures.push({
+							run: run + 1,
+							scenario: `${name}Replay`,
+							elapsedMs: performance.now() - replayStarted,
+							message: message.slice(0, 1000),
+						})
+						console.error(`${name} replay failure: ${message.slice(0, 200)}`)
+					} finally {
+						await typingContext.close()
+					}
+				}
+
+				console.error("Returning user: service worker and offline reload")
 			}
 
-			console.error("Returning user: service worker and offline reload")
 			let returningStage = "startup"
 			let returningStarted = performance.now()
 			let returning = await newContext(browser, credentials, true)
@@ -314,6 +325,8 @@ try {
 						let returningNetwork = await instrument(returningPage, cpu)
 						await returningNetwork.setCacheDisabled(false)
 						await waitForEditorBoot(returningPage)
+						returningStage = "initialLibrary"
+						await waitForDocumentList(returningPage)
 						returningStage = "largeOpen"
 						await waitForEditorBoot(returningPage, {
 							path: `/app/doc/${large.id}`,

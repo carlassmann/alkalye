@@ -34,6 +34,7 @@ function createTraffic() {
 		issues,
 		timeline: new Array<{ at: number; kind: string; bytes?: number }>(),
 		bundleRequests: new Set<string>(),
+		bundleTransfers: new Map<string, { url: string; bytes: number }>(),
 		resources: new Map<string, number>(),
 		requests: new Set<string>(),
 		websocketOwners: new Map<string, string>(),
@@ -101,6 +102,10 @@ async function createCapture(browser: Browser) {
 			if (!state.bundleRequests.has(event.requestId))
 				state.wire.bundle += state.resources.get(event.requestId) ?? 0
 			state.bundleRequests.add(event.requestId)
+			state.bundleTransfers.set(event.requestId, {
+				url: event.response.url,
+				bytes: state.resources.get(event.requestId) ?? 0,
+			})
 		}
 	})
 	client.on("Network.loadingFinished", (event, sessionId) => {
@@ -112,6 +117,8 @@ async function createCapture(browser: Browser) {
 			event.requestId,
 			Math.max(previous, event.encodedDataLength),
 		)
+		let transfer = state.bundleTransfers.get(event.requestId)
+		if (transfer) transfer.bytes += extra
 		state.wire.http += extra
 		if (state.bundleRequests.has(event.requestId)) state.wire.bundle += extra
 	})
@@ -234,6 +241,7 @@ async function createCapture(browser: Browser) {
 		return {
 			wire: current.wire,
 			timeline: current.timeline,
+			bundleTransfers: current.bundleTransfers,
 			ensureHealthy() {
 				if (!connected || current.issues.length)
 					throw new Error(
