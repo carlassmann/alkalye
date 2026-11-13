@@ -1,6 +1,7 @@
 import { spawnSync } from "node:child_process"
 import { readFileSync } from "node:fs"
 import { resolve } from "node:path"
+import { chromium } from "@playwright/test"
 import { setTimeout as delay } from "node:timers/promises"
 import {
 	addedEntryIds,
@@ -191,6 +192,20 @@ async function requireReadyPreview(url: string) {
 	throw new Error(`${url} did not become ready. Inspect \`work logs web\`.`)
 }
 
+async function requireReadyApp(url: string) {
+	let browser = await chromium.launch()
+	try {
+		let page = await browser.newPage({ ignoreHTTPSErrors: true })
+		await page.goto(new URL("/app", url).toString())
+		// A served HTML shell does not mean Vite has compiled the editor or Wasm.
+		await page
+			.locator('body[data-alkalye-ready="true"]')
+			.waitFor({ timeout: 45_000 })
+	} finally {
+		await browser.close()
+	}
+}
+
 // Only failures after the suite starts describe the commit; setup and policy
 // errors would otherwise leave a permanent red mark on healthy code.
 function reportFailure(testedSha: string) {
@@ -249,6 +264,8 @@ async function main() {
 		}
 		let url = previewUrl()
 		await requireReadyPreview(url)
+		process.stdout.write("\n── Wait for browser app readiness ──\n\n")
+		await requireReadyApp(url)
 		run("End-to-end tests", ["bun", "run", "test:e2e", "--", "--forbid-only"], {
 			...ciEnvironment,
 			PLAYWRIGHT_BASE_URL: url,

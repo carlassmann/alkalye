@@ -518,3 +518,9 @@ Both broad and personal-entry document subscriptions select metadata only. Priva
 Editor content splices, immediate writes, async stats, on-demand body reads, Wasm/precache deduplication and compressed benchmark previews remain. The benchmark report leads with the final Classic/original-v2/optimized-v2 comparison; large-document typing still regresses versus Classic. Local CI restarts only the web service, which now hosts Jazz, instead of the removed separate sync service.
 
 written with gpt-6.1-sol in T3 Code (Codex)
+
+CI now waits for the browser's existing `data-alkalye-ready` marker after restarting Work. Serving HTML alone left the first two e2e contexts compiling a cold Vite editor/Wasm graph and exceeding their unchanged 10-second readiness assertions. The preflight has a 45-second limit and closes its own isolated context; each e2e case still starts with fresh storage. This changes setup, not test assertions.
+
+Merge validation: `bun run check` passes 74 files / 801 tests, zero type errors and formatting clean. Same-origin Classic `prepare`/`verify` passes with both profiles' saved title/path/pin columns, interrupted imports, shared assets/roles, recovery words, forged-claim rejection, late-write merging and retired-root recovery. Evidence is local at `/tmp/alkalye-perf-import-cutover/qa-result.json`. The first verification hit a transient proxy HTTP 502 on the fresh-profile settings page; the unchanged verifier passed on retry. Changelog entry 169 uses the requested `pr: 0`, which now parses as an unassigned PR and falls back to commit `f1e6c13` until the supervisor assigns the PR.
+
+written with gpt-6.1-sol in T3 Code (Codex)
