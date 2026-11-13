@@ -96,3 +96,29 @@ restarting the `work` services.
 [MIT](./LICENSE)
 
 © 2025 Carl Assmann
+
+## Jazz benchmarks
+
+Fetch checksum-pinned datasets, start this checkout's services, then run headless Chromium:
+
+```sh
+bun run bench:fetch
+work setup --tailscale
+work up --tailscale
+work urls
+bun run bench:compare -- --target <web-url> --label classic --out bench/results/classic.json
+```
+
+For v2, run the same command against its services with `--label v2 --out bench/results/v2.json`.
+Keep the machine, server build mode and options identical. Defaults: three independent
+accounts, 50 Vite Markdown documents, two Gutenberg books, 200 Automerge trace edits
+per document. Use `--cpu 4` for CPU throttling, `--edits full` for all 259,778 edits,
+or `--notes 20 --edits 50` for a shorter smoke run. Full replay uses UI cursor moves
+and can take hours. No fixed performance threshold runs in CI.
+
+Only `scripts/bench/adapter.ts` depends on account, sign-in and import UI conventions.
+It reuses `e2e/auth-helpers.ts`; change these bindings if v2 changes the UI. Scenarios
+never call Jazz APIs. Credentials stay in memory and are never written to results.
+See `docs/benchmarks/jazz-classic-vs-v2.md` for measurement definitions and limitations.
+
+written with gpt-6.1-sol in T3 Code (Codex)

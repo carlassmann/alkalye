@@ -11,7 +11,7 @@ async function fetchDatasets() {
 		let file = `bench/datasets/${source.file}`
 		let existing = await readFile(file).catch(() => null)
 		let data: Uint8Array
-		if (await file.exists()) data = new Uint8Array(await file.arrayBuffer())
+		if (existing) data = existing
 		else {
 			let response = await fetch(source.url)
 			if (!response.ok) throw new Error(`${response.status}: ${source.url}`)
