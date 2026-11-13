@@ -1,3 +1,6 @@
+import { getExportAssets } from "../lib/document-file-actions"
+import { exportComments } from "@/app/features/import-export"
+import type { Database } from "../lib/library"
 import {
 	useState,
 	useRef,
@@ -1259,13 +1262,13 @@ function DocumentItem({
 									</ContextMenuItem>
 								</>
 							)}
-							<ContextMenuItem onClick={makeDownloadDocument(doc, title)}>
+							<ContextMenuItem onClick={makeDownloadDocument(db, doc, title)}>
 								<Download />
 								{t("doc.download")}
 							</ContextMenuItem>
 							{canShare && (
 								<ContextMenuItem
-									onClick={makeShareDocument(doc, title)}
+									onClick={makeShareDocument(db, doc, title)}
 									data-testid={testIds.doc.shareButton}
 								>
 									<NativeShareIcon />
@@ -1577,11 +1580,23 @@ function makeTogglePin(
 ) {
 	return () => setPinned(db, ownerId, doc, !doc.pinned)
 }
-function makeDownloadDocument(doc: SidebarDoc, title: string) {
-	return () => exportDocument(doc.content, title)
+function makeDownloadDocument(db: Database, doc: SidebarDoc, title: string) {
+	return async () =>
+		exportDocument(
+			doc.content,
+			title,
+			await getExportAssets(db, doc),
+			await exportComments(db, doc.id),
+		)
 }
-function makeShareDocument(doc: SidebarDoc, title: string) {
-	return () => shareDocument(doc.content, title)
+function makeShareDocument(db: Database, doc: SidebarDoc, title: string) {
+	return async () =>
+		shareDocument(
+			doc.content,
+			title,
+			await getExportAssets(db, doc),
+			await exportComments(db, doc.id),
+		)
 }
 function makeLeaveDocument(_doc: SidebarDoc) {
 	// v2-todo(sharing): trusted leave operation.

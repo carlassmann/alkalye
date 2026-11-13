@@ -1,3 +1,4 @@
+import { getRandomWriterName } from "@/app/features/onboarding/lib/random-writer-name"
 import { toast } from "sonner"
 import { createContext, useContext, useEffect } from "react"
 import { useAll, useDb, useSession } from "jazz-tools/react"
@@ -64,12 +65,25 @@ function useLibraryData() {
 	let { data: preferences = [], isLoading: settingsLoading } = useAll(
 		app.settings.where({ ownerId }),
 	)
-	let { data: profiles = [] } = useAll(app.profiles.where({ ownerId }))
+	let { data: profiles = [], isLoading: profileLoading } = useAll(
+		app.profiles.where({ ownerId }),
+	)
 	let { data: grants = [] } = useAll(
 		app.documentGrants.where({ accountId: ownerId }),
 	)
 	useEffect(() => db.onMutationError(error => toast.error(error.reason)), [db])
 	let settings = preferences[0]
+	useEffect(() => {
+		if (
+			!profileLoading &&
+			!profiles[0] &&
+			!sessionStorage.getItem("alkalye-restoring-account")
+		)
+			watchWrite(
+				db.insert(app.profiles, { ownerId, name: getRandomWriterName() }),
+			)
+	}, [db, ownerId, profileLoading, profiles])
+
 	let documents: LibraryDocument[] = rows.map(row => ({
 		...row,
 		canEdit:
@@ -111,12 +125,18 @@ function useLibraryData() {
 	}
 }
 
-async function createDocument(db: Database, ownerId: string, content = "") {
+async function createDocument(
+	db: Database,
+	ownerId: string,
+	content = "",
+	spaceId?: string,
+) {
 	let folderId = await ensureFolder(db, ownerId, getPath(content))
 	let write = await db.transaction(tx => {
 		let now = new Date()
 		let doc = tx.insert(app.documents, {
 			ownerId,
+			spaceId,
 			content,
 			title: getDocumentTitle(content),
 			tags: getTags(content),
@@ -163,6 +183,10 @@ async function updateContent(
 		),
 	)
 	watchWrite(write)
+	if (parseFrontmatter(content).frontmatter?.["theme-source"]) {
+		let { syncThemeFromSource } = await import("@/app/features/themes")
+		await syncThemeFromSource(db, doc.id, content)
+	}
 	void write
 		.wait({ tier: "local" })
 		.then(() =>

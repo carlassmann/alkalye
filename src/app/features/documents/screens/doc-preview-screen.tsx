@@ -1,3 +1,4 @@
+import { useDocumentAssets } from "@/app/features/assets"
 import { EllipsisIcon, MessageSquare, Pencil } from "lucide-react"
 import { Button } from "@/app/components/ui/button"
 import { useTheme, ThemeSubmenu } from "@/app/components/appearance"
@@ -18,6 +19,7 @@ export { DocPreviewScreen }
 function DocPreviewScreen({ id }: { id: string }) {
 	let { documents } = useLibrary()
 	let doc = documents.find(doc => doc.id === id && !doc.deletedAt)
+	let { previewAssets } = useDocumentAssets(id, doc?.content ?? "")
 	let navigate = useNavigate()
 	if (!doc) return <DocumentNotFound />
 	let wikilinks = new Map(
@@ -42,6 +44,7 @@ function DocPreviewScreen({ id }: { id: string }) {
 				<title>{doc.title}</title>
 				<Preview
 					content={doc.content}
+					localAssets={previewAssets}
 					wikilinks={wikilinks}
 					onExit={() => void navigate({ to: "/doc/$id", params: { id } })}
 				/>

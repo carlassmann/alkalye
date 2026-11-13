@@ -73,6 +73,7 @@ interface LocalPreviewAsset {
 	url: string
 	lightUrl?: string
 	darkUrl?: string
+	muteAudio?: boolean
 }
 
 type PreviewComment = {
@@ -185,7 +186,7 @@ type Segment =
 	| { type: "image"; imageId: string; alt: string }
 	| { type: "video"; asset: Asset; alt: string }
 	| { type: "local-image"; url: string; alt: string }
-	| { type: "local-video"; url: string; alt: string }
+	| { type: "local-video"; url: string; alt: string; muteAudio?: boolean }
 
 function PreviewContent({
 	content,
@@ -557,7 +558,12 @@ function PreviewSegments({ segments }: { segments: Segment[] }) {
 				if (segment.type === "local-video") {
 					return (
 						<figure key={i} className="my-4">
-							<video src={segment.url} controls className="w-full rounded-lg" />
+							<video
+								src={segment.url}
+								muted={segment.muteAudio}
+								controls
+								className="w-full rounded-lg"
+							/>
 						</figure>
 					)
 				}
@@ -867,7 +873,7 @@ type RawSegment =
 	| { type: "image"; imageId: string; alt: string }
 	| { type: "video"; asset: Asset; alt: string }
 	| { type: "local-image"; url: string; alt: string }
-	| { type: "local-video"; url: string; alt: string }
+	| { type: "local-video"; url: string; alt: string; muteAudio?: boolean }
 
 async function parseSegments(
 	content: string,
@@ -903,7 +909,12 @@ async function parseSegments(
 			if (url) rawSegments.push({ type: "local-image", url, alt })
 			else rawSegments.push({ type: "text", content: match[0] })
 		} else if (local?.type === "video") {
-			rawSegments.push({ type: "local-video", url: local.url, alt })
+			rawSegments.push({
+				type: "local-video",
+				url: local.url,
+				alt,
+				muteAudio: local.muteAudio,
+			})
 		} else if (asset?.$isLoaded && asset.type === "image" && asset.image) {
 			rawSegments.push({
 				type: "image",

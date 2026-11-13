@@ -1,4 +1,9 @@
-import { useSyncExternalStore } from "react"
+import { loadThemesForPdf } from "@/app/features/themes"
+import { printToPdf, printSlidesToPdf } from "@/app/features/import-export"
+import { app, type Database } from "../lib/library"
+import { readAssetBlob } from "@/app/features/assets"
+import { DuplicateDocDialog } from "./duplicate-doc-dialog"
+import { useState, useSyncExternalStore } from "react"
 import { useNavigate } from "@tanstack/react-router"
 
 import { FileText } from "lucide-react"
@@ -38,7 +43,6 @@ import {
 	getExportAssets,
 	makeAddTag,
 	makeDownload,
-	makeDuplicate,
 	makeOpenTimeMachine,
 	makeRename,
 	makeTogglePin,
@@ -58,7 +62,7 @@ interface SidebarFileMenuProps {
 
 // --- Component ---
 
-function SidebarFileMenu({ doc, editor, spaceId }: SidebarFileMenuProps) {
+function SidebarFileMenu({ doc, editor }: SidebarFileMenuProps) {
 	let { db, ownerId, documents: libraryDocuments } = useLibrary()
 	let me = libraryDocuments
 	let t = useIntl()
@@ -77,18 +81,32 @@ function SidebarFileMenu({ doc, editor, spaceId }: SidebarFileMenuProps) {
 
 	// Themes carry binary assets, so load them on demand when exporting
 
+	let [duplicateOpen, setDuplicateOpen] = useState(false)
 	let content = doc.content
 	let readOnly = !canEdit(doc)
 	let docGroup = getDocumentGroup(doc)
 	let isAdmin = docGroup?.myRole() === "admin"
 	let isPinned = doc.pinned
 	let isPresentation = getPresentationMode(content)
-	let handlePrintPdf = makePrintPdf(content, doc)
-	let makePrintSlides = makePrintSlidesFactory(content, doc)
+	let handlePrintPdf = makePrintPdf(db, content, doc)
+	let makePrintSlides = makePrintSlidesFactory(db, content, doc)
 	let canShare = canShareDocument()
 
 	return (
 		<SidebarMenuItem>
+			<DuplicateDocDialog
+				doc={doc}
+				open={duplicateOpen}
+				onOpenChange={setDuplicateOpen}
+				onDuplicate={(id, destination) => {
+					if (destination)
+						void navigate({
+							to: "/spaces/$spaceId/doc/$id",
+							params: { spaceId: destination.id, id },
+						})
+					else void navigate({ to: "/doc/$id", params: { id } })
+				}}
+			/>
 			<DropdownMenu>
 				<DropdownMenuTrigger
 					render={
@@ -167,12 +185,12 @@ function SidebarFileMenu({ doc, editor, spaceId }: SidebarFileMenuProps) {
 					>
 						{t("doc.turnIntoPresentation")}
 					</DropdownMenuItem>
-					<DropdownMenuItem onClick={makeDownload(doc, content)}>
+					<DropdownMenuItem onClick={makeDownload(db, doc, content)}>
 						{t("doc.download")}
 					</DropdownMenuItem>
 					{canShare && (
 						<DropdownMenuItem
-							onClick={makeShare(doc, content)}
+							onClick={makeShare(db, doc, content)}
 							data-testid={testIds.doc.nativeShareButton}
 						>
 							{t("doc.shareCopy")}
@@ -213,7 +231,7 @@ function SidebarFileMenu({ doc, editor, spaceId }: SidebarFileMenuProps) {
 						</DropdownMenuSub>
 					)}
 					<DropdownMenuItem
-						onClick={makeDuplicate(db, doc, ownerId, spaceId, navigate)}
+						onClick={() => setDuplicateOpen(true)}
 						data-testid={testIds.doc.duplicateButton}
 					>
 						{t("doc.duplicate")}
@@ -263,9 +281,13 @@ function makeSaveAs(content: string) {
 	}
 }
 
-function makeShare(doc: LoadedDocument, content: string) {
+function makeShare(
+	db: import("../lib/library").Database,
+	doc: LoadedDocument,
+	content: string,
+) {
 	return async function handleShare() {
-		let docAssets = await getExportAssets(doc)
+		let docAssets = await getExportAssets(db, doc)
 		let title = getDocumentTitle(content)
 		await shareDocument(
 			content,
@@ -276,13 +298,66 @@ function makeShare(doc: LoadedDocument, content: string) {
 	}
 }
 
-function makePrintPdf(..._args: unknown[]) {
-	return () => {}
+function makePrintPdf(db: Database, content: string, doc: LoadedDocument) {
+	return async () => {
+		let themes = await loadThemesForPdf(db)
+		await printToPdf({
+			...themes,
+			content,
+			assets: await printableAssets(db, doc),
+		})
+	}
 }
 let slidePrintOptions: {
 	layout: SlidePrintLayout
 	aspectRatio: SlideAspectRatio
-}[] = []
-function makePrintSlidesFactory(..._args: unknown[]) {
-	return (_option: unknown) => () => {}
+}[] = [
+	{ layout: "slides", aspectRatio: "16:9" },
+	{ layout: "slides", aspectRatio: "4:3" },
+	{ layout: "notes", aspectRatio: "16:9" },
+	{ layout: "notes", aspectRatio: "4:3" },
+]
+function makePrintSlidesFactory(
+	db: Database,
+	content: string,
+	doc: LoadedDocument,
+) {
+	return (option: {
+			layout: SlidePrintLayout
+			aspectRatio: SlideAspectRatio
+		}) =>
+		async () => {
+			let themes = await loadThemesForPdf(db)
+			await printSlidesToPdf({
+				...themes,
+				...option,
+				content,
+				assets: await printableAssets(db, doc),
+			})
+		}
+}
+async function printableAssets(db: Database, doc: LoadedDocument) {
+	let rows = await db.all(
+		app.assets
+			.where({ documentId: doc.id })
+			.select("id", "name", "type", "revisionId"),
+	)
+	return rows.map(row => ({
+		...row,
+		getBlob: async () => {
+			if (row.type === "tldraw" && row.revisionId) {
+				let revision = await db.one(
+					app.tldrawRevisions
+						.where({ id: row.revisionId })
+						.select("lightPreview"),
+				)
+				return revision
+					? new Blob([new Uint8Array(revision.lightPreview)], {
+							type: "image/png",
+						})
+					: undefined
+			}
+			return readAssetBlob(db, row.id)
+		},
+	}))
 }

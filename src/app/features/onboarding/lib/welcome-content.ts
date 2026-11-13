@@ -1,3 +1,4 @@
+import { replaceShortcutTokens } from "@/app/lib/shortcut-registry"
 export { fetchWelcomeContent, getSpaceWelcomeContent }
 
 let FALLBACK_WELCOME_CONTENT = `# Welcome to Alkalye
@@ -22,7 +23,7 @@ async function fetchWelcomeContent(): Promise<string> {
 	try {
 		let response = await fetch("/docs/welcome.md")
 		if (!response.ok) return FALLBACK_WELCOME_CONTENT
-		return await response.text()
+		return replaceShortcutTokens(await response.text())
 	} catch {
 		return FALLBACK_WELCOME_CONTENT
 	}

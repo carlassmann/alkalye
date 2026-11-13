@@ -1,8 +1,22 @@
+import { handleSaveCopy } from "../lib/save-copy"
+import { useIsBackedUp } from "@/app/features/auth"
 import { toast } from "sonner"
-import { SidebarAssets } from "@/app/features/assets"
+import {
+	SidebarAssets,
+	useDocumentAssets,
+	uploadAsset,
+	useTldrawEditor,
+	createTldrawAsset,
+	updateTldrawAsset,
+	readAssetBlob,
+	copyDocumentAssets,
+} from "@/app/features/assets"
 import { SpaceSelector } from "@/app/features/spaces"
 import { SidebarCollaboration } from "@/app/features/sharing"
-import { SidebarImportExport } from "@/app/features/import-export"
+import {
+	SidebarImportExport,
+	handleImportFiles,
+} from "@/app/features/import-export"
 import { MessageSquareOff } from "lucide-react"
 import { SidebarMenuItem, SidebarMenuButton } from "@/app/components/ui/sidebar"
 import { useTrackLastOpened } from "../hooks/use-track-last-opened"
@@ -80,6 +94,10 @@ function DocumentEditor({ doc }: { doc: LibraryDocument }) {
 	let editor = useMarkdownEditorRef()
 	let { toggleLeft, toggleRight, isMobile, setRightOpenMobile } = useSidebar()
 	let { theme, setTheme } = useTheme()
+	let [saveCopyState, setSaveCopyState] = useState<"idle" | "saving" | "saved">(
+		"idle",
+	)
+	let backedUp = useIsBackedUp()
 	let [selectionCount, setSelectionCount] = useState(1)
 	let readOnly =
 		doc.ownerId !== ownerId &&
@@ -87,6 +105,33 @@ function DocumentEditor({ doc }: { doc: LibraryDocument }) {
 			grant => grant.documentId === doc.id && grant.role !== "reader",
 		)
 	useEditorSettings(settings)
+	let { sidebarAssets, editorAssets } = useDocumentAssets(doc.id, doc.content)
+	let tldraw = useTldrawEditor({
+		assets: sidebarAssets,
+		readOnly,
+		createAsset: (name, save) => createTldrawAsset(db, doc.id, name, save),
+		updateAsset: (id, save) => updateTldrawAsset(db, doc.id, id, save),
+		loadAsset: async id => {
+			let asset = await db.one(app.assets.where({ id }).select("revisionId"))
+			if (!asset?.revisionId) throw new Error("Whiteboard unavailable")
+			let revision = await db.one(
+				app.tldrawRevisions
+					.where({ id: asset.revisionId })
+					.select("snapshot", "createdAt"),
+			)
+			if (!revision) throw new Error("Whiteboard unavailable")
+			return {
+				json: new TextDecoder().decode(revision.snapshot),
+				lastModified: revision.createdAt.getTime(),
+			}
+		},
+	})
+	function insertAsset(id: string, name: string) {
+		let view = editor.current?.getEditor()
+		if (view)
+			view.dispatch(view.state.replaceSelection(`![${name}](asset:${id})`))
+	}
+
 	let [binding] = useState(() =>
 		codeMirrorSync(doc.content, (content, editedFrom) => {
 			void updateContent(db, doc, content, editedFrom).catch(error =>
@@ -115,10 +160,19 @@ function DocumentEditor({ doc }: { doc: LibraryDocument }) {
 	return (
 		<>
 			<title>{doc.title}</title>
+			{tldraw.dialog}
 			<DocumentCommands doc={doc} editor={editor} documents={wikiDocs} />
 			<div className="markdown-editor flex-1" data-testid={testIds.doc.editor}>
 				<MarkdownEditor
 					ref={editor}
+					assets={editorAssets}
+					onUploadImage={file => uploadAsset(db, doc.id, file)}
+					onUploadVideo={(file, options) =>
+						uploadAsset(db, doc.id, file, options)
+					}
+					onCreateTldraw={tldraw.create}
+					onEditTldraw={tldraw.edit}
+					onImportTldraw={tldraw.importFile}
 					value={doc.content}
 					placeholder={t("doc.startWriting")}
 					readOnly={readOnly}
@@ -152,8 +206,17 @@ function DocumentEditor({ doc }: { doc: LibraryDocument }) {
 					onToggleLeftSidebar={toggleLeft}
 					onToggleRightSidebar={toggleRight}
 					docId={doc.id}
+					onSaveCopy={
+						backedUp && doc.publicRead && doc.ownerId !== ownerId
+							? () =>
+									handleSaveCopy(db, ownerId, doc, setSaveCopyState, navigate)
+							: undefined
+					}
+					saveCopyState={saveCopyState}
 					content={doc.content}
-					onThemeChange={() => {}}
+					onThemeChange={content => {
+						editor.current?.setContent(content)
+					}}
 				/>
 				<EditorStatsBadge
 					content={doc.content}
@@ -227,7 +290,56 @@ function DocumentEditor({ doc }: { doc: LibraryDocument }) {
 				</SidebarGroup>
 				<SidebarSeparator />
 				<SidebarGroup className="flex-1">
-					<SidebarAssets assets={[]} readOnly />
+					<SidebarAssets
+						assets={sidebarAssets}
+						readOnly={readOnly}
+						onUploadImages={files => {
+							void Promise.all(
+								Array.from(files).map(file => uploadAsset(db, doc.id, file)),
+							)
+						}}
+						onUploadVideo={async (file, options) => {
+							await uploadAsset(db, doc.id, file, options)
+						}}
+						canUploadVideo
+						onRename={(id, name) => {
+							void db.update(app.assets, id, { name })
+						}}
+						onDelete={id => {
+							void updateContent(
+								db,
+								doc,
+								doc.content.replace(
+									new RegExp(`!\\[[^\\]]*\\]\\(asset:${id}\\)`, "g"),
+									"",
+								),
+							)
+							void db.delete(app.assets, id)
+						}}
+						onToggleMute={id => {
+							let asset = sidebarAssets.find(asset => asset.id === id)
+							if (asset)
+								void db.update(app.assets, id, { muteAudio: !asset.muteAudio })
+						}}
+						onInsert={insertAsset}
+						isAssetUsed={id => doc.content.includes(`asset:${id}`)}
+						onCreateTldraw={() => tldraw.create()}
+						onEditTldraw={tldraw.edit}
+						onImportTldraw={tldraw.importFile}
+						onDownload={async (id, name) => {
+							let blob = await readAssetBlob(db, id)
+							let url = URL.createObjectURL(blob)
+							let a = document.createElement("a")
+							a.href = url
+							a.download =
+								name +
+								(sidebarAssets.find(asset => asset.id === id)?.type === "tldraw"
+									? ".alkalye-tldraw"
+									: "." + blob.type.split("/")[1])
+							a.click()
+							setTimeout(() => URL.revokeObjectURL(url), 1000)
+						}}
+					/>
 				</SidebarGroup>
 			</DocumentSidebar>
 		</>
@@ -244,6 +356,11 @@ function PersonalDocumentSidebar({ docId }: { docId: string }) {
 	}
 	async function duplicate(doc: LibraryDocument) {
 		let copy = await createDocument(db, ownerId, addCopyToTitle(doc.content))
+		await updateContent(
+			db,
+			copy,
+			await copyDocumentAssets(db, doc.id, copy.id, copy.content),
+		)
 		closeSidebar()
 		void navigate({ to: "/doc/$id", params: { id: copy.id } })
 	}
@@ -282,9 +399,7 @@ function PersonalDocumentSidebar({ docId }: { docId: string }) {
 					if (doc.id === docId) void navigate({ to: "/" })
 				}}
 				onCreateFolder={createFolder}
-				onImport={async () => {
-					/* v2-todo(import-export) */
-				}}
+				onImport={files => handleImportFiles(files, db, ownerId)}
 			/>
 		</ListSidebar>
 	)
