@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process"
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs"
+import { mkdirSync, readFileSync, writeFileSync, rmSync } from "node:fs"
 import { join } from "node:path"
 import { z } from "zod"
 
@@ -7,6 +7,7 @@ let mode = process.argv[2]
 let origin = z.url().parse(process.argv[3])
 let directory = process.env.CLASSIC_QA_OUTPUT ?? "/tmp/alkalye-v2-phase3"
 let prefix = process.env.CLASSIC_QA_SESSION ?? "classic-cutover"
+let profilesDirectory = join(directory, "profiles")
 let fixtureSchema = z.object({
 	accountId: z.string(),
 	docId: z.string(),
@@ -15,6 +16,7 @@ let fixtureSchema = z.object({
 	assetId: z.string(),
 })
 mkdirSync(directory, { recursive: true })
+mkdirSync(profilesDirectory, { recursive: true, mode: 0o700 })
 if (mode === "prepare") prepare()
 else if (mode === "verify") verify()
 else
@@ -26,7 +28,7 @@ function browser(profile: string, ...args: string[]) {
 	return execFileSync("agent-browser", args, {
 		encoding: "utf8",
 		timeout: 65_000,
-		env: { ...process.env, AGENT_BROWSER_SESSION: `${prefix}-${profile}` },
+		env: browserEnvironment(profile),
 	}).trim()
 }
 function evaluate(profile: string, source: string): unknown {
@@ -35,9 +37,16 @@ function evaluate(profile: string, source: string): unknown {
 			input: source,
 			encoding: "utf8",
 			timeout: 65_000,
-			env: { ...process.env, AGENT_BROWSER_SESSION: `${prefix}-${profile}` },
+			env: browserEnvironment(profile),
 		}),
 	)
+}
+function browserEnvironment(profile: string) {
+	return {
+		...process.env,
+		AGENT_BROWSER_SESSION: `${prefix}-${profile}`,
+		AGENT_BROWSER_PROFILE: join(profilesDirectory, `${prefix}-${profile}`),
+	}
 }
 function prepare() {
 	for (let profile of ["a", "b"]) {
@@ -100,6 +109,8 @@ function inspect(profile: string) {
 			hashes: z.array(z.object({ id: z.string(), sha256: z.string() })),
 			members: z.array(z.object({ accountId: z.string(), role: z.string() })),
 			grants: z.array(z.object({ documentId: z.string(), role: z.string() })),
+			themeHashes: z.array(z.object({ id: z.string(), sha256: z.string() })),
+			revisionCount: z.number(),
 		})
 		.parse(
 			evaluate(
@@ -114,7 +125,7 @@ function verify() {
 		.parse(JSON.parse(readFileSync(join(directory, "qa-fixture.json"), "utf8")))
 	if (fixture.origin !== origin)
 		throw new Error("Cutover must keep the same origin")
-	for (let profile of ["a", "b"]) browser(profile, "reload")
+	for (let profile of ["a", "b"]) browser(profile, "open", `${origin}/app`)
 	// Interrupt after boot: the next import must finish using persisted maps.
 	browser("a", "wait", "[data-testid=classic-migration]", "--timeout", "60000")
 	browser("a", "reload")
@@ -140,6 +151,10 @@ function verify() {
 		throw new Error("Folders missing")
 	if (a.settings[0]?.editor.fontSize !== 21)
 		throw new Error("Settings not imported")
+	if (!a.themeHashes.length || a.revisionCount < 2)
+		throw new Error("Theme assets or whiteboard revision history missing")
+	if (!b.members.some(member => member.role === "writer"))
+		throw new Error("Space writer membership missing")
 	if (
 		!b.grants.some(
 			grant => grant.documentId === doc.id && grant.role === "reader",
@@ -178,6 +193,10 @@ function verify() {
 			),
 		)
 	browser("fresh", "close")
+	rmSync(join(profilesDirectory, `${prefix}-fresh`), {
+		recursive: true,
+		force: true,
+	})
 	browser("fresh", "open", `${origin}/app/settings`)
 	browser(
 		"fresh",
@@ -208,9 +227,26 @@ function verify() {
 		JSON.stringify(after.documents.map(doc => doc.id).sort())
 	)
 		throw new Error("Phrase recovery duplicated documents")
+	let edgeCases = z
+		.object({
+			forgedClaimStatus: z.literal(400),
+			hasClassic: z.literal(true),
+			hasV2: z.literal(true),
+			retiredRootFound: z.literal(true),
+			progress: z.object({
+				done: z.literal(true),
+				errors: z.array(z.unknown()).max(0),
+			}),
+		})
+		.parse(
+			evaluate(
+				"a",
+				`(${readFileSync(new URL("./fixtures/classic-cutover-checks.js", import.meta.url), "utf8")})(${JSON.stringify(fixture.b)})`,
+			),
+		)
 	writeFileSync(
 		join(directory, "qa-result.json"),
-		JSON.stringify({ a, b }, null, 2),
+		JSON.stringify({ a, b, edgeCases }, null, 2),
 	)
 	console.log(`Same-origin migration passed; inspect ${directory}\n${origin}`)
 }

@@ -88,6 +88,18 @@
 		{ version: 1, type: "tldraw", name: "Sketch", revision, createdAt: now },
 		owner,
 	)
+	board.$jazz.set(
+		"revision",
+		schema.TldrawRevision.create(
+			{
+				snapshot,
+				lightPreview: image,
+				darkPreview: image,
+				createdAt: new Date(),
+			},
+			owner,
+		),
+	)
 	doc.$jazz.set(
 		"assets",
 		co.list(schema.Asset).create([asset, videoAsset, board], owner),
@@ -192,6 +204,24 @@
 			updatedAt: now,
 		},
 		root.root.$jazz.owner,
+	)
+	let themeAsset = schema.ThemeAsset.create(
+		{
+			name: "theme-pixel.png",
+			mimeType: "image/png",
+			data: await co
+				.fileStream()
+				.createFromBlob(imageBlob, root.root.$jazz.owner),
+			createdAt: now,
+		},
+		root.root.$jazz.owner,
+	)
+	theme.$jazz.set(
+		"assets",
+		co.list(schema.ThemeAsset).create([themeAsset], root.root.$jazz.owner),
+	)
+	theme.css.$jazz.applyDiff(
+		`${theme.css.toString()}\nbody {background-image: url(asset:${themeAsset.$jazz.id});}`,
 	)
 	root.root.themes.$jazz.push(theme)
 	root.root.settings.$jazz.set("editor", {

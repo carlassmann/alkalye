@@ -2,7 +2,7 @@ import { z } from "zod"
 import { createJazzClient } from "jazz-tools/client"
 import { app } from "@/jazz/schema"
 import { deviceSecretFromSeed, readClassicCredentials } from "./identity"
-import { stableId, packBytes } from "./conversion"
+import { packBytes } from "./conversion"
 export { inspectClassicMigration }
 
 async function inspectClassicMigration() {
@@ -33,6 +33,7 @@ async function inspectClassicMigration() {
 			replies,
 			assets,
 			revisions,
+			themeAssets,
 		] = await Promise.all([
 			db.all(app.documents, { tier: "remote" }),
 			db.all(app.spaces, { tier: "remote" }),
@@ -47,6 +48,7 @@ async function inspectClassicMigration() {
 			db.all(app.commentReplies, { tier: "remote" }),
 			db.all(app.assets, { tier: "remote" }),
 			db.all(app.tldrawRevisions, { tier: "remote" }),
+			db.all(app.themeAssets, { tier: "remote" }),
 		])
 		let hashes = []
 		for (let asset of assets)
@@ -102,10 +104,15 @@ async function inspectClassicMigration() {
 				createdAt: version.createdAt,
 			})),
 			anchors,
+			themeHashes: await Promise.all(
+				themeAssets.map(async asset => ({
+					id: asset.id,
+					sha256: (await packBytes(new Uint8Array(asset.data))).sha256,
+				})),
+			),
 			replies: replies.map(reply => ({ id: reply.id, body: reply.body })),
 			hashes,
 			revisionCount: revisions.length,
-			fixtureDocumentId: await stableId("co_z5HwFWXGkT42KVTinTMbixXbYbE"),
 		}
 	} finally {
 		await session.close()
