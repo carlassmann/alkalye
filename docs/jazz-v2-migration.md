@@ -405,3 +405,103 @@ The inherited limits still apply: public-space bookmarks lack a schema table; Cl
 written with gpt-6.1-sol in T3 Code (Codex)
 
 - 2026-11-13, phase 1: UI benchmark harness and Classic baseline; three runs, zero scenario failures, v2 pending. Harness commit `262baf5`; results in `bench/results/classic.json`.
+
+## Phase 3: Classic user migration
+
+2026-11-13, implementation branch `t3/seamless-user-migration`, based on `20f0c71`. Local commits only; no push or PR.
+
+### Identity and authority
+
+`src/app/features/classic-import/` is the only Classic runtime boundary. Its schemas have no account migration callbacks. The importer never writes Classic data. Browser recovery reads Classic's exact `jazz-logged-in-secret` JSON (`accountID`, `accountSecret`, `secretSeed` byte array, `provider`). Anonymous accounts follow the same path. The seed becomes a `jazz-auth-v1:` device secret through the same BIP39 English words. A local marker prevents the old credentials from overriding later explicit v2 sign-ins. Classic credentials and IndexedDB remain intact for recovery and later offline edits.
+
+Classic credentials, an explicit recovery-phrase login, or a previous migration marker trigger a Classic probe using the device seed. Entering old words on a fresh device imports the corresponding Classic account. New v2 guests do not load the Classic client or contact its sync server. Home waits for this probe before creating a welcome document. Classic transport must be attached before constructing the controlled account. Attaching it afterwards worked against populated local storage but failed to load account dependencies in a fresh profile.
+
+`/api/classic-import` authenticates through the patched `jazz.forReqUser`. A backend nonce expires after 30 minutes and is bound to the authenticated v2 account. The browser signs `{ nonce, accountId }` with its Classic agent signer. The backend reconstructs the exact Classic account header, checks its content-addressed ID, and verifies the signature with the header's signer key. No seed, passphrase, or agent secret goes to the backend.
+
+The backend independently loads signed Classic groups through a read-only anonymous CoJSON node. It derives roles, inherited members, public visibility, and current ownership itself. Client-supplied membership lists are never accepted. Shared document and space UUIDs derive from Classic IDs, independently of the importer. A non-owner importing first receives only the verified Classic role; an unclaimed owner has a synthetic UUID. Pending access is backend-only. A later owner's verified claim transfers ownership. Claims recheck Classic access before activating pending grants. Grant activation happens once, so replay cannot undo later v2 downgrades or removals. Space documents inherit space membership rather than receiving duplicate individual grants. Child rows must share the signed Classic parent group, and comment authors must match signed creator history. Existing imported documents require current v2 write permission before merging later Classic edits. Ownership transfers after migration remain intact. The initial plaintext snapshot is supplied by a readable Classic client; the backend verifies its access and byte checksums, not every decrypted field against Classic ciphertext.
+
+### Imported data and resumption
+
+The browser flushes Classic's stored unsynced values before reading snapshots. It also traverses historical account-root references, preserving documents added offline to an old root after another device replaced it. It imports active/inactive personal documents, space documents, folders, pins, tags, presentation fields, public flags, profile, language/editor preferences, themes and their assets, comments/replies, binary assets, and whiteboard revision references. Image, video, theme, and whiteboard bytes carry SHA-256 checksums verified by the backend. Classic positions become offsets in Classic text; v2 anchors capture those ranges, retaining quote/context recovery.
+
+Deterministic row IDs plus `classicImports` make retries resumable. A failed item keeps its error and retries through the existing-style banner. A browser lock serializes imports within a profile. Unchanged Classic asset snapshots do not overwrite subsequent v2 asset changes. The last imported Classic text is the common ancestor supplied through `editedFrom` when later Classic edits arrive. Literal Classic IDs in prose remain unchanged; document links, frontmatter and theme asset references are rewritten. Legacy document, space and theme URL paths retain their query strings and fragments during conversion.
+
+Large binary fields and large item envelopes use authenticated 512 KiB base64 chunks. Completed chunks are removed; later uploads restore their tombstoned row IDs. Bytes still materialize in browser/backend memory. Very large videos remain a memory limit, despite avoiding individual host request-size limits. Abandoned partial chunks currently have no scheduled garbage collection.
+
+History groups consecutive edits by one Classic author within a minute, removes unchanged text, and keeps at most 200 versions / 8 MiB per document. Rows retain Classic timestamps, author IDs, and available profile names. The earlier phase-2 limitation still applies: imported text history cannot reconstruct historical image/video membership, asset deletion intervals, or the exact asset set of every old version. Current assets and whiteboard revisions are retained. Removed assets absent from the current Classic asset list are not independently crawled from all historical list transactions.
+
+Agent/MCP credentials are excluded. Users reconnect through Settings. Classic invite links do not carry over. The English/German notice explains the sync move, the loss of end-to-end encryption, and reconnection. Imported language settings control its locale.
+
+### Schema and integration
+
+One additive lens connects `35991c834bd8` to `1e19f995a65c`. New backend-only tables: `classicAccounts`, `classicChallenges`, `classicAccess`, `classicImportChunks`. `classicImports` gains optional `baseContent` and `classicOwnerId`. Existing permission rules deny client writes to all import state and imported versions. No changes to invite/member/grant columns; the parallel sharing patch can add its fields.
+
+Personal library reads now include readable documents referenced by the user's library entries, resolve private folder paths, and keep inactive entries out of the active sidebar. Preserve these changes when merging the sharing UI. This base still has deferred space screens; runtime membership/access checks passed through the actual backend and shared document preview, not a restored space screen.
+
+Configure `PUBLIC_JAZZ_CLASSIC_SYNC_SERVER` to the existing Classic sync peer. The old deployment's `PUBLIC_JAZZ_SYNC_SERVER` remains a fallback, retaining its URL/key. `8379d4e` declares that deployment variable but contains no committed production Cloud credential to copy. Work setup selects the workspace's isolated Classic peer when available. Keep Classic sync running throughout cutover.
+
+### Reusable runtime flow and evidence
+
+`bun scripts/qa-classic-migration.ts prepare <origin>` prepares two background agent-browser profiles against exact Classic `8379d4e`. Switch that **same origin** to v2, retaining the Classic sync server; then run `verify <origin>`. `CLASSIC_QA_SESSION` selects the profile prefix; `CLASSIC_QA_OUTPUT` selects the output directory. The fixture creates folders/pins, comments, many edits, an image, a padded 900 KB playable video, two whiteboard revisions, a theme with an image asset, settings, public content, shared personal content, and a space with separate roles. Profiles live in a private directory under the output folder so a browser-daemon restart does not discard the anonymous account. These profiles contain credentials; keep them local. The fresh recovery profile is cleared before each verification. The verifier interrupts/reloads import, checks identities/roles/history/anchors/settings/hashes, and restores the old words through the auth UI in a fresh profile. It then rejects a forged membership claim, merges an offline Classic edit with an independent v2 edit, and recovers a document added to a retired account root. These scenarios live in `scripts/fixtures/classic-cutover-checks.js`. `inspectClassicMigration` performs authoritative reads without exporting secrets.
+
+Work setup and startup both used `--tailscale`. A temporary Work project under `/tmp/alkalye-v2-phase3/harness` switched its source symlink between the Classic checkout and this worktree, retaining browser origin and storage.
+
+Runtime: https://web-cutover-alkalye-migration-fixture.cshed.carlassmann.com
+
+The final run passed against newly created A/B accounts with persistent profiles. Its result, including all edge-case assertions, is `/tmp/alkalye-v2-phase3/final/qa-result.json`; screenshots are alongside it. Both imported preview images decoded at their original width and the muted video reached readyState 4. Image, video and theme-image SHA-256 values matched the original fixture bytes, recorded in `final/source-hashes.json`.
+
+Evidence under `/tmp/alkalye-v2-phase3/` includes `qa-result.json`, two-profile screenshots, `forged-claim.json` (HTTP 400), and `late-write-result.json` (both the offline Classic addition and an independent v2 addition survived; eight items completed without errors). The source video's SHA-256 matched its imported bytes. A separate second whiteboard revision imported successfully (`revision-result.json`, count 2). A document written to a retired Classic root also imported (`retired-root-result.json`, nine items completed without errors). Recovery in a fresh profile displayed the same library. No production Cloud cutover or installed-PWA cutover was attempted. The fixture's whiteboard snapshot is minimal; the original drawing editor was not manually exercised in this phase.
+
+### Package findings
+
+Classic file headers can resolve before all binary chunks arrive. Subscribe until `toBlob()` returns a complete Blob. Calling Classic `waitForSync` indiscriminately on those files timed out even while its logged local/peer known states were equal; the importer instead flushes stored pending writes before traversal and waits for binary completion when reading files. This is an observed Classic behavior, not a confirmed v2 defect.
+
+Validation: `bun run check:types` has zero errors and nine hints; `check:lint` has zero errors and 144 warnings; `check:test` passes 71 files / 780 tests. Conversion tests cover anchors, grouped/bounded history, byte checksums, link rewriting and actual Classic cryptographic proofs. Real v2 backend tests cover retries, late text merges, author recovery, chunk reuse, parent scope, ID collisions, preserved v2 revocations and theme assets.
+
+V2 tombstoned chunk IDs require `restore`, not another `insert`; a regression test covers reuse after cleanup. Thin clients do not supply text anchors, so the inspection helper uses the local-first client. A temporary browser profile disappeared between long-running checks; the reusable harness now uses persistent profiles. Vite dependency hashes still require restarting Work after type checks. No new confirmed Jazz v2 defect was found.
+
+written with gpt-6.1-sol in T3 Code (Codex)
+
+- 2026-11-13, phase 3 handoff: identity/storage `faaf160`; browser importer and verified access `b4da2bc`; automatic restoration/banner `ba08857`; original cutover runner `e198771`; replay/access protections `cd567c4`; retired roots and cold startup `8652f7d`; durable full-flow fixtures `e54318e`; generated formatting `6b88116`. All commits are local. Types, lint, 780 tests and final same-origin runtime verification pass. Historical removed assets and the base branch's deferred space UI remain the limits above. No push or PR.
+
+written with gpt-6.1-sol in T3 Code (Codex)
+
+## Phase 3 integration into the migration branch
+
+2026-11-13, merged `t3/seamless-user-migration` at `40cbc10` into `jazz-v2-migration` after `1f0de58`. No push or PR.
+
+### Schema decision
+
+The combined schema is `1f98249fc7a2`, with all 25 tables, optional invite provenance on memberships/grants, and multi-use invites by default. A trial graph preserved both branch snapshots and added generated lenses from `9864f7adaa62` and `1e19f995a65c`. Alpha.61 rejected backend startup: "a version whose lenses from 2 versions disagree on where `classicAccess.classicId` comes from (one adds it or keeps another column) is not supported yet".
+
+There is no production v2 data. Integration therefore replaces the earlier snapshots/lenses with one clean combined snapshot, generated by `bun x jazz-tools migrations create --schema-dir src/jazz --migrations-dir src/jazz/migrations --name combined-foundation`, then validates it through the CLI. Existing disposable v2 stores from either lineage need resetting. This checkout's previous `.jazz` and the attempted graph are preserved in `/tmp/alkalye-phase3-integration-backup/`. Classic stores and credentials remain available for the importer.
+
+### Library and sharing
+
+The library combines broad readable-document queries with documents referenced by personal library entries. Private folder paths and pins remain; inactive personal entries stay out of the active sidebar. Space documents remain available to the restored space sidebar, with account-scoped grants and inherited member roles. Home retains both personal-root navigation and the importer probe gate.
+
+Classic imports use the existing patched `jazz.forReqUser` path. Imported memberships and document grants have null `inviteId`. A real-backend regression imports a space, creates/redeems a v2 writer invite, revokes it, and replays import. The original null-provenance membership survives; the revoked v2 membership stays removed. Classic runtime imports remain confined to `src/app/features/classic-import/`; the API route only delegates to that boundary.
+
+written with gpt-6.1-sol in T3 Code (Codex)
+
+### Integration validation
+
+`bun run check` passes: 74 test files / 798 tests, zero type errors, zero lint errors, formatting clean. The invite interoperability regression passes. No editor binding, Wasm, query helper or Astro/PWA configuration changes were needed.
+
+All 13 cases in `e2e/auth.spec.ts`, `doc.spec.ts`, `space.spec.ts` and `document-collab.spec.ts` pass together with one worker and a 120-second timeout in 3.7 minutes, against the integrated cutover runtime with its live Classic peer configured. An earlier run on the main dev origin hit the known 10-second cold-start readiness timeout once; that case passed on retry, and the complete final run passed unchanged.
+
+The cutover runner prepared fresh persistent profiles A/B against exact Classic `8379d4e`, then verified this checkout at the same origin. Work setup/start both used `--tailscale`. The existing temporary Work project's source symlink switched from `/tmp/alkalye-classic-ui-baseline` to this checkout; the Classic sync peer stayed running. Only one v2 backend used this checkout's SQLite store at a time.
+
+Runtime: https://web-cutover-alkalye-migration-fixture.cshed.carlassmann.com
+
+`prepare` and `verify` pass, including interrupted-import resumption, shared IDs/roles/assets, history/anchors/settings, fresh-profile phrase recovery, HTTP 400 for a forged claim, three-way late-write merging and retired-root recovery. Evidence: `/tmp/alkalye-phase3-integration-cutover/qa-result.json`, persistent profiles and screenshots in the same directory. Profiles contain credentials and stay local.
+
+Background agent-browser checks used those same profiles. B's selector lists "Classic shared space"; selecting it opens "Shared Classic notes" in the space sidebar/editor. Its settings show "Classic anonymous B", "You", "Writer". A opens that imported space's share dialog and creates a writer link. Fresh v2 profile C backs up its account through the auth UI, follows the link, sees "Joined successfully", and appears as a writer beside B in space settings. Authoritative reads confirm B's membership has null `inviteId` and C's membership records the new v2 invite. Evidence: `space-interoperability.json`, `imported-space-selector.png`, `imported-space-b.png`, `imported-space-b-role.png`, `imported-space-new-v2-user.png`, `imported-space-new-v2-role.png`.
+
+The inherited importer limits remain: historical removed assets are not exhaustively crawled, large videos materialize in memory, abandoned chunks lack scheduled cleanup, and production Cloud/installed-PWA cutovers remain untested. The earlier deferred-space-screen limitation is resolved by this integration. Public-space bookmarks still lack a private space-list table.
+
+written with gpt-6.1-sol in T3 Code (Codex)
+
+- 2026-11-13, phase 3 integration: merged the seamless importer with spaces/sharing and benchmarks; generated a clean combined schema after alpha.61 rejected the divergent lens graph; preserved personal-library and space behavior. Full check, 798 tests, 13 e2e cases, same-origin Classic cutover and imported-space/v2-invite browser checks pass. Commit: phase-3 integration merge.
+
+written with gpt-6.1-sol in T3 Code (Codex)

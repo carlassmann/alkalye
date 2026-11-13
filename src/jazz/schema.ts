@@ -243,12 +243,43 @@ let schema = {
 		},
 		{},
 	),
+	classicImportChunks: s.table(
+		{
+			ownerId: s.uuid(),
+			uploadId: s.string(),
+			part: s.int(),
+			data: s.bytes(),
+			createdAt: s.timestamp(),
+		},
+		{},
+	),
+	classicChallenges: s.table(
+		{
+			ownerId: s.uuid(),
+			nonce: s.string(),
+			expiresAt: s.timestamp(),
+			classicId: s.string().optional(),
+		},
+		{},
+	),
+	classicAccounts: s.table({ ownerId: s.uuid(), classicId: s.string() }, {}),
+	classicAccess: s.table(
+		{
+			classicId: s.string(),
+			resourceId: s.uuid(),
+			kind: s.enum("document", "space"),
+			role: s.enum("reader", "writer", "manager", "admin"),
+		},
+		{},
+	),
 	classicImports: s.table(
 		{
 			ownerId: s.uuid(),
 			classicId: s.string(),
 			v2Id: s.uuid(),
 			kind: s.string(),
+			baseContent: s.string().optional(),
+			classicOwnerId: s.string().optional(),
 			status: s.enum("pending", "complete", "failed"),
 			importedAt: s.timestamp().optional(),
 			error: s.string().optional(),

@@ -73,6 +73,10 @@ function useLibraryData() {
 	if (!ownerId) throw new Error("Account missing")
 	let { data: rows = [], isLoading } = useAll(app.documents)
 	let { data: entries = [] } = useAll(app.userDocuments.where({ ownerId }))
+	let { data: linkedRows = [] } = useAll(
+		app.documents.where({ id: { in: entries.map(entry => entry.documentId) } }),
+	)
+	let { data: folderRows = [] } = useAll(app.folders.where({ ownerId }))
 	let { data: preferences = [], isLoading: settingsLoading } = useAll(
 		app.settings.where({ ownerId }),
 	)
@@ -93,51 +97,77 @@ function useLibraryData() {
 			)
 	}, [db, ownerId, profileLoading, profiles])
 
-	let documents: LibraryDocument[] = rows.map(row => ({
-		...row,
-		shared: grants.some(
-			grant => grant.documentId === row.id && grant.accountId !== row.ownerId,
-		),
-		canEdit:
-			row.ownerId === ownerId ||
-			spaces.some(
-				space => space.id === row.spaceId && space.ownerId === ownerId,
-			) ||
-			members.some(
-				member =>
-					member.spaceId === row.spaceId &&
-					member.accountId === ownerId &&
-					member.role !== "reader",
-			) ||
-			grants.some(
-				grant =>
-					grant.accountId === ownerId &&
-					grant.documentId === row.id &&
-					grant.role !== "reader",
+	let visibleRows = [
+		...new Map([...rows, ...linkedRows].map(row => [row.id, row])).values(),
+	]
+	function folderPath(documentId: string) {
+		let folderId = entries.find(
+			entry => entry.documentId === documentId,
+		)?.folderId
+		let names: string[] = []
+		let seen = new Set<string>()
+		while (folderId && !seen.has(folderId)) {
+			seen.add(folderId)
+			let folder = folderRows.find(folder => folder.id === folderId)
+			if (!folder) break
+			names.unshift(folder.name)
+			folderId = folder.parentId
+		}
+		return names.length ? names.join("/") : null
+	}
+	let documents: LibraryDocument[] = visibleRows
+		.filter(
+			row =>
+				!entries.some(
+					entry =>
+						entry.documentId === row.id && entry.archived && !row.deletedAt,
+				),
+		)
+		.map(row => ({
+			...row,
+			shared: grants.some(
+				grant => grant.documentId === row.id && grant.accountId !== row.ownerId,
 			),
-		canAdmin:
-			row.ownerId === ownerId ||
-			spaces.some(
-				space => space.id === row.spaceId && space.ownerId === ownerId,
-			) ||
-			members.some(
-				member =>
-					member.spaceId === row.spaceId &&
-					member.accountId === ownerId &&
-					member.role === "admin",
-			) ||
-			grants.some(
-				grant =>
-					grant.accountId === ownerId &&
-					grant.documentId === row.id &&
-					grant.role === "admin",
-			),
-		deletedAt: row.deletedAt ?? undefined,
-		path: getPath(row.content),
-		pinned:
-			entries.find(entry => entry.documentId === row.id)?.pinned ??
-			parseFrontmatter(row.content).frontmatter?.pinned === true,
-	}))
+			canEdit:
+				row.ownerId === ownerId ||
+				spaces.some(
+					space => space.id === row.spaceId && space.ownerId === ownerId,
+				) ||
+				members.some(
+					member =>
+						member.spaceId === row.spaceId &&
+						member.accountId === ownerId &&
+						member.role !== "reader",
+				) ||
+				grants.some(
+					grant =>
+						grant.accountId === ownerId &&
+						grant.documentId === row.id &&
+						grant.role !== "reader",
+				),
+			canAdmin:
+				row.ownerId === ownerId ||
+				spaces.some(
+					space => space.id === row.spaceId && space.ownerId === ownerId,
+				) ||
+				members.some(
+					member =>
+						member.spaceId === row.spaceId &&
+						member.accountId === ownerId &&
+						member.role === "admin",
+				) ||
+				grants.some(
+					grant =>
+						grant.accountId === ownerId &&
+						grant.documentId === row.id &&
+						grant.role === "admin",
+				),
+			deletedAt: row.deletedAt ?? undefined,
+			path: getPath(row.content) ?? (!row.spaceId ? folderPath(row.id) : null),
+			pinned:
+				entries.find(entry => entry.documentId === row.id)?.pinned ??
+				parseFrontmatter(row.content).frontmatter?.pinned === true,
+		}))
 	useEffect(() => {
 		if (
 			settingsLoading ||

@@ -71,6 +71,8 @@ Authorization codes and refresh tokens are protected against immediate reuse wit
 
 Disconnect marks only the connection as revoked in `mcpConnections`. The browser authenticates with its device proof; connection rows reject direct client writes. MCP requests, tools, and token exchanges validate that record. The user's documents, memberships, and other connections remain intact. Cross-instance revocation follows Jazz synchronization; requests already running can finish.
 
+The Classic library importer excludes agent and MCP credentials. Reconnect those clients through Settings after migration. Classic invite links also expire at cutover.
+
 Old dedicated-agent connections cannot authorize with the new credential format. Reconnect clients through OAuth. Existing collaborator memberships are left intact; document admins can remove those old accounts through normal sharing controls.
 
 Exercise OAuth, discovery, personal creation, shared non-admin editing, reader rejection, revision conflicts, comments, and disconnect against the deployed origin.

@@ -1,3 +1,4 @@
+import { useClassicImportPending } from "@/app/features/classic-import/migration-state"
 import { readStorageMode } from "@/app/lib/storage-mode"
 import { fetchWelcomeContent } from "@/app/features/onboarding"
 import { readLastOpenedDocument } from "../lib/last-opened-document"
@@ -10,6 +11,7 @@ function HomeScreen({ personal = false }: { personal?: boolean }) {
 	let { db, ownerId, documents, entries, isLoading } = useLibrary()
 	let navigate = useNavigate()
 	let creating = useRef(false)
+	let importing = useClassicImportPending()
 	useEffect(() => {
 		if (readStorageMode() === "filesystem") {
 			void navigate({ to: "/local", replace: true })
@@ -41,7 +43,7 @@ function HomeScreen({ personal = false }: { personal?: boolean }) {
 			})
 		} else if (doc)
 			void navigate({ to: "/doc/$id", params: { id: doc.id }, replace: true })
-		else if (!creating.current) {
+		else if (!importing && !creating.current) {
 			creating.current = true
 			void fetchWelcomeContent()
 				.then(content => createDocument(db, ownerId, content))
@@ -49,6 +51,15 @@ function HomeScreen({ personal = false }: { personal?: boolean }) {
 					navigate({ to: "/doc/$id", params: { id: doc.id }, replace: true }),
 				)
 		}
-	}, [db, ownerId, documents, entries, isLoading, navigate, personal])
+	}, [
+		db,
+		ownerId,
+		documents,
+		entries,
+		isLoading,
+		navigate,
+		personal,
+		importing,
+	])
 	return <p role="status">Opening documents…</p>
 }

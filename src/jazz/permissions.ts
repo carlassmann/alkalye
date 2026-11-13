@@ -270,7 +270,17 @@ export let permissions = s.definePermissions(
 		policy.documentVersions.allowInsert.never()
 		policy.documentVersions.allowUpdate.never()
 		policy.documentVersions.allowDelete.never()
-		// v2-todo(importer): only trusted backend code writes versions and the verified Classic identity map.
+		for (let table of [
+			policy.classicImportChunks,
+			policy.classicChallenges,
+			policy.classicAccounts,
+			policy.classicAccess,
+		]) {
+			table.allowRead.never()
+			table.allowInsert.never()
+			table.allowUpdate.never()
+			table.allowDelete.never()
+		}
 		policy.classicImports.allowRead.where(owned)
 		policy.classicImports.allowInsert.never()
 		policy.classicImports.allowUpdate.never()

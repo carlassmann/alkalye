@@ -310,6 +310,13 @@
 				"nullable": false
 			},
 			{
+				"name": "inviteId",
+				"column_type": {
+					"type": "Uuid"
+				},
+				"nullable": true
+			},
+			{
 				"name": "role",
 				"column_type": {
 					"type": "Enum",
@@ -342,6 +349,13 @@
 					"type": "Uuid"
 				},
 				"nullable": false
+			},
+			{
+				"name": "inviteId",
+				"column_type": {
+					"type": "Uuid"
+				},
+				"nullable": true
 			},
 			{
 				"name": "role",
@@ -391,6 +405,17 @@
 					"type": "Text"
 				},
 				"nullable": false
+			},
+			{
+				"name": "singleUse",
+				"column_type": {
+					"type": "Boolean"
+				},
+				"nullable": false,
+				"default": {
+					"type": "Boolean",
+					"value": false
+				}
 			},
 			{
 				"name": "role",
@@ -1244,6 +1269,133 @@
 		],
 		"relations": {}
 	},
+	"classicImportChunks": {
+		"columns": [
+			{
+				"name": "ownerId",
+				"column_type": {
+					"type": "Uuid"
+				},
+				"nullable": false
+			},
+			{
+				"name": "uploadId",
+				"column_type": {
+					"type": "Text"
+				},
+				"nullable": false
+			},
+			{
+				"name": "part",
+				"column_type": {
+					"type": "Integer"
+				},
+				"nullable": false
+			},
+			{
+				"name": "data",
+				"column_type": {
+					"type": "Bytea"
+				},
+				"nullable": false
+			},
+			{
+				"name": "createdAt",
+				"column_type": {
+					"type": "Timestamp"
+				},
+				"nullable": false
+			}
+		],
+		"relations": {}
+	},
+	"classicChallenges": {
+		"columns": [
+			{
+				"name": "ownerId",
+				"column_type": {
+					"type": "Uuid"
+				},
+				"nullable": false
+			},
+			{
+				"name": "nonce",
+				"column_type": {
+					"type": "Text"
+				},
+				"nullable": false
+			},
+			{
+				"name": "expiresAt",
+				"column_type": {
+					"type": "Timestamp"
+				},
+				"nullable": false
+			},
+			{
+				"name": "classicId",
+				"column_type": {
+					"type": "Text"
+				},
+				"nullable": true
+			}
+		],
+		"relations": {}
+	},
+	"classicAccounts": {
+		"columns": [
+			{
+				"name": "ownerId",
+				"column_type": {
+					"type": "Uuid"
+				},
+				"nullable": false
+			},
+			{
+				"name": "classicId",
+				"column_type": {
+					"type": "Text"
+				},
+				"nullable": false
+			}
+		],
+		"relations": {}
+	},
+	"classicAccess": {
+		"columns": [
+			{
+				"name": "classicId",
+				"column_type": {
+					"type": "Text"
+				},
+				"nullable": false
+			},
+			{
+				"name": "resourceId",
+				"column_type": {
+					"type": "Uuid"
+				},
+				"nullable": false
+			},
+			{
+				"name": "kind",
+				"column_type": {
+					"type": "Enum",
+					"variants": ["document", "space"]
+				},
+				"nullable": false
+			},
+			{
+				"name": "role",
+				"column_type": {
+					"type": "Enum",
+					"variants": ["reader", "writer", "manager", "admin"]
+				},
+				"nullable": false
+			}
+		],
+		"relations": {}
+	},
 	"classicImports": {
 		"columns": [
 			{
@@ -1273,6 +1425,20 @@
 					"type": "Text"
 				},
 				"nullable": false
+			},
+			{
+				"name": "baseContent",
+				"column_type": {
+					"type": "Text"
+				},
+				"nullable": true
+			},
+			{
+				"name": "classicOwnerId",
+				"column_type": {
+					"type": "Text"
+				},
+				"nullable": true
 			},
 			{
 				"name": "status",
