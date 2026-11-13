@@ -141,7 +141,7 @@ test.each(["reader", "writer", "manager", "admin"])(
 	},
 )
 
-test("public reads grant no writes; credentials, laser and imports stay private", async () => {
+test("public reads grant no document writes; credentials and imports stay private", async () => {
 	let doc = await fixture.seed(db =>
 		db.insert(app.documents, { ...note(), publicRead: true }),
 	)
@@ -266,7 +266,7 @@ test("document blobs inherit access; public access exposes no private account da
 		}),
 	)
 	expect(await bob.all(app.mcpConnections.where({}))).toEqual([])
-	expect(await bob.all(app.laser.where({}))).toEqual([])
+	expect(await bob.all(app.laser.where({ documentId: doc.id }))).toHaveLength(1)
 })
 
 test("presence is readable with the document but only the publishing account can update it", async () => {

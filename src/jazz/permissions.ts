@@ -193,6 +193,7 @@ export let permissions = s.definePermissions(
 				policy.commentThreads.exists.where({
 					id: thread.id,
 					authorId: thread.authorId,
+					documentId: thread.documentId,
 				}),
 			]),
 		)
@@ -214,9 +215,20 @@ export let permissions = s.definePermissions(
 			operation.where(
 				allOf([{ accountId: session.user }, allowedTo.read("document")]),
 			)
-		policy.laser.allowRead.where(owned)
-		policy.laser.allowInsert.where(owned)
-		policy.laser.allowUpdate.where(owned)
+		policy.laser.allowRead.where(allowedTo.read("document"))
+		policy.laser.allowInsert.where(allOf([owned, allowedTo.read("document")]))
+		policy.laser.allowUpdate.where(laser =>
+			allOf([
+				owned,
+				allowedTo.read("document"),
+				policy.laser.exists.where({
+					id: laser.id,
+					ownerId: session.user,
+					documentId: laser.documentId,
+					senderId: laser.senderId,
+				}),
+			]),
+		)
 		policy.laser.allowDelete.where(owned)
 		policy.documentVersions.allowRead.where(allowedTo.read("document"))
 		policy.documentVersions.allowInsert.never()

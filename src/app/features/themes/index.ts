@@ -1,6 +1,6 @@
 import type { schema } from "jazz-tools"
 import { app } from "@/jazz/schema"
-export { getDefaultDocumentCss } from "./lib/default-theme"
+export { getDefaultDocumentCss, getSlideshowBaseCss } from "./lib/default-theme"
 export { sanitizeHtml } from "./lib/sanitize"
 export {
 	useDocumentTheme,
