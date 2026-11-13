@@ -1,4 +1,9 @@
 import type { APIRoute } from "astro"
-// v2-todo(agents-mcp): restore discovery after the v2 API port.
+export { GET }
 export const prerender = false
-export let ALL: APIRoute = () => new Response("Unavailable during Jazz v2 migration", { status: 503 })
+let GET: APIRoute = ({ request }) =>
+	Response.json({
+		baseUrl: new URL(request.url).origin,
+		jazzUrl: new URL("/jazz", request.url).href,
+		authentication: "device-recovery-phrase",
+	})
