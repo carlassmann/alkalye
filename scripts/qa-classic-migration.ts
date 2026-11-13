@@ -11,6 +11,7 @@ let profilesDirectory = join(directory, "profiles")
 let fixtureSchema = z.object({
 	accountId: z.string(),
 	docId: z.string(),
+	claimedDocId: z.string(),
 	spaceId: z.string(),
 	spaceDocId: z.string(),
 	assetId: z.string(),
@@ -86,7 +87,7 @@ function prepare() {
 	)
 	evaluate(
 		"b",
-		`(async()=>{let s=await import('/src/schema/index.ts');let me=await s.UserAccount.getMe().$jazz.ensureLoaded({resolve:{root:{documents:true,spaces:true},profile:true}});me.root.documents.$jazz.push(await s.Document.load(${JSON.stringify(fixture.docId)}));me.root.spaces.$jazz.push(await s.Space.load(${JSON.stringify(fixture.spaceId)}));me.profile.$jazz.set('name','Classic anonymous B');await me.$jazz.waitForAllCoValuesSync({timeout:60000});return true})()`,
+		`(async()=>{let s=await import('/src/schema/index.ts');let me=await s.UserAccount.getMe().$jazz.ensureLoaded({resolve:{root:{documents:true,spaces:true},profile:true}});me.root.documents.$jazz.push(await s.Document.load(${JSON.stringify(fixture.docId)}));me.root.documents.$jazz.push(await s.Document.load(${JSON.stringify(fixture.claimedDocId)}));me.root.spaces.$jazz.push(await s.Space.load(${JSON.stringify(fixture.spaceId)}));me.profile.$jazz.set('name','Classic anonymous B');await me.$jazz.waitForAllCoValuesSync({timeout:60000});return true})()`,
 	)
 	writeFileSync(
 		join(directory, "qa-fixture.json"),
@@ -311,16 +312,29 @@ function verify() {
 	let afterV2Removal = z
 		.object({ id: z.null() })
 		.parse(security("b", "lookup", fixture))
+	let activeTargets = [
+		{ ...fixture, docId: fixture.claimedDocId },
+		{ ...fixture, lookupKind: "space" },
+		{ ...fixture, docId: fixture.spaceDocId },
+	]
+	let beforeClassicRemoval = activeTargets.map(target =>
+		z.object({ id: z.string() }).parse(security("b", "lookup", target)),
+	)
 	security("a", "remove-classic", fixture)
 	security("a", "replay", fixture)
 	let afterClassicRemoval = z
 		.object({ id: z.null() })
 		.parse(security("b", "lookup", fixture))
+	let claimedAccessAfterClassicRemoval = activeTargets.map(target =>
+		z.object({ id: z.null() }).parse(security("b", "lookup", target)),
+	)
 	let securityCases = {
 		readerForgery,
 		redirected,
 		afterV2Removal,
 		afterClassicRemoval,
+		beforeClassicRemoval,
+		claimedAccessAfterClassicRemoval,
 	}
 	writeFileSync(
 		join(directory, "qa-result.json"),

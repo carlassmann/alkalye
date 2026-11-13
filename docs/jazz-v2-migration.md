@@ -558,3 +558,19 @@ Local evidence: `/tmp/alkalye-secure-classic-cutover/validated/qa-result.json`, 
 The remaining limits are explicit writer trust for decrypted plaintext, in-memory envelope assembly, the 512 MiB envelope/upload and 1 GiB active account reservation limits, and activity-driven cleanup. A document requiring more than the account's simultaneous upload quota reports an error; retry after cleanup does not increase the quota. Historical removed assets are still not exhaustively crawled. All seven review items are addressed within those stated limits.
 
 written with gpt-6.1-sol in T3 Code (Codex)
+
+### Active Classic access reconciliation
+
+Authoritative document and space replays now reconcile activated Classic grants as well as pending claims. Classic removals delete the active grants; demotions reduce their roles. The deterministic grant ID and backend membership activation marker identify Classic provenance, so v2 grants stay independent. Reconciliation also reads deleted pending rows to repair grants left active by earlier replays. It never restores deleted grants or raises a current v2 role. Rejoining Classic cannot undo a v2 removal. Direct document grants stay bounded by their direct Classic role rather than absorbing inherited space privileges.
+
+Grant changes and invite invalidation share one serializable transaction with pending ACL updates. Space changes invalidate the affected member's space invites and document invites within that space. Activation also uses a transaction, keeping its marker and grant creation together.
+
+The review's three failures are permanent regressions in `access.test.ts`, reproduced before the fix. Eleven tests cover document and space removal, writer demotion, v2 downgrades and removals, independent grants, previously deleted pending rows, rejoining Classic, invite invalidation and inherited document access. Same-origin `prepare` and `verify` pass with fresh persistent profiles. The extended verifier confirms an already-claimed document, space and inherited space document are readable immediately before Classic removal, then inaccessible after owner replay, without a preceding v2 removal.
+
+Runtime: https://web-main-alkalye-grants-cutover.cshed.carlassmann.com
+
+`bun run check` passes all 83 files / 851 tests, with zero type errors, zero lint errors and clean formatting. An earlier run hit the existing time-machine copy test's five-second timeout; the unchanged rerun passes. Full output: `/tmp/alkalye-grants-check3.log`.
+
+Local evidence: `/tmp/alkalye-grants-cutover/evidence/qa-result.json`. Original failing repro output: `/tmp/alkalye-grants-before.log`. Browser profiles contain credentials and remain local. No push or PR.
+
+written with gpt-6.1-sol in T3 Code (Codex)

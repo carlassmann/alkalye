@@ -31,6 +31,16 @@
 		owner,
 	)
 	root.root.documents.$jazz.push(doc)
+	let claimedDoc = schema.Document.create(
+		{
+			version: 1,
+			content: co.plainText().create("# Claimed Classic access", owner),
+			createdAt: now,
+			updatedAt: now,
+		},
+		owner,
+	)
+	root.root.documents.$jazz.push(claimedDoc)
 	doc.$jazz.set("path", "Migration/Notes")
 	doc.$jazz.set("pinned", true)
 	doc.$jazz.set("isPresentation", true)
@@ -257,6 +267,7 @@
 	let fixture = {
 		accountId: me.$jazz.id,
 		docId: doc.$jazz.id,
+		claimedDocId: claimedDoc.$jazz.id,
 		spaceId: space.$jazz.id,
 		spaceDocId: spaceDoc.$jazz.id,
 		publicDocId: publicDoc.$jazz.id,

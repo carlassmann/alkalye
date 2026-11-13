@@ -113,6 +113,11 @@ async function verifyClassicSecurity(mode, fixture) {
 			})
 			if (!member.$isLoaded) throw new Error("Classic reader unavailable")
 			doc.$jazz.owner.removeMember(member)
+			let space = await schema.Space.load(fixture.spaceId, {
+				loadAs: source.account,
+			})
+			if (!space.$isLoaded) throw new Error("Classic space unavailable")
+			space.$jazz.owner.removeMember(member)
 			await source.account.$jazz.waitForAllCoValuesSync({ timeout: 60000 })
 			return true
 		} finally {
@@ -123,7 +128,11 @@ async function verifyClassicSecurity(mode, fixture) {
 		let response = await fetch("/api/classic-import?action=lookup", {
 			method: "POST",
 			headers,
-			body: JSON.stringify({ classicId: fixture.docId, kind: "document" }),
+			body: JSON.stringify({
+				classicId:
+					fixture.lookupKind === "space" ? fixture.spaceId : fixture.docId,
+				kind: fixture.lookupKind ?? "document",
+			}),
 		})
 		return response.json()
 	}
