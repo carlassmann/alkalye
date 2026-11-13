@@ -99,7 +99,8 @@ restarting the `work` services.
 
 ## Jazz benchmarks
 
-Fetch checksum-pinned datasets, start this checkout's services, then run headless Chromium:
+Fetch checksum-pinned datasets, start this checkout's services, then run headless Chromium.
+Install Chromium once with `bunx playwright install chromium` if needed:
 
 ```sh
 bun run bench:fetch
@@ -109,6 +110,8 @@ work urls
 bun run bench:compare -- --target <web-url> --label classic --out bench/results/classic.json
 ```
 
+Run from the checkout serving the target; package and Git metadata come from that checkout.
+`bun run bench:verify-network` checks worker HTTP, binary WebSocket and Wasm capture.
 For v2, run the same command against its services with `--label v2 --out bench/results/v2.json`.
 Keep the machine, server build mode and options identical. Classic's sync server
 exhausted its default 4 GB heap during repeated imports; use the 16 GB limit above.
@@ -116,7 +119,8 @@ Set `BENCH_SERVER_NOTE` to record the server version and heap limit in results. 
 accounts, 50 Vite Markdown documents, two Gutenberg books, 200 Automerge trace edits
 per document. Use `--cpu 4` for CPU throttling, `--edits full` for all 259,778 edits,
 or `--notes 20 --edits 50` for a shorter smoke run. Full replay uses UI cursor moves
-and can take hours. No fixed performance threshold runs in CI.
+and can take hours. Replay deadlines scale with edit count; override with
+`--replay-timeout-ms <ms>`. Scenario failures remain in JSON and produce exit code 1. No fixed performance threshold runs in CI.
 
 Only `scripts/bench/adapter.ts` depends on account, sign-in and import UI conventions.
 It reuses `e2e/auth-helpers.ts`; change these bindings if v2 changes the UI. Scenarios

@@ -62,7 +62,16 @@ The resulting full content must equal independently replayed trace text plus the
 original document. Full replay also checks upstream's finalText. Default replay uses
 the first 200 edits, not the full history or its original timing.
 
-Input-to-paint is a beforeinput timestamp to the second requestAnimationFrame,
+Typing cases use independent fresh browser contexts, with full original content
+verified before replay. Only the small note needs reset after sync markers. This
+avoids carrying an earlier editor or save worker into the next typing case. Each
+case has a deadline, default two minutes for the short slice, scaling for full replay.
+
+Dispatch-to-paint starts before the Playwright insertion/deletion call and ends
+after a double requestAnimationFrame response. It includes input queueing and
+automation/IPC overhead. It is the primary typing latency estimate.
+
+The additional input-to-paint proxy is a beforeinput timestamp to the second requestAnimationFrame,
 a paint-opportunity estimate rather than a display presentation timestamp. It excludes
 input queueing before beforeinput. Inserts
 and deletions with beforeinput events contribute samples; cursor moves do not.
@@ -73,11 +82,15 @@ samples across runs. Other metrics use nearest-rank percentiles of run samples;
 sync pools five samples per run. Raw samples are retained.
 
 Storage uses Chromium's origin estimate usageDetails.indexedDB after import. It is
-an implementation estimate, not a database-file size. Wire metrics count CDP WebSocket
-payload bytes and HTTP request-body bytes exposed by CDP during replay plus settling, divided by
-trace edits. They include presence/background traffic, exclude TLS, framing and
+an implementation estimate, not a database-file size. Network capture attaches to pages, iframes, dedicated workers and SharedWorkers
+before worker code resumes. The loopback integration fixture checks Wasm transfers
+and exact binary HTTP/WebSocket byte counts inside both worker kinds.
+Wire metrics count CDP WebSocket
+payload bytes and HTTP request-body bytes exposed by CDP during replay, settling and the final verification, divided by
+trace edits. They include presence/background traffic, exclude transport compression, TLS, framing and
 headers, and report received WebSocket payload separately. JS heap comes from CDP
-Runtime.getHeapUsage after replay, without forced GC, and excludes worker heaps.
+Runtime.getHeapUsage after replay, without forced GC. It excludes worker heaps, native allocations and
+Wasm linear memory.
 
 ## Results
 
@@ -88,7 +101,8 @@ Pending baseline completion. v2: TBD.
 These are development-server measurements over a local tailnet proxy, without
 network shaping. CPU throttling applies to page targets, not a whole-machine
 low-end-device simulation. Server caches persist between accounts. Browser JIT,
-background processes, sync batching and garbage collection add noise. Three runs
+background processes, sync batching and garbage collection add noise. Classic debounces saves; v2 writes
+each change immediately, so payload comparisons include that shipped behavior. Three runs
 only give a coarse p95. Repeat on an idle machine before making product claims.
 Service-worker offline startup and production CDN compression need separate runs.
 

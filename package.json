@@ -34,7 +34,8 @@
 		"test": "vitest",
 		"prepare": "effect-language-service patch",
 		"bench:compare": "bun scripts/bench/compare.ts",
-		"bench:fetch": "bun scripts/bench/fetch.ts"
+		"bench:fetch": "bun scripts/bench/fetch.ts",
+		"bench:verify-network": "bun scripts/bench/verify-network.ts"
 	},
 	"dependencies": {
 		"@base-ui/react": "^1.1.0",
@@ -119,17 +120,20 @@
 		"@happy-dom/global-registrator": "^20.3.7",
 		"@modelcontextprotocol/client": "2.0.0",
 		"@playwright/test": "^1.58.2",
+		"@types/chrome-remote-interface": "^0.34.1",
 		"@types/css-tree": "^3.2.0",
 		"@types/dompurify": "^3.2.0",
 		"@types/jsdom": "^30.0.0",
 		"@types/node": "^24.10.9",
 		"@types/react": "^19.2.9",
 		"@types/react-dom": "^19.2.3",
+		"@types/ws": "^8.18.2",
 		"@typescript-eslint/eslint-plugin": "^8.53.1",
 		"@typescript-eslint/parser": "^8.53.1",
 		"@vite-pwa/astro": "^1.2.0",
 		"@vitejs/plugin-react": "^5.1.2",
 		"babel-plugin-react-compiler": "^1.0.0",
+		"chrome-remote-interface": "^0.34.0",
 		"effect-solutions": "^0.4.13",
 		"eslint": "^9.39.2",
 		"eslint-plugin-astro": "^1.5.0",
@@ -143,6 +147,7 @@
 		"typescript": "~5.9.3",
 		"vite": "^7.3.1",
 		"vitest": "^4.0.18",
-		"workbox-window": "^7.4.0"
+		"workbox-window": "^7.4.0",
+		"ws": "^8.23.0"
 	}
 }

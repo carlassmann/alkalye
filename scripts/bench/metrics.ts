@@ -1,3 +1,4 @@
+import { captureNetwork } from "./network"
 import { type BrowserContext, type Page } from "@playwright/test"
 import { installBenchmarkCompatibility } from "./browser"
 
@@ -37,35 +38,9 @@ async function installObservers(context: BrowserContext) {
 async function instrument(page: Page, cpu: number) {
 	await page.bringToFront()
 	let cdp = await page.context().newCDPSession(page)
-	await cdp.send("Network.enable")
-	await cdp.send("Network.setCacheDisabled", { cacheDisabled: true })
 	await cdp.send("Emulation.setCPUThrottlingRate", { rate: cpu })
-	let wire = { sent: 0, received: 0, http: 0, httpSent: 0, bundle: 0 }
-	let bundleIds = new Set<string>()
-	cdp.on("Network.requestWillBeSent", event => {
-		wire.httpSent += Buffer.byteLength(event.request.postData ?? "")
-	})
-	cdp.on("Network.responseReceived", event => {
-		if (/javascript|wasm/.test(event.response.mimeType))
-			bundleIds.add(event.requestId)
-	})
-	cdp.on("Network.loadingFinished", event => {
-		wire.http += event.encodedDataLength
-		if (bundleIds.has(event.requestId)) wire.bundle += event.encodedDataLength
-	})
-	cdp.on("Network.webSocketFrameSent", event => {
-		wire.sent += Buffer.byteLength(
-			event.response.payloadData,
-			event.response.opcode === 2 ? "base64" : "utf8",
-		)
-	})
-	cdp.on("Network.webSocketFrameReceived", event => {
-		wire.received += Buffer.byteLength(
-			event.response.payloadData,
-			event.response.opcode === 2 ? "base64" : "utf8",
-		)
-	})
-	return { cdp, wire }
+	let network = await captureNetwork(page, cdp)
+	return { cdp, ...network }
 }
 
 function summary(values: number[]) {

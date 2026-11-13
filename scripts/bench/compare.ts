@@ -1,3 +1,4 @@
+import { benchmarkBrowserArgs } from "./network"
 import { measureReplay, withDeadline } from "./replay"
 import { execFileSync } from "node:child_process"
 import { mkdir, readFile, writeFile } from "node:fs/promises"
@@ -57,7 +58,10 @@ if (replayTimeoutMs > 2_147_483_647)
 	throw new Error("Replay deadline exceeds timer range")
 if (editCount > trace.edits.length)
 	throw new Error("Requested more edits than trace contains")
-let browser = await chromium.launch({ headless: true })
+let browser = await chromium.launch({
+	headless: true,
+	args: benchmarkBrowserArgs,
+})
 let samples: Record<string, number[]> = {}
 let scenarioFailures: {
 	run: number
@@ -76,6 +80,7 @@ let result = {
 		cores: cpus().length,
 		browser: browser.version(),
 		cpuThrottle: cpu,
+		networkCapture: "CDP pages, iframes, dedicated workers and SharedWorkers",
 		serverRuntime: process.env.BENCH_SERVER_NOTE ?? "unspecified",
 		jazz: JSON.parse(await readFile("package.json", "utf8")).dependencies[
 			"jazz-tools"
@@ -113,7 +118,7 @@ try {
 		let context = await newContext(browser)
 		try {
 			let page = await context.newPage()
-			let { cdp } = await instrument(page, cpu)
+			let sourceNetwork = await instrument(page, cpu)
 			page.on("pageerror", error => console.error(error.message))
 			page.on("console", message => {
 				if (message.type() === "error") console.error(message.text())
@@ -155,6 +160,7 @@ try {
 						})
 					add(scenario, performance.now() - start)
 					await cold.waitForTimeout(1000)
+					network.ensureHealthy()
 					if (scenario === "coldListMs")
 						add("firstLoadJsWasmBytes", network.wire.bundle)
 				} finally {
@@ -162,7 +168,7 @@ try {
 				}
 			}
 			await page.bringToFront()
-			await cdp.send("Network.setCacheDisabled", { cacheDisabled: false })
+			await sourceNetwork.setCacheDisabled(false)
 			await waitForEditorBoot(page)
 			start = performance.now()
 			await page.reload({ waitUntil: "domcontentloaded" })

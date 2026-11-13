@@ -14,7 +14,7 @@ interface ReplayOptions {
 
 async function measureReplay(page: Page, options: ReplayOptions) {
 	let { document, edits, cpu } = options
-	let { cdp, wire } = await instrument(page, cpu)
+	let { cdp, wire, ensureHealthy } = await instrument(page, cpu)
 	await openDocument(page, document)
 	if (options.reset) {
 		await expect
@@ -76,6 +76,7 @@ async function measureReplay(page: Page, options: ReplayOptions) {
 	)
 		throw new Error("Full trace differs from upstream finalText")
 	let heap = await cdp.send("Runtime.getHeapUsage")
+	ensureHealthy()
 	return {
 		paint: metrics.paint,
 		dispatchToPaint,
