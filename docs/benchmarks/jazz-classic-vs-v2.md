@@ -38,10 +38,13 @@ inside the visible editor. Warm reload retains IndexedDB and enables HTTP cache.
 Bundle bytes are CDP encoded transfers of JavaScript/Wasm responses through readiness
 plus one second; development module loading makes this different from production.
 
-Fresh-device time includes recovery-phrase sign-in, Export all, ZIP download and
+Fresh-device time starts with credentials-only restore into empty IndexedDB, then
+Export all, ZIP download and
 exact equality checks for all 52 imported Markdown files. Export loads every document
 body through the public app. This includes export/verification overhead, rather than
-being a pure transport timer. It proves that all bodies arrived. Sync latency starts before an
+being a pure transport timer. It proves that all bodies arrived. Export has a 60-second deadline after startup.
+Failed scenarios are recorded with elapsed time and error, not converted into exact
+latency samples; the remaining scenarios continue and the command exits nonzero. Sync latency starts before an
 editor insertion and ends when a second isolated client's editor contains the
 marker in its visible editor DOM, polled every 20 ms. The receiver is scrolled
 to the end first; polling never takes keyboard focus from the sender. Each run measures five markers on Corpus 000, a roughly 6 KB note.

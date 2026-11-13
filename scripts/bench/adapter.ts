@@ -134,7 +134,7 @@ async function verifyExport(
 	await page
 		.getByRole("button", { name: "File options", exact: true })
 		.dispatchEvent("click")
-	let downloading = page.waitForEvent("download", { timeout: 180_000 })
+	let downloading = page.waitForEvent("download", { timeout: 60_000 })
 	await page
 		.getByRole("menuitem", { name: "Export all", exact: true })
 		.dispatchEvent("click")

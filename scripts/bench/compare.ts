@@ -14,7 +14,6 @@ import { fetchDatasets } from "./fetch"
 import { loadDatasets } from "./datasets"
 import {
 	createAccount,
-	signIn,
 	waitForEditorBoot,
 	seed,
 	resolveDocument,
@@ -55,6 +54,12 @@ if (editCount > trace.edits.length)
 	throw new Error("Requested more edits than trace contains")
 let browser = await chromium.launch({ headless: true })
 let samples: Record<string, number[]> = {}
+let scenarioFailures: {
+	run: number
+	scenario: string
+	elapsedMs: number
+	message: string
+}[] = []
 let result = {
 	label: values.label,
 	target,
@@ -90,6 +95,7 @@ let result = {
 		bytes: Buffer.byteLength(doc.content),
 	})),
 	completedRuns: 0,
+	scenarioFailures,
 	metrics: {},
 }
 
@@ -106,7 +112,7 @@ try {
 			page.on("console", message => {
 				if (message.type() === "error") console.error(message.text())
 			})
-			let account = await createAccount(page)
+			await createAccount(page)
 			await configureEditor(page)
 			console.error("Account ready; importing ZIP")
 			let start = performance.now()
@@ -160,22 +166,40 @@ try {
 			await resolveDocument(page, large.title)
 			add("warmListMs", performance.now() - start)
 
-			console.error("Fresh device: sign in and verify every document body")
-			let receiver = await newContext(browser)
+			console.error(
+				"Fresh device: credentials-only restore and verified bulk export",
+			)
+			let receiver = await newContext(browser, credentials)
+			start = performance.now()
 			try {
 				let other = await receiver.newPage()
 				await instrument(other, cpu)
-				start = performance.now()
-				await signIn(other, { passphrase: account.passphrase })
 				await waitForEditorBoot(other)
+				console.error("Fresh device ready; exporting all bodies")
 				await verifyExport(other, seeded)
 				add("freshDeviceWholeDatasetMs", performance.now() - start)
+			} catch (error) {
+				let message = error instanceof Error ? error.message : String(error)
+				scenarioFailures.push({
+					run: run + 1,
+					scenario: "freshDeviceWholeDatasetMs",
+					elapsedMs: performance.now() - start,
+					message: message.slice(0, 1000),
+				})
+				console.error(`Fresh-device failure: ${message.slice(0, 200)}`)
+			} finally {
+				await receiver.close()
+			}
+			console.error("Sync: independent second client on the small note")
+			let syncReceiver = await newContext(browser, credentials)
+			try {
+				let other = await syncReceiver.newPage()
+				await instrument(other, cpu)
 				let syncDoc = seeded[0]
 				if (!syncDoc) throw new Error("Small sync note missing")
 				await openDocument(other, syncDoc)
 				await editor(other).focus()
 				await other.keyboard.press("ControlOrMeta+End")
-				await page.bringToFront()
 				await openDocument(page, syncDoc)
 				for (let n = 0; n < 5; n++) {
 					console.error(`Sync marker ${n + 1}/5`)
@@ -193,7 +217,7 @@ try {
 					add("syncEditMs", performance.now() - start)
 				}
 			} finally {
-				await receiver.close()
+				await syncReceiver.close()
 			}
 
 			for (let doc of [seeded[0], medium, large]) {
@@ -310,3 +334,5 @@ async function save() {
 	await mkdir(dirname(values.out!), { recursive: true })
 	await writeFile(values.out!, JSON.stringify(result, null, "\t") + "\n")
 }
+
+if (scenarioFailures.length > 0) process.exitCode = 1
