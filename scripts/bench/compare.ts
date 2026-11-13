@@ -167,15 +167,19 @@ try {
 						.toBe(doc.content)
 				}
 				add("freshDeviceWholeDatasetMs", performance.now() - start)
+				await editor(other).click()
+				await other.keyboard.press("ControlOrMeta+End")
+				await page.bringToFront()
 				await waitForEditorBoot(page, { path: `/app/doc/${large.id}` })
 				for (let n = 0; n < 5; n++) {
+					console.error(`Sync marker ${n + 1}/5`)
 					let marker = ` sync-${run}-${n}`
 					await editor(page).click()
 					await page.keyboard.press("ControlOrMeta+End")
 					start = performance.now()
 					await page.keyboard.insertText(marker)
 					await expect
-						.poll(() => readContent(other), {
+						.poll(() => editor(other).innerText(), {
 							timeout: 120_000,
 							intervals: [20],
 						})

@@ -35,8 +35,9 @@ Fresh-device time includes recovery-phrase sign-in and opening every imported do
 copying its complete editor text and checking exact equality. It includes sequential
 UI navigation overhead. This proves all bodies arrived, rather than equating a
 populated sidebar with complete account hydration. Sync latency starts before an
-editor insertion and ends when a second isolated client's clipboard contains the
-marker, polled every 20 ms. Each run measures five markers on the large book.
+editor insertion and ends when a second isolated client's editor contains the
+marker in its visible editor DOM, polled every 20 ms. The receiver is scrolled
+to the end first; polling never takes keyboard focus from the sender. Each run measures five markers on the large book.
 
 Trace edits are replayed through browser text input and Delete keys, using Arrow keys
 to reproduce offsets. No database calls or direct editor-state writes. Each document
