@@ -124,3 +124,63 @@ test("signing in from a private document link keeps the requested document", asy
 		await freshContext.close()
 	}
 })
+
+test("offline guest notes survive signing in and reach a fresh device once", async ({
+	page,
+	browser,
+}) => {
+	await waitForEditorBoot(page)
+	let account = await createAccount(page)
+	await create(page, { title: "Existing account note" })
+	await page.evaluate("window.__jazz.waitForSync()")
+	await signOut(page)
+	await create(page, {
+		title: "Guest draft",
+		body: "Before going offline",
+		path: "Guest folder",
+	})
+	await page.context().setOffline(true)
+	let editor = page.getByTestId(testIds.doc.editor).locator(".cm-content")
+	await editor.click()
+	await editor.press("ControlOrMeta+End")
+	await page.keyboard.insertText("\nWritten without a connection")
+	await expect(editor).toContainText("Written without a connection")
+	await page.context().setOffline(false)
+	await signIn(page, { passphrase: account.passphrase })
+	await page.evaluate("window.__jazz.waitForSync()")
+	await waitForEditorBoot(page)
+	let flatView = page.getByRole("button", { name: "Switch to flat view" })
+	if (await flatView.isVisible()) await flatView.click()
+	await expect(
+		page.locator("[data-doc-id]").filter({ hasText: "Guest draft" }),
+	).toHaveCount(1)
+	let guestNote = page
+		.locator("[data-doc-id]")
+		.filter({ hasText: "Guest draft" })
+	await guestNote.locator("a").click()
+	await expect(editor).toContainText("Written without a connection")
+	await expect(editor).toContainText("Guest folder")
+
+	let freshContext = await browser.newContext()
+	try {
+		let fresh = await freshContext.newPage()
+		await waitForEditorBoot(fresh)
+		await signIn(fresh, { passphrase: account.passphrase })
+		await waitForEditorBoot(fresh)
+		let flatView = fresh.getByRole("button", { name: "Switch to flat view" })
+		if (await flatView.isVisible()) await flatView.click()
+		await expect(
+			fresh.locator("[data-doc-id]").filter({ hasText: "Guest draft" }),
+		).toHaveCount(1)
+		await fresh
+			.locator("[data-doc-id]")
+			.filter({ hasText: "Guest draft" })
+			.locator("a")
+			.click()
+		await expect(fresh.getByTestId(testIds.doc.editor)).toContainText(
+			"Written without a connection",
+		)
+	} finally {
+		await freshContext.close()
+	}
+})

@@ -1,3 +1,4 @@
+import { saveGuestTransfer } from "../lib/guest-transfer"
 import type { JazzClient } from "jazz-tools/client"
 import { markAccountBackedUp } from "../lib/backup-state"
 import { IconTransition } from "@/app/components/ui/icon-transition"
@@ -69,6 +70,7 @@ function AuthForm({ onSuccess }: AuthFormProps) {
 	let [isCopied, setIsCopied] = useState(false)
 	let [currentPassphrase, setCurrentPassphrase] = useState("")
 	let [error, setError] = useState("")
+	let [isSigningIn, setIsSigningIn] = useState(false)
 
 	function handleCreate() {
 		try {
@@ -115,18 +117,32 @@ function AuthForm({ onSuccess }: AuthFormProps) {
 	}
 
 	async function handleLogin() {
+		if (isSigningIn) return
+		setIsSigningIn(true)
 		try {
 			setError("")
 			let secret = RecoveryPhrase.toSecret(loginPassphrase)
+			if (
+				auth.user &&
+				auth.client &&
+				localStorage.getItem("alkalye-recovery-backed-up") !==
+					auth.user.accountId &&
+				secret !== auth.exportDeviceKey()
+			)
+				await saveGuestTransfer(auth.client.db, auth.user.accountId, secret)
 			sessionStorage.setItem("alkalye-restoring-account", "true")
 			sessionStorage.setItem("alkalye-classic-phrase-login", "true")
 			await auth.restoreDeviceAccount(secret)
 		} catch (e) {
+			sessionStorage.removeItem("alkalye-restoring-account")
+			sessionStorage.removeItem("alkalye-classic-phrase-login")
 			setError(
 				e instanceof Error
 					? e.message
 					: t("auth.login.error.invalidPassphrase"),
 			)
+		} finally {
+			setIsSigningIn(false)
 		}
 	}
 
@@ -271,7 +287,7 @@ function AuthForm({ onSuccess }: AuthFormProps) {
 						<Button
 							onClick={handleLogin}
 							size="sm"
-							disabled={!loginPassphrase.trim()}
+							disabled={isSigningIn || !loginPassphrase.trim()}
 							className="flex-1"
 							data-testid={testIds.auth.loginSubmit}
 						>
