@@ -64,6 +64,7 @@ let schema = {
 		{
 			spaceId: s.uuid(),
 			accountId: s.uuid(),
+			inviteId: s.uuid().optional(),
 			role: s.enum("reader", "writer", "manager", "admin"),
 		},
 		{ space: s.rel("spaces", "spaceId") },
@@ -72,6 +73,7 @@ let schema = {
 		{
 			documentId: s.uuid(),
 			accountId: s.uuid(),
+			inviteId: s.uuid().optional(),
 			role: s.enum("reader", "writer", "admin"),
 		},
 		{ document: s.rel("documents", "documentId") },
@@ -82,6 +84,7 @@ let schema = {
 			documentId: s.uuid().optional(),
 			spaceId: s.uuid().optional(),
 			tokenHash: s.string(),
+			singleUse: s.boolean().default(false),
 			role: s.enum("reader", "writer", "manager", "admin"),
 			expiresAt: s.timestamp().optional(),
 			redeemedAt: s.timestamp().optional(),

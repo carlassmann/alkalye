@@ -35,8 +35,20 @@ export let permissions = s.definePermissions(
 		policy.spaces.allowDelete.where(spaceAdmin)
 		policy.spaceMembers.allowRead.where(allowedTo.read("space"))
 		policy.spaceMembers.allowInsert.where(allowedTo.update("space"))
-		policy.spaceMembers.allowUpdate.where(allowedTo.update("space"))
-		policy.spaceMembers.allowDelete.where(allowedTo.update("space"))
+		policy.spaceMembers.allowUpdate.where(member =>
+			allOf([
+				allowedTo.update("space"),
+				policy.spaceMembers.exists.where({
+					id: member.id,
+					spaceId: member.spaceId,
+					accountId: member.accountId,
+					inviteId: member.inviteId,
+				}),
+			]),
+		)
+		policy.spaceMembers.allowDelete.where(
+			anyOf([{ accountId: session.user }, allowedTo.update("space")]),
+		)
 
 		function documentAdmin(doc: RowContext<DocumentRow>) {
 			return anyOf([
@@ -122,12 +134,22 @@ export let permissions = s.definePermissions(
 		policy.documentGrants.allowRead.where(allowedTo.read("document"))
 		for (let operation of [
 			policy.documentGrants.allowInsert,
-			policy.documentGrants.allowUpdate,
 			policy.documentGrants.allowDelete,
 		]) {
 			operation.where(allowedTo.delete("document"))
 		}
 
+		policy.documentGrants.allowUpdate.where(grant =>
+			allOf([
+				allowedTo.delete("document"),
+				policy.documentGrants.exists.where({
+					id: grant.id,
+					documentId: grant.documentId,
+					accountId: grant.accountId,
+					inviteId: grant.inviteId,
+				}),
+			]),
+		)
 		policy.folders.allowRead.where(owned)
 		policy.folders.allowInsert.where(owned)
 		policy.folders.allowUpdate.where(owned)
@@ -208,12 +230,23 @@ export let permissions = s.definePermissions(
 		policy.presence.allowRead.where(allowedTo.read("document"))
 		for (let operation of [
 			policy.presence.allowInsert,
-			policy.presence.allowUpdate,
 			policy.presence.allowDelete,
 		])
 			operation.where(
 				allOf([{ accountId: session.user }, allowedTo.read("document")]),
 			)
+		policy.presence.allowUpdate.where(row =>
+			allOf([
+				{ accountId: session.user },
+				allowedTo.read("document"),
+				policy.presence.exists.where({
+					id: row.id,
+					accountId: row.accountId,
+					documentId: row.documentId,
+					deviceId: row.deviceId,
+				}),
+			]),
+		)
 		policy.laser.allowRead.where(owned)
 		policy.laser.allowInsert.where(owned)
 		policy.laser.allowUpdate.where(owned)
@@ -227,7 +260,7 @@ export let permissions = s.definePermissions(
 		policy.classicImports.allowInsert.never()
 		policy.classicImports.allowUpdate.never()
 		policy.classicImports.allowDelete.never()
-		// v2-todo(sharing): invite creation/redemption goes through the backend, never a client-supplied membership claim.
+		// Only backend transactions create, redeem and revoke hashed invites.
 		policy.invites.allowRead.where(owned)
 		policy.invites.allowInsert.never()
 		policy.invites.allowUpdate.never()
