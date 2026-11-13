@@ -246,7 +246,7 @@ let en: LandingContent = {
 		points: [
 			"Jazz v2 sync is not end-to-end encrypted. Alkalye’s backend and Jazz Cloud can read synced data.",
 			"You can start without an account. Sign in with a passphrase to sync across devices. It stays on your device.",
-			"Connecting an MCP client is the exception: the hosted server then holds your account key and can decrypt what that client asks for.",
+			"MCP clients use a separate device credential. Your recovery key stays on your device. Synced data remains readable by the server.",
 			"Open source under the MIT license. You can run it with your own sync server.",
 		],
 	},
@@ -460,7 +460,7 @@ let de: LandingContent = {
 		points: [
 			"Jazz-v2-Sync ist nicht Ende-zu-Ende-verschlüsselt. Alkalyes Backend und Jazz Cloud können synchronisierte Daten lesen.",
 			"Du kannst ohne Konto anfangen. Mit einer Passphrase meldest du dich an und synchronisierst zwischen Geräten. Sie bleibt auf deinem Gerät.",
-			"Ausnahme ist ein verbundener MCP-Client: Dann hält der gehostete Server deinen Kontoschlüssel und kann entschlüsseln, was dieser Client abfragt.",
+			"MCP-Clients verwenden eigene Geräte-Zugangsdaten. Dein Wiederherstellungsschlüssel bleibt auf deinem Gerät. Synchronisierte Daten bleiben für den Server lesbar.",
 			"Open Source unter MIT-Lizenz. Du kannst es mit deinem eigenen Sync-Server betreiben.",
 		],
 	},
