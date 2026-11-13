@@ -6,7 +6,7 @@ Pinned to `jazz-tools@2.0.0-alpha.61`. Verify APIs against `/tmp/jazzref/jazz-a6
 
 `src/jazz/schema.ts` defines the tables. `src/schema/index.ts` re-exports the app and document row types. Use `schema.RowOf<typeof app.table>` for row types. Nullable columns read as `null`. Settings JSON uses `EditorSettings` from `src/jazz/value-types.ts`.
 
-Document content is a `string().merge("markdown")` column. Documents have stable UUIDs. Personal ordering, pins and folder assignments belong to `userDocuments`, not the shared document. Space memberships and document grants carry explicit roles. Blobs use `bytes()`; comment anchors use JSON captured by `db.textAnchors()`. Presence and laser tables retain latest history only. Laser rows stay private to the account.
+Document content is a `string().merge("markdown")` column. Documents have stable UUIDs. Personal ordering, pins and folder assignments belong to `userDocuments`, not the shared document. Space memberships and document grants carry explicit roles. Blobs use `bytes()`; comment anchors use JSON captured by `db.textAnchors()`. Presence and laser tables retain latest history only. Laser rows are readable by document readers; only their publishing account can write or delete them.
 
 `classicImports` and `documentVersions` are backend-written. The importer must verify Classic membership before granting v2 access. Invite redemption must verify the token server-side before adding membership. Client writes to those tables are denied.
 
