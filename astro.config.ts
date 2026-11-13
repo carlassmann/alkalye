@@ -28,6 +28,8 @@ export default defineConfig({
 		routing: { prefixDefaultLocale: false },
 	},
 	vite: {
+		optimizeDeps: { exclude: ["jazz-tools", "jazz-wasm"] },
+		ssr: { external: ["jazz-napi", "jazz-tools"] },
 		server: { allowedHosts: getWorkAllowedHosts() },
 		build: {
 			rollupOptions: {

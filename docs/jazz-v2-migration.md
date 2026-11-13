@@ -50,3 +50,5 @@ Same harness against Classic (`main`) and v2 (this branch), real-life datasets, 
 ## Progress log
 
 Agents append one line per finished step: date, phase, what, commit.
+
+- 2026-11-13, phase 1 spike: Astro `/jazz/[...path]` + `jazz.handle`, isolated `.jazz` SQLite, local-first SharedWorker/Wasm, device account and React live query exercised with agent-browser at `/spike`. Created note survived reload. Vite 7 needs both `jazz-tools` and `jazz-wasm` excluded from prebundling, native backend externalized. HTTP stream fallback works without WebSocket attachment. Astro requires `export const prerender = false` for static route analysis. Commit: foundation spike.
