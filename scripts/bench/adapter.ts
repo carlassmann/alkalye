@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises"
 import { expect, type Page } from "@playwright/test"
 import JSZip from "jszip"
 import {
-	createAccount,
+	createAccount as createTestAccount,
 	signIn,
 	waitForEditorBoot,
 } from "../../e2e/auth-helpers"
@@ -19,6 +19,11 @@ export {
 	configureEditor,
 	verifyExport,
 	editor,
+}
+
+async function createAccount(page: Page) {
+	await waitForEditorBoot(page)
+	return createTestAccount(page)
 }
 
 function editor(page: Page) {
