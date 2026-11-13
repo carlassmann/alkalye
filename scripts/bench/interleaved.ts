@@ -30,7 +30,7 @@ for (let serviceWorkersOnly of [false, true]) {
 					"1",
 					"--edits",
 					"200",
-					...(serviceWorkersOnly ? ["--sw-only"] : []),
+					...(serviceWorkersOnly ? ["--sw-only"] : ["--skip-sw"]),
 				],
 				{
 					stdio: "inherit",

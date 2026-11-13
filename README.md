@@ -124,12 +124,15 @@ No fixed performance threshold runs in CI.
 capture. For individual runs use `bun run bench:compare -- --target <url>
 --label classic|v2 --out <path>`. Set `BENCH_JAZZ`, `BENCH_GIT_HEAD` and
 `BENCH_SERVER_NOTE` when the served app differs from the harness checkout.
+Set `BENCH_SERVER_MODE=development` for a dev-only diagnostic.
 
 Defaults: three accounts, 50 Vite Markdown notes, two Gutenberg books and 200
 Automerge trace edits per document. Use `--cpu 4` for page CPU throttling or
 `--notes 20 --edits 50` for a smoke run. The full 259,778-edit trace exceeds two
-hours at the frame-pacing floor alone. `--edits 5000 --large-only` runs a longer
+hours at the frame-pacing floor alone. `--edits 5000 --large-only --literal-newlines` runs a longer
 large-document slice; `--replay-timeout-ms <ms>` sets its deadline.
+The literal-newline option uses plain-text paste for trace line breaks, avoiding
+contenteditable newline normalization during cursor-heavy replay.
 `BENCH_PROFILE_DIR` captures main-page CPU profiles. `--sw-only` measures a
 hydrated returning user; `--skip-sw` excludes that case for diagnostics.
 

@@ -357,9 +357,8 @@ try {
 					}
 				}
 			}
-			console.error("Returning user: service worker and offline reload")
-
 			if (!values["skip-sw"]) {
+				console.error("Returning user: service worker and offline reload")
 				let returningStage = "startup"
 				let returningStarted = performance.now()
 				let returning = await newContext(browser, credentials, true)
