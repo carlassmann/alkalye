@@ -1,3 +1,4 @@
+import { measureReplay, withDeadline } from "./replay"
 import { execFileSync } from "node:child_process"
 import { mkdir, readFile, writeFile } from "node:fs/promises"
 import { dirname } from "node:path"
@@ -17,9 +18,7 @@ import {
 	waitForEditorBoot,
 	seed,
 	resolveDocument,
-	readContent,
 	openDocument,
-	replaceContent,
 	configureEditor,
 	verifyExport,
 	editor,
@@ -36,6 +35,7 @@ let { values } = parseArgs({
 		cpu: { type: "string", default: "1" },
 		notes: { type: "string", default: "50" },
 		edits: { type: "string", default: "200" },
+		"replay-timeout-ms": { type: "string" },
 	},
 })
 if (!values.target || !values.label || !values.out)
@@ -50,6 +50,11 @@ let sources = await fetchDatasets()
 let { documents, trace } = await loadDatasets(notes)
 let editCount =
 	values.edits === "full" ? trace.edits.length : positive(values.edits)
+let replayTimeoutMs = values["replay-timeout-ms"]
+	? positive(values["replay-timeout-ms"])
+	: Math.max(120_000, editCount * 500)
+if (replayTimeoutMs > 2_147_483_647)
+	throw new Error("Replay deadline exceeds timer range")
 if (editCount > trace.edits.length)
 	throw new Error("Requested more edits than trace contains")
 let browser = await chromium.launch({ headless: true })
@@ -87,6 +92,7 @@ let result = {
 		edits: editCount,
 		totalTraceEdits: trace.edits.length,
 		automaticPairsAndCompletion: false,
+		replayTimeoutMs,
 	},
 	sources,
 	datasets: documents.map(doc => ({
@@ -107,7 +113,7 @@ try {
 		let context = await newContext(browser)
 		try {
 			let page = await context.newPage()
-			let { wire, cdp } = await instrument(page, cpu)
+			let { cdp } = await instrument(page, cpu)
 			page.on("pageerror", error => console.error(error.message))
 			page.on("console", message => {
 				if (message.type() === "error") console.error(message.text())
@@ -223,70 +229,45 @@ try {
 			for (let doc of [seeded[0], medium, large]) {
 				if (!doc) throw new Error("Small note missing")
 				let name = doc === large ? "large" : doc === medium ? "medium" : "small"
-				console.error(`Replay ${editCount} trace edits on ${name}`)
-				await openDocument(page, doc)
-				await replaceContent(page, doc.content)
-				await page.waitForTimeout(3000)
-				await page.evaluate(() => {
-					window.__bench.paint = []
-					window.__bench.longTasks = []
-				})
-				let before = { ...wire }
-				let cursor = 0
-				let expected: string[] = []
-				for (let [position, remove, insert = ""] of trace.edits.slice(
-					0,
-					editCount,
-				)) {
-					while (cursor < position) {
-						await page.keyboard.press("ArrowRight")
-						cursor++
-					}
-					while (cursor > position) {
-						await page.keyboard.press("ArrowLeft")
-						cursor--
-					}
-					for (let i = 0; i < remove; i++) await page.keyboard.press("Delete")
-					if (insert) await page.keyboard.insertText(insert)
-					cursor += insert.length
-					expected.splice(position, remove, ...insert)
-					await page.evaluate(
-						() =>
-							new Promise<void>(resolve =>
-								requestAnimationFrame(() =>
-									requestAnimationFrame(() => resolve()),
-								),
-							),
+				console.error(`Replay ${editCount} edits in isolated ${name} context`)
+				let typingContext = await newContext(browser, credentials)
+				let replayStarted = performance.now()
+				try {
+					let typingPage = await typingContext.newPage()
+					let metrics = await withDeadline(
+						measureReplay(typingPage, {
+							document: doc,
+							edits: trace.edits.slice(0, editCount),
+							cpu,
+							reset: name === "small",
+							finalText:
+								editCount === trace.edits.length ? trace.finalText : undefined,
+						}),
+						replayTimeoutMs,
+						`${name} replay`,
 					)
+					for (let value of metrics.paint) add(`${name}InputToPaintMs`, value)
+					for (let value of metrics.dispatchToPaint)
+						add(`${name}DispatchToPaintMs`, value)
+					add(`${name}LongTaskCount`, metrics.longTaskCount)
+					add(`${name}LongTaskTotalMs`, metrics.longTaskTotalMs)
+					add(`${name}SentBytesPerEdit`, metrics.sentBytesPerEdit)
+					add(`${name}ReceivedWsBytesPerEdit`, metrics.receivedWsBytesPerEdit)
+					add(`${name}JsHeapBytes`, metrics.jsHeapBytes)
+				} catch (error) {
+					let message = error instanceof Error ? error.message : String(error)
+					scenarioFailures.push({
+						run: run + 1,
+						scenario: `${name}Replay`,
+						elapsedMs: performance.now() - replayStarted,
+						message: message.slice(0, 1000),
+					})
+					console.error(`${name} replay failure: ${message.slice(0, 200)}`)
+				} finally {
+					await typingContext.close()
 				}
-				await page.waitForTimeout(3000)
-				let metrics = await page.evaluate(() => window.__bench)
-				let actual = await readContent(page)
-				if (actual !== expected.join("") + doc.content)
-					throw new Error(`Trace replay diverged on ${name}`)
-				if (
-					editCount === trace.edits.length &&
-					expected.join("") !== trace.finalText
-				)
-					throw new Error("Full trace final text mismatch")
-				for (let value of metrics.paint) add(`${name}InputToPaintMs`, value)
-				add(`${name}LongTaskCount`, metrics.longTasks.length)
-				add(
-					`${name}LongTaskTotalMs`,
-					metrics.longTasks.reduce((a, b) => a + b, 0),
-				)
-				add(
-					`${name}SentBytesPerEdit`,
-					(wire.sent - before.sent + wire.httpSent - before.httpSent) /
-						editCount,
-				)
-				add(
-					`${name}ReceivedWsBytesPerEdit`,
-					(wire.received - before.received) / editCount,
-				)
-				let heap = await cdp.send("Runtime.getHeapUsage")
-				add(`${name}JsHeapBytes`, heap.usedSize)
 			}
+
 			result.completedRuns++
 			await save()
 		} finally {
@@ -324,7 +305,7 @@ function positive(value: string) {
 	return n
 }
 function add(name: string, value: number) {
-	console.error(`${name}: ${value.toFixed(2)}`)
+	if (!name.includes("ToPaint")) console.error(`${name}: ${value.toFixed(2)}`)
 	;(samples[name] ??= []).push(value)
 }
 async function save() {
