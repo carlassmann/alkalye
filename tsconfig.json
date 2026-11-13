@@ -4,7 +4,7 @@
 		"target": "ES2022",
 		"lib": ["ES2022", "DOM", "DOM.Iterable"],
 		"module": "preserve",
-		"types": ["vite/client", "vite-plugin-pwa/client", "bun"],
+		"types": ["vite/client", "vite-plugin-pwa/client", "node"],
 		"skipLibCheck": true,
 		"incremental": true,
 		"jsx": "react-jsx",

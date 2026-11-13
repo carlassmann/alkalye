@@ -56,14 +56,14 @@ interface LandingContent {
 let en: LandingContent = {
 	htmlLang: "en",
 	otherLocale: "de",
-	pageTitle: "Alkalye - Encrypted Markdown editor for notes, docs and slides",
+	pageTitle: "Alkalye - Markdown editor for notes, docs and slides",
 	metaDescription:
-		"Write Markdown offline, sync it end-to-end encrypted, edit together with live cursors, and present the same file as slides with a phone teleprompter. Free public beta, MIT licensed.",
+		"Write Markdown offline, sync across devices, edit together with live cursors, and present the same file as slides with a phone teleprompter. Free public beta, MIT licensed.",
 	nav: { open: "Open Alkalye", switchLanguage: "Deutsch" },
 	hero: {
 		badge: "Free public beta",
 		title: "Write in Markdown. Share it, present it, keep it.",
-		lede: "Alkalye is a Markdown editor for notes, drafts and talks. Write on any device, even offline, edit together with live cursors, and present the same file as slides. Everything syncs end-to-end encrypted.",
+		lede: "Alkalye is a Markdown editor for notes, drafts and talks. Write on any device, even offline, edit together with live cursors, and present the same file as slides. Synced data is readable by Alkalye’s backend and Jazz Cloud.",
 		primaryAction: "Start writing",
 		secondaryAction: "See what it does",
 		facts: ["No account needed to start", "Works offline", "MIT licensed"],
@@ -94,7 +94,7 @@ let en: LandingContent = {
 			{
 				id: "devices",
 				title: "Same post, other device",
-				body: "Carl picks up the phone and keeps writing while the Mac is still open. Each device is just another cursor in the same document, synced end-to-end encrypted. No export, no “which version do you want to keep?”.",
+				body: "Carl picks up the phone and keeps writing while the Mac is still open. Each device is just another cursor in the same document, synced across devices. No export, no “which version do you want to keep?”.",
 			},
 			{
 				id: "review",
@@ -244,7 +244,7 @@ let en: LandingContent = {
 	privacy: {
 		title: "Privacy, plainly",
 		points: [
-			"Documents are encrypted on your device before they sync. The sync server stores data it cannot read.",
+			"Jazz v2 sync is not end-to-end encrypted. Alkalye’s backend and Jazz Cloud can read synced data.",
 			"You can start without an account. Sign in with a passphrase to sync across devices. It stays on your device.",
 			"Connecting an MCP client is the exception: the hosted server then holds your account key and can decrypt what that client asks for.",
 			"Open source under the MIT license. You can run it with your own sync server.",
@@ -269,15 +269,14 @@ let en: LandingContent = {
 let de: LandingContent = {
 	htmlLang: "de",
 	otherLocale: "en",
-	pageTitle:
-		"Alkalye - Verschlüsselter Markdown-Editor für Notizen, Texte und Folien",
+	pageTitle: "Alkalye - Markdown-Editor für Notizen, Texte und Folien",
 	metaDescription:
-		"Schreibe Markdown offline, synchronisiere Ende-zu-Ende-verschlüsselt, bearbeite gemeinsam mit Live-Cursorn und präsentiere dieselbe Datei als Folien mit Handy-Teleprompter. Kostenlose öffentliche Beta, MIT-Lizenz.",
+		"Schreibe Markdown offline, synchronisiere zwischen Geräten, bearbeite gemeinsam mit Live-Cursorn und präsentiere dieselbe Datei als Folien mit Handy-Teleprompter. Kostenlose öffentliche Beta, MIT-Lizenz.",
 	nav: { open: "Alkalye öffnen", switchLanguage: "English" },
 	hero: {
 		badge: "Kostenlose öffentliche Beta",
 		title: "Schreib in Markdown. Teile es, präsentiere es, behalte es.",
-		lede: "Alkalye ist ein Markdown-Editor für Notizen, Entwürfe und Vorträge. Schreib auf jedem Gerät, auch offline, bearbeite gemeinsam mit Live-Cursorn und präsentiere dieselbe Datei als Folien. Alles synchronisiert Ende-zu-Ende-verschlüsselt.",
+		lede: "Alkalye ist ein Markdown-Editor für Notizen, Entwürfe und Vorträge. Schreib auf jedem Gerät, auch offline, bearbeite gemeinsam mit Live-Cursorn und präsentiere dieselbe Datei als Folien. Alkalyes Backend und Jazz Cloud können synchronisierte Daten lesen.",
 		primaryAction: "Losschreiben",
 		secondaryAction: "Was es kann",
 		facts: ["Kein Konto zum Start nötig", "Funktioniert offline", "MIT-Lizenz"],
@@ -309,7 +308,7 @@ let de: LandingContent = {
 			{
 				id: "devices",
 				title: "Derselbe Post, anderes Gerät",
-				body: "Carl nimmt das Handy und schreibt weiter, während der Mac noch offen ist. Jedes Gerät ist nur ein weiterer Cursor im selben Dokument, Ende-zu-Ende-verschlüsselt synchronisiert. Kein Export, kein „Welche Version willst du behalten?“.",
+				body: "Carl nimmt das Handy und schreibt weiter, während der Mac noch offen ist. Jedes Gerät ist nur ein weiterer Cursor im selben Dokument, zwischen Geräten synchronisiert. Kein Export, kein „Welche Version willst du behalten?“.",
 			},
 			{
 				id: "review",
@@ -459,7 +458,7 @@ let de: LandingContent = {
 	privacy: {
 		title: "Datenschutz, klar gesagt",
 		points: [
-			"Dokumente werden auf deinem Gerät verschlüsselt, bevor sie synchronisiert werden. Der Sync-Server speichert Daten, die er nicht lesen kann.",
+			"Jazz-v2-Sync ist nicht Ende-zu-Ende-verschlüsselt. Alkalyes Backend und Jazz Cloud können synchronisierte Daten lesen.",
 			"Du kannst ohne Konto anfangen. Mit einer Passphrase meldest du dich an und synchronisierst zwischen Geräten. Sie bleibt auf deinem Gerät.",
 			"Ausnahme ist ein verbundener MCP-Client: Dann hält der gehostete Server deinen Kontoschlüssel und kann entschlüsseln, was dieser Client abfragt.",
 			"Open Source unter MIT-Lizenz. Du kannst es mit deinem eigenen Sync-Server betreiben.",

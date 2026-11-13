@@ -1,12 +1,12 @@
 # Alkalye
 
-Beautiful, end-to-end encrypted markdown editor with real-time collaboration and presentation mode.
+Offline-capable markdown editor with real-time collaboration and presentation mode.
 
 **[alkalye.com](https://alkalye.com)**
 
 ## Features
 
-- **E2E Encrypted** — Your documents are encrypted on your device before syncing
+- **Server-readable sync** — Alkalye’s backend and Jazz Cloud can read synced data
 - **Real-time Collaboration** — Share documents and edit together with live cursors
 - **Presentation Mode** — Turn markdown into slideshows with `mode: present` frontmatter
 - **Teleprompter Mode** — Present with auto-scrolling text
@@ -20,7 +20,7 @@ Beautiful, end-to-end encrypted markdown editor with real-time collaboration and
 
 ## Tech Stack
 
-- [Jazz](https://jazz.tools) for local-first sync and encryption
+- [Jazz](https://jazz.tools) for local-first sync
 - [Astro](https://astro.build) 5 + React 19
 - [Tanstack Router](https://tanstack.com/router) for routing
 - Tailwind CSS 4 + shadcn/ui (base-lyra style)

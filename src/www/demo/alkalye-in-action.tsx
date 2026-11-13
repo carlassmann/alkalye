@@ -1,4 +1,3 @@
-import { lazy, Suspense } from "react"
 import type { LandingLocale } from "#www/landing-content"
 import { demoIntroText, type DemoStageLabels } from "./demo-script"
 
@@ -6,9 +5,6 @@ export { AlkalyeInAction }
 
 // The stage shares most of its code with the app, so the hero shows the
 // static intro document until that code arrives.
-let DemoStageRoot = lazy(() =>
-	import("./demo-stage").then(module => ({ default: module.DemoStageRoot })),
-)
 
 function AlkalyeInAction({
 	locale,
@@ -17,11 +13,9 @@ function AlkalyeInAction({
 	locale: LandingLocale
 	labels: DemoStageLabels
 }) {
-	return (
-		<Suspense fallback={<IntroDocumentFrame locale={locale} />}>
-			<DemoStageRoot locale={locale} labels={labels} />
-		</Suspense>
-	)
+	void labels
+	// v2-todo(landing-demo): reconnect the interactive demo after presentation and editor feature ports.
+	return <IntroDocumentFrame locale={locale} />
 }
 
 function IntroDocumentFrame({ locale }: { locale: LandingLocale }) {

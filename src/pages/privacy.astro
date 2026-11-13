@@ -11,32 +11,17 @@ import LegalDoc from "@/layouts/LegalDoc.astro"
 	<p>Your documents are stored:</p>
 	<ul>
 		<li>Locally on your device</li>
-		<li>Optionally synced to the <a href="https://jazz.tools" target="_blank" rel="noopener" class="text-brand hover:underline">Jazz Cloud</a> when you create an account</li>
+		<li>Synced through Alkalye’s backend to the <a href="https://jazz.tools" target="_blank" rel="noopener" class="text-brand hover:underline">Jazz Cloud</a> while online, including device accounts</li>
 	</ul>
 
-	<h2>Encryption</h2>
-	<p>Your data is end-to-end encrypted:</p>
-	<ul>
-		<li>Encryption keys are derived from your passphrase</li>
-		<li>Your passphrase unlocks your personal Alkalye account</li>
-		<li>Jazz sync servers cannot decrypt your documents. Authorizing an MCP connection lets Alkalye’s hosted server decrypt content as your account.</li>
-		<li>When you share documents, collaborators can decrypt them using their own passphrases</li>
-	</ul>
-
-	<h2>MCP connections</h2>
-	<p>When you connect ChatGPT or another MCP client:</p>
-	<ul>
-		<li>You authorize Alkalye’s hosted server to use your account key. Your passphrase stays on your device.</li>
-		<li>The connected client acts as you and can access documents and spaces under your existing Jazz permissions.</li>
-		<li>Content returned by an agent tool is sent to the AI provider and is then subject to that provider's terms and privacy policy</li>
-		<li>Jazz permission changes apply to future tool calls.</li>
-		<li>Disconnecting revokes that connection’s OAuth access. It does not remove your own access.</li>
-	</ul>
-	<p>The hosted server decrypts your account credential and processes content in memory to answer tool calls, even while your app is closed. Credentials stored in your private Jazz root and OAuth tokens are encrypted with a server-held key. The server operator can decrypt these credentials; encryption does not hide them from the server.</p>
-	<p>Depending on the tool, shared data may include document and space names and identifiers, Markdown content, revisions, timestamps, comments, comment status, and collaborator display names. OAuth access and refresh tokens contain the encrypted account credential and expire. The connector temporarily keeps short-lived replay-prevention identifiers in server memory, not document content.</p>
+	<h2>Synced data</h2>
+    <p>Jazz v2 sync is not end-to-end encrypted. Alkalye's backend and Jazz Cloud can read synced documents, assets and account settings. Access policies control which users can read and edit data. HTTPS protects data in transit.</p>
+    <p>Your 24 recovery words restore your device account. Anyone with them can sign in. Keep them private.</p>
+    <h2>MCP connections</h2>
+    <p>MCP connections are unavailable during the Jazz v2 migration.</p>
 
 	<h2>Optional AI guide</h2>
-	<p>When enabled, Carl's Syntwin, an AI guide, is provided through Syntwin. The guide connects to Syntwin's service and processes conversation messages there. AI conversations are separate from Alkalye's encrypted document sync and require an internet connection.</p>
+	<p>When enabled, Carl's Syntwin, an AI guide, is provided through Syntwin. The guide connects to Syntwin's service and processes conversation messages there. AI conversations are separate from Alkalye's document sync and require an internet connection.</p>
 	<p>The guide receives a general note identifying the website or app, without account details or document contents. If you grant page access through the guide, visible page content can be sent to Syntwin and its AI providers to answer questions or guide you. Alkalye marks sign-in forms and recovery phrases as hidden from that access. Share only content you want the guide to see. Page access can be declined or revoked in the guide.</p>
 	<p>See <a href="https://my.syntwin.ai/legal/privacy" target="_blank" rel="noopener" class="text-brand hover:underline">Syntwin's privacy policy</a> for its data handling practices.</p>
 

@@ -24,10 +24,20 @@ function writeWorkspaceEnv() {
 	let sourceEnvPath = getSourceEnvPath()
 	let workspaceEnvPath = join(root, ".env")
 	let envFile = readFileSync(sourceEnvPath, "utf-8")
-	let syncServer = `wss://sync.${workspace}.alkalye.localhost`
-	let mcpBaseUrl = `https://${workspace}.alkalye.localhost`
+	let webUrl =
+		process.env.WORK_WEB_URL ?? `https://web.${workspace}.alkalye.localhost`
+	let mcpBaseUrl = webUrl
 
-	envFile = setEnvValue(envFile, "PUBLIC_JAZZ_SYNC_SERVER", syncServer)
+	envFile = envFile
+		.split("\n")
+		.filter(
+			line =>
+				!/^(PUBLIC_JAZZ_SYNC_SERVER|JAZZ_APP_ID|JAZZ_SERVER_URL|JAZZ_ADMIN_SECRET)=/.test(
+					line,
+				),
+		)
+		.join("\n")
+	envFile = setEnvValue(envFile, "JAZZ_PUBLIC_URL", `${webUrl}/jazz`)
 	envFile = setEnvValue(envFile, "ALKALYE_MCP_BASE_URL", mcpBaseUrl)
 
 	mkdirSync(dirname(workspaceEnvPath), { recursive: true })
