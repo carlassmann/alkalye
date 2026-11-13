@@ -15,7 +15,7 @@ for (let serviceWorkersOnly of [false, true]) {
 				["restart", label === "classic" ? "sync" : "v2", "--tailscale"],
 				{ cwd: "/tmp/alkalye-bench-production", stdio: "inherit" },
 			)
-			let path = `bench/results/${label}${serviceWorkersOnly ? "-sw" : ""}-${run}.json`
+			let path = `bench/results/raw/${label}${serviceWorkersOnly ? "-sw" : ""}-${run}.json`
 			let execution = spawnSync(
 				"bun",
 				[
@@ -64,21 +64,21 @@ for (let serviceWorkersOnly of [false, true]) {
 for (let label of ["classic", "v2"]) {
 	let runs = await Promise.all(
 		Array.from({ length: 5 }, (_, index) =>
-			readFile(`bench/results/${label}-${index + 1}.json`, "utf8").then(text =>
-				JSON.parse(text),
+			readFile(`bench/results/raw/${label}-${index + 1}.json`, "utf8").then(
+				text => JSON.parse(text),
 			),
 		),
 	)
 	let serviceWorkerRuns = await Promise.all(
 		Array.from({ length: 5 }, (_, index) =>
-			readFile(`bench/results/${label}-sw-${index + 1}.json`, "utf8").then(
+			readFile(`bench/results/raw/${label}-sw-${index + 1}.json`, "utf8").then(
 				text => JSON.parse(text),
 			),
 		),
 	)
 
 	await writeFile(
-		`bench/results/${label}.json`,
+		`bench/results/raw/${label}.json`,
 		JSON.stringify(
 			{
 				...runs[0],
