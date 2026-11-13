@@ -149,6 +149,7 @@ let schema = {
 			type: s.enum("image", "video", "tldraw"),
 			name: s.string(),
 			data: s.bytes().optional(),
+			thumbnail: s.bytes().optional(),
 			mimeType: s.string().optional(),
 			muteAudio: s.boolean().default(false),
 			width: s.int().optional(),
