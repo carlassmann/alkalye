@@ -31,22 +31,7 @@ declare module "@tanstack/react-router" {
 	}
 }
 
-let wasmReady: Promise<void> | undefined
-
-async function initializeWasm() {
-	let { default: init } = await import("jazz-wasm")
-	await init()
-}
-
 function PWA() {
-	let [ready, setReady] = useState(false)
-	let [error, setError] = useState<Error>()
-	useEffect(() => {
-		// Finish the page fetch before the worker asks for the same immutable asset.
-		void (wasmReady ??= initializeWasm()).then(() => setReady(true), setError)
-	}, [])
-	if (error) throw error
-	if (!ready) return <p role="status">Opening your library…</p>
 	return (
 		<IntlProvider>
 			<JazzProvider

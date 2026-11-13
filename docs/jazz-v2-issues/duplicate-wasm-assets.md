@@ -25,10 +25,14 @@ Precache both and the unused raw worker adds about 0.89 MB to installation.
 
 Set Vite worker `rollupOptions.output.assetFileNames` to
 `_astro/[name].[hash][extname]`, matching Astro's page asset names. Both builds
-then reference one Wasm asset. Complete page Wasm initialization before starting
-Jazz, allowing its worker to reuse the immutable HTTP cache entry. Exclude the
+then reference one Wasm asset. Exclude the
 unused dotted broker worker asset from the PWA precache; keep the actual
 hyphenated worker chunk and the single Wasm asset.
+
+A separate capture still records two uncached transfers of the now-identical
+URL, one per realm. Serial page initialization did not eliminate this. URL and
+precache deduplication therefore do not by themselves reduce encoded first-load
+bytes. This SDK startup behavior remains unresolved.
 
 First-load measurements use a fresh isolated browser context with HTTP caching
 enabled and service workers blocked. The original harness disabled caching on
