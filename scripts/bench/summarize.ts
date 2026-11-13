@@ -1,15 +1,18 @@
 import { readFile, writeFile } from "node:fs/promises"
 import { z } from "zod"
 
-let finalResults = [
-	"classic",
-	"v2",
-	"v2-optimized",
-	"v2-optimized-load",
-	"v2-optimized-brotli",
-	"classic-5000",
-	"v2-5000",
-]
+let finalResults =
+	process.argv.length > 2
+		? process.argv.slice(2)
+		: [
+				"classic",
+				"v2",
+				"v2-optimized",
+				"v2-optimized-load",
+				"v2-optimized-brotli",
+				"classic-5000",
+				"v2-5000",
+			]
 for (let name of finalResults) {
 	let source = `bench/results/raw/${name}.json`
 	let raw: unknown = JSON.parse(await readFile(source, "utf8"))

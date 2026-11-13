@@ -6,22 +6,39 @@ import { summary } from "./metrics"
 let head = execFileSync("git", ["rev-parse", "HEAD"], {
 	encoding: "utf8",
 }).trim()
+let prefix = process.env.BENCH_RESULT_PREFIX ?? ""
+let setups = {
+	classic: {
+		target:
+			process.env.BENCH_CLASSIC_TARGET ??
+			"https://classic-main-alkalye-bench.cshed.carlassmann.com",
+		workRoot:
+			process.env.BENCH_CLASSIC_WORK_ROOT ?? "/tmp/alkalye-bench-production",
+		command: process.env.BENCH_CLASSIC_COMMAND ?? "sync",
+	},
+	v2: {
+		target:
+			process.env.BENCH_V2_TARGET ??
+			"https://v2-main-alkalye-bench.cshed.carlassmann.com",
+		workRoot: process.env.BENCH_V2_WORK_ROOT ?? "/tmp/alkalye-bench-production",
+		command: process.env.BENCH_V2_COMMAND ?? "v2",
+	},
+}
 let results: Record<string, Record<string, number[]>> = { classic: {}, v2: {} }
 for (let serviceWorkersOnly of [false, true]) {
 	for (let run = 1; run <= 5; run++) {
-		for (let label of ["classic", "v2"]) {
-			execFileSync(
-				"work",
-				["restart", label === "classic" ? "sync" : "v2", "--tailscale"],
-				{ cwd: "/tmp/alkalye-bench-production", stdio: "inherit" },
-			)
-			let path = `bench/results/raw/${label}${serviceWorkersOnly ? "-sw" : ""}-${run}.json`
+		for (let [label, setup] of Object.entries(setups)) {
+			execFileSync("work", ["restart", setup.command, "--tailscale"], {
+				cwd: setup.workRoot,
+				stdio: "inherit",
+			})
+			let path = `bench/results/raw/${prefix}${label}${serviceWorkersOnly ? "-sw" : ""}-${run}.json`
 			let execution = spawnSync(
 				"bun",
 				[
 					"scripts/bench/compare.ts",
 					"--target",
-					`https://${label}-main-alkalye-bench.cshed.carlassmann.com`,
+					setup.target,
 					"--label",
 					label,
 					"--out",
@@ -31,6 +48,9 @@ for (let serviceWorkersOnly of [false, true]) {
 					"--edits",
 					"200",
 					...(serviceWorkersOnly ? ["--sw-only"] : ["--skip-sw"]),
+					...(process.env.BENCH_LITERAL_NEWLINES === "1"
+						? ["--literal-newlines"]
+						: []),
 				],
 				{
 					stdio: "inherit",
@@ -39,15 +59,16 @@ for (let serviceWorkersOnly of [false, true]) {
 						BENCH_JAZZ: label === "classic" ? "0.20.18" : "2.0.0-alpha.61",
 						BENCH_GIT_HEAD: label === "classic" ? "8379d4e" : head,
 						BENCH_SERVER_NOTE:
-							label === "classic"
+							process.env.BENCH_SERVER_NOTE ??
+							(label === "classic"
 								? "Node production + jazz-run 0.20.19, 32GB heap"
-								: "Node production + isolated SQLite",
+								: "Node production + isolated SQLite"),
 					},
 				},
 			)
 			let data = JSON.parse(await readFile(path, "utf8"))
 			if (execution.error || data.completedRuns !== 1)
-				throw new Error(`Incomplete ${label} run ${run}`)
+				throw new Error(`Incomplete ${prefix}${label} run ${run}`)
 			if (execution.status !== 0) process.exitCode = 1
 			for (let [name, metric] of Object.entries(data.metrics)) {
 				if (
@@ -64,21 +85,23 @@ for (let serviceWorkersOnly of [false, true]) {
 for (let label of ["classic", "v2"]) {
 	let runs = await Promise.all(
 		Array.from({ length: 5 }, (_, index) =>
-			readFile(`bench/results/raw/${label}-${index + 1}.json`, "utf8").then(
-				text => JSON.parse(text),
-			),
+			readFile(
+				`bench/results/raw/${prefix}${label}-${index + 1}.json`,
+				"utf8",
+			).then(text => JSON.parse(text)),
 		),
 	)
 	let serviceWorkerRuns = await Promise.all(
 		Array.from({ length: 5 }, (_, index) =>
-			readFile(`bench/results/raw/${label}-sw-${index + 1}.json`, "utf8").then(
-				text => JSON.parse(text),
-			),
+			readFile(
+				`bench/results/raw/${prefix}${label}-sw-${index + 1}.json`,
+				"utf8",
+			).then(text => JSON.parse(text)),
 		),
 	)
 
 	await writeFile(
-		`bench/results/raw/${label}.json`,
+		`bench/results/raw/${prefix}${label}.json`,
 		JSON.stringify(
 			{
 				...runs[0],

@@ -38,34 +38,12 @@ await cp(resolve(root, ".env"), resolve(classic, ".env"))
 run("bun", ["install"], classic)
 run("git", ["init", "-q", "--initial-branch=main"], serving)
 await writeFile(
-	resolve(serving, "classic-server.mjs"),
-	`
-import { createServer, request } from "node:http"
-import { spawn } from "node:child_process"
-let port = Number(process.env.PORT)
-let upstream = port + 10000
-let child = spawn("node", ["--env-file=.env", "dist/server/entry.mjs"], {
- cwd: ${JSON.stringify(classic)}, env: { ...process.env, PORT: String(upstream), HOST: "127.0.0.1" }, stdio: "inherit"
-})
-process.on("exit", () => child.kill())
-process.on("SIGTERM", () => { child.kill(); process.exit() })
-createServer((req, res) => {
- let path = req.url.startsWith("/app/") && !req.url.includes(".") ? "/app" : req.url
- let proxy = request({ hostname: "127.0.0.1", port: upstream, path, method: req.method, headers: req.headers }, response => {
-  res.writeHead(response.statusCode, response.headers); response.pipe(res)
- })
- proxy.on("error", () => { res.writeHead(502); res.end() })
- req.pipe(proxy)
-}).listen(port, "0.0.0.0")
-`,
-)
-await writeFile(
 	resolve(serving, "work.config.js"),
 	`
 export default {
  project: "alkalye-bench",
  commands: {
-  classic: { run: 'node ${serving}/classic-server.mjs', route: true },
+  classic: { run: 'HOST=0.0.0.0 BENCH_HISTORY_FALLBACK=1 BENCH_BUILD_ROOT=${classic} bun ${root}/scripts/bench/serve-production.ts', route: true },
   sync: { run: 'cd ${classic} && ulimit -c 0; NODE_OPTIONS=--max-old-space-size=32768 bunx jazz-run@0.20.19 sync --port "$PORT" --host "$HOST"', route: true },
   v2: { run: 'cd ${serving} && ALKALYE_LOCAL_PREVIEW=1 WORK_WEB_URL=https://v2-main-alkalye-bench.cshed.carlassmann.com JAZZ_PUBLIC_URL=https://v2-main-alkalye-bench.cshed.carlassmann.com/jazz HOST=0.0.0.0 BENCH_BUILD_ROOT=${root} bun ${root}/scripts/bench/serve-production.ts', route: true }
  }
