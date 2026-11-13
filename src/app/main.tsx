@@ -1,3 +1,4 @@
+import { ClassicMigration } from "./features/classic-import/migration-notice"
 import { AccountRoutingContext } from "./lib/account-routing"
 import { useEffect, useState } from "react"
 import { JazzProvider, useSession, useSyncStatus } from "jazz-tools/react"
@@ -44,7 +45,9 @@ function PWA() {
 				}
 				loading={<p role="status">Opening your library…</p>}
 			>
-				<AccountApp />
+				<ClassicMigration>
+					<AccountApp />
+				</ClassicMigration>
 			</JazzProvider>
 		</IntlProvider>
 	)
