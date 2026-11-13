@@ -1,6 +1,8 @@
 # Jazz Classic vs v2
 
-Classic baseline pending the final run. v2 remains TBD.
+Classic baseline measured 2026-11-13: three completed runs, zero scenario failures.
+All nine typing replays and three whole-dataset exports passed exact-content checks.
+v2 remains TBD.
 Raw samples: `bench/results/classic.json`.
 
 ## Reproduce
@@ -96,7 +98,54 @@ when v2 moves work into a SharedWorker.
 
 ## Results
 
-<!-- results -->
+Client: jazz-tools 0.20.18, harness commit `262baf5`. Server: jazz-run 0.20.19,
+Node 24.22.1, 16 GB heap limit; server database retained across measured accounts.
+AMD RYZEN AI MAX+ 395, 32 logical CPUs, Linux 7.2.8-9-omarchy,
+Chromium 145.0.7632.6, CPU throttle 1×. The 52 imported files total 1,595,667 bytes.
+This baseline uses the 200-edit slice; the full 259,778-edit replay was not run.
+
+| Metric                                       | Samples | Classic median | Classic p95 | v2 median / p95 |
+| -------------------------------------------- | ------: | -------------: | ----------: | --------------- |
+| ZIP import, including document resolution    |       3 |        67.26 s |     67.55 s | TBD             |
+| Cold usable document list                    |       3 |         6.84 s |      7.15 s | TBD             |
+| Warm usable document list                    |       3 |         3.40 s |      3.55 s | TBD             |
+| Cold large-document open                     |       3 |        14.29 s |     14.31 s | TBD             |
+| Fresh device, all bodies verified via export |       3 |        22.34 s |     23.52 s | TBD             |
+| Edit visible on second client                |      15 |         409 ms |   22,359 ms | TBD             |
+| Typing dispatch → double-rAF, small          |     600 |       33.32 ms |    34.58 ms | TBD             |
+| Typing dispatch → double-rAF, medium         |     600 |       33.31 ms |    33.84 ms | TBD             |
+| Typing dispatch → double-rAF, large          |     600 |       33.33 ms |    33.83 ms | TBD             |
+| Long-task count, small                       |       3 |              3 |           3 | TBD             |
+| Long-task count, medium                      |       3 |              3 |           4 | TBD             |
+| Long-task count, large                       |       3 |              2 |           2 | TBD             |
+| Total long-task duration, small              |       3 |         496 ms |      499 ms | TBD             |
+| Total long-task duration, medium             |       3 |         702 ms |    1,011 ms | TBD             |
+| Total long-task duration, large              |       3 |       1,878 ms |    2,206 ms | TBD             |
+
+Byte units below are decimal: 1 MB = 1,000,000 bytes. Per-edit figures divide the
+entire measurement window by 200 edits, including background traffic.
+
+| Metric                                 | Samples | Classic median |  Classic p95 | v2 median / p95 |
+| -------------------------------------- | ------: | -------------: | -----------: | --------------- |
+| IndexedDB after import                 |       3 |      115.54 MB |    142.65 MB | TBD             |
+| First-load JS + Wasm transferred       |       3 |       20.23 MB |     20.23 MB | TBD             |
+| Sent payload bytes/edit, small         |       3 |       183.06 B |     183.07 B | TBD             |
+| Sent payload bytes/edit, medium        |       3 |       340.57 B |     346.22 B | TBD             |
+| Sent payload bytes/edit, large         |       3 |       258.05 B |     262.28 B | TBD             |
+| Received WS payload bytes/edit, small  |       3 |         8.53 B |       8.53 B | TBD             |
+| Received WS payload bytes/edit, medium |       3 |   193,378.57 B | 200,445.57 B | TBD             |
+| Received WS payload bytes/edit, large  |       3 |    94,772.09 B | 100,075.20 B | TBD             |
+| Main-page JS heap after replay, small  |       3 |       80.48 MB |     94.46 MB | TBD             |
+| Main-page JS heap after replay, medium |       3 |      191.36 MB |    208.43 MB | TBD             |
+| Main-page JS heap after replay, large  |       3 |      497.16 MB |  1,144.18 MB | TBD             |
+
+Three of 15 sync samples took 21.39–22.36 seconds; the remaining 12 took
+311–453 ms. This tail is retained without attributing its cause. Large incoming
+payloads during book replay include hydration/background work; they do not imply
+that each keystroke individually downloads that much data. Typing medians sit near
+the frame-pacing floor despite substantial long tasks, so both measures matter.
+The app also emitted Base UI and unavailable-wikilink console warnings; measured
+document content still passed verification.
 
 ## Limits and v2 adapter
 

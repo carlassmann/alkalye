@@ -50,3 +50,5 @@ Same harness against Classic (`main`) and v2 (this branch), real-life datasets, 
 ## Progress log
 
 Agents append one line per finished step: date, phase, what, commit.
+
+- 2026-11-13, phase 1: UI benchmark harness and Classic baseline; three runs, zero scenario failures, v2 pending. Harness commit `262baf5`; results in `bench/results/classic.json`.

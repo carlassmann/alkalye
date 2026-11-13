@@ -125,6 +125,9 @@ and can take hours. Replay deadlines scale with edit count; override with
 Only `scripts/bench/adapter.ts` depends on account, sign-in and import UI conventions.
 It reuses `e2e/auth-helpers.ts`; change these bindings if v2 changes the UI. Scenarios
 never call Jazz APIs. Credentials stay in memory and are never written to results.
+Classic restores only its authentication secret into fresh contexts. If v2 stores
+device credentials in IndexedDB or a worker, adapt `captureCredentials` to restore
+authentication only; leave document caches and session leases empty.
 See `docs/benchmarks/jazz-classic-vs-v2.md` for measurement definitions and limitations.
 
 written with gpt-6.1-sol in T3 Code (Codex)
