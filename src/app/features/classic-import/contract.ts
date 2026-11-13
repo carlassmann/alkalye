@@ -81,7 +81,7 @@ let importItemSchema = z.discriminatedUnion("kind", [
 		createdAt: date,
 		updatedAt: date,
 		deletedAt: date.optional(),
-		versions: z.array(version).max(200),
+		versions: z.array(version),
 		comments: z.array(comment),
 		assets: z.array(asset),
 	}),

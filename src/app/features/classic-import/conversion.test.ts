@@ -49,17 +49,16 @@ test("anchors preserve exact positions, recover unique context, and reject ambig
 	).toEqual({ start: 8, end: 12 })
 	expect(resolveClassicAnchor("deleted", anchor)).toBeUndefined()
 })
-test("history groups an author's typing, preserves author changes, and bounds bytes and count", () => {
+test("history groups an author's typing and preserves author changes", () => {
 	let versions = Array.from({ length: 250 }, (_, index) => ({
 		content: `version ${index}`,
 		authorId: index < 3 ? "a" : `author-${index}`,
 		createdAt: new Date(index * 1000),
 	}))
 	let grouped = groupHistory(versions)
-	expect(grouped).toHaveLength(200)
+	expect(grouped).toHaveLength(248)
 	expect(grouped.at(-1)?.content).toBe("version 249")
 	expect(groupHistory(versions.slice(0, 4))).toHaveLength(2)
-	expect(groupHistory(versions, 200, 20)).toHaveLength(1)
 })
 test("stable ids and references are account-independent; checksum corruption is rejected", async () => {
 	let first = await stableId("co_z123")
@@ -119,4 +118,15 @@ test("Classic proof binds the signed challenge to the account header hash and v2
 			message,
 		),
 	).toBe(false)
+})
+
+test("history retains every grouped version and snapshots larger than eight MiB", () => {
+	let versions = Array.from({ length: 250 }, (_, index) => ({
+		content: `version ${index}`,
+		authorId: `author-${index}`,
+		createdAt: new Date(index * 60000),
+	}))
+	expect(groupHistory(versions)).toHaveLength(250)
+	let large = { ...versions[0]!, content: "x".repeat(9 * 1024 * 1024) }
+	expect(groupHistory([large])).toEqual([large])
 })

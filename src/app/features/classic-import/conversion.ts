@@ -31,7 +31,7 @@ async function unpackBytes(value: { base64: string; sha256: string }) {
 }
 function groupHistory<
 	T extends { createdAt: Date; authorId: string; content: string },
->(versions: T[], limit = 200, maxBytes = 8 * 1024 * 1024) {
+>(versions: T[]) {
 	let result: T[] = []
 	for (let version of [...versions].sort(
 		(a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
@@ -46,15 +46,7 @@ function groupHistory<
 			result[result.length - 1] = version
 		else result.push(version)
 	}
-	let bytes = 0
 	return result
-		.slice(-limit)
-		.reverse()
-		.filter(version => {
-			bytes += new TextEncoder().encode(version.content).length
-			return bytes <= maxBytes
-		})
-		.reverse()
 }
 function resolveClassicAnchor(
 	content: string,
