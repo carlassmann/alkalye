@@ -3,12 +3,15 @@ import {
 	ChangeSet,
 	Transaction,
 	type Extension,
+	type Text,
 } from "@codemirror/state"
 import { EditorView } from "@codemirror/view"
 import { diff } from "fast-myers-diff"
 
 export { codeMirrorSync, minimalChanges }
-export type { MarkdownSync, TextUpdate, TextSource }
+export type { MarkdownSync, TextUpdate, TextSource, TextEdit }
+
+type TextEdit = { from: number; to: number; insert: string }
 
 type TextUpdate = {
 	previous: string
@@ -24,7 +27,11 @@ let remoteChange = Annotation.define<boolean>()
 
 function codeMirrorSync(
 	initial: string,
-	write: (text: string, editedFrom: string) => void,
+	write: (
+		text: string,
+		editedFrom: string,
+		edit?: TextEdit,
+	) => void | Promise<void>,
 ) {
 	let base = initial
 	let pending: string[] = []
@@ -32,8 +39,12 @@ function codeMirrorSync(
 	let held: string | null = null
 	let composing = false
 	let view: EditorView | undefined
+	let knownDocument: Text | undefined
+	let knownText = initial
+	let writing = 0
+	let heldForWrite: { value: string; update?: TextUpdate } | null = null
 
-	function changed(text: string) {
+	function changed(text: string, edit?: TextEdit) {
 		if (text === base) return
 		let editedFrom = base
 		let before = pending
@@ -41,15 +52,29 @@ function codeMirrorSync(
 		if (pending.length === 0) pendingBase = editedFrom
 		base = text
 		pending = [...pending, text]
+		writing++
 		try {
-			write(text, editedFrom)
+			let result = edit
+				? write(text, editedFrom, edit)
+				: write(text, editedFrom)
+			if (result) void result.then(finishedWriting, finishedWriting)
+			else finishedWriting()
 		} catch (error) {
 			base = editedFrom
 			pending = before
 			pendingBase = previousPendingBase
+			finishedWriting()
 			throw error
 		}
 		held = null
+	}
+
+	function finishedWriting() {
+		writing--
+		if (writing !== 0 || !heldForWrite) return
+		let latest = heldForWrite
+		heldForWrite = null
+		apply(latest.value, latest.update)
 	}
 
 	function apply(value: string, update?: TextUpdate) {
@@ -58,9 +83,14 @@ function codeMirrorSync(
 			held = value
 			return
 		}
-		let shown = view.state.doc.toString()
+		let shown =
+			view.state.doc === knownDocument ? knownText : view.state.doc.toString()
 		if (shown !== base) {
 			changed(shown)
+			return
+		}
+		if (writing > 0) {
+			heldForWrite = { value, update }
 			return
 		}
 		if (pending.length > 0 && value === pendingBase) return
@@ -87,13 +117,32 @@ function codeMirrorSync(
 	let extension: Extension = [
 		EditorView.updateListener.of(update => {
 			view = update.view
-			if (
-				update.docChanged &&
-				!update.transactions.every(transaction =>
-					transaction.annotation(remoteChange),
-				)
+			if (!update.docChanged) return
+			let local = !update.transactions.every(transaction =>
+				transaction.annotation(remoteChange),
 			)
-				changed(update.state.doc.toString())
+			knownDocument = update.state.doc
+			knownText = local ? update.state.doc.toString() : base
+			if (local) {
+				let edit: TextEdit | undefined
+				if (base.length >= 16 * 1024) {
+					let from = -1
+					let to = 0
+					let start = 0
+					let end = 0
+					update.changes.iterChanges((oldFrom, oldTo, newFrom, newTo) => {
+						if (from < 0) {
+							from = oldFrom
+							start = newFrom
+						}
+						to = oldTo
+						end = newTo
+					})
+					if (from >= 0 && end - start <= base.length / 4)
+						edit = { from, to, insert: knownText.slice(start, end) }
+				}
+				changed(knownText, edit)
+			}
 		}),
 		EditorView.domEventHandlers({
 			compositionstart() {
@@ -119,6 +168,8 @@ function codeMirrorSync(
 		apply,
 		attach(editor: EditorView) {
 			view = editor
+			knownDocument = editor.state.doc
+			knownText = editor.state.doc.toString()
 		},
 		destroy() {
 			view = undefined

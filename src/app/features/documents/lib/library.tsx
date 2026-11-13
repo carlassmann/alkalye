@@ -16,6 +16,7 @@ import {
 import { parseWikiLinks } from "@/app/features/editor/lib/wikilink-parser"
 import { documentMetadata } from "./metadata"
 import { watchWrite } from "./writes"
+import type { TextEdit } from "./codemirror-sync"
 
 export {
 	app,
@@ -321,27 +322,95 @@ function scheduleMetadata(db: Database, id: string) {
 	)
 }
 
+let contentWrites = new WeakMap<Database, Map<string, Promise<unknown>>>()
+
+function writeDocumentContent(
+	db: Database,
+	id: string,
+	content: string,
+	original: string,
+	deferMetadata: boolean,
+	edit?: TextEdit,
+) {
+	let queue = contentWrites.get(db)
+	if (!queue) {
+		queue = new Map()
+		contentWrites.set(db, queue)
+	}
+	let previous = queue.get(id)
+	let paint = deferMetadata ? afterPaint() : undefined
+	let result = write()
+	queue.set(id, result)
+	function finished() {
+		if (queue?.get(id) === result) queue.delete(id)
+	}
+	void result.then(finished, finished)
+	return result
+
+	async function write() {
+		if (previous) await previous.catch(() => {})
+		if (paint) await paint
+		return db.transaction(transaction =>
+			transaction.update(
+				app.documents,
+				id,
+				{
+					content,
+					...(deferMetadata
+						? {}
+						: { ...documentMetadata(content), updatedAt: new Date() }),
+				},
+				{
+					editedFrom: { content: original },
+					...(edit ? { editedSplices: { content: edit } } : {}),
+				},
+			),
+		)
+	}
+}
+
+function afterPaint() {
+	if (document.visibilityState !== "visible") return Promise.resolve()
+	return new Promise<void>(resolve => {
+		let finished = false
+		let frame = requestAnimationFrame(() => setTimeout(finish, 0))
+		let deadline = setTimeout(finish, 40)
+		window.addEventListener("pagehide", finish)
+		document.addEventListener("visibilitychange", finishWhenHidden)
+		function finishWhenHidden() {
+			if (document.visibilityState !== "visible") finish()
+		}
+		function finish() {
+			if (finished) return
+			finished = true
+			cancelAnimationFrame(frame)
+			clearTimeout(deadline)
+			window.removeEventListener("pagehide", finish)
+			document.removeEventListener("visibilitychange", finishWhenHidden)
+			resolve()
+		}
+	})
+}
+
 async function updateContent(
 	db: Database,
 	doc: DocumentRow | LibraryDocument,
 	content: string,
 	editedFrom?: string,
-	{ deferMetadata = false }: { deferMetadata?: boolean } = {},
+	{
+		deferMetadata = false,
+		edit,
+	}: { deferMetadata?: boolean; edit?: TextEdit } = {},
 ) {
 	editedFrom ??= (await readDocument(db, doc.id)).content
 	let original = editedFrom
-	let write = await db.transaction(tx =>
-		tx.update(
-			app.documents,
-			doc.id,
-			{
-				content,
-				...(deferMetadata
-					? {}
-					: { ...documentMetadata(content), updatedAt: new Date() }),
-			},
-			{ editedFrom: { content: original } },
-		),
+	let write = await writeDocumentContent(
+		db,
+		doc.id,
+		content,
+		original,
+		deferMetadata,
+		edit,
 	)
 	watchWrite(write)
 	if (deferMetadata) scheduleMetadata(db, doc.id)

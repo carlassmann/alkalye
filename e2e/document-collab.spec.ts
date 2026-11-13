@@ -196,8 +196,8 @@ test("large text merges concurrent offline typing exactly and survives reload", 
 		await editorFor(collaborator.page).focus()
 		await collaborator.page.keyboard.press("ControlOrMeta+Home")
 		await Promise.all([
-			page.keyboard.type(suffix, { delay: 12 }),
-			collaborator.page.keyboard.type(prefix, { delay: 17 }),
+			page.keyboard.type(suffix, { delay: 0 }),
+			collaborator.page.keyboard.type(prefix, { delay: 0 }),
 		])
 		await expect.poll(() => copyDocument(page)).toBe(original + suffix)
 		await expect

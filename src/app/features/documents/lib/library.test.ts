@@ -108,3 +108,20 @@ test("browser creation in another owner's space preserves space ownership and in
 	await fixture.seed(db => db.delete(app.spaceMembers, member.id))
 	expect(await db.all(app.documents.where({ id: doc.id }))).toEqual([])
 })
+
+test("large editedFrom writes preserve both stale-base insertions", async () => {
+	let db = actor()
+	let original = "# Guarded large edit\n\n" + "a😀é paragraph\n".repeat(4096)
+	let doc = await createDocument(db, ownerId, original)
+	await db.waitForSync()
+	await updateContent(db, doc, original + " suffix", original, {
+		edit: { from: original.length, to: original.length, insert: " suffix" },
+	})
+	await updateContent(db, doc, "prefix " + original, original, {
+		edit: { from: 0, to: 0, insert: "prefix " },
+	})
+	await db.waitForSync()
+	expect((await db.one(app.documents.where({ id: doc.id })))?.content).toBe(
+		"prefix " + original + " suffix",
+	)
+})

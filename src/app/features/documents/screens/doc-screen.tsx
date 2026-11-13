@@ -163,14 +163,15 @@ function DocumentEditor({
 	}
 
 	let [binding] = useState(() =>
-		codeMirrorSync(doc.content, (content, editedFrom) => {
-			void updateContent(db, doc, content, editedFrom, {
+		codeMirrorSync(doc.content, (content, editedFrom, edit) => {
+			return updateContent(db, doc, content, editedFrom, {
 				deferMetadata: true,
-			}).catch(error =>
+				edit,
+			}).catch(error => {
 				toast.error(
 					error instanceof Error ? error.message : "Could not save document",
-				),
-			)
+				)
+			})
 		}),
 	)
 	useEffect(() => {

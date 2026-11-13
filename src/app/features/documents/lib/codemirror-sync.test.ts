@@ -133,3 +133,45 @@ test("falls back to a diff when a render skipped a subscription update", () => {
 	})
 	expect(view.state.doc.toString()).toBe("new middle!")
 })
+
+test("large multi-range edits carry a replacement against their exact editor base", () => {
+	let original = "a😀é paragraph\n".repeat(4096)
+	let { view, write } = editor(original)
+	view.dispatch({
+		changes: [
+			{ from: 0, insert: "prefix " },
+			{ from: 25, to: 28, insert: "XYZ" },
+		],
+	})
+	let result = view.state.doc.toString()
+	expect(write).toHaveBeenCalledWith(result, original, {
+		from: 0,
+		to: 28,
+		insert: result.slice(0, 35),
+	})
+})
+
+test("keeps local text visible until asynchronous writes expose their merged snapshot", async () => {
+	let complete: (() => void)[] = []
+	let binding = codeMirrorSync(
+		"A",
+		() => new Promise<void>(resolve => complete.push(resolve)),
+	)
+	let view = new EditorView({
+		state: EditorState.create({ doc: "A", extensions: [binding.extension] }),
+	})
+	binding.attach(view)
+	views.push(view)
+	view.dispatch({ changes: { from: 1, insert: "B" } })
+	binding.apply("remote A")
+	expect(view.state.doc.toString()).toBe("AB")
+	view.dispatch({ changes: { from: 2, insert: "C" } })
+	binding.apply("remote AB")
+	complete[0]!()
+	await Promise.resolve()
+	expect(view.state.doc.toString()).toBe("ABC")
+	binding.apply("remote ABC")
+	complete[1]!()
+	await Promise.resolve()
+	expect(view.state.doc.toString()).toBe("remote ABC")
+})
