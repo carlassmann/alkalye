@@ -178,7 +178,6 @@ async function captureCredentials(context: BrowserContext) {
 		let auth = origin.localStorage.filter(
 			entry =>
 				entry.name === "jazz-logged-in-secret" ||
-				entry.name.startsWith("jazz-auth-store-v1-") ||
 				entry.name.startsWith("jazz-account-selection"),
 		)
 		auth = auth.map(entry => {

@@ -41,6 +41,7 @@ let { values } = parseArgs({
 		"replay-timeout-ms": { type: "string" },
 		"large-only": { type: "boolean", default: false },
 		"sw-only": { type: "boolean", default: false },
+		"skip-sw": { type: "boolean", default: false },
 	},
 })
 if (!values.target || !values.label || !values.out)
@@ -232,6 +233,12 @@ try {
 					await editor(other).focus()
 					await other.keyboard.press("ControlOrMeta+End")
 					await openDocument(page, syncDoc)
+					if (process.env.BENCH_SYNC_PROFILE_DIR) {
+						await sourceNetwork.cdp.send("Profiler.enable")
+						await sourceNetwork.cdp.send("Profiler.start")
+						await syncNetwork.cdp.send("Profiler.enable")
+						await syncNetwork.cdp.send("Profiler.start")
+					}
 					for (let n = 0; n < 5; n++) {
 						console.error(`Sync marker ${n + 1}/5`)
 						let marker = ` sync-${run}-${n}`
@@ -258,6 +265,19 @@ try {
 							receiverTimeline: syncNetwork.timeline.slice(-200),
 							receiver: { ...syncNetwork.wire },
 						})
+					}
+					if (process.env.BENCH_SYNC_PROFILE_DIR) {
+						await mkdir(process.env.BENCH_SYNC_PROFILE_DIR, { recursive: true })
+						for (let [name, cdp] of [
+							["sender", sourceNetwork.cdp],
+							["receiver", syncNetwork.cdp],
+						] satisfies [string, typeof sourceNetwork.cdp][]) {
+							let { profile } = await cdp.send("Profiler.stop")
+							await writeFile(
+								`${process.env.BENCH_SYNC_PROFILE_DIR}/${name}.cpuprofile`,
+								JSON.stringify(profile),
+							)
+						}
 					}
 				} finally {
 					await syncReceiver.close()
@@ -318,99 +338,102 @@ try {
 			}
 			console.error("Returning user: service worker and offline reload")
 
-			let returningStage = "startup"
-			let returningStarted = performance.now()
-			let returning = await newContext(browser, credentials, true)
-			let returningPage = await returning.newPage()
-			try {
-				await withDeadline(
-					(async () => {
-						let returningNetwork = await instrument(returningPage, cpu)
-						await returningNetwork.setCacheDisabled(false)
-						await waitForEditorBoot(returningPage)
-						returningStage = "initialLibrary"
-						await waitForDocumentList(returningPage)
-						returningStage = "largeOpen"
-						await waitForEditorBoot(returningPage, {
-							path: `/app/doc/${large.id}`,
-						})
-						await expect(editor(returningPage)).toContainText("Book dracula")
-						returningStage = "serviceWorkerReady"
-						await returningPage.evaluate(async () => {
-							await navigator.serviceWorker.ready
-						})
-						returningStage = "controlledReload"
-						await returningPage.reload()
-						await expect
-							.poll(() =>
-								returningPage.evaluate(
-									() => !!navigator.serviceWorker.controller,
-								),
-							)
-							.toBe(true)
-						start = performance.now()
-						await returningPage.reload({ waitUntil: "domcontentloaded" })
-						await waitForDocumentList(returningPage)
-						add("returningSwListMs", performance.now() - start)
-						returningStage = "offlineOpen"
-						await returning.setOffline(true)
-						start = performance.now()
-						await waitForEditorBoot(returningPage, {
-							path: `/app/doc/${large.id}`,
-						})
-						await expect(editor(returningPage)).toContainText("Book dracula")
-						add("offlineSwLargeOpenMs", performance.now() - start)
-					})(),
-					90_000,
-					"returning SW case",
-				)
-			} catch (error) {
-				scenarioFailures.push({
-					run: run + 1,
-					scenario: "returningServiceWorker",
-					elapsedMs: performance.now() - returningStarted,
-					message: `${returningStage}: ${String(error)}`.slice(0, 1000),
-				})
-				serviceWorkerDiagnostics.push({
-					stage: returningStage,
-					ui: await returningPage
-						.locator("body")
-						.innerText({ timeout: 3000 })
-						.then(text => text.slice(0, 1500))
-						.catch(String),
-					controller: await returningPage
-						.evaluate(() => navigator.serviceWorker.controller?.state ?? null)
-						.catch(String),
-				})
-				if (returningStage !== "offlineOpen") {
-					let offlineStart = performance.now()
-					try {
-						await returning.setOffline(true)
-						await withDeadline(
-							(async () => {
-								await waitForEditorBoot(returningPage, {
-									path: `/app/doc/${large.id}`,
-								})
-								await expect(editor(returningPage)).toContainText(
-									"Book dracula",
+			if (!values["skip-sw"]) {
+				let returningStage = "startup"
+				let returningStarted = performance.now()
+				let returning = await newContext(browser, credentials, true)
+				let returningPage = await returning.newPage()
+				try {
+					await withDeadline(
+						(async () => {
+							let returningNetwork = await instrument(returningPage, cpu)
+							await returningNetwork.setCacheDisabled(false)
+							await waitForEditorBoot(returningPage)
+							returningStage = "initialLibrary"
+							await waitForDocumentList(returningPage)
+							returningStage = "largeOpen"
+							await waitForEditorBoot(returningPage, {
+								path: `/app/doc/${large.id}`,
+							})
+							await expect(editor(returningPage)).toContainText("Book dracula")
+							returningStage = "serviceWorkerReady"
+							await returningPage.evaluate(async () => {
+								await navigator.serviceWorker.ready
+							})
+							returningStage = "controlledReload"
+							await returningPage.reload()
+							await expect
+								.poll(() =>
+									returningPage.evaluate(
+										() => !!navigator.serviceWorker.controller,
+									),
 								)
-							})(),
-							30_000,
-							"independent offline open",
-						)
-						add("offlineSwLargeOpenMs", performance.now() - offlineStart)
-					} catch (offlineError) {
-						scenarioFailures.push({
-							run: run + 1,
-							scenario: "offlineServiceWorker",
-							elapsedMs: performance.now() - offlineStart,
-							message: String(offlineError).slice(0, 1000),
-						})
+								.toBe(true)
+							start = performance.now()
+							await returningPage.reload({ waitUntil: "domcontentloaded" })
+							await waitForDocumentList(returningPage)
+							add("returningSwListMs", performance.now() - start)
+							returningStage = "offlineOpen"
+							await returning.setOffline(true)
+							start = performance.now()
+							await waitForEditorBoot(returningPage, {
+								path: `/app/doc/${large.id}`,
+							})
+							await expect(editor(returningPage)).toContainText("Book dracula")
+							add("offlineSwLargeOpenMs", performance.now() - start)
+						})(),
+						90_000,
+						"returning SW case",
+					)
+				} catch (error) {
+					scenarioFailures.push({
+						run: run + 1,
+						scenario: "returningServiceWorker",
+						elapsedMs: performance.now() - returningStarted,
+						message: `${returningStage}: ${String(error)}`.slice(0, 1000),
+					})
+					serviceWorkerDiagnostics.push({
+						stage: returningStage,
+						ui: await returningPage
+							.locator("body")
+							.innerText({ timeout: 3000 })
+							.then(text => text.slice(0, 1500))
+							.catch(String),
+						controller: await returningPage
+							.evaluate(() => navigator.serviceWorker.controller?.state ?? null)
+							.catch(String),
+					})
+					if (returningStage !== "offlineOpen") {
+						let offlineStart = performance.now()
+						try {
+							await returning.setOffline(true)
+							await withDeadline(
+								(async () => {
+									await waitForEditorBoot(returningPage, {
+										path: `/app/doc/${large.id}`,
+									})
+									await expect(editor(returningPage)).toContainText(
+										"Book dracula",
+									)
+								})(),
+								30_000,
+								"independent offline open",
+							)
+							add("offlineSwLargeOpenMs", performance.now() - offlineStart)
+						} catch (offlineError) {
+							scenarioFailures.push({
+								run: run + 1,
+								scenario: "offlineServiceWorker",
+								elapsedMs: performance.now() - offlineStart,
+								message: String(offlineError).slice(0, 1000),
+							})
+						}
 					}
+				} finally {
+					await returning.close()
 				}
-			} finally {
-				await returning.close()
 			}
+
 			let load = runLoads.at(-1)
 			if (load) load.end = loadavg()
 			result.completedRuns++
