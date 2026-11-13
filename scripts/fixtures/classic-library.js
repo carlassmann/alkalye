@@ -235,12 +235,33 @@
 	credentials.provider = "passphrase"
 	localStorage.setItem("jazz-logged-in-secret", JSON.stringify(credentials))
 	await me.$jazz.waitForAllCoValuesSync({ timeout: 60000 })
+	let unmigratedDoc = schema.Document.create(
+		{
+			version: 1,
+			content: co.plainText().create("# Waiting private", owner),
+			createdAt: now,
+			updatedAt: now,
+		},
+		owner,
+	)
+	let unmigratedPublic = schema.Document.create(
+		{
+			version: 1,
+			content: co.plainText().create("# Waiting public", publicOwner),
+			createdAt: now,
+			updatedAt: now,
+		},
+		publicOwner,
+	)
+	await me.$jazz.waitForAllCoValuesSync({ timeout: 60000 })
 	let fixture = {
 		accountId: me.$jazz.id,
 		docId: doc.$jazz.id,
 		spaceId: space.$jazz.id,
 		spaceDocId: spaceDoc.$jazz.id,
 		publicDocId: publicDoc.$jazz.id,
+		unmigratedDocId: unmigratedDoc.$jazz.id,
+		unmigratedPublicId: unmigratedPublic.$jazz.id,
 		archivedId: archived.$jazz.id,
 		assetId: asset.$jazz.id,
 		threadId: thread.$jazz.id,

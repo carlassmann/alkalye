@@ -14,6 +14,9 @@ let fixtureSchema = z.object({
 	spaceId: z.string(),
 	spaceDocId: z.string(),
 	assetId: z.string(),
+	publicDocId: z.string(),
+	unmigratedDocId: z.string(),
+	unmigratedPublicId: z.string(),
 })
 mkdirSync(directory, { recursive: true })
 mkdirSync(profilesDirectory, { recursive: true, mode: 0o700 })
@@ -92,6 +95,7 @@ function prepare() {
 	)
 	browser("a", "screenshot", join(directory, "classic-a.png"))
 	browser("b", "screenshot", join(directory, "classic-b.png"))
+	for (let profile of ["a", "b"]) browser(profile, "close")
 	console.log(
 		`Classic ready. Switch this SAME origin to v2; keep Classic sync running.\n${origin}\nbun scripts/qa-classic-migration.ts verify ${origin}`,
 	)
@@ -128,16 +132,35 @@ function inspect(profile: string) {
 			),
 		)
 }
+function security(profile: string, mode: string, fixture: unknown) {
+	return evaluate(
+		profile,
+		`(${readFileSync(new URL("./fixtures/classic-security-checks.js", import.meta.url), "utf8")})(${JSON.stringify(mode)},${JSON.stringify(fixture)})`,
+	)
+}
 function verify() {
 	let fixture = fixtureSchema
 		.extend({ b: z.string(), origin: z.string() })
 		.parse(JSON.parse(readFileSync(join(directory, "qa-fixture.json"), "utf8")))
 	if (fixture.origin !== origin)
 		throw new Error("Cutover must keep the same origin")
-	for (let profile of ["a", "b"]) browser(profile, "open", `${origin}/app`)
+	browser("b", "open", `${origin}/app`)
+	browser("b", "wait", "[data-testid=classic-migration]", "--timeout", "60000")
+	let readerForgery = security("b", "reader", fixture)
+	browser("a", "open", `${origin}/app`)
 	// Interrupt after boot: the next import must finish using persisted maps.
 	browser("a", "wait", "[data-testid=classic-migration]", "--timeout", "60000")
 	browser("a", "reload")
+	browser(
+		"a",
+		"wait",
+		"--text",
+		"Classic import finished.",
+		"--timeout",
+		"60000",
+	)
+	security("b", "replay", fixture)
+	browser("b", "reload")
 	for (let profile of ["a", "b"])
 		browser(
 			profile,
@@ -263,9 +286,45 @@ function verify() {
 				`(${readFileSync(new URL("./fixtures/classic-cutover-checks.js", import.meta.url), "utf8")})(${JSON.stringify(fixture.b)})`,
 			),
 		)
+	browser(
+		"visitor",
+		"open",
+		`${origin}/app/doc/${fixture.publicDocId}/preview?legacy=1#kept`,
+	)
+	browser(
+		"visitor",
+		"wait",
+		"--text",
+		"Public Classic note",
+		"--timeout",
+		"60000",
+	)
+	let redirected = z.string().parse(evaluate("visitor", "window.location.href"))
+	if (
+		redirected.includes("co_z") ||
+		!redirected.endsWith("/preview?legacy=1#kept")
+	)
+		throw new Error("Fresh public Classic URL did not redirect")
+	browser("visitor", "screenshot", join(directory, "fresh-public-link.png"))
+	security("b", "leave", fixture)
+	security("a", "replay", fixture)
+	let afterV2Removal = z
+		.object({ id: z.null() })
+		.parse(security("b", "lookup", fixture))
+	security("a", "remove-classic", fixture)
+	security("a", "replay", fixture)
+	let afterClassicRemoval = z
+		.object({ id: z.null() })
+		.parse(security("b", "lookup", fixture))
+	let securityCases = {
+		readerForgery,
+		redirected,
+		afterV2Removal,
+		afterClassicRemoval,
+	}
 	writeFileSync(
 		join(directory, "qa-result.json"),
-		JSON.stringify({ a, b, edgeCases }, null, 2),
+		JSON.stringify({ a, b, edgeCases, securityCases }, null, 2),
 	)
 	console.log(`Same-origin migration passed; inspect ${directory}\n${origin}`)
 }
