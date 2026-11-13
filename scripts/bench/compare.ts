@@ -21,6 +21,7 @@ import {
 	resolveDocument,
 	waitForDocumentList,
 	openDocument,
+	readContent,
 	configureEditor,
 	captureCredentials,
 	verifyExport,
@@ -351,16 +352,22 @@ try {
 							await waitForEditorBoot(returningPage)
 							returningStage = "initialLibrary"
 							await waitForDocumentList(returningPage)
-							if (values["sw-only"]) {
-								returningStage = "verifiedHydration"
-								await verifyExport(returningPage, seeded)
-								await returningPage.waitForTimeout(5000)
-							}
 							returningStage = "largeOpen"
 							await waitForEditorBoot(returningPage, {
 								path: `/app/doc/${large.id}`,
 							})
 							await expect(editor(returningPage)).toContainText("Book dracula")
+							if (values["sw-only"]) {
+								returningStage = "verifiedHydration"
+								await expect
+									.poll(() => readContent(returningPage), { timeout: 60_000 })
+									.toBe(large.content)
+								await expect(() => verifyExport(returningPage, seeded)).toPass({
+									timeout: 60_000,
+									intervals: [2000],
+								})
+								await returningPage.waitForTimeout(5000)
+							}
 							returningStage = "serviceWorkerReady"
 							await returningPage.evaluate(async () => {
 								await navigator.serviceWorker.ready
@@ -385,7 +392,12 @@ try {
 								path: `/app/doc/${large.id}`,
 							})
 							await expect(editor(returningPage)).toContainText("Book dracula")
-							add("offlineSwLargeOpenMs", performance.now() - start)
+							let offlineOpenMs = performance.now() - start
+							if (values["sw-only"])
+								await expect
+									.poll(() => readContent(returningPage), { timeout: 30_000 })
+									.toBe(large.content)
+							add("offlineSwLargeOpenMs", offlineOpenMs)
 						})(),
 						150_000,
 						"returning SW case",
@@ -424,7 +436,12 @@ try {
 								30_000,
 								"independent offline open",
 							)
-							add("offlineSwLargeOpenMs", performance.now() - offlineStart)
+							let offlineOpenMs = performance.now() - offlineStart
+							if (values["sw-only"])
+								await expect
+									.poll(() => readContent(returningPage), { timeout: 30_000 })
+									.toBe(large.content)
+							add("offlineSwLargeOpenMs", offlineOpenMs)
 						} catch (offlineError) {
 							scenarioFailures.push({
 								run: run + 1,
