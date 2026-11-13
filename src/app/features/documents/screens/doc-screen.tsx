@@ -1,9 +1,26 @@
+import {
+	SidebarComments,
+	useComments,
+	areCommentsEnabled,
+	getVisibleCommentThreads,
+	getUnresolvedCommentCount,
+	createCommentThread,
+	getCommentRange,
+	setCommentsEnabled,
+	commentsExtension,
+	scrollEditorCommentIntoView,
+	setCommentDecorationsEffect,
+} from "@/app/features/comments"
+import {
+	presentationExtensions,
+	SidebarPresentationLinks,
+} from "@/app/features/presentation"
 import { toast } from "sonner"
 import { SidebarAssets } from "@/app/features/assets"
 import { SpaceSelector } from "@/app/features/spaces"
 import { SidebarCollaboration } from "@/app/features/sharing"
 import { SidebarImportExport } from "@/app/features/import-export"
-import { MessageSquareOff } from "lucide-react"
+import { MessageSquareOff, MessageSquare } from "lucide-react"
 import { SidebarMenuItem, SidebarMenuButton } from "@/app/components/ui/sidebar"
 import { useTrackLastOpened } from "../hooks/use-track-last-opened"
 import { useEffect, useState } from "react"
@@ -73,12 +90,13 @@ function DocScreen({ id }: { id: string }) {
 }
 
 function DocumentEditor({ doc }: { doc: LibraryDocument }) {
-	let { db, ownerId, documents, settings, grants } = useLibrary()
+	let { db, ownerId, documents, settings, grants, profile } = useLibrary()
 	useTrackLastOpened(ownerId, doc.id)
 	let t = useIntl()
 	let navigate = useNavigate()
 	let editor = useMarkdownEditorRef()
-	let { toggleLeft, toggleRight, isMobile, setRightOpenMobile } = useSidebar()
+	let { toggleLeft, toggleRight, isMobile, setRightOpenMobile, setRightOpen } =
+		useSidebar()
 	let { theme, setTheme } = useTheme()
 	let [selectionCount, setSelectionCount] = useState(1)
 	let readOnly =
@@ -106,6 +124,83 @@ function DocumentEditor({ doc }: { doc: LibraryDocument }) {
 			window.__alkalyeReady = false
 		}
 	}, [binding])
+
+	let commentDoc = useComments(doc)
+	let commentsEnabled = areCommentsEnabled(commentDoc)
+	let commentThreads = getVisibleCommentThreads(commentDoc)
+	let [rightTab, setRightTab] = useState("tools")
+	let [selectedCommentThreadId, setSelectedCommentThreadId] = useState<
+		string | null
+	>(null)
+	let unresolvedCommentCount = getUnresolvedCommentCount(commentDoc)
+	function openCommentsTab() {
+		setRightTab("comments")
+		if (isMobile) setRightOpenMobile(true)
+		else setRightOpen(true)
+	}
+	function handleSelectComment(threadId: string) {
+		setSelectedCommentThreadId(selected =>
+			selected === threadId ? null : threadId,
+		)
+		openCommentsTab()
+	}
+	useEffect(() => {
+		let view = editor.current?.getEditor(),
+			thread = commentThreads.find(
+				thread => thread.id === selectedCommentThreadId,
+			)
+		if (view && thread)
+			scrollEditorCommentIntoView(
+				view,
+				getCommentRange(commentDoc, thread.anchor),
+			)
+	}, [selectedCommentThreadId])
+
+	function handleCreateCommentFromSelection(
+		selection: { from: number; to: number },
+		body: string,
+	) {
+		let content =
+			editor.current?.getEditor()?.state.doc.toString() ?? doc.content
+		let thread = createCommentThread(
+			{ ...commentDoc, content },
+			selection,
+			body,
+			profile?.name,
+		)
+		if (!thread) return false
+		setSelectedCommentThreadId(thread.id)
+		openCommentsTab()
+		return true
+	}
+	function handleSetCommentsEnabled(enabled: boolean) {
+		void setCommentsEnabled(commentDoc, enabled)
+		if (!enabled) {
+			setRightTab("tools")
+			setSelectedCommentThreadId(null)
+		}
+	}
+	useEffect(() => {
+		let view = editor.current?.getEditor()
+		if (!view) return
+		view.dispatch({
+			effects: setCommentDecorationsEffect.of(
+				commentThreads.map(thread => ({
+					...getCommentRange(commentDoc, thread.anchor),
+					id: thread.id,
+					resolved: !!thread.resolvedAt,
+					selected: thread.id === selectedCommentThreadId,
+				})),
+			),
+		})
+	}, [commentDoc, commentThreads, editor, selectedCommentThreadId])
+	useEffect(() => {
+		function handleKeyDown(event: KeyboardEvent) {
+			if (event.key === "Escape") setSelectedCommentThreadId(null)
+		}
+		document.addEventListener("keydown", handleKeyDown)
+		return () => document.removeEventListener("keydown", handleKeyDown)
+	}, [])
 	let wikiDocs = documents
 		.filter(doc => !doc.deletedAt)
 		.map(doc => ({ id: doc.id, title: doc.title }))
@@ -124,6 +219,15 @@ function DocumentEditor({ doc }: { doc: LibraryDocument }) {
 					readOnly={readOnly}
 					documents={wikiDocs}
 					sync={binding}
+					onAddComment={
+						!readOnly && commentsEnabled
+							? handleCreateCommentFromSelection
+							: undefined
+					}
+					extensions={[
+						...presentationExtensions(),
+						...commentsExtension(handleSelectComment),
+					]}
 					resolveWikilink={id => {
 						let target = documents.find(doc => doc.id === id && !doc.deletedAt)
 						return {
@@ -164,12 +268,18 @@ function DocumentEditor({ doc }: { doc: LibraryDocument }) {
 			<DocumentSidebar
 				tabs={[
 					{ id: "tools", label: t("comments.tab.tools") },
-					{ id: "comments", label: t("comments.tab.comments"), disabled: true },
+					...(commentsEnabled
+						? [
+								{
+									id: "comments",
+									label: t("comments.tab.comments"),
+									count: unresolvedCommentCount,
+								},
+							]
+						: []),
 				]}
-				activeTab="tools"
-				onTabChange={() => {
-					/* v2-todo(comments) */
-				}}
+				activeTab={commentsEnabled ? rightTab : "tools"}
+				onTabChange={setRightTab}
 				header={
 					<>
 						<ThemeToggle theme={theme} setTheme={setTheme} />
@@ -190,45 +300,68 @@ function DocumentEditor({ doc }: { doc: LibraryDocument }) {
 					/>
 				}
 			>
-				<SidebarGroup>
-					<SidebarGroupContent>
-						<SidebarMenu>
-							<SidebarEditorNavigation
-								editor={editor}
-								onOpen={open => setRightOpenMobile(false, open)}
-							/>
-							<SidebarViewLinks doc={doc} />
-							<SidebarMenuItem>
-								<SidebarMenuButton disabled nativeButton>
-									<MessageSquareOff className="size-4" />
-									{t("comments.disable")}
-								</SidebarMenuButton>
-							</SidebarMenuItem>
-							<SidebarSeparator />
-							<SidebarFileMenu doc={doc} editor={editor} />
-							<SidebarEditMenu
-								editor={editor}
-								disabled={readOnly}
-								readOnly={readOnly}
-							/>
-							<SidebarFormatMenu
-								editor={editor}
-								disabled={readOnly}
-								readOnly={readOnly}
-								documents={wikiDocs}
-								onCreateDocument={createLinkedDocument}
-							/>
-						</SidebarMenu>
-					</SidebarGroupContent>
-				</SidebarGroup>
-				<SidebarSeparator />
-				<SidebarGroup>
-					<SidebarCollaboration docId={doc.id} />
-				</SidebarGroup>
-				<SidebarSeparator />
-				<SidebarGroup className="flex-1">
-					<SidebarAssets assets={[]} readOnly />
-				</SidebarGroup>
+				{commentsEnabled && rightTab === "comments" ? (
+					<SidebarComments
+						doc={commentDoc}
+						selectedThreadId={selectedCommentThreadId}
+						onSelectThread={handleSelectComment}
+						readOnly={readOnly}
+						authorName={profile?.name}
+					/>
+				) : (
+					<>
+						<SidebarGroup>
+							<SidebarGroupContent>
+								<SidebarMenu>
+									<SidebarEditorNavigation
+										editor={editor}
+										onOpen={open => setRightOpenMobile(false, open)}
+									/>
+									<SidebarViewLinks doc={doc} />
+									<SidebarPresentationLinks doc={doc} />
+									<SidebarMenuItem>
+										<SidebarMenuButton
+											disabled={!doc.canAdmin}
+											onClick={() => handleSetCommentsEnabled(!commentsEnabled)}
+											nativeButton
+										>
+											{commentsEnabled ? (
+												<MessageSquareOff className="size-4" />
+											) : (
+												<MessageSquare className="size-4" />
+											)}
+											{commentsEnabled
+												? t("comments.disable")
+												: t("comments.enable")}
+										</SidebarMenuButton>
+									</SidebarMenuItem>
+									<SidebarSeparator />
+									<SidebarFileMenu doc={doc} editor={editor} />
+									<SidebarEditMenu
+										editor={editor}
+										disabled={readOnly}
+										readOnly={readOnly}
+									/>
+									<SidebarFormatMenu
+										editor={editor}
+										disabled={readOnly}
+										readOnly={readOnly}
+										documents={wikiDocs}
+										onCreateDocument={createLinkedDocument}
+									/>
+								</SidebarMenu>
+							</SidebarGroupContent>
+						</SidebarGroup>
+						<SidebarSeparator />
+						<SidebarGroup>
+							<SidebarCollaboration docId={doc.id} />
+						</SidebarGroup>
+						<SidebarSeparator />
+						<SidebarGroup className="flex-1">
+							<SidebarAssets assets={[]} readOnly />
+						</SidebarGroup>
+					</>
+				)}
 			</DocumentSidebar>
 		</>
 	)
