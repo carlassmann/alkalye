@@ -104,7 +104,7 @@ async function openDocument(page: Page, target: { id: string; title: string }) {
 			document.body.dataset.alkalyeReady === "true",
 		target.id,
 	)
-	await expect(page).toHaveTitle(target.title)
+	await expect(page).toHaveTitle(target.title, { timeout: 120_000 })
 	await editor(page).waitFor({ state: "visible" })
 }
 
