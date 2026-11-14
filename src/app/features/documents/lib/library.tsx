@@ -1,8 +1,9 @@
+import { useStableRows } from "@/app/hooks/use-stable-rows"
 import { getRandomWriterName } from "@/app/features/onboarding/lib/random-writer-name"
 import type { JazzClient } from "jazz-tools/client"
 import { toast } from "sonner"
 import { createContext, useContext, useEffect, useState } from "react"
-import { useAll, useDb, useSession, useJazzSession } from "jazz-tools/react"
+import { useDb, useSession, useJazzSession } from "jazz-tools/react"
 import { schema } from "jazz-tools"
 import { app, type DocumentRow } from "@/jazz/schema"
 import { DEFAULT_EDITOR_SETTINGS } from "@/jazz/value-types"
@@ -88,22 +89,26 @@ function useLibraryData() {
 		"updatedAt",
 		"deletedAt",
 	)
-	let { data: rows = [], isLoading } = useAll(documentSummaries)
-	let { data: entries = [] } = useAll(app.userDocuments.where({ ownerId }))
-	let { data: linkedRows = [] } = useAll(
+	let { data: rows = [], isLoading } = useStableRows(documentSummaries)
+	let { data: entries = [] } = useStableRows(
+		app.userDocuments.where({ ownerId }),
+	)
+	let { data: linkedRows = [] } = useStableRows(
 		documentSummaries.where({
 			id: { in: entries.map(entry => entry.documentId) },
 		}),
 	)
-	let { data: folderRows = [] } = useAll(app.folders.where({ ownerId }))
-	let { data: preferences = [], isLoading: settingsLoading } = useAll(
+	let { data: folderRows = [] } = useStableRows(app.folders.where({ ownerId }))
+	let { data: preferences = [], isLoading: settingsLoading } = useStableRows(
 		app.settings.where({ ownerId }),
 	)
-	let { data: profiles = [], isLoading: profileLoading } = useAll(app.profiles)
-	let { data: grants = [] } = useAll(app.documentGrants)
+	let { data: profiles = [], isLoading: profileLoading } = useStableRows(
+		app.profiles,
+	)
+	let { data: grants = [] } = useStableRows(app.documentGrants)
 	useEffect(() => db.onMutationError(error => toast.error(error.reason)), [db])
-	let { data: spaces = [] } = useAll(app.spaces)
-	let { data: members = [] } = useAll(app.spaceMembers)
+	let { data: spaces = [] } = useStableRows(app.spaces)
+	let { data: members = [] } = useStableRows(app.spaceMembers)
 	let settings = preferences[0]
 	useEffect(() => {
 		if (
@@ -406,8 +411,12 @@ function afterPaint<T>(write: () => T) {
 	})
 	if (scheduledContentWrites.length > 1) return result
 	let flushed = false
-	let frame = requestAnimationFrame(() => setTimeout(flush, 0))
-	let deadline = setTimeout(flush, 40)
+	// Coalesce a short typing burst before stock Jazz copies the full scalar.
+	let frame = requestAnimationFrame(() => {
+		clearTimeout(deadline)
+		deadline = setTimeout(flush, 100)
+	})
+	let deadline = setTimeout(flush, 140)
 	window.addEventListener("pagehide", flush)
 	document.addEventListener("visibilitychange", flushWhenHidden)
 	function flushWhenHidden() {

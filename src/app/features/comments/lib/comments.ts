@@ -1,4 +1,5 @@
-import { useAll, useDb } from "jazz-tools/react"
+import { useStableRows } from "@/app/hooks/use-stable-rows"
+import { useDb } from "jazz-tools/react"
 import { schema } from "jazz-tools"
 import { z } from "zod"
 import { diff } from "fast-myers-diff"
@@ -86,10 +87,10 @@ function useComments(
 	doc: Pick<DocumentRow, "id" | "content" | "commentsDisabled">,
 ): LoadedCommentDocument {
 	let db = useDb()
-	let { data: threads = [] } = useAll(
+	let { data: threads = [] } = useStableRows(
 		app.commentThreads.where({ documentId: doc.id }),
 	)
-	let { data: replies = [] } = useAll(
+	let { data: replies = [] } = useStableRows(
 		app.commentReplies.where({
 			threadId: { in: threads.map(thread => thread.id) },
 		}),

@@ -1,6 +1,5 @@
 import { exportComments } from "@/app/features/import-export"
 import { loadThemesForPdf } from "@/app/features/themes"
-import { printToPdf, printSlidesToPdf } from "@/app/features/import-export"
 import { app, type Database } from "../lib/library"
 import { readAssetBlob } from "@/app/features/assets"
 import { DuplicateDocDialog } from "./duplicate-doc-dialog"
@@ -310,6 +309,8 @@ function makePrintPdf(
 	doc: LoadedDocument & { content: string },
 ) {
 	return async () => {
+		let { printToPdf } =
+			await import("@/app/features/import-export/lib/pdf-export")
 		let themes = await loadThemesForPdf(db)
 		await printToPdf({
 			...themes,
@@ -338,6 +339,8 @@ function makePrintSlidesFactory(
 			aspectRatio: SlideAspectRatio
 		}) =>
 		async () => {
+			let { printSlidesToPdf } =
+				await import("@/app/features/import-export/lib/pdf-export")
 			let themes = await loadThemesForPdf(db)
 			await printSlidesToPdf({
 				...themes,

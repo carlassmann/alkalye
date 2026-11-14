@@ -1,5 +1,5 @@
+import { useStableRows } from "@/app/hooks/use-stable-rows"
 import { useEffect, useRef, useState } from "react"
-import { useAll } from "jazz-tools/react"
 import { z } from "zod"
 import { app } from "@/jazz/schema"
 import { useLibrary, type LibraryDocument } from "@/app/features/documents"
@@ -28,7 +28,7 @@ function usePresence({
 	let rowId = useRef<string | null>(null)
 	let position = useRef({ position: 0, selectionEnd: 0 })
 	let cursorTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
-	let { data: rows = [] } = useAll(
+	let { data: rows = [] } = useStableRows(
 		app.presence.where({ documentId: doc.id, deviceId: { ne: deviceId } }),
 	)
 	let [now, setNow] = useState(() => Date.now())
@@ -79,7 +79,7 @@ function usePresence({
 	}, [rows, deviceId, now, editorRef])
 	function updateCursor(from: number, to: number) {
 		position.current = { position: from, selectionEnd: to }
-		if (cursorTimer.current !== undefined) return
+		if (rows.length === 0 || cursorTimer.current !== undefined) return
 		cursorTimer.current = setTimeout(() => {
 			cursorTimer.current = undefined
 			if (rowId.current)

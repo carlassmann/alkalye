@@ -62,6 +62,31 @@ test("a newer saved notification supersedes the earlier result without cancellin
 		"ABC",
 	)
 })
+test("a visible typing burst commits its latest text within the bounded save window", async () => {
+	let page = new EventTarget()
+	vi.stubGlobal("window", page)
+	vi.stubGlobal(
+		"document",
+		Object.assign(new EventTarget(), { visibilityState: "visible" }),
+	)
+	vi.stubGlobal("requestAnimationFrame", (callback: () => void) =>
+		setTimeout(callback, 0),
+	)
+	vi.stubGlobal("cancelAnimationFrame", clearTimeout)
+	let db = actor()
+	let doc = await createDocument(db, ownerId, "A")
+	let transactions = vi.spyOn(db, "beginTransaction")
+	let first = updateContent(db, doc, "AB", "A", { deferMetadata: true })
+	let second = updateContent(db, doc, "ABC", "AB", { deferMetadata: true })
+	expect(transactions).not.toHaveBeenCalled()
+	await Promise.all([first, second])
+	expect(transactions).toHaveBeenCalledTimes(1)
+	expect((await db.one(app.documents.where({ id: doc.id })))?.content).toBe(
+		"ABC",
+	)
+	await updateContent(db, doc, "ABC", "ABC")
+	await db.waitForSync()
+})
 test("pagehide submits queued text writes in order before Promise continuations", async () => {
 	let page = new EventTarget()
 	vi.stubGlobal("window", page)
