@@ -348,6 +348,17 @@ try {
 							document: name,
 							persistence: metrics.persistenceVerified,
 						})
+						if (metrics.persistenceError) {
+							scenarioFailures.push({
+								run: run + 1,
+								scenario: `${name}Persistence`,
+								elapsedMs: performance.now() - replayStarted,
+								message: metrics.persistenceError,
+							})
+							console.error(
+								`${name} persistence failure: ${metrics.persistenceError.slice(0, 200)}`,
+							)
+						}
 						for (let event of metrics.events) {
 							add(`${name}EventDurationMs`, event.duration)
 							add(`${name}EventInputDelayMs`, event.inputDelay)

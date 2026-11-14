@@ -123,17 +123,24 @@ async function measureReplay(page: Page, options: ReplayOptions) {
 
 	let heap = await cdp.send("Runtime.getHeapUsage")
 	ensureHealthy()
+	let persistenceError: string | undefined
 	if (options.verifyPersistence) {
 		console.error("Verifying committed text after reload")
-		if (options.flushWrites)
-			await withDeadline(flushWrites(page), 120_000, "Pending text writes")
-		await openDocument(page, document)
-		await expect
-			.poll(() => readContent(page), { timeout: 120_000 })
-			.toBe(expectedContent)
+		try {
+			if (options.flushWrites)
+				await withDeadline(flushWrites(page), 120_000, "Pending text writes")
+			await openDocument(page, document)
+			await expect
+				.poll(() => readContent(page), { timeout: 120_000 })
+				.toBe(expectedContent)
+		} catch (error) {
+			persistenceError = error instanceof Error ? error.message : String(error)
+		}
 	}
 	return {
-		persistenceVerified: options.verifyPersistence === true,
+		persistenceError,
+		persistenceVerified:
+			options.verifyPersistence === true && !persistenceError,
 		paint: metrics.paint,
 		events: metrics.events,
 		dispatchToPaint,

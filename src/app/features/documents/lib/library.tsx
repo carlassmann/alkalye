@@ -322,8 +322,6 @@ function scheduleMetadata(db: Database, id: string) {
 	)
 }
 
-let contentWrites = new WeakMap<Database, Map<string, Promise<unknown>>>()
-
 function writeDocumentContent(
 	db: Database,
 	id: string,
@@ -332,25 +330,9 @@ function writeDocumentContent(
 	deferMetadata: boolean,
 	edit?: TextEdit,
 ) {
-	let queue = contentWrites.get(db)
-	if (!queue) {
-		queue = new Map()
-		contentWrites.set(db, queue)
-	}
-	let previous = queue.get(id)
-	let paint = deferMetadata ? afterPaint() : undefined
-	let result = write()
-	queue.set(id, result)
-	function finished() {
-		if (queue?.get(id) === result) queue.delete(id)
-	}
-	void result.then(finished, finished)
-	return result
-
-	async function write() {
-		if (previous) await previous.catch(() => {})
-		if (paint) await paint
-		return db.transaction(transaction =>
+	function write() {
+		let transaction = db.beginTransaction()
+		try {
 			transaction.update(
 				app.documents,
 				id,
@@ -364,32 +346,51 @@ function writeDocumentContent(
 					editedFrom: { content: original },
 					...(edit ? { editedSplices: { content: edit } } : {}),
 				},
-			),
-		)
+			)
+			return transaction.commit()
+		} catch (error) {
+			void transaction.rollback().catch(() => {})
+			throw error
+		}
 	}
+	return deferMetadata ? afterPaint(write) : write()
 }
 
-function afterPaint() {
-	if (document.visibilityState !== "visible") return Promise.resolve()
-	return new Promise<void>(resolve => {
-		let finished = false
-		let frame = requestAnimationFrame(() => setTimeout(finish, 0))
-		let deadline = setTimeout(finish, 40)
-		window.addEventListener("pagehide", finish)
-		document.addEventListener("visibilitychange", finishWhenHidden)
-		function finishWhenHidden() {
-			if (document.visibilityState !== "visible") finish()
-		}
-		function finish() {
-			if (finished) return
-			finished = true
-			cancelAnimationFrame(frame)
-			clearTimeout(deadline)
-			window.removeEventListener("pagehide", finish)
-			document.removeEventListener("visibilitychange", finishWhenHidden)
-			resolve()
-		}
+let scheduledContentWrites: (() => void)[] = []
+
+function afterPaint<T>(write: () => T) {
+	if (document.visibilityState !== "visible") return Promise.resolve(write())
+	let result = new Promise<T>((resolve, reject) => {
+		scheduledContentWrites.push(() => {
+			try {
+				resolve(write())
+			} catch (error) {
+				reject(error)
+			}
+		})
 	})
+	if (scheduledContentWrites.length > 1) return result
+	let flushed = false
+	let frame = requestAnimationFrame(() => setTimeout(flush, 0))
+	let deadline = setTimeout(flush, 40)
+	window.addEventListener("pagehide", flush)
+	document.addEventListener("visibilitychange", flushWhenHidden)
+	function flushWhenHidden() {
+		if (document.visibilityState !== "visible") flush()
+	}
+	function flush() {
+		if (flushed) return
+		flushed = true
+		cancelAnimationFrame(frame)
+		clearTimeout(deadline)
+		window.removeEventListener("pagehide", flush)
+		document.removeEventListener("visibilitychange", flushWhenHidden)
+		let writes = scheduledContentWrites
+		scheduledContentWrites = []
+		// Stage and commit synchronously: navigation can discard Promise continuations.
+		for (let submit of writes) submit()
+	}
+	return result
 }
 
 async function updateContent(

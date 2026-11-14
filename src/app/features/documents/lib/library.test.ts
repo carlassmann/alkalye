@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { afterEach, beforeEach, expect, test } from "vitest"
+import { afterEach, beforeEach, expect, test, vi } from "vitest"
 import { createPolicyTestApp, type PolicyTestApp } from "jazz-tools/testing"
 import {
 	app,
@@ -17,6 +17,7 @@ beforeEach(async () => {
 })
 afterEach(async () => {
 	await fixture.shutdown()
+	vi.unstubAllGlobals()
 })
 function actor() {
 	return fixture.as({
@@ -39,6 +40,26 @@ function personal(
 		canAdmin: true,
 	}
 }
+test("pagehide submits queued text writes in order before Promise continuations", async () => {
+	let page = new EventTarget()
+	vi.stubGlobal("window", page)
+	vi.stubGlobal(
+		"document",
+		Object.assign(new EventTarget(), { visibilityState: "visible" }),
+	)
+	vi.stubGlobal("requestAnimationFrame", () => 1)
+	vi.stubGlobal("cancelAnimationFrame", () => {})
+	let db = actor()
+	let doc = await createDocument(db, ownerId, "A")
+	let first = updateContent(db, doc, "AB", "A", { deferMetadata: true })
+	let second = updateContent(db, doc, "ABC", "AB", { deferMetadata: true })
+	page.dispatchEvent(new Event("pagehide"))
+	let current = db.one(app.documents.where({ id: doc.id }))
+	expect((await current)?.content).toBe("ABC")
+	await Promise.all([first, second])
+	await updateContent(db, doc, "ABC", "ABC")
+	await db.waitForSync()
+})
 test("creates a library entry and nested folders, and keeps pins across reads", async () => {
 	let db = actor()
 	let doc = await createDocument(
