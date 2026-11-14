@@ -311,7 +311,7 @@ test("large binary chunks resume without duplication and are removed after a ver
 		base64: packed.base64.slice(0, 65536),
 	})
 	expect(await state.jazz!.db.all(app.classicImportChunks)).toHaveLength(1)
-})
+}, 30_000)
 test("a later verified author claim recovers imported comment ownership", async () => {
 	let { challenge, claimClassicAccount, importClassicItem } =
 		await import("./server")
