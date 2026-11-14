@@ -1,5 +1,5 @@
 import { setOffline } from "../../e2e/network-helpers"
-import { benchmarkBrowserArgs } from "./network"
+import { benchmarkBrowserArgs, installSocketTracker } from "./network"
 import { measureReplay, withDeadline } from "./replay"
 import { execFileSync } from "node:child_process"
 import { mkdir, readFile, writeFile } from "node:fs/promises"
@@ -376,6 +376,11 @@ try {
 			if (!values["skip-sw"]) {
 				console.error("Returning user: service worker and offline reload")
 				let returningStage = "startup"
+				let returningActive = true
+				function advanceReturning(stage: string) {
+					if (!returningActive) throw new Error("Returning case expired")
+					returningStage = stage
+				}
 				let returningStarted = performance.now()
 				let returning = await newContext(browser, credentials, true)
 				let returningPage = await returning.newPage()
@@ -385,29 +390,31 @@ try {
 							let returningNetwork = await instrument(returningPage, cpu)
 							await returningNetwork.setCacheDisabled(false)
 							await waitForEditorBoot(returningPage)
-							returningStage = "initialLibrary"
+							advanceReturning("initialLibrary")
 							await waitForDocumentList(returningPage)
-							returningStage = "largeOpen"
+							if (values["sw-only"]) {
+								advanceReturning("verifiedHydration")
+								await expect(() => verifyExport(returningPage, seeded)).toPass({
+									timeout: 60_000,
+									intervals: [2000],
+								})
+							}
+							advanceReturning("largeOpen")
 							await waitForEditorBoot(returningPage, {
 								path: `/app/doc/${large.id}`,
 							})
 							await expect(editor(returningPage)).toContainText("Book dracula")
 							if (values["sw-only"]) {
-								returningStage = "verifiedHydration"
-								await expect(() => verifyExport(returningPage, seeded)).toPass({
-									timeout: 60_000,
-									intervals: [2000],
-								})
 								await expect
 									.poll(() => readContent(returningPage), { timeout: 60_000 })
 									.toBe(large.content)
 								await returningPage.waitForTimeout(5000)
 							}
-							returningStage = "serviceWorkerReady"
+							advanceReturning("serviceWorkerReady")
 							await returningPage.evaluate(async () => {
 								await navigator.serviceWorker.ready
 							})
-							returningStage = "controlledReload"
+							advanceReturning("controlledReload")
 							await returningPage.reload()
 							await expect
 								.poll(() =>
@@ -419,8 +426,9 @@ try {
 							start = performance.now()
 							await returningPage.reload({ waitUntil: "domcontentloaded" })
 							await waitForDocumentList(returningPage)
+							advanceReturning("controlledReload")
 							add("returningSwListMs", performance.now() - start)
-							returningStage = "offlineOpen"
+							advanceReturning("offlineOpen")
 							await disconnectForOffline(returningPage)
 							start = performance.now()
 							await waitForEditorBoot(returningPage, {
@@ -432,12 +440,14 @@ try {
 								await expect
 									.poll(() => readContent(returningPage), { timeout: 30_000 })
 									.toBe(large.content)
+							advanceReturning("offlineOpen")
 							add("offlineSwLargeOpenMs", offlineOpenMs)
 						})(),
 						150_000,
 						"returning SW case",
 					)
 				} catch (error) {
+					returningActive = false
 					scenarioFailures.push({
 						run: run + 1,
 						scenario: "returningServiceWorker",
@@ -463,6 +473,7 @@ try {
 						let offlineStart = performance.now()
 						try {
 							await disconnectForOffline(returningPage)
+							offlineStart = performance.now()
 							await withDeadline(
 								(async () => {
 									await waitForEditorBoot(returningPage, {
@@ -535,6 +546,8 @@ async function newContext(
 	})
 	context.setDefaultTimeout(120_000)
 	context.setDefaultNavigationTimeout(120_000)
+	if (allowServiceWorker && values.label === "classic")
+		await installSocketTracker(context)
 	await installObservers(context)
 	return context
 }
@@ -560,32 +573,16 @@ if (scenarioFailures.length > 0) process.exitCode = 1
 
 async function disconnectForOffline(page: Page) {
 	if (values.label === "v2") {
-		await setOffline(page, true)
+		await withDeadline(setOffline(page, true), 10_000, "disconnecting Jazz")
 		return
 	}
 	await page.context().setOffline(true)
-	let session = await page.context().newCDPSession(page)
-	try {
-		let { result: prototype } = await session.send("Runtime.evaluate", {
-			expression: "WebSocket.prototype",
-			objectGroup: "offline-transport",
-		})
-		if (!prototype.objectId) throw new Error("WebSocket prototype missing")
-		let { objects } = await session.send("Runtime.queryObjects", {
-			prototypeObjectId: prototype.objectId,
-			objectGroup: "offline-transport",
-		})
-		if (!objects.objectId) throw new Error("WebSocket instances missing")
-		// Context emulation does not terminate an already-open Classic socket.
-		await session.send("Runtime.callFunctionOn", {
-			objectId: objects.objectId,
-			functionDeclaration:
-				"function() { for (let socket of this) socket.close() }",
-		})
-		await session.send("Runtime.releaseObjectGroup", {
-			objectGroup: "offline-transport",
-		})
-	} finally {
-		await session.detach()
-	}
+	await withDeadline(
+		page.evaluate(async () => {
+			if (!window.__benchCloseSockets) throw new Error("Socket tracker missing")
+			await window.__benchCloseSockets()
+		}),
+		10_000,
+		"closing Classic sockets",
+	)
 }

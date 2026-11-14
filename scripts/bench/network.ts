@@ -1,9 +1,48 @@
 import CDP from "chrome-remote-interface"
-import type { Browser, CDPSession, Page } from "@playwright/test"
+import type {
+	Browser,
+	BrowserContext,
+	CDPSession,
+	Page,
+} from "@playwright/test"
 import { mkdir, readFile, writeFile } from "node:fs/promises"
 import { join } from "node:path"
 
-export { benchmarkBrowserArgs, captureNetwork }
+export { benchmarkBrowserArgs, captureNetwork, installSocketTracker }
+
+declare global {
+	interface Window {
+		__benchCloseSockets?: () => Promise<void>
+	}
+}
+
+async function installSocketTracker(context: BrowserContext) {
+	await context.addInitScript(() => {
+		let OriginalWebSocket = window.WebSocket
+		let sockets = new Set<WebSocket>()
+		class TrackedWebSocket extends OriginalWebSocket {
+			constructor(url: string | URL, protocols?: string | string[]) {
+				super(url, protocols)
+				sockets.add(this)
+				this.addEventListener("close", () => sockets.delete(this), {
+					once: true,
+				})
+			}
+		}
+		window.WebSocket = TrackedWebSocket
+		window.__benchCloseSockets = async function closeSockets() {
+			await Promise.all(
+				[...sockets].map(socket => {
+					if (socket.readyState === OriginalWebSocket.CLOSED) return
+					return new Promise<void>(resolve => {
+						socket.addEventListener("close", () => resolve(), { once: true })
+						socket.close()
+					})
+				}),
+			)
+		}
+	})
+}
 
 let benchmarkBrowserArgs = [
 	"--remote-debugging-port=0",

@@ -25,7 +25,26 @@ let setups = {
 	},
 }
 let results: Record<string, Record<string, number[]>> = { classic: {}, v2: {} }
-for (let serviceWorkersOnly of [false, true]) {
+let phases = process.env.BENCH_PHASE === "sw" ? [true] : [false, true]
+if (process.env.BENCH_PHASE === "sw") {
+	for (let label of Object.keys(setups)) {
+		for (let run = 1; run <= 5; run++) {
+			let data = JSON.parse(
+				await readFile(
+					`bench/results/raw/${prefix}${label}-${run}.json`,
+					"utf8",
+				),
+			)
+			for (let [name, metric] of Object.entries(data.metrics)) {
+				if (name === "returningSwListMs" || name === "offlineSwLargeOpenMs")
+					continue
+				let values = z.object({ samples: z.array(z.number()) }).parse(metric)
+				;(results[label]![name] ??= []).push(...values.samples)
+			}
+		}
+	}
+}
+for (let serviceWorkersOnly of phases) {
 	for (let run = 1; run <= 5; run++) {
 		for (let [label, setup] of Object.entries(setups)) {
 			execFileSync("work", ["restart", setup.command, "--tailscale"], {
