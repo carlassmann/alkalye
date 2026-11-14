@@ -26,6 +26,31 @@ let setups = {
 }
 let results: Record<string, Record<string, number[]>> = { classic: {}, v2: {} }
 let phases = process.env.BENCH_PHASE === "sw" ? [true] : [false, true]
+let only = process.env.BENCH_ONLY
+	? z.enum(["classic", "v2"]).parse(process.env.BENCH_ONLY)
+	: undefined
+if (only) {
+	let retained = only === "classic" ? "v2" : "classic"
+	for (let serviceWorkersOnly of phases) {
+		for (let run = 1; run <= 5; run++) {
+			let data = JSON.parse(
+				await readFile(
+					`bench/results/raw/${prefix}${retained}${serviceWorkersOnly ? "-sw" : ""}-${run}.json`,
+					"utf8",
+				),
+			)
+			for (let [name, metric] of Object.entries(data.metrics)) {
+				if (
+					serviceWorkersOnly !==
+					(name === "returningSwListMs" || name === "offlineSwLargeOpenMs")
+				)
+					continue
+				let values = z.object({ samples: z.array(z.number()) }).parse(metric)
+				;(results[retained]![name] ??= []).push(...values.samples)
+			}
+		}
+	}
+}
 if (process.env.BENCH_PHASE === "sw") {
 	for (let label of Object.keys(setups)) {
 		for (let run = 1; run <= 5; run++) {
@@ -47,6 +72,7 @@ if (process.env.BENCH_PHASE === "sw") {
 for (let serviceWorkersOnly of phases) {
 	for (let run = 1; run <= 5; run++) {
 		for (let [label, setup] of Object.entries(setups)) {
+			if (only && label !== only) continue
 			execFileSync("work", ["restart", setup.command, "--tailscale"], {
 				cwd: setup.workRoot,
 				stdio: "inherit",
@@ -124,6 +150,11 @@ for (let label of ["classic", "v2"]) {
 		JSON.stringify(
 			{
 				...runs[0],
+				retainedReference: only
+					? only === "v2"
+						? "classic"
+						: "v2"
+					: undefined,
 				config: { ...runs[0].config, runs: 5 },
 				completedRuns: 5,
 				runLoads: runs.flatMap((run, index) =>
