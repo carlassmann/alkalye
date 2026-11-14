@@ -144,11 +144,7 @@ test("large multi-range edits carry a replacement against their exact editor bas
 		],
 	})
 	let result = view.state.doc.toString()
-	expect(write).toHaveBeenCalledWith(result, original, {
-		from: 0,
-		to: 28,
-		insert: result.slice(0, 35),
-	})
+	expect(write).toHaveBeenCalledWith(result, original)
 })
 
 test("keeps local text visible until asynchronous writes expose their merged snapshot", async () => {

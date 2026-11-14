@@ -80,11 +80,9 @@ test("pagehide submits queued text writes in order before Promise continuations"
 		.mockReturnValueOnce(transaction)
 	let first = updateContent(db, doc, "AB", "A", {
 		deferMetadata: true,
-		edit: { from: 1, to: 1, insert: "B" },
 	})
 	let second = updateContent(db, doc, "ABC", "AB", {
 		deferMetadata: true,
-		edit: { from: 2, to: 2, insert: "C" },
 	})
 	page.dispatchEvent(new Event("pagehide"))
 	expect(transactions).toHaveBeenCalledTimes(1)
@@ -94,7 +92,6 @@ test("pagehide submits queued text writes in order before Promise continuations"
 		{ content: "ABC" },
 		{
 			editedFrom: { content: "A" },
-			editedSplices: { content: { from: 1, to: 1, insert: "BC" } },
 		},
 	)
 	let current = db.one(app.documents.where({ id: doc.id }))
@@ -212,12 +209,8 @@ test("large editedFrom writes preserve both stale-base insertions", async () => 
 	let original = "# Guarded large edit\n\n" + "a😀é paragraph\n".repeat(4096)
 	let doc = await createDocument(db, ownerId, original)
 	await db.waitForSync()
-	await updateContent(db, doc, original + " suffix", original, {
-		edit: { from: original.length, to: original.length, insert: " suffix" },
-	})
-	await updateContent(db, doc, "prefix " + original, original, {
-		edit: { from: 0, to: 0, insert: "prefix " },
-	})
+	await updateContent(db, doc, original + " suffix", original)
+	await updateContent(db, doc, "prefix " + original, original)
 	await db.waitForSync()
 	expect((await db.one(app.documents.where({ id: doc.id })))?.content).toBe(
 		"prefix " + original + " suffix",

@@ -16,7 +16,6 @@ import {
 import { parseWikiLinks } from "@/app/features/editor/lib/wikilink-parser"
 import { documentMetadata } from "./metadata"
 import { watchWrite, localWriteReceipt } from "./writes"
-import type { TextEdit } from "./codemirror-sync"
 
 export {
 	app,
@@ -322,7 +321,7 @@ function scheduleMetadata(db: Database, id: string) {
 	)
 }
 
-type ContentChange = { content: string; original: string; edit?: TextEdit }
+type ContentChange = { content: string; original: string }
 let queuedContentWrites = new WeakMap<
 	Database,
 	Map<
@@ -340,9 +339,8 @@ function writeDocumentContent(
 	content: string,
 	original: string,
 	deferMetadata: boolean,
-	edit?: TextEdit,
 ) {
-	let change: ContentChange = { content, original, edit }
+	let change: ContentChange = { content, original }
 	if (!deferMetadata) return commitDocumentContent(db, id, change, false)
 	let queue = queuedContentWrites.get(db)
 	if (!queue) {
@@ -352,7 +350,6 @@ function writeDocumentContent(
 	let previous = queue.get(id)
 	// A different editor base must keep its own stale-base merge.
 	if (previous && previous.change.content === original) {
-		previous.change.edit = composeTextEdit(previous.change.edit, edit)
 		previous.change.content = content
 		return previous.result
 	}
@@ -364,26 +361,6 @@ function writeDocumentContent(
 	})
 	if (!started) queue.set(id, { change, result })
 	return result
-}
-
-function composeTextEdit(
-	first: TextEdit | undefined,
-	edit: TextEdit | undefined,
-): TextEdit | undefined {
-	if (
-		!first ||
-		!edit ||
-		edit.from < first.from ||
-		edit.to > first.from + first.insert.length
-	)
-		return
-	return {
-		...first,
-		insert:
-			first.insert.slice(0, edit.from - first.from) +
-			edit.insert +
-			first.insert.slice(edit.to - first.from),
-	}
 }
 
 function commitDocumentContent(
@@ -405,7 +382,6 @@ function commitDocumentContent(
 			},
 			{
 				editedFrom: { content: change.original },
-				...(change.edit ? { editedSplices: { content: change.edit } } : {}),
 			},
 		)
 		return transaction.commit()
@@ -492,10 +468,7 @@ async function updateContent(
 	doc: DocumentRow | LibraryDocument,
 	content: string,
 	editedFrom?: string,
-	{
-		deferMetadata = false,
-		edit,
-	}: { deferMetadata?: boolean; edit?: TextEdit } = {},
+	{ deferMetadata = false }: { deferMetadata?: boolean } = {},
 ) {
 	editedFrom ??= (await readDocument(db, doc.id)).content
 	let original = editedFrom
@@ -505,7 +478,6 @@ async function updateContent(
 		content,
 		original,
 		deferMetadata,
-		edit,
 	)
 	watchWrite(write)
 	let receipt = localWriteReceipt(write)

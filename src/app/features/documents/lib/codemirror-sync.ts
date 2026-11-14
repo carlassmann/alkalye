@@ -9,9 +9,7 @@ import { EditorView } from "@codemirror/view"
 import { diff } from "fast-myers-diff"
 
 export { codeMirrorSync, minimalChanges }
-export type { MarkdownSync, TextUpdate, TextSource, TextEdit }
-
-type TextEdit = { from: number; to: number; insert: string }
+export type { MarkdownSync, TextUpdate, TextSource }
 
 type TextUpdate = {
 	previous: string
@@ -27,11 +25,7 @@ let remoteChange = Annotation.define<boolean>()
 
 function codeMirrorSync(
 	initial: string,
-	write: (
-		text: string,
-		editedFrom: string,
-		edit?: TextEdit,
-	) => void | Promise<void>,
+	write: (text: string, editedFrom: string) => void | Promise<void>,
 ) {
 	let base = initial
 	let pending: string[] = []
@@ -45,7 +39,7 @@ function codeMirrorSync(
 	let heldForWrite: { value: string; update?: TextUpdate } | null = null
 	let idleWaiters = new Set<() => void>()
 
-	function changed(text: string, edit?: TextEdit) {
+	function changed(text: string) {
 		if (text === base) return
 		let editedFrom = base
 		let before = pending
@@ -55,9 +49,7 @@ function codeMirrorSync(
 		pending = [...pending, text]
 		writing++
 		try {
-			let result = edit
-				? write(text, editedFrom, edit)
-				: write(text, editedFrom)
+			let result = write(text, editedFrom)
 			if (result) void result.then(finishedWriting, finishedWriting)
 			else finishedWriting()
 		} catch (error) {
@@ -130,26 +122,7 @@ function codeMirrorSync(
 			)
 			knownDocument = update.state.doc
 			knownText = local ? update.state.doc.toString() : base
-			if (local) {
-				let edit: TextEdit | undefined
-				if (base.length >= 16 * 1024) {
-					let from = -1
-					let to = 0
-					let start = 0
-					let end = 0
-					update.changes.iterChanges((oldFrom, oldTo, newFrom, newTo) => {
-						if (from < 0) {
-							from = oldFrom
-							start = newFrom
-						}
-						to = oldTo
-						end = newTo
-					})
-					if (from >= 0 && end - start <= base.length / 4)
-						edit = { from, to, insert: knownText.slice(start, end) }
-				}
-				changed(knownText, edit)
-			}
+			if (local) changed(knownText)
 		}),
 		EditorView.domEventHandlers({
 			compositionstart() {
