@@ -8,6 +8,7 @@ import {
 	setPinned,
 	type LibraryDocument,
 } from "./library"
+import { watchWrite, localWriteReceipt } from "./writes"
 import { permissions } from "@/jazz/permissions"
 
 let fixture: PolicyTestApp
@@ -72,14 +73,69 @@ test("pagehide submits queued text writes in order before Promise continuations"
 	vi.stubGlobal("cancelAnimationFrame", () => {})
 	let db = actor()
 	let doc = await createDocument(db, ownerId, "A")
-	let first = updateContent(db, doc, "AB", "A", { deferMetadata: true })
-	let second = updateContent(db, doc, "ABC", "AB", { deferMetadata: true })
+	let transaction = db.beginTransaction()
+	let update = vi.spyOn(transaction, "update")
+	let transactions = vi
+		.spyOn(db, "beginTransaction")
+		.mockReturnValueOnce(transaction)
+	let first = updateContent(db, doc, "AB", "A", {
+		deferMetadata: true,
+		edit: { from: 1, to: 1, insert: "B" },
+	})
+	let second = updateContent(db, doc, "ABC", "AB", {
+		deferMetadata: true,
+		edit: { from: 2, to: 2, insert: "C" },
+	})
 	page.dispatchEvent(new Event("pagehide"))
+	expect(transactions).toHaveBeenCalledTimes(1)
+	expect(update).toHaveBeenCalledWith(
+		app.documents,
+		doc.id,
+		{ content: "ABC" },
+		{
+			editedFrom: { content: "A" },
+			editedSplices: { content: { from: 1, to: 1, insert: "BC" } },
+		},
+	)
 	let current = db.one(app.documents.where({ id: doc.id }))
 	expect((await current)?.content).toBe("ABC")
 	await Promise.all([first, second])
 	await updateContent(db, doc, "ABC", "ABC")
 	await db.waitForSync()
+})
+test("queued writers with different bases keep both edits", async () => {
+	let page = new EventTarget()
+	vi.stubGlobal("window", page)
+	vi.stubGlobal(
+		"document",
+		Object.assign(new EventTarget(), { visibilityState: "visible" }),
+	)
+	vi.stubGlobal("requestAnimationFrame", () => 1)
+	vi.stubGlobal("cancelAnimationFrame", () => {})
+	let db = actor()
+	let doc = await createDocument(db, ownerId, "A")
+	let first = updateContent(db, doc, "AB", "A", { deferMetadata: true })
+	let second = updateContent(db, doc, "XA", "A", { deferMetadata: true })
+	page.dispatchEvent(new Event("pagehide"))
+	await Promise.all([first, second])
+	expect((await db.one(app.documents.where({ id: doc.id })))?.content).toBe(
+		"XAB",
+	)
+	await updateContent(db, doc, "XAB", "XAB")
+	await db.waitForSync()
+})
+test("multiple observers share the same local receipt", async () => {
+	let db = actor()
+	let doc = await createDocument(db, ownerId, "A")
+	let write = db.update(app.documents, doc.id, { title: "Changed" })
+	let wait = vi.spyOn(write, "wait")
+	watchWrite(write)
+	watchWrite(write)
+	let first = localWriteReceipt(write)
+	let second = localWriteReceipt(write)
+	expect(first).toBe(second)
+	expect(wait).toHaveBeenCalledTimes(1)
+	await first
 })
 test("creates a library entry and nested folders, and keeps pins across reads", async () => {
 	let db = actor()

@@ -158,6 +158,65 @@ test("simultaneous writers converge without rolling back local text", async ({
 	}
 })
 
+test("rapid writers at the same position keep every character and converge", async ({
+	page,
+}) => {
+	test.setTimeout(120_000)
+	await waitForEditorBoot(page)
+	await createAccount(page)
+	let created = await create(page, { title: "Same position", body: "initial" })
+	let invite = await createDocumentInvite(page, {
+		docId: created.id,
+		role: "writer",
+	})
+	await page.keyboard.press("Escape")
+	let collaborator = await openAcceptedDocumentInvite(page, {
+		link: invite.link,
+	})
+	await collaborator.context.grantPermissions([
+		"clipboard-read",
+		"clipboard-write",
+	])
+	try {
+		let original = "# Same position\n" + "BASE\n".repeat(4096)
+		await editorFor(page).focus()
+		await page.keyboard.press("ControlOrMeta+a")
+		await page.evaluate(text => navigator.clipboard.writeText(text), original)
+		await page.keyboard.press("ControlOrMeta+Shift+v")
+		await expect.poll(() => copyDocument(collaborator.page)).toBe(original)
+		await editorFor(page).focus()
+		await page.keyboard.press("ControlOrMeta+Home")
+		await editorFor(collaborator.page).focus()
+		await collaborator.page.keyboard.press("ControlOrMeta+Home")
+		await Promise.all([
+			page.keyboard.type("q".repeat(128), { delay: 0 }),
+			collaborator.page.keyboard.type("z".repeat(128), { delay: 0 }),
+		])
+		await expect
+			.poll(
+				async () => {
+					let text = await copyDocument(page)
+					return {
+						q: text.match(/q/g)?.length,
+						z: text.match(/z/g)?.length,
+						original: text.replace(/[qz]/g, ""),
+					}
+				},
+				{ timeout: 30_000 },
+			)
+			.toEqual({ q: 128, z: 128, original })
+		let merged = await copyDocument(page)
+		await expect
+			.poll(() => copyDocument(collaborator.page), { timeout: 30_000 })
+			.toBe(merged)
+		await Promise.all([page.reload(), collaborator.page.reload()])
+		await expect.poll(() => copyDocument(page)).toBe(merged)
+		await expect.poll(() => copyDocument(collaborator.page)).toBe(merged)
+	} finally {
+		await collaborator.context.close()
+	}
+})
+
 test("large text merges concurrent offline typing exactly and survives reload", async ({
 	page,
 }) => {

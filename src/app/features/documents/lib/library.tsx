@@ -3,7 +3,7 @@ import type { JazzClient } from "jazz-tools/client"
 import { toast } from "sonner"
 import { createContext, useContext, useEffect, useState } from "react"
 import { useAll, useDb, useSession, useJazzSession } from "jazz-tools/react"
-import { schema, type WriteHandle } from "jazz-tools"
+import { schema } from "jazz-tools"
 import { app, type DocumentRow } from "@/jazz/schema"
 import { DEFAULT_EDITOR_SETTINGS } from "@/jazz/value-types"
 import {
@@ -15,7 +15,7 @@ import {
 } from "@/app/features/editor/lib/frontmatter"
 import { parseWikiLinks } from "@/app/features/editor/lib/wikilink-parser"
 import { documentMetadata } from "./metadata"
-import { watchWrite } from "./writes"
+import { watchWrite, localWriteReceipt } from "./writes"
 import type { TextEdit } from "./codemirror-sync"
 
 export {
@@ -322,6 +322,18 @@ function scheduleMetadata(db: Database, id: string) {
 	)
 }
 
+type ContentChange = { content: string; original: string; edit?: TextEdit }
+let queuedContentWrites = new WeakMap<
+	Database,
+	Map<
+		string,
+		{
+			change: ContentChange
+			result: Promise<ReturnType<typeof commitDocumentContent>>
+		}
+	>
+>()
+
 function writeDocumentContent(
 	db: Database,
 	id: string,
@@ -330,30 +342,77 @@ function writeDocumentContent(
 	deferMetadata: boolean,
 	edit?: TextEdit,
 ) {
-	function write() {
-		let transaction = db.beginTransaction()
-		try {
-			transaction.update(
-				app.documents,
-				id,
-				{
-					content,
-					...(deferMetadata
-						? {}
-						: { ...documentMetadata(content), updatedAt: new Date() }),
-				},
-				{
-					editedFrom: { content: original },
-					...(edit ? { editedSplices: { content: edit } } : {}),
-				},
-			)
-			return transaction.commit()
-		} catch (error) {
-			void transaction.rollback().catch(() => {})
-			throw error
-		}
+	let change: ContentChange = { content, original, edit }
+	if (!deferMetadata) return commitDocumentContent(db, id, change, false)
+	let queue = queuedContentWrites.get(db)
+	if (!queue) {
+		queue = new Map()
+		queuedContentWrites.set(db, queue)
 	}
-	return deferMetadata ? afterPaint(write) : write()
+	let previous = queue.get(id)
+	// A different editor base must keep its own stale-base merge.
+	if (previous && previous.change.content === original) {
+		previous.change.edit = composeTextEdit(previous.change.edit, edit)
+		previous.change.content = content
+		return previous.result
+	}
+	let started = false
+	let result = afterPaint(() => {
+		started = true
+		if (queue.get(id)?.change === change) queue.delete(id)
+		return commitDocumentContent(db, id, change, true)
+	})
+	if (!started) queue.set(id, { change, result })
+	return result
+}
+
+function composeTextEdit(
+	first: TextEdit | undefined,
+	edit: TextEdit | undefined,
+): TextEdit | undefined {
+	if (
+		!first ||
+		!edit ||
+		edit.from < first.from ||
+		edit.to > first.from + first.insert.length
+	)
+		return
+	return {
+		...first,
+		insert:
+			first.insert.slice(0, edit.from - first.from) +
+			edit.insert +
+			first.insert.slice(edit.to - first.from),
+	}
+}
+
+function commitDocumentContent(
+	db: Database,
+	id: string,
+	change: ContentChange,
+	deferMetadata: boolean,
+) {
+	let transaction = db.beginTransaction()
+	try {
+		transaction.update(
+			app.documents,
+			id,
+			{
+				content: change.content,
+				...(deferMetadata
+					? {}
+					: { ...documentMetadata(change.content), updatedAt: new Date() }),
+			},
+			{
+				editedFrom: { content: change.original },
+				...(change.edit ? { editedSplices: { content: change.edit } } : {}),
+			},
+		)
+		return transaction.commit()
+	} catch (error) {
+		void transaction.rollback().catch(() => {})
+		throw error
+	}
 }
 
 let scheduledContentWrites: (() => void)[] = []
@@ -403,7 +462,7 @@ function notifySaved(
 	db: Database,
 	id: string,
 	content: string,
-	write: WriteHandle<unknown, unknown>,
+	receipt: Promise<unknown>,
 ) {
 	let pending = saveNotifications.get(db)
 	if (!pending) {
@@ -412,8 +471,7 @@ function notifySaved(
 	}
 	let token = Symbol()
 	pending.set(id, { token, content })
-	void write
-		.wait({ tier: "local" })
+	void receipt
 		.then(() => {
 			let saved = pending.get(id)
 			if (saved?.token !== token) return
@@ -450,13 +508,14 @@ async function updateContent(
 		edit,
 	)
 	watchWrite(write)
+	let receipt = localWriteReceipt(write)
 	if (deferMetadata) scheduleMetadata(db, doc.id)
 	else clearTimeout(pendingMetadata.get(db)?.get(doc.id))
 	if (parseFrontmatter(content).frontmatter?.["theme-source"]) {
 		let { syncThemeFromSource } = await import("@/app/features/themes")
 		await syncThemeFromSource(db, doc.id, content)
 	}
-	notifySaved(db, doc.id, content, write)
+	notifySaved(db, doc.id, content, receipt)
 	let ownerId = db.getAuthState().session?.user
 	if (ownerId && getPath(editedFrom) !== getPath(content)) {
 		let folderId = await ensureFolder(db, ownerId, getPath(content))
