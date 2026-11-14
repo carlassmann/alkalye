@@ -1,16 +1,15 @@
 import { Link, useNavigate } from "@tanstack/react-router"
-import { co, type ResolveQuery } from "jazz-tools"
-import { createImage } from "jazz-tools/media"
-import { useCoState, useAccount, Image } from "jazz-tools/react"
+import { useLibrary } from "@/app/features/documents"
+import { app } from "@/jazz/schema"
+import { useSpaces, type Space } from "../lib/spaces"
+import { SpaceAvatarImage } from "../widgets/space-avatar"
 import { useState, useEffect, useRef } from "react"
 import { ArrowLeft, Loader2, Trash2, Upload, UserRoundPlus } from "lucide-react"
 import Cropper from "react-easy-crop"
-import { Space, UserAccount } from "@/schema"
 import { SpaceShareDialog } from "@/app/features/sharing"
 import { Button } from "@/app/components/ui/button"
 import { Input } from "@/app/components/ui/input"
 import { Badge } from "@/app/components/ui/badge"
-import { Empty, EmptyHeader, EmptyTitle } from "@/app/components/ui/empty"
 import {
 	ConfirmDialog,
 	useConfirmDialog,
@@ -30,13 +29,12 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/app/components/ui/select"
-import { SpaceNotFound, SpaceUnauthorized } from "@/app/components/error-states"
+import { SpaceNotFound } from "@/app/components/error-states"
 import {
 	getSpaceGroup,
 	leaveSpace,
 	changeSpaceCollaboratorRole,
 	revokeSpaceInvite,
-	listSpaceMembers,
 	isSpaceMember,
 	permanentlyDeleteSpace,
 	type SpaceMember,
@@ -45,45 +43,13 @@ import { SpaceInitials } from "../widgets/space-selector"
 import { testIds } from "@/app/lib/test-ids"
 import { useIntl } from "@/shared/intl/setup"
 
-export { SpaceSettingsScreen, spaceSettingsResolve }
-
-let spaceSettingsResolve = {
-	documents: true,
-	avatar: true,
-} as const satisfies ResolveQuery<typeof Space>
-
-type LoadedSpace = co.loaded<typeof Space, typeof spaceSettingsResolve>
-
-interface SpaceSettingsScreenProps {
-	spaceId: string
-	loaderData: {
-		space: LoadedSpace | null
-		loadingState: string | null
-	}
-}
-
-function SpaceSettingsScreen({
-	spaceId,
-	loaderData,
-}: SpaceSettingsScreenProps) {
-	let space = useCoState(Space, spaceId, { resolve: spaceSettingsResolve })
-
-	if (!loaderData.space) {
-		if (loaderData.loadingState === "unauthorized") return <SpaceUnauthorized />
-		return <SpaceNotFound />
-	}
-
-	if (!space.$isLoaded) {
-		return (
-			<Empty className="h-screen">
-				<EmptyHeader>
-					<Loader2 className="text-muted-foreground size-8 animate-spin" />
-					<EmptyTitle>Loading space...</EmptyTitle>
-				</EmptyHeader>
-			</Empty>
-		)
-	}
-
+export { SpaceSettingsScreen }
+type LoadedSpace = Space
+function SpaceSettingsScreen({ spaceId }: { spaceId: string }) {
+	let space = useSpaces().find(space => space.id === spaceId)
+	let { isLoading } = useLibrary()
+	if (isLoading) return <p role="status">Loading space…</p>
+	if (!space) return <SpaceNotFound />
 	return <SpaceSettingsContent space={space} spaceId={spaceId} />
 }
 
@@ -154,16 +120,12 @@ function SpaceSettingsContent({
 function PublicSpaceViewerSettings({ space }: { space: LoadedSpace }) {
 	let t = useIntl()
 	let navigate = useNavigate()
-	let me = useAccount(UserAccount, { resolve: { root: { spaces: true } } })
+	let { db } = useLibrary()
 	let leaveDialog = useConfirmDialog()
 
 	function handleLeave() {
-		if (!me.$isLoaded || !me.root?.spaces?.$isLoaded) return
-		let idx = me.root.spaces.findIndex(s => s?.$jazz.id === space.$jazz.id)
-		if (idx !== -1) {
-			me.root.spaces.$jazz.splice(idx, 1)
-		}
-		navigate({ to: "/" })
+		void leaveSpace(db, space)
+		navigate({ to: "/", search: { personal: true } })
 	}
 
 	return (
@@ -207,13 +169,16 @@ function PublicSpaceViewerSettings({ space }: { space: LoadedSpace }) {
 
 function SpaceNameSection({ space }: { space: LoadedSpace }) {
 	let t = useIntl()
+	let { db } = useLibrary()
 	let spaceGroup = getSpaceGroup(space)
 	let isAdmin = spaceGroup?.myRole() === "admin"
 
 	function handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
 		let newName = e.target.value
-		space.$jazz.set("name", newName)
-		space.$jazz.set("updatedAt", new Date())
+		void db.update(app.spaces, space.id, {
+			name: newName,
+			updatedAt: new Date(),
+		})
 	}
 
 	return (
@@ -248,6 +213,7 @@ function SpaceAvatarUpload({
 	isAdmin: boolean
 }) {
 	let t = useIntl()
+	let { db } = useLibrary()
 	let fileInputRef = useRef<HTMLInputElement>(null)
 	let [isUploading, setIsUploading] = useState(false)
 	let [cropperOpen, setCropperOpen] = useState(false)
@@ -260,7 +226,7 @@ function SpaceAvatarUpload({
 
 		let reader = new FileReader()
 		reader.onloadend = () => {
-			setSelectedImage(reader.result as string)
+			if (typeof reader.result === "string") setSelectedImage(reader.result)
 			setCropperOpen(true)
 		}
 		reader.readAsDataURL(file)
@@ -273,12 +239,12 @@ function SpaceAvatarUpload({
 	async function handleCropComplete(croppedFile: File) {
 		setIsUploading(true)
 		try {
-			let image = await createImage(croppedFile, {
-				owner: space.$jazz.owner,
-				maxSize: 512,
-			})
-			space.$jazz.set("avatar", image)
-			space.$jazz.set("updatedAt", new Date())
+			await db
+				.update(app.spaces, space.id, {
+					avatar: new Uint8Array(await croppedFile.arrayBuffer()),
+					updatedAt: new Date(),
+				})
+				.wait({ tier: "local" })
 		} finally {
 			setIsUploading(false)
 			setSelectedImage(null)
@@ -286,11 +252,13 @@ function SpaceAvatarUpload({
 	}
 
 	function handleRemoveAvatar() {
-		space.$jazz.set("avatar", undefined)
-		space.$jazz.set("updatedAt", new Date())
+		void db.update(app.spaces, space.id, {
+			avatar: null,
+			updatedAt: new Date(),
+		})
 	}
 
-	let avatarId = space.avatar?.$jazz.id
+	let avatarId = space.avatar
 
 	return (
 		<div>
@@ -300,11 +268,8 @@ function SpaceAvatarUpload({
 			<div className="flex items-center gap-3">
 				<div className="flex size-12 items-center justify-center overflow-hidden rounded-lg">
 					{avatarId ? (
-						<Image
-							imageId={avatarId}
-							width={48}
-							height={48}
-							alt={space.name}
+						<SpaceAvatarImage
+							space={space}
 							className="size-full object-cover"
 						/>
 					) : (
@@ -506,29 +471,13 @@ async function getCroppedImg(
 
 function SpaceMembersSection({ space }: { space: LoadedSpace }) {
 	let t = useIntl()
-	let me = useAccount(UserAccount)
+	let { ownerId } = useLibrary()
 	let spaceGroup = getSpaceGroup(space)
 	let myRole = spaceGroup?.myRole()
 	let canEditMembers = myRole === "admin" || myRole === "manager"
-	let [members, setMembers] = useState<SpaceMember[]>([])
+	let members = space.members
 	let [shareOpen, setShareOpen] = useState(false)
 	let [editMember, setEditMember] = useState<SpaceMember | null>(null)
-
-	let loadMembersRef = useRef(async () => {
-		let loaded = await listSpaceMembers(space)
-		setMembers(loaded)
-	})
-
-	useEffect(() => {
-		loadMembersRef.current = async () => {
-			let loaded = await listSpaceMembers(space)
-			setMembers(loaded)
-		}
-	})
-
-	useEffect(() => {
-		loadMembersRef.current()
-	}, [spaceGroup])
 
 	if (!spaceGroup) return null
 
@@ -537,12 +486,8 @@ function SpaceMembersSection({ space }: { space: LoadedSpace }) {
 
 	function handleEditMember(member: SpaceMember) {
 		if (!canEditMembers) return
-		if (member.role === "admin" && member.id !== me?.$jazz.id) return
-		if (
-			member.id === me?.$jazz.id &&
-			member.role === "admin" &&
-			adminCount <= 1
-		)
+		if (member.role === "admin" && member.id !== ownerId) return
+		if (member.id === ownerId && member.role === "admin" && adminCount <= 1)
 			return
 		setEditMember(member)
 	}
@@ -569,7 +514,7 @@ function SpaceMembersSection({ space }: { space: LoadedSpace }) {
 				{members.length > 0 ? (
 					<ul className="space-y-2">
 						{members.map(member => {
-							let isMe = member.id === me?.$jazz.id
+							let isMe = member.id === ownerId
 							let isOtherAdmin = member.role === "admin" && !isMe
 							let isLastAdmin =
 								isMe && member.role === "admin" && adminCount <= 1
@@ -620,7 +565,7 @@ function SpaceMembersSection({ space }: { space: LoadedSpace }) {
 				space={space}
 				member={editMember}
 				onOpenChange={open => !open && setEditMember(null)}
-				onMemberUpdated={() => loadMembersRef.current()}
+				onMemberUpdated={() => {}}
 			/>
 		</section>
 	)
@@ -638,7 +583,8 @@ function MemberEditDialog({
 	onMemberUpdated: () => void
 }) {
 	let t = useIntl()
-	let [role, setRole] = useState<string>(member?.role ?? "reader")
+	let { db } = useLibrary()
+	let [role, setRole] = useState<SpaceMember["role"]>(member?.role ?? "reader")
 	let [loading, setLoading] = useState(false)
 
 	useEffect(() => {
@@ -653,11 +599,7 @@ function MemberEditDialog({
 		}
 		setLoading(true)
 		try {
-			await changeSpaceCollaboratorRole(
-				space,
-				member.inviteGroupId,
-				role as "admin" | "manager" | "writer" | "reader",
-			)
+			await changeSpaceCollaboratorRole(db, space, member.inviteGroupId, role)
 			onMemberUpdated()
 			onOpenChange(false)
 		} catch (e) {
@@ -671,7 +613,7 @@ function MemberEditDialog({
 		if (!member?.inviteGroupId) return
 		setLoading(true)
 		try {
-			revokeSpaceInvite(space, member.inviteGroupId)
+			await revokeSpaceInvite(db, space, member.inviteGroupId)
 			onMemberUpdated()
 			onOpenChange(false)
 		} finally {
@@ -695,7 +637,18 @@ function MemberEditDialog({
 						<div className="text-muted-foreground mb-1 text-xs">
 							{t("spaces.members.roleLabel")}
 						</div>
-						<Select value={role} onValueChange={v => v && setRole(v)}>
+						<Select
+							value={role}
+							onValueChange={v => {
+								if (
+									v === "admin" ||
+									v === "manager" ||
+									v === "writer" ||
+									v === "reader"
+								)
+									setRole(v)
+							}}
+						>
 							<SelectTrigger className="w-full">
 								<SelectValue>{getRoleLabel(t, role)}</SelectValue>
 							</SelectTrigger>
@@ -753,7 +706,7 @@ function getRoleLabel(t: ReturnType<typeof useIntl>, role: string): string {
 function DangerZoneSection({ space }: { space: LoadedSpace }) {
 	let t = useIntl()
 	let navigate = useNavigate()
-	let me = useAccount(UserAccount)
+	let { db } = useLibrary()
 	let spaceGroup = getSpaceGroup(space)
 	let myRole = spaceGroup?.myRole()
 	let isAdmin = myRole === "admin"
@@ -769,21 +722,19 @@ function DangerZoneSection({ space }: { space: LoadedSpace }) {
 	let [loading, setLoading] = useState(false)
 
 	async function handleLeave() {
-		if (!me?.$isLoaded) return
 		setLoading(true)
 		try {
-			await leaveSpace(space, me)
-			navigate({ to: "/" })
+			await leaveSpace(db, space)
+			navigate({ to: "/", search: { personal: true } })
 		} finally {
 			setLoading(false)
 		}
 	}
 
 	async function handleDelete() {
-		if (!me?.$isLoaded) return
 		try {
-			await permanentlyDeleteSpace(space, me)
-			navigate({ to: "/" })
+			await permanentlyDeleteSpace(db, space)
+			navigate({ to: "/", search: { personal: true } })
 		} catch (e) {
 			console.error("Failed to delete space:", e)
 		}

@@ -1,7 +1,7 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Link } from "@tanstack/react-router"
-import { useAccount, Image } from "jazz-tools/react"
-import { co } from "jazz-tools"
+import { useAll, useSession, useDb } from "jazz-tools/react"
+import { app } from "@/jazz/schema"
 import { Button } from "@/app/components/ui/button"
 import {
 	Tooltip,
@@ -18,16 +18,12 @@ import {
 	DropdownMenuGroup,
 } from "@/app/components/ui/dropdown-menu"
 import { Palette, Check } from "lucide-react"
-import { UserAccount } from "@/schema"
 import { parseFrontmatter, setTheme } from "@/app/features/editor"
-import { Theme } from "../lib/schema"
+import type { ThemeRow } from "../lib/schema"
 
 export { ThemePicker }
 
-type LoadedTheme = co.loaded<
-	typeof Theme,
-	typeof themesResolve.root.themes.$each
->
+type LoadedTheme = ThemeRow
 
 interface ThemePickerProps {
 	content: string
@@ -42,14 +38,8 @@ function ThemePicker({
 	onThemeChange,
 	disabled,
 }: ThemePickerProps) {
-	let me = useAccount(UserAccount, { resolve: themesResolve })
-
-	let themes: LoadedTheme[] = []
-	if (me.$isLoaded && me.root?.themes?.$isLoaded) {
-		themes = Array.from(me.root.themes).filter(
-			(t): t is LoadedTheme => t?.$isLoaded === true,
-		)
-	}
+	let ownerId = useSession()?.user ?? undefined
+	let { data: themes = [] } = useAll(app.themes.where({ ownerId }))
 
 	let { frontmatter } = parseFrontmatter(content)
 	let currentThemeName = frontmatter?.theme as string | undefined
@@ -101,11 +91,11 @@ function ThemePicker({
 						<DropdownMenuLabel>Preview Themes</DropdownMenuLabel>
 						{previewThemes.map(theme => (
 							<ThemeMenuItem
-								key={theme.$jazz.id}
+								key={theme.id}
 								theme={theme}
 								isSelected={isThemeSelected(currentThemeName, theme)}
 								onSelect={() => {
-									let newContent = setTheme(getContent(), theme.$jazz.id)
+									let newContent = setTheme(getContent(), theme.id)
 									onThemeChange(newContent)
 								}}
 							/>
@@ -120,11 +110,11 @@ function ThemePicker({
 						<DropdownMenuLabel>Slideshow Themes</DropdownMenuLabel>
 						{slideshowThemes.map(theme => (
 							<ThemeMenuItem
-								key={theme.$jazz.id}
+								key={theme.id}
 								theme={theme}
 								isSelected={isThemeSelected(currentThemeName, theme)}
 								onSelect={() => {
-									let newContent = setTheme(getContent(), theme.$jazz.id)
+									let newContent = setTheme(getContent(), theme.id)
 									onThemeChange(newContent)
 								}}
 							/>
@@ -151,7 +141,7 @@ function ThemePicker({
 							render={
 								<Link
 									to="/themes/$id/workbench"
-									params={{ id: selectedTheme.$jazz.id }}
+									params={{ id: selectedTheme.id }}
 								/>
 							}
 						>
@@ -170,7 +160,7 @@ function isThemeSelected(
 ): boolean {
 	if (!themeReference) return false
 	return (
-		themeReference === theme.$jazz.id ||
+		themeReference === theme.id ||
 		themeReference.toLowerCase() === theme.name.toLowerCase()
 	)
 }
@@ -185,7 +175,26 @@ function ThemeMenuItem({
 	onSelect: () => void
 }) {
 	let [isHovered, setIsHovered] = useState(false)
-	let thumbnailId = theme.thumbnail?.$jazz.id
+	let db = useDb()
+	let [thumbnailId, setThumbnailId] = useState<string>()
+	useEffect(() => {
+		if (!isHovered || theme.thumbnailDataUrl) return
+		let cancelled = false
+		let url: string | undefined
+		void db
+			.one(app.themes.where({ id: theme.id }).select("thumbnail"))
+			.then(row => {
+				if (cancelled || !row?.thumbnail) return
+				url = URL.createObjectURL(
+					new Blob([new Uint8Array(row.thumbnail)], { type: "image/png" }),
+				)
+				setThumbnailId(url)
+			})
+		return () => {
+			cancelled = true
+			if (url) URL.revokeObjectURL(url)
+		}
+	}, [db, theme.id, theme.thumbnailDataUrl, isHovered])
 	let thumbnailDataUrl = theme.thumbnailDataUrl
 	let hasPreviewContent = thumbnailId || thumbnailDataUrl || theme.description
 
@@ -211,7 +220,11 @@ function ThemeMenuItem({
 				>
 					{thumbnailId ? (
 						<div className="bg-muted aspect-video w-full overflow-hidden">
-							<Image imageId={thumbnailId} className="size-full object-cover" />
+							<img
+								src={thumbnailId}
+								alt=""
+								className="size-full object-cover"
+							/>
 						</div>
 					) : thumbnailDataUrl ? (
 						<div className="bg-muted aspect-video w-full overflow-hidden">
@@ -240,7 +253,3 @@ function ThemeMenuItem({
 		</Tooltip>
 	)
 }
-
-let themesResolve = {
-	root: { themes: { $each: { thumbnail: true } } },
-} as const

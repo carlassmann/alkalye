@@ -71,7 +71,7 @@ function DemoEditorPane({
 					onChange={readContent => {
 						// Scripted updates also report a change; only the visitor focuses.
 						if (!editor.current?.getEditor()?.hasFocus) return
-						onType(readContent())
+						onType(readContent)
 					}}
 					extensions={editorExtensions}
 					typeToFocus={false}

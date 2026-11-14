@@ -9,6 +9,7 @@ import {
 	revokeDocumentInvite,
 } from "./document-collab-helpers"
 import { createSpace } from "./space-helpers"
+import { setOffline } from "./network-helpers"
 import { testIds } from "@/app/lib/test-ids"
 
 test("document invite CRUD helpers return JSON", async ({ page }) => {
@@ -104,6 +105,7 @@ test("simultaneous writers converge without rolling back local text", async ({
 		role: "writer",
 	})
 	await page.keyboard.press("Escape")
+	let original = await copyDocument(page)
 	let collaborator = await openAcceptedDocumentInvite(page, {
 		link: invite.link,
 	})
@@ -116,6 +118,7 @@ test("simultaneous writers converge without rolling back local text", async ({
 		let collaboratorEditor = editorFor(collaborator.page)
 		let ownerMarker = "owner sequential ending ".repeat(4)
 		let collaboratorMarker = "collaborator sequential beginning ".repeat(4)
+		let expected = `${collaboratorMarker}\n${original}\n${ownerMarker}`
 		await observeLocalRollback(page, ownerMarker)
 		await observeLocalRollback(collaborator.page, collaboratorMarker)
 
@@ -136,16 +139,166 @@ test("simultaneous writers converge without rolling back local text", async ({
 		})
 		expect(await didLocalTextRollback(page)).toBe(false)
 		expect(await didLocalTextRollback(collaborator.page)).toBe(false)
+		await expect
+			.poll(() => copyDocument(page), { timeout: 20_000 })
+			.toBe(expected)
+		await expect
+			.poll(() => copyDocument(collaborator.page), { timeout: 20_000 })
+			.toBe(expected)
 
 		await Promise.all([page.reload(), collaborator.page.reload()])
 		await expect(editorFor(page)).toContainText(ownerMarker)
 		await expect(editorFor(page)).toContainText(collaboratorMarker)
 		await expect(editorFor(collaborator.page)).toContainText(ownerMarker)
 		await expect(editorFor(collaborator.page)).toContainText(collaboratorMarker)
+		await expect.poll(() => copyDocument(page)).toBe(expected)
+		await expect.poll(() => copyDocument(collaborator.page)).toBe(expected)
 	} finally {
 		await collaborator.context.close()
 	}
 })
+
+test("rapid writers at the same position keep every character and converge", async ({
+	page,
+}) => {
+	test.setTimeout(120_000)
+	await waitForEditorBoot(page)
+	await createAccount(page)
+	let created = await create(page, { title: "Same position", body: "initial" })
+	let invite = await createDocumentInvite(page, {
+		docId: created.id,
+		role: "writer",
+	})
+	await page.keyboard.press("Escape")
+	let collaborator = await openAcceptedDocumentInvite(page, {
+		link: invite.link,
+	})
+	await collaborator.context.grantPermissions([
+		"clipboard-read",
+		"clipboard-write",
+	])
+	try {
+		let original = "# Same position\n" + "BASE\n".repeat(4096)
+		await editorFor(page).focus()
+		await page.keyboard.press("ControlOrMeta+a")
+		await page.evaluate(text => navigator.clipboard.writeText(text), original)
+		await page.keyboard.press("ControlOrMeta+Shift+v")
+		await expect.poll(() => copyDocument(collaborator.page)).toBe(original)
+		await editorFor(page).focus()
+		await page.keyboard.press("ControlOrMeta+Home")
+		await editorFor(collaborator.page).focus()
+		await collaborator.page.keyboard.press("ControlOrMeta+Home")
+		await Promise.all([
+			page.keyboard.type("q".repeat(128), { delay: 0 }),
+			collaborator.page.keyboard.type("z".repeat(128), { delay: 0 }),
+		])
+		await expect
+			.poll(
+				async () => {
+					let text = await copyDocument(page)
+					return {
+						q: text.match(/q/g)?.length,
+						z: text.match(/z/g)?.length,
+						original: text.replace(/[qz]/g, ""),
+					}
+				},
+				{ timeout: 30_000 },
+			)
+			.toEqual({ q: 128, z: 128, original })
+		let merged = await copyDocument(page)
+		await expect
+			.poll(() => copyDocument(collaborator.page), { timeout: 30_000 })
+			.toBe(merged)
+		await Promise.all([page.reload(), collaborator.page.reload()])
+		await expect.poll(() => copyDocument(page)).toBe(merged)
+		await expect.poll(() => copyDocument(collaborator.page)).toBe(merged)
+	} finally {
+		await collaborator.context.close()
+	}
+})
+
+test("large text merges concurrent offline typing exactly and survives reload", async ({
+	page,
+}) => {
+	test.setTimeout(120_000)
+	await waitForEditorBoot(page)
+	await createAccount(page)
+	let original =
+		"# Offline writers\n\n" + "A paragraph with 👩🏽‍💻 and café.\n\n".repeat(4096)
+	let created = await create(page, {
+		title: "Offline writers",
+		body: "initial",
+	})
+	let invite = await createDocumentInvite(page, {
+		docId: created.id,
+		role: "writer",
+	})
+	await page.keyboard.press("Escape")
+	let collaborator = await openAcceptedDocumentInvite(page, {
+		link: invite.link,
+	})
+	await collaborator.context.grantPermissions([
+		"clipboard-read",
+		"clipboard-write",
+	])
+	await page.bringToFront()
+	await editorFor(page).focus()
+	await page.keyboard.press("ControlOrMeta+a")
+	await page.evaluate(text => navigator.clipboard.writeText(text), original)
+	await page.keyboard.press("ControlOrMeta+Shift+v")
+	await expect.poll(() => copyDocument(page)).toBe(original)
+	await expect(page).toHaveTitle("Offline writers")
+	await page.keyboard.press("Escape")
+	try {
+		await waitForEditorBoot(collaborator.page, {
+			path: `/app/doc/${created.id}`,
+		})
+		await expect.poll(() => copyDocument(collaborator.page)).toBe(original)
+		await Promise.all([
+			setOffline(page, true),
+			setOffline(collaborator.page, true),
+		])
+		let prefix = "offline collaborator insertion ".repeat(8)
+		let suffix = " offline owner ending".repeat(8)
+		await editorFor(page).focus()
+		await page.keyboard.press("ControlOrMeta+End")
+		await editorFor(collaborator.page).focus()
+		await collaborator.page.keyboard.press("ControlOrMeta+Home")
+		await Promise.all([
+			page.keyboard.type(suffix, { delay: 0 }),
+			collaborator.page.keyboard.type(prefix, { delay: 0 }),
+		])
+		await expect.poll(() => copyDocument(page)).toBe(original + suffix)
+		await expect
+			.poll(() => copyDocument(collaborator.page))
+			.toBe(prefix + original)
+		await Promise.all([
+			setOffline(page, false),
+			setOffline(collaborator.page, false),
+		])
+		let merged = prefix + original + suffix
+		await expect
+			.poll(() => copyDocument(page), { timeout: 30_000 })
+			.toBe(merged)
+		await expect
+			.poll(() => copyDocument(collaborator.page), { timeout: 30_000 })
+			.toBe(merged)
+		await Promise.all([page.reload(), collaborator.page.reload()])
+		await expect.poll(() => copyDocument(page)).toBe(merged)
+		await expect.poll(() => copyDocument(collaborator.page)).toBe(merged)
+	} finally {
+		await setOffline(page, false)
+		await collaborator.context.close()
+	}
+})
+
+async function copyDocument(page: Page) {
+	await page.bringToFront()
+	await editorFor(page).focus()
+	await page.keyboard.press("ControlOrMeta+a")
+	await page.keyboard.press("ControlOrMeta+c")
+	return page.evaluate(() => navigator.clipboard.readText())
+}
 
 function editorFor(page: Page) {
 	return page.getByTestId(testIds.doc.editor).locator(".cm-content")
@@ -156,9 +309,14 @@ async function observeLocalRollback(page: Page, marker: string) {
 		document.documentElement.dataset.localTextRolledBack = "false"
 		let seen = false
 		function inspectEditor() {
-			let content = document.querySelector(
-				".markdown-editor .cm-content",
-			)?.textContent
+			let editor = document.querySelector(".markdown-editor .cm-content")
+			let text = editor?.cloneNode(true)
+			if (text instanceof Element) {
+				// Cursor labels are decorations, not the document's text.
+				for (let cursor of text.querySelectorAll(".cm-remote-cursor"))
+					cursor.remove()
+			}
+			let content = text?.textContent
 			if (content?.includes(localMarker)) {
 				seen = true
 			} else if (seen) {

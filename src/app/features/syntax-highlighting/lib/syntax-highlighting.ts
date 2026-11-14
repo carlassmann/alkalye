@@ -1,10 +1,9 @@
-import { useAccount } from "jazz-tools/react"
+import { useLibrary } from "@/app/features/documents"
 import type { ThemeInput } from "shiki/core"
 import {
 	parseFrontmatter,
 	setSyntaxTheme,
 } from "@/app/features/editor/lib/frontmatter"
-import { UserAccount } from "@/schema"
 import { alkalyeDarkTheme, alkalyeLightTheme } from "./alkalye-themes"
 
 export {
@@ -271,12 +270,8 @@ function useSyntaxTheme(
 	content: string,
 	appearance: "light" | "dark",
 ): SyntaxTheme {
-	let me = useAccount(UserAccount, {
-		resolve: { root: { settings: true } },
-	})
-	let defaultFamilyId = me.$isLoaded
-		? me.root?.settings?.syntaxTheme
-		: undefined
+	let { settings } = useLibrary()
+	let defaultFamilyId = settings?.syntaxTheme
 	return resolveSyntaxTheme({ content, defaultFamilyId, appearance })
 }
 

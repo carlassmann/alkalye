@@ -1,6 +1,9 @@
+import { testIds } from "@/app/lib/test-ids"
+import type { JazzClient } from "jazz-tools/client"
 import { useState } from "react"
 import { useLocation, useNavigate } from "@tanstack/react-router"
-import { useAccount, useIsAuthenticated, useLogOut } from "jazz-tools/react"
+import { useJazzSession, useSyncStatus } from "jazz-tools/react"
+import { useLibrary, app } from "@/app/features/documents"
 import { Button } from "@/app/components/ui/button"
 import {
 	DropdownMenu,
@@ -14,11 +17,9 @@ import {
 	DropdownMenuRadioGroup,
 	DropdownMenuRadioItem,
 } from "@/app/components/ui/dropdown-menu"
-import { AuthDialog } from "@/app/features/auth"
+import { AuthDialog, useIsBackedUp } from "@/app/features/auth"
 import { ThemeSubmenu, useTheme } from "@/app/components/appearance"
 import { usePWA } from "@/app/lib/pwa"
-import { useIsOnline } from "@/app/hooks/use-online"
-import { UserAccount } from "@/schema"
 import {
 	ChevronUp,
 	Cloud,
@@ -38,39 +39,41 @@ function SidebarSyncStatus() {
 	let navigate = useNavigate()
 	let location = useLocation()
 	let isFilesystem = location.pathname === "/local"
-	let logOut = useLogOut()
-	let isAuthenticated = useIsAuthenticated()
-	let me = useAccount(UserAccount, { resolve: { profile: true, root: true } })
+	let auth = useJazzSession<JazzClient>()
+	let logOut = async () => {
+		await auth.signOut()
+		await auth.createDeviceAccount()
+	}
+	let isAuthenticated = useIsBackedUp()
+	let { db, settings, profile } = useLibrary()
 	let [authOpen, setAuthOpen] = useState(false)
-	let isOnline = useIsOnline()
+	let { link, synced } = useSyncStatus()
+	let isConnected = link.state === "connected"
+	let isLocalOnly = link.state === "local-only"
 	let { theme, setTheme } = useTheme()
 	let { needRefresh } = usePWA()
 	let t = useIntl()
 
-	let rawName = me?.$isLoaded ? me.profile.name.trim() || null : null
+	let rawName = profile?.name.trim() || "Anonymous user"
 	let name = rawName === "Anonymous user" ? t("common.anonymousUser") : rawName
-	let statusLabel = isAuthenticated
-		? isOnline
-			? t("sync.syncing")
-			: t("sync.offline")
-		: t("sync.localOnly")
-	let accountLabel = isFilesystem
-		? "File System Mode"
-		: (name ?? (isAuthenticated ? t("sync.signedIn") : t("sync.localOnly")))
+	let statusLabel = isLocalOnly
+		? t("sync.localOnly")
+		: link.state === "offline"
+			? t("sync.offline")
+			: synced
+				? t("sync.synced")
+				: t("sync.syncing")
+	let accountLabel = isFilesystem ? "File System Mode" : name
 	let StatusIcon = isFilesystem
 		? HardDrive
-		: isAuthenticated
-			? isOnline
-				? Cloud
-				: WifiOff
-			: CloudOff
-	let statusIconClassName = isFilesystem
-		? "text-muted-foreground"
-		: isAuthenticated
-			? isOnline
-				? "text-green-600 dark:text-green-400"
-				: "text-muted-foreground"
-			: "text-destructive"
+		: isLocalOnly
+			? CloudOff
+			: link.state === "offline"
+				? WifiOff
+				: Cloud
+	let statusIconClassName = isConnected
+		? "text-green-600 dark:text-green-400"
+		: "text-muted-foreground"
 
 	return (
 		<DropdownMenu>
@@ -78,6 +81,7 @@ function SidebarSyncStatus() {
 				render={
 					<Button
 						variant="ghost"
+						data-testid={testIds.sidebar.syncStatus}
 						nativeButton
 						className="relative h-auto w-full flex-1 justify-start gap-2 px-2 py-2 pointer-fine:h-auto"
 					>
@@ -119,10 +123,10 @@ function SidebarSyncStatus() {
 				)}
 				<ThemeSubmenu theme={theme} setTheme={setTheme} />
 				<LanguageSubmenu
-					language={me?.$isLoaded ? (me.root?.language ?? "en") : "en"}
+					language={settings?.language ?? "en"}
 					setLanguage={lang => {
-						if (me?.$isLoaded && me.root && (lang === "en" || lang === "de")) {
-							me.root.$jazz.set("language", lang)
+						if (settings && (lang === "en" || lang === "de")) {
+							db.update(app.settings, settings.id, { language: lang })
 						}
 					}}
 				/>

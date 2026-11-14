@@ -9,7 +9,6 @@ import {
 	useId,
 } from "react"
 import { createPortal } from "react-dom"
-import { Image as JazzImage } from "jazz-tools/react"
 import {
 	parsePresentationSize,
 	parsePresentationTheme,
@@ -66,19 +65,13 @@ let WikilinkContext = createContext<Map<string, ResolvedWikilink>>(new Map())
 let SyntaxThemeContext = createContext<SyntaxTheme>("github-light")
 
 type Asset = {
-	$jazz: { id: string }
-	$isLoaded?: boolean
-	type?: "image" | "video" | "tldraw"
-	image?: { $jazz: { id: string } }
-	video?: { $isLoaded?: boolean; toBlob?: () => Blob | undefined }
+	id: string
+	type: "image" | "video" | "tldraw"
+	url: string
+	lightUrl?: string
+	darkUrl?: string
 	muteAudio?: boolean
-	revision?: {
-		$isLoaded?: boolean
-		lightPreview?: { $jazz: { id: string } }
-		darkPreview?: { $jazz: { id: string } }
-	}
 }
-
 let AssetContext = createContext<Asset[] | undefined>(undefined)
 
 type Slide = { slideNumber: number; blocks: VisualBlock[] }
@@ -901,129 +894,38 @@ function SlideImage({ src, alt }: { src: string; alt: string }) {
 	let assets = useContext(AssetContext)
 	let systemTheme = useResolvedTheme()
 	let colorScheme = useContext(ThemeContext) ?? systemTheme
-
-	let assetMatch = src.match(/^asset:(.+)$/)
-	if (assetMatch) {
-		let assetId = assetMatch[1]
-		let asset = assets?.find(a => a?.$jazz.id === assetId)
-
-		if (asset?.$isLoaded && asset.image) {
-			return (
-				<JazzImage
-					imageId={asset.image.$jazz.id}
-					alt={alt}
-					className="slideshow-image"
-					style={{ width: "100%", height: "100%", objectFit: "contain" }}
-				/>
-			)
-		}
-
-		if (asset?.$isLoaded && asset.type === "tldraw") {
-			let preview =
-				colorScheme === "dark"
-					? asset.revision?.darkPreview
-					: asset.revision?.lightPreview
-			if (preview) {
-				return (
-					<JazzImage
-						imageId={preview.$jazz.id}
-						alt={alt}
-						className="slideshow-image"
-						style={{ width: "100%", height: "100%", objectFit: "contain" }}
-					/>
-				)
-			}
-		}
-
-		if (asset?.$isLoaded && asset.video) {
-			return <SlideVideo asset={asset} />
-		}
-
+	let assetId = src.match(/^asset:(.+)$/)?.[1]
+	let asset = assets?.find(asset => asset.id === assetId)
+	let url = asset
+		? asset.type === "tldraw"
+			? ((colorScheme === "dark" ? asset.darkUrl : asset.lightUrl) ?? asset.url)
+			: asset.url
+		: src
+	if (asset?.type === "video")
+		return (
+			<video
+				src={url}
+				controls
+				muted={isLaserPreview() || asset.muteAudio}
+				className="slideshow-image"
+				style={{ width: "100%", height: "100%", objectFit: "contain" }}
+				onClick={event => event.stopPropagation()}
+			/>
+		)
+	if (assetId && !asset)
 		return (
 			<div className="slideshow-image-placeholder flex aspect-video items-center justify-center">
 				<span className="text-sm opacity-60">Loading...</span>
 			</div>
 		)
-	}
-
 	return (
 		<img
-			src={src}
+			src={url}
 			alt={alt}
 			className="slideshow-image"
 			style={{ width: "100%", height: "100%", objectFit: "contain" }}
 		/>
 	)
-}
-
-function SlideVideo({ asset }: { asset: Asset }) {
-	let video = asset.video
-	let url = useVideoUrl(video)
-
-	if (!url) {
-		return (
-			<div className="slideshow-image-placeholder flex aspect-video items-center justify-center">
-				<span className="text-sm opacity-60">
-					<T k="presentation.slideshow.loadingVideo" />
-				</span>
-			</div>
-		)
-	}
-
-	return (
-		<video
-			src={url}
-			controls
-			muted={isLaserPreview() || asset.muteAudio}
-			className="slideshow-image"
-			style={{ width: "100%", height: "100%", objectFit: "contain" }}
-			onClick={e => e.stopPropagation()}
-		/>
-	)
-}
-
-function useVideoUrl(
-	video: { $isLoaded?: boolean; toBlob?: () => Blob | undefined } | undefined,
-): string | null {
-	let [url, setUrl] = useState<string | null>(null)
-	let [trackedVideo, setTrackedVideo] = useState(video)
-
-	// Reset when video changes (adjust state during render)
-	if (trackedVideo !== video) {
-		setTrackedVideo(video)
-		if (url) {
-			URL.revokeObjectURL(url)
-			setUrl(null)
-		}
-	}
-
-	// Load URL - schedule via rAF to avoid lint error
-	useEffect(() => {
-		if (url) return
-		if (!video?.$isLoaded || !video.toBlob) return
-
-		let cancelled = false
-		requestAnimationFrame(() => {
-			if (cancelled) return
-			let blob = video.toBlob?.()
-			if (!blob) return
-			let objectUrl = URL.createObjectURL(blob)
-			setUrl(objectUrl)
-		})
-
-		return () => {
-			cancelled = true
-		}
-	}, [video, url])
-
-	// Cleanup on unmount
-	useEffect(() => {
-		return () => {
-			if (url) URL.revokeObjectURL(url)
-		}
-	}, [url])
-
-	return url
 }
 
 function HighlightedCode({
@@ -1086,7 +988,7 @@ function useThemeStyles(documentTheme: ResolvedTheme): ThemeStylesResult {
 	let [loadedThemeId, setLoadedThemeId] = useState<string | null>(null)
 	let [fontsReady, setFontsReady] = useState(false)
 
-	let currentThemeId = documentTheme.theme?.$jazz.id ?? null
+	let currentThemeId = documentTheme.theme?.id ?? null
 	let isLoading =
 		currentThemeId !== null &&
 		(currentThemeId !== loadedThemeId || (styles !== null && !fontsReady))
@@ -1104,7 +1006,7 @@ function useThemeStyles(documentTheme: ResolvedTheme): ThemeStylesResult {
 		if (!documentTheme.theme) return
 
 		let cancelled = false
-		let themeId = documentTheme.theme.$jazz.id
+		let themeId = documentTheme.theme.id
 
 		tryCachedThemeStylesAsync(documentTheme.theme, documentTheme.preset).then(
 			buildResult => {
@@ -1154,7 +1056,7 @@ function getThemeMeasureKey(
 	documentTheme: ResolvedTheme,
 	styles: ThemeStyles | null,
 ): string {
-	let themeId = documentTheme.theme?.$jazz.id ?? "__none__"
+	let themeId = documentTheme.theme?.id ?? "__none__"
 	let preset = documentTheme.preset?.name ?? "__none__"
 	if (!styles) return `${themeId}:${preset}:__loading__`
 	let stylesKey = hashThemeStyles(styles)

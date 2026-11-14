@@ -1,12 +1,10 @@
-import type { co } from "jazz-tools"
-import { McpConnection } from "./schema"
+import { mintLocalFirstTokenInJs } from "jazz-tools/thin"
 
-export { readJsonResponse, disconnectMcpConnection }
+export { readJsonResponse, deviceAuthorization, disconnectMcpConnection }
 
 async function readJsonResponse(response: Response): Promise<unknown> {
 	let body = await response.text()
 	if (!body) return undefined
-
 	try {
 		let value: unknown = JSON.parse(body)
 		return value
@@ -15,19 +13,20 @@ async function readJsonResponse(response: Response): Promise<unknown> {
 	}
 }
 
-async function disconnectMcpConnection(
-	connection: co.loaded<typeof McpConnection>,
-	sync: () => Promise<void>,
-) {
-	connection.$jazz.set("revokedAt", new Date())
-	// Local revocation must survive server outages and token-key rotation.
-	await Promise.allSettled([
-		sync(),
-		fetch("/api/mcp-connections", {
-			method: "DELETE",
-			headers: { "content-type": "application/json" },
-			body: JSON.stringify({ credential: connection.credential }),
-			signal: AbortSignal.timeout(5_000),
-		}),
-	])
+function deviceAuthorization(key: string, origin = window.location.origin) {
+	return {
+		authorization: `Bearer ${mintLocalFirstTokenInJs(key, `${origin}/jazz`)}`,
+	}
+}
+
+async function disconnectMcpConnection(connectionId: string, key: string) {
+	let response = await fetch("/api/mcp-connections", {
+		method: "DELETE",
+		headers: {
+			"content-type": "application/json",
+			...deviceAuthorization(key),
+		},
+		body: JSON.stringify({ connectionId }),
+	})
+	if (!response.ok) throw new Error("Could not disconnect agent connection")
 }

@@ -11,3 +11,17 @@ example
 .vercel
 /agents
 tsconfig.tsbuildinfo
+
+.jazz/
+
+/bench/datasets/*
+!/bench/datasets/sources.json
+
+/bench/results/*
+!/bench/results/classic.json
+!/bench/results/v2.json
+!/bench/results/v2-optimized.json
+!/bench/results/v2-optimized-load.json
+!/bench/results/v2-optimized-brotli.json
+!/bench/results/classic-5000.json
+!/bench/results/v2-5000.json

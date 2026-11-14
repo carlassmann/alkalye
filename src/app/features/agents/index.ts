@@ -1,4 +1,1 @@
-export {
-	AgentConnectionsSection,
-	agentConnectionsQuery,
-} from "./widgets/agent-connections-section"
+export { AgentConnectionsSection } from "./widgets/agent-connections-section"

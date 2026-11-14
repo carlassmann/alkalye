@@ -1,68 +1,25 @@
+import { useDocumentAssets } from "@/app/features/assets"
 import {
 	useEffect,
 	useState,
 	type FormEvent,
 	type KeyboardEvent as ReactKeyboardEvent,
 } from "react"
-import { Link, useNavigate } from "@tanstack/react-router"
-import { useCoState, useAccount } from "jazz-tools/react"
-import { type ResolveQuery } from "jazz-tools"
 import { toast } from "sonner"
-import { Document, UserAccount } from "@/schema"
-import { getDocumentTitle } from "../lib/title"
+import { useOne } from "jazz-tools/react"
+import { app, type DocumentRow } from "@/jazz/schema"
+import { useDocumentAccess } from "../hooks/use-document-access"
+import { useLibrary } from "../lib/library"
 import {
-	getShortcutLabel,
-	getActiveShortcutPlatform,
-	isShortcutEvent,
-	isShortcutTargetBlocked,
-	isModEnterEvent,
-} from "@/app/lib/shortcut-registry"
-import {
-	EllipsisIcon,
-	MessageSquare,
-	MessageSquarePlus,
-	Pencil,
-} from "lucide-react"
-import {
-	DocumentNotFound,
-	DocumentUnauthorized,
-} from "@/app/components/error-states"
-
-import { Button } from "@/app/components/ui/button"
-import { Kbd } from "@/app/components/ui/kbd"
-import { Textarea } from "@/app/components/ui/textarea"
-import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogHeader,
-	DialogTitle,
-} from "@/app/components/ui/dialog"
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuSeparator,
-	DropdownMenuShortcut,
-	DropdownMenuTrigger,
-} from "@/app/components/ui/dropdown-menu"
-import { useTheme, ThemeSubmenu } from "@/app/components/appearance"
-import { Preview } from "../widgets/preview"
-import { parseFrontmatter, parseWikiLinks } from "@/app/features/editor"
-import {
+	useComments,
 	SidebarComments,
 	areCommentsEnabled,
-	createCommentThread,
-	getCommentRange,
-	getUnresolvedCommentCount,
 	getVisibleCommentThreads,
+	getUnresolvedCommentCount,
+	getCommentRange,
+	createCommentThread,
 } from "@/app/features/comments"
-import { canEdit } from "@/app/features/sharing"
-import {
-	resolveDocTitles,
-	useDocTitles,
-	type ResolvedDoc,
-} from "../lib/wikilink-titles"
+import { parseFrontmatter } from "@/app/features/editor"
 import {
 	buildPreviewTextMap,
 	rawRangeToRenderedRange,
@@ -72,189 +29,106 @@ import {
 	countOccurrences,
 	findBestTextOccurrence,
 } from "../lib/comment-text-match"
-import { printToPdf } from "@/app/features/import-export"
 import { useIntl } from "@/shared/intl/setup"
 import {
-	assetPreviewResolve,
-	getLoadedAssets,
-	toPrintableAsset,
-} from "@/app/features/assets"
-
-export { DocPreviewScreen, previewResolve, resolveDocTitles }
-
-let previewResolve = {
-	content: true,
-	assets: {
-		$each: assetPreviewResolve,
-	},
-	comments: { $each: { replies: true } },
-} as const satisfies ResolveQuery<typeof Document>
-
-let themesResolve = {
-	profile: true,
-	root: {
-		settings: true,
-		themes: {
-			$each: {
-				css: true,
-				template: true,
-				slideTemplate: true,
-				assets: { $each: { data: true } },
-			},
-		},
-	},
-} as const
-
-interface DocPreviewScreenProps {
-	id: string
-	loaderData: {
-		doc:
-			| import("jazz-tools").co.loaded<typeof Document, typeof previewResolve>
-			| null
-		loadingState: string | null
-		wikilinkCache: Map<string, ResolvedDoc>
-	}
+	isModEnterEvent,
+	isShortcutEvent,
+	isShortcutTargetBlocked,
+	getActiveShortcutPlatform,
+} from "@/app/lib/shortcut-registry"
+import { Kbd } from "@/app/components/ui/kbd"
+import { Textarea } from "@/app/components/ui/textarea"
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogDescription,
+} from "@/app/components/ui/dialog"
+import { type PreviewProps } from "../widgets/preview"
+type PreviewSelection = NonNullable<
+	Parameters<NonNullable<PreviewProps["onTextSelectionChange"]>>[0]
+>
+import { MessageSquarePlus } from "lucide-react"
+import { EllipsisIcon, MessageSquare, Pencil } from "lucide-react"
+import { Button } from "@/app/components/ui/button"
+import { useTheme, ThemeSubmenu } from "@/app/components/appearance"
+import { getShortcutLabel } from "@/app/lib/shortcut-registry"
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuSeparator,
+	DropdownMenuShortcut,
+	DropdownMenuTrigger,
+} from "@/app/components/ui/dropdown-menu"
+import { Link, useNavigate } from "@tanstack/react-router"
+import { Preview } from "../widgets/preview"
+import { DocumentNotFound } from "@/app/components/error-states"
+export { DocPreviewScreen }
+function DocPreviewScreen({ id }: { id: string }) {
+	let { data: doc, isLoading } = useOne(app.documents.where({ id }))
+	if (isLoading) return <p role="status">Opening document…</p>
+	if (!doc || doc.deletedAt) return <DocumentNotFound />
+	return <PreviewContent key={id} id={id} doc={doc} />
 }
-
-type PreviewSelection = {
-	text: string
-	occurrence: number
-	renderedFrom: number
-	renderedTo: number
-	contextBefore: string
-	contextAfter: string
-}
-
-function DocPreviewScreen({ id, loaderData }: DocPreviewScreenProps) {
-	let t = useIntl()
-	let navigate = useNavigate()
+function PreviewContent({ id, doc }: { id: string; doc: DocumentRow }) {
+	let { documents, profile } = useLibrary()
+	let t = useIntl(),
+		navigate = useNavigate()
+	let { previewAssets } = useDocumentAssets(id, doc.content)
+	let commentDoc = useComments(doc)
+	let content = doc.content,
+		docTitle = doc.title
+	let parsedContent = parseContentBody(content),
+		previewTextMap = buildPreviewTextMap(parsedContent.body)
+	let commentsEnabled = areCommentsEnabled(commentDoc)
+	let commentThreads = getVisibleCommentThreads(commentDoc),
+		unresolvedCommentCount = getUnresolvedCommentCount(commentDoc)
+	let { canEdit } = useDocumentAccess(doc)
+	let readOnly = !canEdit
+	let commentAuthorName = profile?.name
 	let [commentsOpen, setCommentsOpen] = useState(false)
 	let [selectedCommentThreadId, setSelectedCommentThreadId] = useState<
 		string | null
 	>(null)
 	let [previewSelection, setPreviewSelection] =
 		useState<PreviewSelection | null>(null)
-	let [pendingCommentQuote, setPendingCommentQuote] = useState("")
 	let [commentDialogOpen, setCommentDialogOpen] = useState(false)
-	let [commentBody, setCommentBody] = useState("")
-
-	let subscribedDoc = useCoState(Document, id, { resolve: previewResolve })
-	let meWithThemes = useAccount(UserAccount, { resolve: themesResolve })
-
-	// Extract content for wikilinks (use loader data as fallback, empty if neither)
-	let content =
-		(subscribedDoc.$isLoaded
-			? subscribedDoc
-			: loaderData.doc
-		)?.content?.toString() ?? ""
-	let parsedContent = parseContentBody(content)
-	let wikilinkIds = parseWikiLinks(content).map(w => w.id)
-	let wikilinkCache = useDocTitles(wikilinkIds, loaderData.wikilinkCache)
-	let previewTextMap = buildPreviewTextMap(parsedContent.body, docId => {
-		return wikilinkCache.get(docId) ?? { title: docId, exists: false }
-	})
-	let previewDoc = subscribedDoc.$isLoaded ? subscribedDoc : loaderData.doc
-	let commentsEnabled = previewDoc ? areCommentsEnabled(previewDoc) : false
-	let canAddPreviewComment = Boolean(
-		previewDoc && commentsEnabled && canEdit(previewDoc),
+	let [commentBody, setCommentBody] = useState(""),
+		[pendingCommentQuote, setPendingCommentQuote] = useState("")
+	let wikilinks = new Map(
+		documents.map(doc => [
+			doc.id,
+			{ id: doc.id, title: doc.title, exists: !doc.deletedAt },
+		]),
 	)
-
 	useEffect(() => {
-		function handleKeyDown(e: KeyboardEvent) {
-			if (e.key === "Escape" && selectedCommentThreadId) {
-				if (isFormControl(e.target)) return
+		function handleKeyDown(event: KeyboardEvent) {
+			if (event.key === "Escape" && selectedCommentThreadId) {
+				if (isShortcutTargetBlocked(event.target)) return
 				setSelectedCommentThreadId(null)
 				return
 			}
-
-			if (e.defaultPrevented || isShortcutTargetBlocked(e.target)) return
-
-			if (isShortcutEvent(e, "print")) {
-				e.preventDefault()
-				void printToPdf({
-					content,
-					assets: getLoadedAssets(previewDoc?.assets).map(toPrintableAsset),
-					themes: meWithThemes.$isLoaded
-						? meWithThemes.root?.themes
-						: undefined,
-					defaultPreviewTheme: meWithThemes.$isLoaded
-						? (meWithThemes.root?.settings?.defaultPreviewTheme ?? null)
-						: null,
-					defaultSyntaxTheme: meWithThemes.$isLoaded
-						? (meWithThemes.root?.settings?.syntaxTheme ?? null)
-						: null,
-				})
+			if (
+				event.defaultPrevented ||
+				isShortcutTargetBlocked(event.target) ||
+				!isShortcutEvent(event, "comment") ||
+				readOnly ||
+				!commentsEnabled
+			)
+				return
+			event.preventDefault()
+			if (!previewSelection?.text.trim()) {
+				toast.info(t("comments.selectionRequired"))
 				return
 			}
-
-			if (isShortcutEvent(e, "comment")) {
-				if (!canAddPreviewComment) return
-				e.preventDefault()
-				let currentSelection = window.getSelection()?.toString().trim()
-				let selection =
-					previewSelection ??
-					(currentSelection
-						? {
-								text: currentSelection,
-								occurrence: 0,
-								renderedFrom: 0,
-								renderedTo: currentSelection.length,
-								contextBefore: "",
-								contextAfter: "",
-							}
-						: null)
-				if (!selection?.text.trim()) {
-					toast.info(t("comments.selectionRequired"))
-					return
-				}
-				setPreviewSelection(selection)
-				setPendingCommentQuote(selection.text)
-				setCommentDialogOpen(true)
-			}
+			setPendingCommentQuote(previewSelection.text)
+			setCommentDialogOpen(true)
 		}
-
 		document.addEventListener("keydown", handleKeyDown)
 		return () => document.removeEventListener("keydown", handleKeyDown)
-	}, [
-		canAddPreviewComment,
-		content,
-		meWithThemes,
-		previewDoc?.assets,
-		previewSelection,
-		selectedCommentThreadId,
-		t,
-	])
-
-	// Error states from loader
-	if (!loaderData.doc) {
-		if (loaderData.loadingState === "unauthorized")
-			return <DocumentUnauthorized />
-		return <DocumentNotFound />
-	}
-
-	// Handle live access revocation
-	if (
-		!subscribedDoc.$isLoaded &&
-		subscribedDoc.$jazz.loadingState !== "loading"
-	) {
-		if (subscribedDoc.$jazz.loadingState === "unauthorized")
-			return <DocumentUnauthorized />
-		return <DocumentNotFound />
-	}
-
-	if (!previewDoc) return <DocumentNotFound />
-
-	let doc = previewDoc
-	let assets = doc.assets?.$isLoaded
-		? doc.assets.filter(asset => asset?.$isLoaded)
-		: []
-	let docTitle = getDocumentTitle(content)
-	let commentThreads = getVisibleCommentThreads(doc)
-	let unresolvedCommentCount = getUnresolvedCommentCount(doc)
-	let readOnly = !canEdit(doc)
-	let commentAuthorName = meWithThemes.$isLoaded
-		? meWithThemes.profile?.name
-		: undefined
+	}, [selectedCommentThreadId, commentsEnabled, readOnly, previewSelection, t])
 
 	function handleSelectComment(threadId: string) {
 		if (!commentsEnabled) return
@@ -278,14 +152,14 @@ function DocPreviewScreen({ id, loaderData }: DocPreviewScreenProps) {
 
 		let range = getPreviewSelectionRange(selection)
 		let thread = range
-			? createCommentThread(doc, range, body, commentAuthorName)
+			? createCommentThread(commentDoc, range, body, commentAuthorName)
 			: null
 		if (!thread) {
 			toast.info(t("comments.selectionNotFound"))
 			return false
 		}
 
-		setSelectedCommentThreadId(thread.$jazz.id)
+		setSelectedCommentThreadId(thread.id)
 		setCommentsOpen(true)
 		window.getSelection()?.removeAllRanges()
 		return true
@@ -350,7 +224,7 @@ function DocPreviewScreen({ id, loaderData }: DocPreviewScreenProps) {
 	}
 
 	function getPreviewComment(thread: (typeof commentThreads)[number]) {
-		let range = getCommentRange(doc, thread.anchor)
+		let range = getCommentRange(commentDoc, thread.anchor)
 		let rawFrom = range.from - parsedContent.start
 		let rendered =
 			range.orphaned || rawFrom < 0
@@ -365,7 +239,7 @@ function DocPreviewScreen({ id, loaderData }: DocPreviewScreenProps) {
 				? countPreviewCommentOccurrence(thread, rawFrom, rendered)
 				: -1
 		return {
-			id: thread.$jazz.id,
+			id: thread.id,
 			quote: rendered?.text || thread.anchor.quote,
 			contextBefore: thread.anchor.contextBefore,
 			contextAfter: thread.anchor.contextAfter,
@@ -373,7 +247,7 @@ function DocPreviewScreen({ id, loaderData }: DocPreviewScreenProps) {
 			renderedFrom: rendered?.from ?? null,
 			renderedTo: rendered?.to ?? null,
 			resolved: Boolean(thread.resolvedAt),
-			selected: thread.$jazz.id === selectedCommentThreadId,
+			selected: thread.id === selectedCommentThreadId,
 		}
 	}
 
@@ -406,9 +280,9 @@ function DocPreviewScreen({ id, loaderData }: DocPreviewScreenProps) {
 			/>
 			<div className="relative flex min-h-0 flex-1">
 				<Preview
-					content={content}
-					assets={assets}
-					wikilinks={wikilinkCache}
+					content={doc.content}
+					localAssets={previewAssets}
+					wikilinks={wikilinks}
 					onExit={() => navigate({ to: "/doc/$id", params: { id } })}
 					comments={
 						commentsEnabled
@@ -423,7 +297,7 @@ function DocPreviewScreen({ id, loaderData }: DocPreviewScreenProps) {
 				{commentsEnabled && commentsOpen && (
 					<aside className="border-border bg-sidebar text-sidebar-foreground absolute inset-0 z-10 flex w-full border-l-0 md:relative md:w-[22rem] md:shrink-0 md:border-l">
 						<SidebarComments
-							doc={doc}
+							doc={commentDoc}
 							selectedThreadId={selectedCommentThreadId}
 							onSelectThread={handleSelectComment}
 							readOnly={readOnly}
@@ -487,7 +361,6 @@ function DocPreviewScreen({ id, loaderData }: DocPreviewScreenProps) {
 		</div>
 	)
 }
-
 function TopBar({
 	id,
 	docTitle,
@@ -567,18 +440,7 @@ function TopBar({
 	)
 }
 
-function isFormControl(target: EventTarget | null) {
-	return (
-		target instanceof HTMLInputElement ||
-		target instanceof HTMLTextAreaElement ||
-		target instanceof HTMLSelectElement
-	)
-}
-
 function parseContentBody(content: string) {
 	let { body } = parseFrontmatter(content)
-	return {
-		body,
-		start: content.length - body.length,
-	}
+	return { body, start: content.length - body.length }
 }

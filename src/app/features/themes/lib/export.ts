@@ -1,7 +1,8 @@
-import { type co, FileStream, z } from "jazz-tools"
-import { Theme, ThemePreset } from "./schema"
+import { z } from "zod"
+import { app } from "@/jazz/schema"
+import type { Database } from "@/app/features/documents/lib/library"
+import { ThemePreset, type ThemeRow, type ThemeAssetRow } from "./schema"
 import { sanitizeFilename } from "@/app/features/import-export/lib/export"
-import { Document } from "@/app/features/documents/lib/schema"
 import { setFrontmatterField } from "@/app/features/editor/lib/frontmatter"
 import {
 	serializeThemeSource,
@@ -10,19 +11,11 @@ import {
 	type ThemeSourceMetadata,
 } from "./source"
 import { serializePortableAssetFence } from "./portable-assets"
-
-export { exportTheme, serializePortableTheme, type ThemeExportQuery }
-
-type ThemeExportQuery = {
-	css: true
-	template: true
-	slideTemplate: true
-	thumbnail: { original: true }
-	assets: { $each: { data: true } }
+export { exportTheme, serializePortableTheme }
+type LoadedThemeForExport = ThemeRow & {
+	assets?: ThemeAssetRow[]
+	sourceContent?: string
 }
-
-type LoadedThemeForExport = co.loaded<typeof Theme, ThemeExportQuery>
-
 async function serializePortableTheme(
 	theme: LoadedThemeForExport,
 	sourceOverride?: string,
@@ -32,8 +25,8 @@ async function serializePortableTheme(
 	let metadata: ThemeSourceMetadata = {
 		name: theme.name,
 		type: theme.type,
-		author: theme.author,
-		description: theme.description,
+		author: theme.author ?? undefined,
+		description: theme.description ?? undefined,
 	}
 	let sourceMetadata = parseThemeSource(source, {
 		validateTemplate: () => null,
@@ -42,16 +35,13 @@ async function serializePortableTheme(
 		if (sourceMetadata.thumbnail) metadata.thumbnail = sourceMetadata.thumbnail
 	} else if (theme.thumbnailDataUrl) {
 		metadata.thumbnail = theme.thumbnailDataUrl
-	} else if (
-		theme.thumbnail?.$isLoaded &&
-		theme.thumbnail.original?.$isLoaded
-	) {
-		let thumbnail = theme.thumbnail.original.toBlob()
-		if (!thumbnail) throw new Error("Unable to read theme thumbnail")
-		metadata.thumbnail = fileStreamToDataUrl(
-			theme.thumbnail.original,
-			thumbnail.type || "image/png",
-		)
+	} else if (theme.thumbnail) {
+		let binary = ""
+		for (let index = 0; index < theme.thumbnail.length; index += 0x8000)
+			binary += String.fromCharCode(
+				...theme.thumbnail.subarray(index, index + 0x8000),
+			)
+		metadata.thumbnail = `data:image/png;base64,${btoa(binary)}`
 	}
 	if (theme.presets) {
 		let presets = z
@@ -59,20 +49,18 @@ async function serializePortableTheme(
 				z.array(ThemePreset),
 				z.object({ presets: z.array(ThemePreset) }),
 			])
-			.parse(JSON.parse(theme.presets))
+			.parse(
+				typeof theme.presets === "string"
+					? JSON.parse(theme.presets)
+					: theme.presets,
+			)
 		metadata.presets = Array.isArray(presets) ? presets : presets.presets
 	}
 	let sections = [stripThemeSourceId(source).trimEnd()]
 	let fontFaces: string[] = []
-	if (theme.assets && !theme.assets.$isLoaded)
-		throw new Error("Theme assets are not loaded")
 	for (let asset of theme.assets ?? []) {
-		if (!asset?.$isLoaded || !asset.data?.$isLoaded)
-			throw new Error("Theme asset is unavailable")
-		let data = asset.data.getChunks()
-		if (!data?.finished)
-			throw new Error(`Unable to read theme asset: ${asset.name}`)
-		let path = `legacy/${asset.$jazz.id}`
+		let data = { chunks: [asset.data] }
+		let path = `legacy/${asset.id}`
 		while (source.includes(path)) path += "-copy"
 		let binary = ""
 		for (let bytes of data.chunks)
@@ -105,44 +93,14 @@ async function serializePortableTheme(
 	return portable
 }
 
-function fileStreamToDataUrl(fileStream: FileStream, mimeType: string): string {
-	let data = fileStream.getChunks()
-	if (!data?.finished) throw new Error("Unable to read theme thumbnail")
-	if (
-		!(
-			"image/png" === mimeType ||
-			"image/jpeg" === mimeType ||
-			"image/webp" === mimeType ||
-			"image/gif" === mimeType ||
-			"image/svg+xml" === mimeType
-		)
-	)
-		throw new Error(`Unsupported theme thumbnail MIME type: ${mimeType}`)
-	let byteLength = data.chunks.reduce((total, bytes) => total + bytes.length, 0)
-	if (byteLength > 2_000_000) throw new Error("Theme thumbnail exceeds 2 MB")
-	let binary = ""
-	for (let bytes of data.chunks)
-		for (let index = 0; index < bytes.length; index += 0x8000)
-			binary += String.fromCharCode(...bytes.subarray(index, index + 0x8000))
-	return `data:${mimeType};base64,${btoa(binary)}`
-}
-
 async function loadEditableSource(
 	theme: LoadedThemeForExport,
 ): Promise<string> {
-	if (theme.sourceDocId) {
-		let source = await Document.load(theme.sourceDocId, {
-			resolve: { content: true },
-			loadAs: theme.$jazz.loadedAs,
-		})
-		if (!source.$isLoaded || !source.content?.$isLoaded)
-			throw new Error("Theme source is unavailable")
-		return source.content.toString()
-	}
+	if (theme.sourceContent) return theme.sourceContent
 	return serializeThemeSource({
 		css: theme.css.toString(),
-		documentTemplate: theme.template?.toString(),
-		slideTemplate: theme.slideTemplate?.toString(),
+		documentTemplate: theme.template ?? undefined,
+		slideTemplate: theme.slideTemplate ?? undefined,
 	})
 }
 
@@ -150,8 +108,16 @@ function stripThemeSourceId(source: string): string {
 	return setFrontmatterField(source, "theme-source", null)
 }
 
-async function exportTheme(theme: LoadedThemeForExport): Promise<void> {
-	let content = await serializePortableTheme(theme)
+async function exportTheme(db: Database, theme: ThemeRow): Promise<void> {
+	let assets = await db.all(app.themeAssets.where({ themeId: theme.id }))
+	let source = theme.sourceDocId
+		? await db.one(app.documents.where({ id: theme.sourceDocId }))
+		: null
+	let content = await serializePortableTheme({
+		...theme,
+		assets,
+		sourceContent: source?.content,
+	})
 	let blob = new Blob([content], { type: "text/markdown" })
 	let url = URL.createObjectURL(blob)
 	let link = document.createElement("a")

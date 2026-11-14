@@ -1,34 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router"
-import { Document } from "@/schema"
-import {
-	TeleprompterScreen,
-	teleprompterResolve,
-	loadTeleprompterWikilinkCache,
-	type TeleprompterLoaderData,
-} from "@/app/features/presentation"
-import { type ResolvedDoc } from "@/app/features/documents"
-
+import { z } from "zod"
+import { TeleprompterScreen } from "@/app/features/presentation"
 export { Route }
-
 let Route = createFileRoute("/doc/$id/teleprompter")({
-	loader: async ({ params }): Promise<TeleprompterLoaderData> => {
-		let doc = await Document.load(params.id, { resolve: teleprompterResolve })
-		if (!doc.$isLoaded) {
-			return {
-				doc: null,
-				loadingState: doc.$jazz.loadingState as "unauthorized" | "unavailable",
-				wikilinkCache: new Map<string, ResolvedDoc>(),
-			}
-		}
-
-		let wikilinkCache = await loadTeleprompterWikilinkCache(doc)
-		return { doc, loadingState: null, wikilinkCache }
-	},
-	component: RouteComponent,
+	validateSearch: z.object({
+		from: z.string().optional(),
+		spaceId: z.string().optional(),
+		step: z.number().optional(),
+	}),
+	component: Screen,
 })
-
-function RouteComponent() {
+function Screen() {
 	let { id } = Route.useParams()
-	let loaderData = Route.useLoaderData()
-	return <TeleprompterScreen id={id} loaderData={loaderData} />
+	return <TeleprompterScreen id={id} />
 }

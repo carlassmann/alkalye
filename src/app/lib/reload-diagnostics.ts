@@ -79,7 +79,9 @@ async function collectStorageDiagnostics(
 ): Promise<void> {
 	await Promise.all([
 		collectStorageEstimate(),
-		collectJazzDatabaseDiagnostics(labels),
+		labels.length
+			? collectJazzDatabaseDiagnostics(labels)
+			: collectLocalStoreDiagnostics(),
 	])
 }
 
@@ -161,6 +163,40 @@ async function collectStorageEstimate(): Promise<void> {
 		recordStartupTraceOnce("browser-storage-breakdown", details)
 	} catch (error) {
 		recordStartupTraceOnce("browser-storage-breakdown:error", {
+			error: getErrorName(error),
+		})
+	}
+}
+
+async function collectLocalStoreDiagnostics(): Promise<void> {
+	try {
+		let databases = await indexedDB.databases()
+		for (let info of databases) {
+			if (!info.name) continue
+			let database = await openDatabase(info.name)
+			try {
+				let stores = Array.from(database.objectStoreNames)
+				let details: StartupTraceDetails = {
+					database: info.name,
+					version: database.version,
+				}
+				if (stores.length) {
+					let transaction = database.transaction(stores, "readonly")
+					await Promise.all(
+						stores.map(async name => {
+							details[`records.${name}`] = await requestResult(
+								transaction.objectStore(name).count(),
+							)
+						}),
+					)
+				}
+				recordStartupTrace("local-store-counts", details)
+			} finally {
+				database.close()
+			}
+		}
+	} catch (error) {
+		recordStartupTrace("local-store-counts:error", {
 			error: getErrorName(error),
 		})
 	}

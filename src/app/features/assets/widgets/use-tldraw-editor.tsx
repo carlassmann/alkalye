@@ -1,6 +1,5 @@
 import { useState, type ReactNode } from "react"
 import { toast } from "sonner"
-import { TldrawRevision } from "../lib/schema"
 import { tldrawNameFromFile, type TldrawSave } from "../lib/tldraw"
 import { useIntl } from "@/shared/intl/setup"
 import type { SidebarAsset } from "./sidebar-assets"
@@ -116,20 +115,7 @@ function useTldrawEditor({
 			return
 		}
 		if (asset?.type !== "tldraw" || !asset.tldrawRevisionId) return
-		let revision = await TldrawRevision.load(asset.tldrawRevisionId, {
-			resolve: { snapshot: true },
-		})
-		let blob = revision?.$isLoaded ? revision.snapshot.toBlob() : undefined
-		if (!blob) {
-			toast.error(t("assets.whiteboardLoading"))
-			return
-		}
-		setEditor({
-			assetId,
-			name: asset.name,
-			initialJson: await blob.text(),
-			mode: "edit",
-		})
+		toast.error(t("assets.whiteboardLoading"))
 	}
 
 	let dialog = editor ? (

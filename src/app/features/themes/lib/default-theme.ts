@@ -1,16 +1,9 @@
-import { co } from "jazz-tools"
-import { UserAccount } from "@/schema"
-import { Theme } from "./schema"
-import { createThemeSourceDocument } from "./source"
-
 export {
-	createDefaultTheme,
 	getDefaultDocumentCss,
 	getDefaultThemeCss,
 	getDefaultThemeSource,
 	getSlideshowBaseCss,
 }
-
 let defaultDocumentTypographyCss = `
   .document .content {
     color: var(--tw-prose-body);
@@ -580,43 +573,6 @@ function getDefaultThemeStarterCss(): string {
 	color: var(--theme-accent);
 }
 `.trim()
-}
-
-async function createDefaultTheme(account: co.loaded<typeof UserAccount>) {
-	let loaded = await account.$jazz.ensureLoaded({
-		resolve: { root: { themes: true } },
-	})
-	let root = loaded.root
-	if (!root) throw new Error("Personal themes are not loaded")
-
-	let owner = root.$jazz.owner
-	let themes = root.themes
-	let name = `Custom theme ${(themes?.length ?? 0) + 1}`
-	let now = new Date()
-	let theme = Theme.create(
-		{
-			version: 1,
-			name,
-			type: "both",
-			css: co.plainText().create(getDefaultThemeStarterCss(), owner),
-			createdAt: now,
-			updatedAt: now,
-		},
-		owner,
-	)
-	let source = await createThemeSourceDocument(loaded, {
-		themeId: theme.$jazz.id,
-		name,
-		source: getDefaultThemeSource(),
-	})
-	theme.$jazz.set("sourceDocId", source.$jazz.id)
-
-	if (!themes) {
-		themes = co.list(Theme).create([], owner)
-		root.$jazz.set("themes", themes)
-	}
-	themes.$jazz.push(theme)
-	return theme
 }
 
 function getSlideshowBaseCss(): string {

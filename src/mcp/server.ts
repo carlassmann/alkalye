@@ -1,25 +1,14 @@
+import { findComment, summarizeComment } from "./comments"
 import { createHash } from "node:crypto"
 import { McpServer, createMcpHandler } from "@modelcontextprotocol/server"
 import { z } from "zod"
-import {
-	createPersonalDocument,
-	deletePersonalDocument,
-	getDocumentTitle,
-	replaceDocumentContent,
-} from "@/app/features/documents"
-import { createSpaceDocument, Space } from "@/schema"
-import {
-	addCommentReply,
-	createCommentThreadFromQuote,
-	getCommentRange,
-	getVisibleCommentThreads,
-	reopenCommentThread,
-	resolveCommentThread,
-} from "@/app/features/comments"
+import { app, type DocumentRow } from "@/jazz/schema"
+import type { Db } from "jazz-tools/backend"
+import { getDocumentTitle } from "@/app/features/documents"
+import { getTags } from "@/app/features/editor"
 import { setDocumentTitle } from "@/cli/document-title"
-import { connectionCredentialsSchema } from "./credentials"
 import { getMcpConfig } from "./config"
-import { openUserAccount, runWithUserAccount } from "./jazz"
+import { runWithUserAccount } from "./jazz"
 import { toolSecurityMetadata } from "./metadata"
 
 export { createAlkalyeServer, mcpHandler }
@@ -93,52 +82,30 @@ function createAlkalyeServer(credential: string | undefined) {
 			},
 		},
 		async () =>
-			withUser(credential, async account => {
-				let loaded = await account.$jazz.ensureLoaded({
-					resolve: {
-						root: {
-							documents: {
-								$each: { content: true, $onError: "catch" },
-							},
-							spaces: {
-								$each: {
-									documents: {
-										$each: { content: true, $onError: "catch" },
-									},
-									$onError: "catch",
-								},
-							},
-						},
-					},
+			withUser(credential, async (db, accountId) => {
+				let [documents, entries, spaces] = await Promise.all([
+					db.all(app.documents),
+					db.all(app.userDocuments.where({ ownerId: accountId })),
+					db.all(app.spaces),
+				])
+				let personal = documents
+					.filter(
+						doc =>
+							!doc.deletedAt &&
+							!doc.spaceId &&
+							entries.some(entry => entry.documentId === doc.id),
+					)
+					.map(doc => documentSummary(doc, undefined))
+				return toolResult({
+					personal,
+					spaces: spaces.map(space => ({
+						spaceId: space.id,
+						name: space.name,
+						documents: documents
+							.filter(doc => !doc.deletedAt && doc.spaceId === space.id)
+							.map(doc => documentSummary(doc, space.id)),
+					})),
 				})
-				let sharedSpaceIds = new Set(
-					(loaded.root.spaces ?? []).flatMap(space =>
-						space?.$isLoaded ? [space.$jazz.id] : [],
-					),
-				)
-				let personal = loaded.root.documents.flatMap(document =>
-					document?.$isLoaded &&
-					!document.deletedAt &&
-					(!document.spaceId || !sharedSpaceIds.has(document.spaceId))
-						? [documentSummary(document, undefined)]
-						: [],
-				)
-				let spaces = (loaded.root.spaces ?? []).flatMap(space =>
-					space?.$isLoaded
-						? [
-								{
-									spaceId: space.$jazz.id,
-									name: space.name,
-									documents: space.documents.flatMap(document =>
-										document?.$isLoaded && !document.deletedAt
-											? [documentSummary(document, space.$jazz.id)]
-											: [],
-									),
-								},
-							]
-						: [],
-				)
-				return toolResult({ personal, spaces })
 			}),
 	)
 
@@ -166,14 +133,13 @@ function createAlkalyeServer(credential: string | undefined) {
 			},
 		},
 		async ({ documentId }) =>
-			withUser(credential, async account => {
-				let document = await findUserDocument(account, documentId)
-				let content = document.content.toString()
+			withUser(credential, async db => {
+				let document = await findUserDocument(db, documentId)
 				return toolResult({
 					documentId,
-					title: getDocumentTitle(content),
-					content,
-					revision: documentRevision(content),
+					title: getDocumentTitle(document.content),
+					content: document.content,
+					revision: documentRevision(document.content),
 					updatedAt: document.updatedAt.toISOString(),
 				})
 			}),
@@ -205,24 +171,17 @@ function createAlkalyeServer(credential: string | undefined) {
 			},
 		},
 		async ({ documentId, content, expectedRevision }) =>
-			withUser(credential, async (account, sync) => {
-				let document = await findUserDocument(account, documentId)
-				requireWriteAccess(document.$jazz.owner, account.$jazz.id)
-				let currentContent = document.content.toString()
-				if (documentRevision(currentContent) !== expectedRevision) {
+			withUser(credential, async db => {
+				let document = await findUserDocument(db, documentId)
+				if (documentRevision(document.content) !== expectedRevision)
 					return toolError(
 						"Document changed since it was read. Read it again before editing.",
 					)
-				}
-				if (!(await replaceDocumentContent(document, content))) {
-					return toolError("Document is being edited. Try again shortly.")
-				}
-				document.$jazz.set("updatedAt", new Date())
-				await sync()
+				let updatedAt = await replaceContent(db, document, content)
 				return toolResult({
 					documentId,
 					revision: documentRevision(content),
-					updatedAt: document.updatedAt.toISOString(),
+					updatedAt: updatedAt.toISOString(),
 				})
 			}),
 	)
@@ -253,46 +212,34 @@ function createAlkalyeServer(credential: string | undefined) {
 			},
 		},
 		async ({ spaceId, content }) =>
-			withUser(credential, async (account, sync) => {
-				if (!spaceId) {
-					let document = await createPersonalDocument(account, content)
-					await sync()
-					return toolResult({
-						documentId: document.$jazz.id,
+			withUser(credential, async (db, accountId) => {
+				let space = spaceId
+					? await db.one(app.spaces.where({ id: spaceId }))
+					: null
+				if (spaceId && !space) throw new Error("Space not found")
+				let write = await db.transaction(tx => {
+					let now = new Date()
+					let doc = tx.insert(app.documents, {
+						ownerId: space?.ownerId ?? accountId,
+						spaceId,
+						content,
 						title: getDocumentTitle(content),
-						revision: documentRevision(content),
+						tags: getTags(content),
+						createdAt: now,
+						updatedAt: now,
 					})
-				}
-				let loaded = await account.$jazz.ensureLoaded({
-					resolve: {
-						root: {
-							spaces: {
-								$each: { documents: true, $onError: "catch" },
-							},
-						},
-					},
+					if (!spaceId)
+						tx.insert(app.userDocuments, {
+							ownerId: accountId,
+							documentId: doc.id,
+							rank: now.getTime(),
+						})
+					return doc
 				})
-				let space = (loaded.root.spaces ?? []).find(
-					candidate => candidate?.$jazz.id === spaceId,
-				)
-				if (!space?.$isLoaded) throw new Error("Space not found")
-				let writableSpace = await Space.load(spaceId, {
-					resolve: { documents: true },
-					loadAs: account,
-				})
-				if (!writableSpace.$isLoaded) throw new Error("Space is unavailable")
-				requireWriteAccess(writableSpace.$jazz.owner, account.$jazz.id)
-				let document = createSpaceDocument(
-					writableSpace.$jazz.owner,
-					writableSpace.$jazz.id,
-					content,
-					account,
-				)
-				writableSpace.documents.$jazz.push(document)
-				await sync()
+				await write.wait({ tier: "global" })
 				return toolResult({
-					documentId: document.$jazz.id,
-					spaceId,
+					documentId: write.value.id,
+					...(spaceId ? { spaceId } : {}),
 					title: getDocumentTitle(content),
 					revision: documentRevision(content),
 				})
@@ -320,25 +267,18 @@ function createAlkalyeServer(credential: string | undefined) {
 			annotations: writeAnnotations(false),
 		},
 		async ({ documentId, title, expectedRevision }) =>
-			withUser(credential, async (account, sync) => {
-				let document = await findUserDocument(account, documentId)
-				requireWriteAccess(document.$jazz.owner, account.$jazz.id)
-				let content = document.content.toString()
-				if (documentRevision(content) !== expectedRevision) {
+			withUser(credential, async db => {
+				let document = await findUserDocument(db, documentId)
+				if (documentRevision(document.content) !== expectedRevision)
 					return toolError(
 						"Document changed since it was read. Read it again before renaming.",
 					)
-				}
-				let nextContent = setDocumentTitle(content, title)
-				if (!(await replaceDocumentContent(document, nextContent))) {
-					return toolError("Document is being edited. Try again shortly.")
-				}
-				document.$jazz.set("updatedAt", new Date())
-				await sync()
+				let content = setDocumentTitle(document.content, title)
+				await replaceContent(db, document, content)
 				return toolResult({
 					documentId,
 					title,
-					revision: documentRevision(nextContent),
+					revision: documentRevision(content),
 				})
 			}),
 	)
@@ -355,12 +295,11 @@ function createAlkalyeServer(credential: string | undefined) {
 			annotations: writeAnnotations(true),
 		},
 		async ({ documentId }) =>
-			withUser(credential, async (account, sync) => {
-				let document = await findUserDocument(account, documentId)
-				requireWriteAccess(document.$jazz.owner, account.$jazz.id)
-				let result = await deletePersonalDocument(document)
-				if (result.type === "error") return toolError(result.error)
-				await sync()
+			withUser(credential, async db => {
+				let document = await findUserDocument(db, documentId)
+				await db
+					.update(app.documents, document.id, { deletedAt: new Date() })
+					.wait({ tier: "global" })
 				return toolResult({ documentId, archived: true })
 			}),
 	)
@@ -381,12 +320,15 @@ function createAlkalyeServer(credential: string | undefined) {
 			annotations: readAnnotations(),
 		},
 		async ({ documentId }) =>
-			withUser(credential, async account => {
-				let document = await findUserDocument(account, documentId)
+			withUser(credential, async db => {
+				let document = await findUserDocument(db, documentId)
+				let threads = await db.all(
+					app.commentThreads.where({ documentId, deletedAt: null }),
+				)
 				return toolResult({
 					documentId,
-					comments: getVisibleCommentThreads(document).map(thread =>
-						summarizeComment(document, thread),
+					comments: await Promise.all(
+						threads.map(thread => summarizeComment(db, document, thread)),
 					),
 				})
 			}),
@@ -407,21 +349,40 @@ function createAlkalyeServer(credential: string | undefined) {
 			annotations: writeAnnotations(false),
 		},
 		async ({ documentId, quote, body }) =>
-			withUser(credential, async (account, sync) => {
-				let document = await findUserDocument(account, documentId)
-				requireWriteAccess(document.$jazz.owner, account.$jazz.id)
-				let profile = await account.$jazz.ensureLoaded({
-					resolve: { profile: true },
+			withUser(credential, async (db, accountId) => {
+				let document = await findUserDocument(db, documentId)
+				let start = document.content.indexOf(quote)
+				if (start < 0) return toolError("Quote not found in document")
+				let anchor = db
+					.textAnchors()
+					.captureRange(document.content, start, start + quote.length)
+				let profile = await db.one(app.profiles.where({ ownerId: accountId }))
+				let write = await db.transaction(tx => {
+					let now = new Date()
+					let thread = tx.insert(app.commentThreads, {
+						documentId,
+						authorId: accountId,
+						anchor,
+						createdAt: now,
+						updatedAt: now,
+					})
+					tx.insert(app.commentReplies, {
+						threadId: thread.id,
+						authorId: accountId,
+						authorName: profile?.name,
+						body,
+						createdAt: now,
+					})
+					return thread
 				})
-				let thread = createCommentThreadFromQuote(
-					document,
-					quote,
-					body,
-					profile.profile.name,
+				await write.wait({ tier: "global" })
+				return toolResult(
+					await summarizeComment(
+						db,
+						document,
+						await findComment(db, documentId, write.value.id),
+					),
 				)
-				if (!thread) return toolError("Quote not found in document")
-				await sync()
-				return toolResult(summarizeComment(document, thread))
 			}),
 	)
 
@@ -439,16 +400,24 @@ function createAlkalyeServer(credential: string | undefined) {
 			annotations: writeAnnotations(false),
 		},
 		async ({ documentId, commentId, body }) =>
-			withUser(credential, async (account, sync) => {
-				let document = await findUserDocument(account, documentId)
-				requireWriteAccess(document.$jazz.owner, account.$jazz.id)
-				let thread = findComment(document, commentId)
-				let profile = await account.$jazz.ensureLoaded({
-					resolve: { profile: true },
+			withUser(credential, async (db, accountId) => {
+				let document = await findUserDocument(db, documentId)
+				let thread = await findComment(db, documentId, commentId)
+				let profile = await db.one(app.profiles.where({ ownerId: accountId }))
+				let now = new Date()
+				let write = await db.transaction(tx => {
+					tx.insert(app.commentReplies, {
+						threadId: thread.id,
+						authorId: accountId,
+						authorName: profile?.name,
+						body,
+						createdAt: now,
+					})
+					tx.update(app.commentThreads, thread.id, { updatedAt: now })
+					return { ...thread, updatedAt: now }
 				})
-				addCommentReply(thread, body, profile.profile.name)
-				await sync()
-				return toolResult(summarizeComment(document, thread))
+				await write.wait({ tier: "global" })
+				return toolResult(await summarizeComment(db, document, write.value))
 			}),
 	)
 
@@ -466,14 +435,21 @@ function createAlkalyeServer(credential: string | undefined) {
 			annotations: writeAnnotations(false),
 		},
 		async ({ documentId, commentId, resolved }) =>
-			withUser(credential, async (account, sync) => {
-				let document = await findUserDocument(account, documentId)
-				requireWriteAccess(document.$jazz.owner, account.$jazz.id)
-				let thread = findComment(document, commentId)
-				if (resolved) resolveCommentThread(thread)
-				else reopenCommentThread(thread)
-				await sync()
-				return toolResult(summarizeComment(document, thread))
+			withUser(credential, async db => {
+				let document = await findUserDocument(db, documentId)
+				let thread = await findComment(db, documentId, commentId)
+				let next = {
+					...thread,
+					resolvedAt: resolved ? new Date() : null,
+					updatedAt: new Date(),
+				}
+				await db
+					.update(app.commentThreads, thread.id, {
+						resolvedAt: next.resolvedAt,
+						updatedAt: next.updatedAt,
+					})
+					.wait({ tier: "global" })
+				return toolResult(await summarizeComment(db, document, next))
 			}),
 	)
 
@@ -490,20 +466,12 @@ function createAlkalyeServer(credential: string | undefined) {
 			annotations: writeAnnotations(false),
 		},
 		async ({ spaceId, name }) =>
-			withUser(credential, async (account, sync) => {
-				let loaded = await account.$jazz.ensureLoaded({
-					resolve: { root: { spaces: true } },
-				})
-				let reference = (loaded.root.spaces ?? []).find(
-					space => space?.$jazz.id === spaceId,
-				)
-				if (!reference) throw new Error("Space not found")
-				let space = await Space.load(spaceId, { loadAs: account })
-				if (!space.$isLoaded) throw new Error("Space is unavailable")
-				requireWriteAccess(space.$jazz.owner, account.$jazz.id)
-				space.$jazz.set("name", name)
-				space.$jazz.set("updatedAt", new Date())
-				await sync()
+			withUser(credential, async db => {
+				let space = await db.one(app.spaces.where({ id: spaceId }))
+				if (!space) throw new Error("Space not found")
+				await db
+					.update(app.spaces, space.id, { name, updatedAt: new Date() })
+					.wait({ tier: "global" })
 				return toolResult({ spaceId, name })
 			}),
 	)
@@ -514,27 +482,16 @@ function createAlkalyeServer(credential: string | undefined) {
 async function withUser(
 	credential: string | undefined,
 	operation: (
-		account: Awaited<ReturnType<typeof openUserAccount>>["account"],
-		sync: () => Promise<void>,
+		db: Db,
+		accountId: string,
 	) => Promise<ReturnType<typeof toolResult> | ReturnType<typeof toolError>>,
 ) {
 	if (!credential) return authenticationRequired()
-	let config = getMcpConfig()
 	try {
-		let credentials = await config.tokens.open(
-			"connection",
-			credential,
-			connectionCredentialsSchema,
-		)
 		return await runWithUserAccount(
-			config.syncServer,
-			credentials,
-			async user => {
-				await user.account.$jazz.waitForAllCoValuesSync({ timeout: 10_000 })
-				return operation(user.account, async () => {
-					await user.account.$jazz.waitForAllCoValuesSync({ timeout: 10_000 })
-				})
-			},
+			credential,
+			getMcpConfig().tokens,
+			operation,
 		)
 	} catch (error) {
 		if (!isPublicToolError(error)) console.error("[mcp] tool failed", error)
@@ -542,55 +499,48 @@ async function withUser(
 	}
 }
 
-async function findUserDocument(
-	account: Awaited<ReturnType<typeof openUserAccount>>["account"],
-	documentId: string,
-) {
-	let loaded = await account.$jazz.ensureLoaded({
-		resolve: {
-			root: {
-				documents: { $each: { $onError: "catch" } },
-				spaces: {
-					$each: {
-						documents: { $each: { $onError: "catch" } },
-						$onError: "catch",
-					},
-				},
-			},
-		},
-	})
-	let candidates = [
-		...loaded.root.documents.values(),
-		...(loaded.root.spaces ?? []).flatMap(space =>
-			space?.$isLoaded ? [...space.documents.values()] : [],
-		),
-	]
-	let reference = candidates.find(document => document?.$jazz.id === documentId)
-	if (!reference?.$isLoaded) throw new Error("Document not found")
-	let document = await reference.$jazz.ensureLoaded({
-		resolve: { content: true, comments: { $each: { replies: true } } },
-	})
-	if (!document.$isLoaded) throw new Error("Document is unavailable")
+async function findUserDocument(db: Db, documentId: string) {
+	let document = await db.one(app.documents.where({ id: documentId }))
+	if (!document) throw new Error("Document not found")
 	if (document.deletedAt) throw new Error("Document is archived")
 	return document
 }
 
-function documentSummary(
-	document: {
-		$jazz: { id: string }
-		content: { toString(): string }
-		updatedAt: Date
-	},
-	spaceId: string | undefined,
-) {
-	let content = document.content.toString()
-	let summary = {
-		documentId: document.$jazz.id,
-		title: getDocumentTitle(content),
+async function replaceContent(db: Db, document: DocumentRow, content: string) {
+	let updatedAt = new Date()
+	let write = await db.serializableTransaction(async tx => {
+		let current = await tx.one(app.documents.where({ id: document.id }))
+		if (
+			!current ||
+			documentRevision(current.content) !== documentRevision(document.content)
+		)
+			throw new Error(
+				"Document changed since it was read. Read it again before editing.",
+			)
+		tx.update(
+			app.documents,
+			document.id,
+			{
+				content,
+				title: getDocumentTitle(content),
+				tags: getTags(content),
+				updatedAt,
+			},
+			{ editedFrom: { content: document.content } },
+		)
+	})
+	await write.wait()
+	return updatedAt
+}
+
+function documentSummary(document: DocumentRow, spaceId: string | undefined) {
+	return {
+		documentId: document.id,
+		...(spaceId ? { spaceId } : {}),
+		title: getDocumentTitle(document.content),
 		updatedAt: document.updatedAt.toISOString(),
-		revision: documentRevision(content),
+		revision: documentRevision(document.content),
 	}
-	return spaceId ? { ...summary, spaceId } : summary
 }
 
 function publicToolError(error: unknown) {
@@ -615,58 +565,8 @@ function isPublicToolError(error: unknown): error is Error {
 	return safeMessages.has(error.message)
 }
 
-function requireWriteAccess(
-	group: { getRoleOf(id: string): string | undefined },
-	accountId: string,
-) {
-	let role = group.getRoleOf(accountId)
-	if (role !== "admin" && role !== "manager" && role !== "writer")
-		throw new Error("You do not have write access")
-}
-
 function documentRevision(content: string) {
 	return createHash("sha256").update(content).digest("base64url")
-}
-
-function findComment(
-	document: Awaited<ReturnType<typeof findUserDocument>>,
-	commentId: string,
-) {
-	let thread = getVisibleCommentThreads(document).find(
-		candidate => candidate.$jazz.id === commentId,
-	)
-	if (!thread) throw new Error("Comment not found")
-	return thread
-}
-
-function summarizeComment(
-	document: Awaited<ReturnType<typeof findUserDocument>>,
-	thread: ReturnType<typeof getVisibleCommentThreads>[number],
-) {
-	let range = getCommentRange(document, thread.anchor)
-	let replies = Array.from(thread.replies.values()).flatMap(reply =>
-		reply?.$isLoaded && !reply.deletedAt
-			? [
-					{
-						replyId: reply.$jazz.id,
-						body: reply.body,
-						authorName: reply.authorName ?? null,
-						createdAt: reply.createdAt.toISOString(),
-					},
-				]
-			: [],
-	)
-	return {
-		commentId: thread.$jazz.id,
-		quote: thread.anchor.quote,
-		from: range.orphaned ? null : range.from,
-		to: range.orphaned ? null : range.to,
-		orphaned: range.orphaned,
-		resolved: Boolean(thread.resolvedAt),
-		createdAt: thread.createdAt.toISOString(),
-		updatedAt: thread.updatedAt.toISOString(),
-		replies,
-	}
 }
 
 function readAnnotations() {

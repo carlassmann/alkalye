@@ -3,6 +3,14 @@ import { messages, translate } from "@ccssmnn/intl"
 export { baseAuthMessages, deAuthMessages }
 
 let baseAuthMessages = messages({
+	"migration.disclosure":
+		"Sync has moved. Synced notes are no longer end-to-end encrypted: Alkalye and Jazz Cloud can read them. Old invite links no longer work. Reconnect AI and MCP clients in Settings.",
+	"migration.complete": "Classic import finished.",
+	"migration.progress": "Importing your Classic library…",
+	"migration.retry": "Retry import",
+	"migration.dismiss": "Dismiss",
+	"migration.opening": "Opening your library…",
+
 	"auth.initial.description":
 		"Sign in with your recovery phrase to sync your notes across devices and collaborate with others.",
 	"auth.initial.createAccount": "Create new account",
@@ -28,6 +36,14 @@ let baseAuthMessages = messages({
 })
 
 let deAuthMessages = translate(baseAuthMessages, {
+	"migration.disclosure":
+		"Die Synchronisierung ist umgezogen. Synchronisierte Notizen sind nicht mehr Ende-zu-Ende-verschlüsselt: Alkalye und Jazz Cloud können sie lesen. Alte Einladungslinks funktionieren nicht mehr. Verbinde KI- und MCP-Clients in den Einstellungen neu.",
+	"migration.complete": "Classic-Import abgeschlossen.",
+	"migration.progress": "Deine Classic-Bibliothek wird importiert…",
+	"migration.retry": "Import erneut versuchen",
+	"migration.dismiss": "Schließen",
+	"migration.opening": "Deine Bibliothek wird geöffnet…",
+
 	"auth.initial.description":
 		"Melde dich mit deiner Recovery-Phrase an, um deine Notizen auf allen Geräten zu synchronisieren und mit anderen zu arbeiten.",
 	"auth.initial.createAccount": "Neues Konto erstellen",

@@ -1,0 +1,639 @@
+{
+	"method": {
+		"appSource": "afdb0a65343e856d4f41516a0679700b26d26ebf",
+		"engine": "published jazz-wasm@2.0.0-alpha.61",
+		"editsPerCase": 200,
+		"units": "sampled milliseconds per trace edit",
+		"scope": "Separate diagnostic. Entire replay window, cursor movement, full-content verification and three-second settling. Excludes setup/import. Worker CPU runs in parallel and cannot be added to dispatch latency. Leaf-frame categories; native symbol subgroups are part of Wasm, not additional time."
+	},
+	"profiles": {
+		"Book dracula-shared_worker-0.cpuprofile": {
+			"durationMs": 12322.492,
+			"sampleCount": 11561,
+			"groupsMsPerEdit": {
+				"idle": 53.61445499999914,
+				"gc": 0.039525,
+				"jsAndBrowserApis": 1.6902700000000017,
+				"wasm": 6.151015000000002,
+				"program": 0.11612000000000001
+			},
+			"selectedLeafSymbolsMsPerEdit": {
+				"sha256": 1.5276699999999999,
+				"materialization": 0.81966
+			},
+			"topSelfMsPerEdit": [
+				{
+					"function": "(idle)",
+					"ms": 53.6145
+				},
+				{
+					"function": "sha2::sha256::compress256",
+					"ms": 1.5277
+				},
+				{
+					"function": "jazz_types::large_values::materialize_attempt",
+					"ms": 0.8197
+				},
+				{
+					"function": "",
+					"ms": 0.4922
+				},
+				{
+					"function": "put",
+					"ms": 0.4824
+				},
+				{
+					"function": "core::str::converts::from_utf8",
+					"ms": 0.4277
+				},
+				{
+					"function": "memcmp",
+					"ms": 0.2699
+				},
+				{
+					"function": "fetch",
+					"ms": 0.1912
+				},
+				{
+					"function": "core::ptr::drop_in_place<alloc::vec::splice::Splice<core::iter::adapters::copied::Copied<core::slice::iter::Iter<u8>>>>",
+					"ms": 0.1801
+				},
+				{
+					"function": "memcpy",
+					"ms": 0.1637
+				},
+				{
+					"function": "talc::base::Talc<S,B>::allocate",
+					"ms": 0.1589
+				},
+				{
+					"function": "jazz_types::large_values::LargeValueFormat::decode_node",
+					"ms": 0.1535
+				},
+				{
+					"function": "talc::base::Talc<S,B>::deallocate",
+					"ms": 0.1161
+				},
+				{
+					"function": "(program)",
+					"ms": 0.1161
+				},
+				{
+					"function": "sqlite3VdbeExec",
+					"ms": 0.0899
+				},
+				{
+					"function": "sqlite3RunParser",
+					"ms": 0.0793
+				},
+				{
+					"function": "<core::hash::sip::Hasher<S> as core::hash::Hasher>::write",
+					"ms": 0.0687
+				},
+				{
+					"function": "jazz_types::records::BorrowedRecord::validate_inner::{{closure}}",
+					"ms": 0.0636
+				},
+				{
+					"function": "transaction",
+					"ms": 0.0527
+				},
+				{
+					"function": "alloc::collections::btree::map::BTreeMap<K,V,A>::remove",
+					"ms": 0.0477
+				},
+				{
+					"function": "jazz_types::records::values::validate_value_inner",
+					"ms": 0.0476
+				},
+				{
+					"function": "<alloc::string::String as core::fmt::Write>::write_str::h5e2146c598670080[9]",
+					"ms": 0.0476
+				},
+				{
+					"function": "wasm-to-js",
+					"ms": 0.0475
+				},
+				{
+					"function": "__wbg_set_16a9c1a07b3d38ec",
+					"ms": 0.0424
+				},
+				{
+					"function": "(garbage collector)",
+					"ms": 0.0395
+				},
+				{
+					"function": "jazz_db::db::sync::<impl jazz_db::db::Inner>::images_where",
+					"ms": 0.0371
+				},
+				{
+					"function": "jazz_db::names::Names::stored_type",
+					"ms": 0.037
+				},
+				{
+					"function": "alloc::collections::btree::remove::<impl alloc::collections::btree::node::Handle<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Mut,K,V,alloc::collections::btree::node::marker::Leaf>,alloc::collections::btree::node::marker::KV>>::remove_leaf_kv",
+					"ms": 0.037
+				},
+				{
+					"function": "jazz_wasm::idb_vfs::IdbVfs::commit_loop::{{closure}}",
+					"ms": 0.032
+				},
+				{
+					"function": "rusqlite::statement::Statement::bind_parameters",
+					"ms": 0.0318
+				}
+			]
+		},
+		"Book dracula-worker-1.cpuprofile": {
+			"durationMs": 12289.229,
+			"sampleCount": 11545,
+			"groupsMsPerEdit": {
+				"idle": 61.32736999999929,
+				"jsAndBrowserApis": 0.057935,
+				"gc": 0.05827500000000001
+			},
+			"selectedLeafSymbolsMsPerEdit": {},
+			"topSelfMsPerEdit": [
+				{
+					"function": "(idle)",
+					"ms": 61.3274
+				},
+				{
+					"function": "(garbage collector)",
+					"ms": 0.0583
+				},
+				{
+					"function": "o",
+					"ms": 0.0421
+				},
+				{
+					"function": "i",
+					"ms": 0.0105
+				},
+				{
+					"function": "p",
+					"ms": 0.0053
+				}
+			]
+		},
+		"Book dracula.cpuprofile": {
+			"durationMs": 12283.575,
+			"sampleCount": 11448,
+			"groupsMsPerEdit": {
+				"program": 5.208395,
+				"idle": 32.98944999999966,
+				"jsAndBrowserApis": 11.644469999999973,
+				"wasm": 10.828675000000018,
+				"gc": 0.7422749999999999
+			},
+			"selectedLeafSymbolsMsPerEdit": {
+				"sha256": 3.931500000000001,
+				"materialization": 1.7140900000000003,
+				"domSelection": 0.15436
+			},
+			"topSelfMsPerEdit": [
+				{
+					"function": "(idle)",
+					"ms": 32.9894
+				},
+				{
+					"function": "(program)",
+					"ms": 5.2084
+				},
+				{
+					"function": "sha2::sha256::compress256",
+					"ms": 3.9315
+				},
+				{
+					"function": "jazz_types::large_values::materialize_attempt",
+					"ms": 1.7141
+				},
+				{
+					"function": "core::str::converts::from_utf8",
+					"ms": 0.9791
+				},
+				{
+					"function": "",
+					"ms": 0.9131
+				},
+				{
+					"function": "encodeInto",
+					"ms": 0.904
+				},
+				{
+					"function": "(garbage collector)",
+					"ms": 0.7423
+				},
+				{
+					"function": "sliceString",
+					"ms": 0.625
+				},
+				{
+					"function": "RegExp: \\[\\[([^\\]]*)\\]\\](\\w*)",
+					"ms": 0.5761
+				},
+				{
+					"function": "memcmp",
+					"ms": 0.4338
+				},
+				{
+					"function": "decode",
+					"ms": 0.4289
+				},
+				{
+					"function": "tp",
+					"ms": 0.3968
+				},
+				{
+					"function": "Zf",
+					"ms": 0.3807
+				},
+				{
+					"function": "u",
+					"ms": 0.3655
+				},
+				{
+					"function": "jazz_types::large_values::LargeValueFormat::decode_node",
+					"ms": 0.3385
+				},
+				{
+					"function": "core::ptr::drop_in_place<alloc::vec::splice::Splice<core::iter::adapters::copied::Copied<core::slice::iter::Iter<u8>>>>",
+					"ms": 0.3384
+				},
+				{
+					"function": "serde_core::ser::impls::<impl serde_core::ser::Serialize for alloc::vec::Vec<T>>::serialize",
+					"ms": 0.2964
+				},
+				{
+					"function": "_De",
+					"ms": 0.2439
+				},
+				{
+					"function": "Ie",
+					"ms": 0.2163
+				},
+				{
+					"function": "Rf",
+					"ms": 0.2145
+				},
+				{
+					"function": "collapse",
+					"ms": 0.1544
+				},
+				{
+					"function": "hr",
+					"ms": 0.1533
+				},
+				{
+					"function": "C",
+					"ms": 0.1524
+				},
+				{
+					"function": "talc::base::Talc<S,B>::allocate",
+					"ms": 0.1481
+				},
+				{
+					"function": "sqlite3VdbeExec",
+					"ms": 0.1475
+				},
+				{
+					"function": "xa",
+					"ms": 0.1428
+				},
+				{
+					"function": "F0",
+					"ms": 0.1339
+				},
+				{
+					"function": "update",
+					"ms": 0.1328
+				},
+				{
+					"function": "k0",
+					"ms": 0.111
+				}
+			]
+		},
+		"Corpus 000-shared_worker-0.cpuprofile": {
+			"durationMs": 10411.26,
+			"sampleCount": 9790,
+			"groupsMsPerEdit": {
+				"idle": 48.78826999999983,
+				"gc": 0.029435,
+				"wasm": 1.9783199999999999,
+				"jsAndBrowserApis": 1.1689000000000005,
+				"program": 0.08989
+			},
+			"selectedLeafSymbolsMsPerEdit": {
+				"sha256": 0.020954999999999998
+			},
+			"topSelfMsPerEdit": [
+				{
+					"function": "(idle)",
+					"ms": 48.7883
+				},
+				{
+					"function": "put",
+					"ms": 0.3495
+				},
+				{
+					"function": "",
+					"ms": 0.2489
+				},
+				{
+					"function": "memcpy",
+					"ms": 0.1057
+				},
+				{
+					"function": "fetch",
+					"ms": 0.1007
+				},
+				{
+					"function": "talc::base::Talc<S,B>::allocate",
+					"ms": 0.0902
+				},
+				{
+					"function": "talc::base::Talc<S,B>::deallocate",
+					"ms": 0.0901
+				},
+				{
+					"function": "(program)",
+					"ms": 0.0899
+				},
+				{
+					"function": "sqlite3RunParser",
+					"ms": 0.0691
+				},
+				{
+					"function": "sqlite3VdbeExec",
+					"ms": 0.0687
+				},
+				{
+					"function": "memcmp",
+					"ms": 0.0637
+				},
+				{
+					"function": "jazz_db::db::sync::<impl jazz_db::db::Db>::server_tick",
+					"ms": 0.0477
+				},
+				{
+					"function": "transaction",
+					"ms": 0.0475
+				},
+				{
+					"function": "jazz_types::records::values::encode_value_into",
+					"ms": 0.0474
+				},
+				{
+					"function": "alloc::collections::btree::remove::<impl alloc::collections::btree::node::Handle<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Mut,K,V,alloc::collections::btree::node::marker::Leaf>,alloc::collections::btree::node::marker::KV>>::remove_leaf_kv",
+					"ms": 0.0473
+				},
+				{
+					"function": "<core::hash::sip::Hasher<S> as core::hash::Hasher>::write",
+					"ms": 0.0424
+				},
+				{
+					"function": "jazz_types::records::BorrowedRecord::validate_inner::{{closure}}",
+					"ms": 0.0423
+				},
+				{
+					"function": "jazz_types::records::values::validate_value_inner",
+					"ms": 0.0422
+				},
+				{
+					"function": "__wbg_set_16a9c1a07b3d38ec",
+					"ms": 0.037
+				},
+				{
+					"function": "jazz_types::large_values::DurableLargeValueRecordSchema::ordered_values",
+					"ms": 0.0319
+				},
+				{
+					"function": "<talc::cell::TalcCell<S,B> as core::alloc::global::GlobalAlloc>::realloc",
+					"ms": 0.0318
+				},
+				{
+					"function": "core::hash::BuildHasher::hash_one",
+					"ms": 0.0317
+				},
+				{
+					"function": "wasm-to-js",
+					"ms": 0.0314
+				},
+				{
+					"function": "(garbage collector)",
+					"ms": 0.0294
+				},
+				{
+					"function": "jazz_db::names::Names::stored_type",
+					"ms": 0.0264
+				},
+				{
+					"function": "jazz_db::db::sync::<impl jazz_db::db::Db>::sync_tick",
+					"ms": 0.0264
+				},
+				{
+					"function": "jazz_types::records::RecordDescriptor::create_with_encoded_fields",
+					"ms": 0.0212
+				},
+				{
+					"function": "memset",
+					"ms": 0.0211
+				},
+				{
+					"function": "core::ptr::drop_in_place<jazz_types::records::values::Value>",
+					"ms": 0.0211
+				},
+				{
+					"function": "alloc::collections::btree::map::BTreeMap<K,V,A>::insert",
+					"ms": 0.0211
+				}
+			]
+		},
+		"Corpus 000-worker-1.cpuprofile": {
+			"durationMs": 10378.097,
+			"sampleCount": 9773,
+			"groupsMsPerEdit": {
+				"idle": 51.884859999999634
+			},
+			"selectedLeafSymbolsMsPerEdit": {},
+			"topSelfMsPerEdit": [
+				{
+					"function": "(idle)",
+					"ms": 51.8849
+				}
+			]
+		},
+		"Corpus 000.cpuprofile": {
+			"durationMs": 10378.359,
+			"sampleCount": 9723,
+			"groupsMsPerEdit": {
+				"program": 5.2570900000000025,
+				"idle": 35.87505499999985,
+				"jsAndBrowserApis": 8.410294999999993,
+				"wasm": 1.7562050000000016,
+				"gc": 0.5884600000000001
+			},
+			"selectedLeafSymbolsMsPerEdit": {
+				"domSelection": 0.34931000000000006,
+				"sha256": 0.04248000000000001,
+				"materialization": 0.015870000000000002
+			},
+			"topSelfMsPerEdit": [
+				{
+					"function": "(idle)",
+					"ms": 35.8751
+				},
+				{
+					"function": "(program)",
+					"ms": 5.2571
+				},
+				{
+					"function": "",
+					"ms": 0.669
+				},
+				{
+					"function": "(garbage collector)",
+					"ms": 0.5885
+				},
+				{
+					"function": "collapse",
+					"ms": 0.3493
+				},
+				{
+					"function": "Rf",
+					"ms": 0.2498
+				},
+				{
+					"function": "Zf",
+					"ms": 0.2327
+				},
+				{
+					"function": "F0",
+					"ms": 0.2326
+				},
+				{
+					"function": "Ie",
+					"ms": 0.2276
+				},
+				{
+					"function": "matchMedia",
+					"ms": 0.1432
+				},
+				{
+					"function": "update",
+					"ms": 0.143
+				},
+				{
+					"function": "k0",
+					"ms": 0.1369
+				},
+				{
+					"function": "xa",
+					"ms": 0.1197
+				},
+				{
+					"function": "hr",
+					"ms": 0.1162
+				},
+				{
+					"function": "Ae",
+					"ms": 0.1144
+				},
+				{
+					"function": "getClientRects",
+					"ms": 0.1108
+				},
+				{
+					"function": "talc::base::Talc<S,B>::deallocate",
+					"ms": 0.0952
+				},
+				{
+					"function": "K0",
+					"ms": 0.0897
+				},
+				{
+					"function": "effect",
+					"ms": 0.0848
+				},
+				{
+					"function": "measure",
+					"ms": 0.0846
+				},
+				{
+					"function": "o0",
+					"ms": 0.0845
+				},
+				{
+					"function": "n.useSyncExternalStore",
+					"ms": 0.0792
+				},
+				{
+					"function": "Qm",
+					"ms": 0.0791
+				},
+				{
+					"function": "talc::base::Talc<S,B>::allocate",
+					"ms": 0.0791
+				},
+				{
+					"function": "ll",
+					"ms": 0.0741
+				},
+				{
+					"function": "ha",
+					"ms": 0.0741
+				},
+				{
+					"function": "advance",
+					"ms": 0.0741
+				},
+				{
+					"function": "Dwe",
+					"ms": 0.074
+				},
+				{
+					"function": "yC",
+					"ms": 0.0689
+				},
+				{
+					"function": "getBoundingClientRect",
+					"ms": 0.0687
+				}
+			]
+		}
+	},
+	"environment": {
+		"platform": "linux",
+		"release": "7.2.8-9-omarchy",
+		"cpu": "AMD RYZEN AI MAX+ 395 w/ Radeon 8060S",
+		"cores": 32,
+		"browser": "145.0.7632.6",
+		"cpuThrottle": 1,
+		"networkCapture": "CDP pages, iframes, dedicated workers and SharedWorkers",
+		"serverRuntime": "Separate stock Jazz CPU diagnostic; excluded from latency distributions",
+		"jazz": "2.0.0-alpha.61",
+		"gitHead": "afdb0a65343e856d4f41516a0679700b26d26ebf",
+		"server": "production Node adapter; local store; first visit SW blocked, returning SW installed"
+	},
+	"runLoads": [
+		{
+			"run": 1,
+			"start": [2.93, 3.54, 5.89],
+			"end": [3.82, 3.65, 5.77]
+		}
+	],
+	"replayVerifications": [
+		{
+			"run": 1,
+			"document": "small",
+			"persistence": false
+		},
+		{
+			"run": 1,
+			"document": "large",
+			"persistence": false
+		}
+	],
+	"scenarioFailures": []
+}

@@ -20,16 +20,6 @@ export { Teleprompter, groupBySlide } from "./widgets/teleprompter"
 export type { SlideGroup } from "./widgets/teleprompter"
 export { TeleprompterTopBar } from "./widgets/teleprompter-top-bar"
 export { SidebarPresentationLinks } from "./widgets/sidebar-presentation-links"
-export {
-	SlideshowScreen,
-	resolve as slideshowResolve,
-	loadWikilinkCache as loadSlideshowWikilinkCache,
-} from "./screens/slideshow-screen"
-export type { LoaderData as SlideshowLoaderData } from "./screens/slideshow-screen"
-export {
-	TeleprompterScreen,
-	resolve as teleprompterResolve,
-	loadWikilinkCache as loadTeleprompterWikilinkCache,
-} from "./screens/teleprompter-screen"
-export type { LoaderData as TeleprompterLoaderData } from "./screens/teleprompter-screen"
+export { SlideshowScreen } from "./screens/slideshow-screen"
+export { TeleprompterScreen } from "./screens/teleprompter-screen"
 export { isLaserPreview } from "./lib/laser-preview"

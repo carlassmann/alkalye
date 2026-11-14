@@ -23,7 +23,7 @@ export default defineConfig({
 		},
 	},
 	test: {
-		exclude: ["node_modules", ".reference", "e2e"],
+		exclude: ["node_modules", ".reference", "e2e", "dist", ".vercel"],
 		include: ["src/**/*.test.ts"],
 		environment: "jsdom",
 		setupFiles: ["./src/test-setup.ts"],

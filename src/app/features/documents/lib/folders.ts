@@ -1,10 +1,12 @@
-import { co } from "jazz-tools"
-import { Document } from "@/schema"
+import {
+	readDocument,
+	type Database,
+	type LibraryDocument,
+	updateContent,
+} from "./library"
 import { getPath, parseFrontmatter } from "@/app/features/editor"
-import { applyContentDiffLoadingCommentAnchors } from "@/app/features/comments"
 import { canEdit } from "@/app/features/sharing"
 import { tryCatch } from "@/app/lib/try-catch"
-import { syncDocumentMetadata } from "./metadata"
 
 export type { BatchResult }
 export {
@@ -49,24 +51,22 @@ function applyFolderPathToContent(
 }
 
 async function moveDocumentToFolder(
-	doc: co.loaded<typeof Document, { content: true }>,
+	db: Database,
+	doc: LibraryDocument,
 	newPath: string | null,
 ): Promise<boolean> {
-	if (!doc.content) return false
-
-	let content = doc.content.toString()
+	let content = (await readDocument(db, doc.id)).content
 	let newContent = applyFolderPathToContent(content, newPath)
 	if (newContent === content) return false
 
-	await applyContentDiffLoadingCommentAnchors(doc, newContent)
-	doc.$jazz.set("updatedAt", new Date())
-	syncDocumentMetadata(doc)
+	await updateContent(db, doc, newContent, content)
 	return true
 }
 
 // One unwritable document must not stop the rest of the batch
 async function moveDocumentsToFolder(
-	docs: co.loaded<typeof Document>[],
+	db: Database,
+	docs: LibraryDocument[],
 	newPath: string | null,
 ): Promise<BatchResult> {
 	let result: BatchResult = { changed: 0, skipped: 0 }
@@ -75,7 +75,7 @@ async function moveDocumentsToFolder(
 			result.skipped++
 			continue
 		}
-		let moved = await tryCatch(moveLoadedDocumentToFolder(doc, newPath))
+		let moved = await tryCatch(moveLoadedDocumentToFolder(db, doc, newPath))
 		if (!moved.ok) result.skipped++
 		else if (moved.value) result.changed++
 	}
@@ -83,9 +83,9 @@ async function moveDocumentsToFolder(
 }
 
 async function moveLoadedDocumentToFolder(
-	doc: co.loaded<typeof Document>,
+	db: Database,
+	doc: LibraryDocument,
 	newPath: string | null,
 ): Promise<boolean> {
-	let loaded = await doc.$jazz.ensureLoaded({ resolve: { content: true } })
-	return moveDocumentToFolder(loaded, newPath)
+	return moveDocumentToFolder(db, doc, newPath)
 }

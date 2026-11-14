@@ -1,6 +1,6 @@
 # Welcome to Alkalye
 
-A beautiful markdown editor. Private by design.
+A beautiful markdown editor. Write offline, sync across devices.
 
 **Currently in free public beta. Self-host anytime.**
 
@@ -10,9 +10,9 @@ A beautiful markdown editor. Private by design.
 
 Alkalye is a beautiful web app, made to work and look great on any device and OS. **It even works offline.**. Install it on your phone, tablet, or desktop. Your documents sync automatically across all your devices.
 
-## Your words, encrypted
+## Your words, available anywhere
 
-Everything you write is **end-to-end encrypted**. Not even we can read your documents. Your thoughts stay yours.
+Documents sync across your devices. Synced data is readable by Alkalye’s backend and Jazz Cloud.
 
 ## Write together, in real-time
 

@@ -5,7 +5,7 @@ import { getMcpConfig } from "@/mcp/config"
 import { readAccessToken } from "@/mcp/oauth"
 import { mcpHandler } from "@/mcp/server"
 
-export { POST, OPTIONS }
+export { GET, POST, OPTIONS }
 
 export const prerender = false
 
@@ -50,6 +50,7 @@ let handle: APIRoute = async ({ request }) => {
 	}
 }
 
+let GET = handle
 let POST = handle
 let OPTIONS: APIRoute = () =>
 	new Response(null, {

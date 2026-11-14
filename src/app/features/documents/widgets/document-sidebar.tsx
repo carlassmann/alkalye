@@ -21,7 +21,7 @@ function DocumentSidebar({
 }: {
 	header?: React.ReactNode
 	footer?: React.ReactNode
-	tabs?: { id: string; label: string; count?: number }[]
+	tabs?: { id: string; label: string; count?: number; disabled?: boolean }[]
 	activeTab?: string
 	onTabChange?: (tab: string) => void
 	children: React.ReactNode
@@ -66,6 +66,7 @@ function DocumentSidebar({
 									key={tab.id}
 									size="sm"
 									variant="ghost"
+									disabled={tab.disabled}
 									onClick={() => onTabChange(tab.id)}
 									className={cn(
 										"justify-center",

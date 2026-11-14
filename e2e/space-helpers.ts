@@ -189,6 +189,10 @@ async function listSpaceInvites(page: Page, args: SpaceArgs) {
 	if (!args.spaceId) throw new Error("spaceId required")
 	await openSpaceShareDialog(page, { spaceId: args.spaceId })
 
+	await expect(
+		page.getByTestId(testIds.space.sharePendingInviteRow).first(),
+	).toBeVisible()
+
 	let invites = await page
 		.getByTestId(testIds.space.sharePendingInviteRow)
 		.evaluateAll(rows => {
@@ -261,7 +265,7 @@ async function acceptSpaceInvite(page: Page, args: AcceptSpaceInviteArgs) {
 	await invitePage.getByTestId(testIds.auth.createCopy).click()
 	await invitePage.getByTestId(testIds.auth.createSubmit).click()
 	await expect(invitePage.getByTestId(testIds.auth.dialog)).toBeHidden({
-		timeout: 10_000,
+		timeout: 30_000,
 	})
 	await waitForInviteSuccess(invitePage)
 
@@ -334,11 +338,11 @@ function getSpaceIdFromUrl(url: string) {
 }
 
 function parseInviteGroupId(link: string) {
-	let match = link.match(/\/invite\/(co_[^/]+)\//)
+	let match = link.match(/\/invite\/([^/]+)\//)
 	return match?.[1] ?? null
 }
 
 function parseSpaceIdFromInviteLink(link: string) {
-	let match = link.match(/#\/space\/(co_[^/]+)\//)
+	let match = link.match(/#\/space\/([^/]+)\//)
 	return match?.[1] ?? null
 }

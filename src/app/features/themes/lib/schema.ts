@@ -1,6 +1,11 @@
-import { co, z } from "jazz-tools"
+import { z } from "zod"
+import type { schema } from "jazz-tools"
+import { app } from "@/jazz/schema"
 
-export { Theme, ThemeAsset, ThemePreset, ThemeType }
+export { ThemePreset, ThemeType }
+export type { ThemeRow, ThemeAssetRow }
+type ThemeRow = schema.RowOf<typeof app.themes>
+type ThemeAssetRow = schema.RowOf<typeof app.themeAssets>
 
 // Theme types: 'preview' for document preview, 'slideshow' for presentations, 'both' for both
 let ThemeType = z.enum(["preview", "slideshow", "both"])
@@ -25,31 +30,4 @@ let ThemePreset = z.object({
 			body: z.string().optional(),
 		})
 		.optional(),
-})
-
-// Asset stored within a theme (fonts, images)
-let ThemeAsset = co.map({
-	name: z.string(),
-	mimeType: z.string(),
-	data: co.fileStream(),
-	createdAt: z.date(),
-})
-
-// Theme schema for custom themes
-let Theme = co.map({
-	version: z.literal(1),
-	name: z.string(),
-	author: z.string().optional(),
-	description: z.string().optional(),
-	type: ThemeType,
-	css: co.plainText(),
-	template: co.optional(co.plainText()),
-	slideTemplate: co.optional(co.plainText()),
-	sourceDocId: z.string().optional(),
-	presets: z.string().optional(),
-	assets: co.optional(co.list(ThemeAsset)),
-	thumbnail: co.optional(co.image()),
-	thumbnailDataUrl: z.string().optional(),
-	createdAt: z.date(),
-	updatedAt: z.date(),
 })

@@ -1,0 +1,50 @@
+diff --git a/dist/backend/create-jazz.d.ts b/dist/backend/create-jazz.d.ts
+index 0f0c3cbf1557af3a461dfd4b2c562cc7a8b827b6..d3c0273e84437f6c3636644d5b387e111b3e8ed7 100644
+--- a/dist/backend/create-jazz.d.ts
++++ b/dist/backend/create-jazz.d.ts
+@@ -391,6 +391,8 @@ export interface Jazz {
+      * a {@link NoJazzAccountError} (`code: "no_account"`) for a user who has no
+      * account yet (see {@link createAccountFor}).
+      */
++    /** Trusted server delegation to an already authorized account, enforcing policies. Alkalye alpha.61 patch. */
++    forUser(accountId: string): Promise<Db>;
+     forReqUser(request: Request): Promise<Db>;
+     /**
+      * The Jazz account of the request's signed-in user, or null when
+diff --git a/dist/backend/create-jazz.js b/dist/backend/create-jazz.js
+index ecbef2226b7941d6e12934bd8e59fa27706c9b6c..8c50b9b225a979c2c8f8936886c833b5c1a99c6b 100644
+--- a/dist/backend/create-jazz.js
++++ b/dist/backend/create-jazz.js
+@@ -2329,7 +2329,24 @@ async function openJazz(initial, store) {
+             return backend.db;
+         },
+         linkIdentity,
++        async forUser(accountId) {
++            if (!/^[0-9a-f-]{36}$/i.test(accountId)) throw new TypeError("Expected account UUID");
++            return backendDbForSession(backend, { account_id: accountId, issuer, user_id: accountId, claims: {}, authMode: "external" });
++        },
+         async forReqUser(request) {
++            const authorization = request.headers.get("authorization");
++            const token = authorization?.startsWith("Bearer ") ? authorization.slice(7) : undefined;
++            if (token && parseJwtPayload(token)?.iss === LOCAL_FIRST_JWT_ISSUER) {
++                if (!originAllowed(request) || !(await acceptsGuest(request))) throw signedOut("forReqUser");
++                const audience = guestAudience(request, token);
++                if (!audience) throw signedOut("forReqUser");
++                const subject = verifyLocalFirstToken(token, audience.endpoint ?? appId);
++                const { account } = await adminAccounts("found-local-first", {
++                    identity: { issuer: LOCAL_FIRST_JWT_ISSUER, subject },
++                    ...(audience.endpoint !== undefined ? { audience: audience.endpoint } : {}),
++                });
++                return backendDbForSession(backend, { account_id: account, issuer, user_id: account, claims: {}, authMode: "external" });
++            }
+             const user = await authenticate(request);
+             if (!user)
+                 throw signedOut("forReqUser");
+@@ -2948,6 +2965,7 @@ function facade(entry) {
+                 .finally(() => heldSockets--);
+         },
+         db,
++        forUser: async (accountId) => (await use()).forUser(accountId),
+         forReqUser: async (request) => (await use()).forReqUser(request),
+         withAttribution: async (request) => (await use()).withAttribution(request),
+         accountFor: async (request) => (await use()).accountFor(request),

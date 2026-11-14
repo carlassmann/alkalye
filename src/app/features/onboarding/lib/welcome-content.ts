@@ -1,10 +1,11 @@
+import { replaceShortcutTokens } from "@/app/lib/shortcut-registry"
 export { fetchWelcomeContent, getSpaceWelcomeContent }
 
 let FALLBACK_WELCOME_CONTENT = `# Welcome to Alkalye
 
-A beautiful markdown editor. Private by design.
+A beautiful markdown editor. Write offline, sync across devices.
 
-Your words are end-to-end encrypted. Collaborate in real-time. Works on any device.
+Synced data is readable by Alkalye’s backend and Jazz Cloud. Works on any device.
 
 **Get started:** Edit this document, create a new one, or open a tutor from the Help menu.
 `
@@ -22,7 +23,7 @@ async function fetchWelcomeContent(): Promise<string> {
 	try {
 		let response = await fetch("/docs/welcome.md")
 		if (!response.ok) return FALLBACK_WELCOME_CONTENT
-		return await response.text()
+		return replaceShortcutTokens(await response.text())
 	} catch {
 		return FALLBACK_WELCOME_CONTENT
 	}

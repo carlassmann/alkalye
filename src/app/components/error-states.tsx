@@ -1,9 +1,8 @@
 import { useState } from "react"
 import { Link, useRouter } from "@tanstack/react-router"
 import { FileX, FolderLock, FolderSearch, ShieldOff } from "lucide-react"
-import { useIsAuthenticated } from "jazz-tools/react"
 import { Button } from "@/app/components/ui/button"
-import { AuthDialog } from "@/app/features/auth"
+import { AuthDialog, useIsBackedUp } from "@/app/features/auth"
 import {
 	Empty,
 	EmptyHeader,
@@ -51,7 +50,7 @@ function DocumentNotFound() {
 }
 
 function DocumentUnauthorized() {
-	let isAuthenticated = useIsAuthenticated()
+	let isAuthenticated = useIsBackedUp()
 	let router = useRouter()
 	let [authOpen, setAuthOpen] = useState(false)
 
@@ -80,7 +79,17 @@ function DocumentUnauthorized() {
 						</Button>
 						{!isAuthenticated && (
 							<>
-								<Button variant="outline" onClick={() => setAuthOpen(true)}>
+								<Button
+									variant="outline"
+									onClick={() => {
+										sessionStorage.setItem(
+											"alkalye-requested-document",
+											window.location.pathname.match(/\/doc\/([^/]+)/)?.[1] ??
+												"",
+										)
+										setAuthOpen(true)
+									}}
+								>
 									<T k="common.signIn" />
 								</Button>
 								<AuthDialog
@@ -123,7 +132,7 @@ function SpaceNotFound() {
 }
 
 function SpaceUnauthorized() {
-	let isAuthenticated = useIsAuthenticated()
+	let isAuthenticated = useIsBackedUp()
 	let router = useRouter()
 	let [authOpen, setAuthOpen] = useState(false)
 
@@ -152,7 +161,17 @@ function SpaceUnauthorized() {
 						</Button>
 						{!isAuthenticated && (
 							<>
-								<Button variant="outline" onClick={() => setAuthOpen(true)}>
+								<Button
+									variant="outline"
+									onClick={() => {
+										sessionStorage.setItem(
+											"alkalye-requested-document",
+											window.location.pathname.match(/\/doc\/([^/]+)/)?.[1] ??
+												"",
+										)
+										setAuthOpen(true)
+									}}
+								>
 									<T k="common.signIn" />
 								</Button>
 								<AuthDialog

@@ -1,14 +1,11 @@
+import { useIsBackedUp } from "@/app/features/auth"
 import { useState, useRef } from "react"
-import { co, type ResolveQuery } from "jazz-tools"
-import {
-	useAccount,
-	useCoState,
-	useIsAuthenticated,
-	Image,
-} from "jazz-tools/react"
+import { useLibrary } from "@/app/features/documents"
+import { useSpaces, createSpace, type Space } from "../lib/spaces"
+import { SpaceAvatarImage } from "./space-avatar"
 import { useParams, useNavigate, Link } from "@tanstack/react-router"
 import { useIntl, T } from "@/shared/intl/setup"
-import { User, Users, Check, Plus, SettingsIcon, UserPlus } from "lucide-react"
+import { User, Users, Check, Plus, SettingsIcon } from "lucide-react"
 import {
 	DropdownMenuItem,
 	DropdownMenuSeparator,
@@ -24,65 +21,34 @@ import {
 import { Button } from "@/app/components/ui/button"
 import { Input } from "@/app/components/ui/input"
 import { Label } from "@/app/components/ui/label"
-import { UserAccount, Space, createSpace } from "@/schema"
-import { getSpaceGroup } from "../lib/spaces"
 import { testIds } from "@/app/lib/test-ids"
 import { WorkspaceSelector } from "@/app/components/workspace-selector"
-import { waitForLocalJazzStorage } from "@/app/lib/local-jazz-poke"
 import { tryCatch } from "@/app/lib/try-catch"
 import { toast } from "sonner"
 
 export { SpaceSelector, SpaceInitials }
 
-let spacesQuery = { root: { spaces: { $each: { avatar: true } } } } as const
-type LoadedSpaces = co.loaded<typeof UserAccount, typeof spacesQuery>
-
-let currentSpaceQuery = { avatar: true } as const satisfies ResolveQuery<
-	typeof Space
->
-
 function SpaceSelector() {
 	let t = useIntl()
-	let me = useAccount(UserAccount, { resolve: spacesQuery })
-	let isAuthenticated = useIsAuthenticated()
+	let isAuthenticated = useIsBackedUp()
 	let params = useParams({ strict: false })
 	let spaceId = params.spaceId ?? null
 	let [dialogOpen, setDialogOpen] = useState(false)
 
-	// Load current space directly (for public spaces not in user's list)
-	let currentSpaceFromUrl = useCoState(Space, spaceId ?? undefined, {
-		resolve: currentSpaceQuery,
-	})
-
-	let spaces = me?.$isLoaded ? getSortedSpaces(me.root.spaces) : []
-	let currentSpaceInList = spaceId
-		? spaces.find(s => s.$jazz.id === spaceId)
-		: null
-
-	// Use current space from list if available, otherwise from URL (for public spaces)
+	let spaces = useSpaces().filter(space => space.role)
+	let currentSpaceInList = spaces.find(space => space.id === spaceId)
+	let currentSpaceFromUrl = useSpaces().find(space => space.id === spaceId)
 	let currentSpace = currentSpaceInList ?? currentSpaceFromUrl
-	let displayName = currentSpace?.$isLoaded
-		? currentSpace.name
-		: t("spaces.selector.personal")
-	let isInSpace = currentSpace?.$isLoaded
-
-	// Check if current space is not in user's list (public space they're viewing)
-	let isViewingPublicSpace =
-		spaceId && currentSpaceFromUrl?.$isLoaded && !currentSpaceInList
-
-	// Check if user can add this space to their list
-	let spaceGroup = currentSpaceFromUrl?.$isLoaded
-		? getSpaceGroup(currentSpaceFromUrl)
-		: null
-	let canAddToSpaces =
-		isViewingPublicSpace && isAuthenticated && spaceGroup?.myRole()
+	let displayName = currentSpace?.name ?? t("spaces.selector.personal")
+	let isInSpace = Boolean(currentSpace)
+	let isViewingPublicSpace = currentSpaceFromUrl && !currentSpaceInList
 
 	return (
 		<>
 			<WorkspaceSelector
 				label={displayName}
 				icon={
-					isInSpace && currentSpace.$isLoaded ? (
+					isInSpace && currentSpace ? (
 						<SpaceAvatar space={currentSpace} />
 					) : (
 						<User />
@@ -99,7 +65,7 @@ function SpaceSelector() {
 								render={
 									<Link
 										to="/spaces/$spaceId/settings"
-										params={{ spaceId: currentSpaceInList.$jazz.id }}
+										params={{ spaceId: currentSpaceInList.id }}
 									/>
 								}
 							>
@@ -121,22 +87,19 @@ function SpaceSelector() {
 				</DropdownMenuItem>
 				{spaces.map(space => (
 					<DropdownMenuItem
-						key={space.$jazz.id}
+						key={space.id}
 						data-testid={testIds.space.listItem}
-						data-space-id={space.$jazz.id}
+						data-space-id={space.id}
 						render={
-							<Link
-								to="/spaces/$spaceId"
-								params={{ spaceId: space.$jazz.id }}
-							/>
+							<Link to="/spaces/$spaceId" params={{ spaceId: space.id }} />
 						}
 					>
 						<SpaceAvatar space={space} />
 						<span>{space.name}</span>
-						{spaceId === space.$jazz.id && <Check className="ml-auto size-4" />}
+						{spaceId === space.id && <Check className="ml-auto size-4" />}
 					</DropdownMenuItem>
 				))}
-				{isViewingPublicSpace && currentSpaceFromUrl?.$isLoaded && (
+				{isViewingPublicSpace && currentSpaceFromUrl && (
 					<>
 						<DropdownMenuSeparator />
 						<div className="text-muted-foreground px-2 py-1.5 text-xs">
@@ -152,9 +115,7 @@ function SpaceSelector() {
 				{isAuthenticated && (
 					<>
 						<DropdownMenuSeparator />
-						{canAddToSpaces && (
-							<AddToSpacesMenuItem space={currentSpaceFromUrl!} me={me} />
-						)}
+
 						<DropdownMenuItem
 							onClick={() => setDialogOpen(true)}
 							data-testid={testIds.space.createButton}
@@ -167,11 +128,7 @@ function SpaceSelector() {
 					</>
 				)}
 			</WorkspaceSelector>
-			<CreateSpaceDialog
-				open={dialogOpen}
-				onOpenChange={setDialogOpen}
-				me={me}
-			/>
+			<CreateSpaceDialog open={dialogOpen} onOpenChange={setDialogOpen} />
 		</>
 	)
 }
@@ -197,52 +154,19 @@ function SpaceInitials({
 
 // --- Helpers ---
 
-type MaybeLoadedSpace = ReturnType<
-	typeof useCoState<typeof Space, typeof currentSpaceQuery>
->
-
-function AddToSpacesMenuItem({
-	space,
-	me,
-}: {
-	space: MaybeLoadedSpace
-	me: ReturnType<typeof useAccount<typeof UserAccount, typeof spacesQuery>>
-}) {
-	async function handleAddToSpaces() {
-		if (!me.$isLoaded || !me.root?.spaces?.$isLoaded || !space?.$isLoaded)
-			return
-		// Check if already in list
-		let alreadyHas = me.root.spaces.some(s => s?.$jazz.id === space.$jazz.id)
-		if (!alreadyHas) {
-			me.root.spaces.$jazz.push(space)
-		}
-	}
-
-	return (
-		<DropdownMenuItem onClick={handleAddToSpaces}>
-			<UserPlus className="size-4" />
-			<span>
-				<T k="spaces.selector.addToMySpaces" />
-			</span>
-		</DropdownMenuItem>
-	)
-}
-
 function CreateSpaceDialog({
 	open,
 	onOpenChange,
-	me,
 }: {
 	open: boolean
 	onOpenChange: (open: boolean) => void
-	me: ReturnType<typeof useAccount<typeof UserAccount, typeof spacesQuery>>
 }) {
+	let { db, ownerId } = useLibrary()
 	let t = useIntl()
 	let navigate = useNavigate()
 	let [name, setName] = useState("")
 	let [saving, setSaving] = useState(false)
 	let inputRef = useRef<HTMLInputElement>(null)
-	let pendingSpace = useRef<ReturnType<typeof createSpace> | null>(null)
 
 	function handleOpenChangeComplete(open: boolean) {
 		if (!open) setName("")
@@ -251,13 +175,10 @@ function CreateSpaceDialog({
 	async function handleSubmit(e: React.FormEvent) {
 		e.preventDefault()
 		let trimmed = name.trim()
-		if (!trimmed || saving || !me.$isLoaded || !me.root) return
+		if (!trimmed || saving) return
 
 		setSaving(true)
-		let space = pendingSpace.current ?? createSpace(trimmed, me.root)
-		pendingSpace.current = space
-		if (space.name !== trimmed) space.$jazz.set("name", trimmed)
-		let saved = await tryCatch(waitForLocalJazzStorage(me))
+		let saved = await tryCatch(createSpace(db, ownerId, trimmed))
 		if (!saved.ok) {
 			setSaving(false)
 			toast.error(t("spaces.create.saveFailed"))
@@ -266,8 +187,8 @@ function CreateSpaceDialog({
 		onOpenChange(false)
 		setSaving(false)
 		setName("")
-		pendingSpace.current = null
-		navigate({ to: "/spaces/$spaceId", params: { spaceId: space.$jazz.id } })
+		let space = saved.value
+		navigate({ to: "/spaces/$spaceId", params: { spaceId: space.id } })
 	}
 
 	return (
@@ -327,36 +248,15 @@ function CreateSpaceDialog({
 	)
 }
 
-type LoadedSpaceWithAvatar = NonNullable<
-	NonNullable<LoadedSpaces["root"]["spaces"]>[number]
->
-
-function getSortedSpaces(
-	spaces: LoadedSpaces["root"]["spaces"],
-): LoadedSpaceWithAvatar[] {
-	if (!spaces) return []
-
-	return Array.from(spaces)
-		.filter((s): s is LoadedSpaceWithAvatar => s != null && s.$isLoaded)
-		.sort((a, b) => a.name.localeCompare(b.name))
-}
-
-function SpaceAvatar({ space }: { space: LoadedSpaceWithAvatar }) {
-	let avatarId = space.avatar?.$jazz.id
-
-	if (avatarId) {
-		return (
-			<Image
-				imageId={avatarId}
-				width={16}
-				height={16}
-				alt={space.name}
-				className="size-4 shrink-0 rounded object-cover"
-			/>
-		)
-	}
-
-	return <SpaceInitials name={space.name} size="sm" />
+function SpaceAvatar({ space }: { space: Space }) {
+	return space.avatar ? (
+		<SpaceAvatarImage
+			space={space}
+			className="size-4 shrink-0 rounded object-cover"
+		/>
+	) : (
+		<SpaceInitials name={space.name} size="sm" />
+	)
 }
 
 function getInitials(name: string): string {

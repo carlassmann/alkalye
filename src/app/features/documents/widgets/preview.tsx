@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef, useId, type RefObject } from "react"
 import { createPortal } from "react-dom"
-import { Image as JazzImage } from "jazz-tools/react"
 import { getDocumentTitle } from "../lib/title"
 import {
 	isShortcutEvent,
@@ -41,16 +40,16 @@ export { Preview, PreviewView }
 export type { PreviewProps }
 
 type Asset = {
-	$jazz: { id: string }
+	id: string
 	$isLoaded?: boolean
 	type?: "image" | "video" | "tldraw"
-	image?: { $jazz: { id: string } }
+	image?: { id: string }
 	video?: { $isLoaded?: boolean; toBlob?: () => Blob | undefined }
 	muteAudio?: boolean
 	revision?: {
 		$isLoaded?: boolean
-		lightPreview?: { $jazz: { id: string } }
-		darkPreview?: { $jazz: { id: string } }
+		lightPreview?: { id: string }
+		darkPreview?: { id: string }
 	}
 }
 
@@ -74,6 +73,7 @@ interface LocalPreviewAsset {
 	url: string
 	lightUrl?: string
 	darkUrl?: string
+	muteAudio?: boolean
 }
 
 type PreviewComment = {
@@ -186,7 +186,7 @@ type Segment =
 	| { type: "image"; imageId: string; alt: string }
 	| { type: "video"; asset: Asset; alt: string }
 	| { type: "local-image"; url: string; alt: string }
-	| { type: "local-video"; url: string; alt: string }
+	| { type: "local-video"; url: string; alt: string; muteAudio?: boolean }
 
 function PreviewContent({
 	content,
@@ -458,7 +458,10 @@ function applyPreviewCommentHighlights(
 		let quote = comment.quote.trim()
 		if (!quote) continue
 		let segments =
-			comment.renderedFrom !== null && comment.renderedTo !== null
+			comment.renderedFrom !== null &&
+			comment.renderedTo !== null &&
+			getRootText(root).slice(comment.renderedFrom, comment.renderedTo) ===
+				comment.quote
 				? findTextSegmentsInRange(
 						root,
 						comment.renderedFrom,
@@ -531,8 +534,8 @@ function PreviewSegments({ segments }: { segments: Segment[] }) {
 				if (segment.type === "image") {
 					return (
 						<figure key={i} className="my-4">
-							<JazzImage
-								imageId={segment.imageId}
+							<img
+								src={segment.imageId}
 								alt={segment.alt}
 								className="w-full rounded-lg"
 							/>
@@ -558,7 +561,12 @@ function PreviewSegments({ segments }: { segments: Segment[] }) {
 				if (segment.type === "local-video") {
 					return (
 						<figure key={i} className="my-4">
-							<video src={segment.url} controls className="w-full rounded-lg" />
+							<video
+								src={segment.url}
+								muted={segment.muteAudio}
+								controls
+								className="w-full rounded-lg"
+							/>
 						</figure>
 					)
 				}
@@ -752,7 +760,7 @@ function useThemeStyles(documentTheme: ResolvedTheme): ThemeStylesResult {
 	// Track the theme ID we've loaded styles for to derive loading state
 	let [loadedThemeId, setLoadedThemeId] = useState<string | null>(null)
 
-	let currentThemeId = documentTheme.theme?.$jazz.id ?? null
+	let currentThemeId = documentTheme.theme?.id ?? null
 	let isLoading = currentThemeId !== null && currentThemeId !== loadedThemeId
 
 	// Clear state when theme is removed (adjust state during render pattern)
@@ -771,7 +779,7 @@ function useThemeStyles(documentTheme: ResolvedTheme): ThemeStylesResult {
 		if (!documentTheme.theme) return
 
 		let cancelled = false
-		let themeId = documentTheme.theme.$jazz.id
+		let themeId = documentTheme.theme.id
 
 		tryCachedThemeStylesAsync(documentTheme.theme, documentTheme.preset).then(
 			buildResult => {
@@ -868,7 +876,7 @@ type RawSegment =
 	| { type: "image"; imageId: string; alt: string }
 	| { type: "video"; asset: Asset; alt: string }
 	| { type: "local-image"; url: string; alt: string }
-	| { type: "local-video"; url: string; alt: string }
+	| { type: "local-video"; url: string; alt: string; muteAudio?: boolean }
 
 async function parseSegments(
 	content: string,
@@ -895,7 +903,7 @@ async function parseSegments(
 		let alt = match[1]
 		let assetId = match[3]
 		let local = localAssets?.find(asset => asset.id === assetId)
-		let asset = assets?.find(a => a?.$jazz.id === assetId)
+		let asset = assets?.find(a => a?.id === assetId)
 
 		if (local?.type === "image") {
 			rawSegments.push({ type: "local-image", url: local.url, alt })
@@ -904,11 +912,16 @@ async function parseSegments(
 			if (url) rawSegments.push({ type: "local-image", url, alt })
 			else rawSegments.push({ type: "text", content: match[0] })
 		} else if (local?.type === "video") {
-			rawSegments.push({ type: "local-video", url: local.url, alt })
+			rawSegments.push({
+				type: "local-video",
+				url: local.url,
+				alt,
+				muteAudio: local.muteAudio,
+			})
 		} else if (asset?.$isLoaded && asset.type === "image" && asset.image) {
 			rawSegments.push({
 				type: "image",
-				imageId: asset.image.$jazz.id,
+				imageId: asset.image.id,
 				alt,
 			})
 		} else if (asset?.$isLoaded && asset.type === "tldraw") {
@@ -919,7 +932,7 @@ async function parseSegments(
 			if (preview) {
 				rawSegments.push({
 					type: "image",
-					imageId: preview.$jazz.id,
+					imageId: preview.id,
 					alt,
 				})
 			} else {

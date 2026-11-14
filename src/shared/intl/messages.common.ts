@@ -102,6 +102,7 @@ let baseCommonMessages = messages({
 	"footer.imprint": "Imprint",
 
 	"sync.syncing": "Syncing",
+	"sync.synced": "Synced",
 	"sync.offline": "Offline",
 	"sync.localOnly": "Local only",
 	"sync.signedIn": "Signed in",
@@ -273,6 +274,7 @@ let deCommonMessages = translate(baseCommonMessages, {
 	"footer.imprint": "Impressum",
 
 	"sync.syncing": "Synchronisiere",
+	"sync.synced": "Synchronisiert",
 	"sync.offline": "Offline",
 	"sync.localOnly": "Nur lokal",
 	"sync.signedIn": "Angemeldet",

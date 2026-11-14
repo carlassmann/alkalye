@@ -1,5 +1,9 @@
 import { defineConfig, devices } from "@playwright/test"
 
+import { configureBrowserEnvironment } from "./scripts/browser-environment"
+
+configureBrowserEnvironment()
+
 let appUrl = process.env.PLAYWRIGHT_BASE_URL ?? "https://alkalye.localhost"
 
 export default defineConfig({

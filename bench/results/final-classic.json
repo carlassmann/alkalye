@@ -1,0 +1,5367 @@
+{
+	"replayVerifications": [
+		{
+			"run": 1,
+			"document": "small",
+			"persistence": false
+		},
+		{
+			"run": 1,
+			"document": "medium",
+			"persistence": false
+		},
+		{
+			"run": 1,
+			"document": "large",
+			"persistence": false
+		}
+	],
+	"runLoads": [
+		{
+			"run": 1,
+			"start": [
+				2.61,
+				3.11,
+				3.84
+			],
+			"end": [
+				2.79,
+				3.06,
+				3.71
+			]
+		},
+		{
+			"run": 2,
+			"start": [
+				2.95,
+				3.02,
+				3.63
+			],
+			"end": [
+				2.56,
+				2.96,
+				3.52
+			]
+		},
+		{
+			"run": 3,
+			"start": [
+				2.84,
+				2.95,
+				3.46
+			],
+			"end": [
+				3.76,
+				3.22,
+				3.48
+			]
+		},
+		{
+			"run": 4,
+			"start": [
+				3.87,
+				3.38,
+				3.51
+			],
+			"end": [
+				3.26,
+				3.35,
+				3.48
+			]
+		},
+		{
+			"run": 5,
+			"start": [
+				3.84,
+				3.55,
+				3.54
+			],
+			"end": [
+				2.69,
+				3.26,
+				3.44
+			]
+		}
+	],
+	"label": "classic",
+	"target": "https://classic-main-alkalye-typing.cshed.carlassmann.com",
+	"createdAt": "2026-11-14T05:00:11.859Z",
+	"environment": {
+		"platform": "linux",
+		"release": "7.2.8-9-omarchy",
+		"cpu": "AMD RYZEN AI MAX+ 395 w/ Radeon 8060S",
+		"cores": 32,
+		"browser": "145.0.7632.6",
+		"cpuThrottle": 1,
+		"networkCapture": "CDP pages, iframes, dedicated workers and SharedWorkers",
+		"serverRuntime": "Node production; identical Brotli-6 serving; Classic jazz-run 0.20.19 (32 GB); v2 isolated SQLite",
+		"jazz": "0.20.18",
+		"gitHead": "8379d4e",
+		"server": "production Node adapter; local store; first visit SW blocked, returning SW installed"
+	},
+	"config": {
+		"runs": 5,
+		"notes": 50,
+		"edits": 200,
+		"totalTraceEdits": 259778,
+		"serviceWorkersOnly": false,
+		"largeOnly": false,
+		"performanceOnly": false,
+		"loadOnly": false,
+		"firstVisitHttpCache": "fresh context, enabled",
+		"literalNewlines": true,
+		"verifyPersistence": false,
+		"automaticPairsAndCompletion": false,
+		"replayTimeoutMs": 120000
+	},
+	"sources": [
+		{
+			"file": "vite.tar.gz",
+			"url": "https://codeload.github.com/vitejs/vite/tar.gz/4d21dc4ebcabecc13a35d73ef7dcac704cdbc817",
+			"sha256": "e3bd67ccafd837066cf8d263f871089424da7eabb87c48e7d29f9d52f2c69291",
+			"license": "MIT",
+			"attribution": "Vite contributors",
+			"licenseUrl": "https://github.com/vitejs/vite/blob/4d21dc4ebcabecc13a35d73ef7dcac704cdbc817/LICENSE"
+		},
+		{
+			"file": "trace.js",
+			"url": "https://raw.githubusercontent.com/automerge/automerge-perf/da212e984c777d31ee7d888f82637288aa4c61d3/edit-by-index/editing-trace.js",
+			"sha256": "23116070719243e2950c310006dd50b3d80744be7542a86c62e7d5c2ed7326d0",
+			"license": "CC-BY-4.0",
+			"attribution": "Martin Kleppmann and Alastair R. Beresford, A Conflict-Free Replicated JSON Datatype",
+			"licenseUrl": "https://github.com/automerge/automerge-perf/blob/da212e984c777d31ee7d888f82637288aa4c61d3/README.md#license"
+		},
+		{
+			"file": "alice.txt",
+			"url": "https://www.gutenberg.org/ebooks/11.txt.utf-8",
+			"sha256": "01b38ea4c710a84bc18d0bd41271a5a1a92b94e97b2812f4dece97d4a694725e",
+			"license": "Public domain in USA; Project Gutenberg license retained in text",
+			"attribution": "Lewis Carroll, Alice's Adventures in Wonderland; Project Gutenberg",
+			"licenseUrl": "https://www.gutenberg.org/policy/license.html"
+		},
+		{
+			"file": "dracula.txt",
+			"url": "https://www.gutenberg.org/ebooks/345.txt.utf-8",
+			"sha256": "96cd16eacdbfebae8fdda5591f66e0cc8ee76be18e0cd1aca02bc00615782d28",
+			"license": "Public domain in USA; Project Gutenberg license retained in text",
+			"attribution": "Bram Stoker, Dracula; Project Gutenberg",
+			"licenseUrl": "https://www.gutenberg.org/policy/license.html"
+		}
+	],
+	"datasets": [
+		{
+			"title": "Corpus 000",
+			"source": "acknowledgements.md",
+			"bytes": 6218
+		},
+		{
+			"title": "Corpus 001",
+			"source": "blog.md",
+			"bytes": 232
+		},
+		{
+			"title": "Corpus 002",
+			"source": "blog/announcing-vite2.md",
+			"bytes": 5936
+		},
+		{
+			"title": "Corpus 003",
+			"source": "blog/announcing-vite3.md",
+			"bytes": 20753
+		},
+		{
+			"title": "Corpus 004",
+			"source": "blog/announcing-vite4-3.md",
+			"bytes": 4606
+		},
+		{
+			"title": "Corpus 005",
+			"source": "blog/announcing-vite4.md",
+			"bytes": 12080
+		},
+		{
+			"title": "Corpus 006",
+			"source": "blog/announcing-vite5-1.md",
+			"bytes": 11126
+		},
+		{
+			"title": "Corpus 007",
+			"source": "blog/announcing-vite5.md",
+			"bytes": 10567
+		},
+		{
+			"title": "Corpus 008",
+			"source": "blog/announcing-vite6.md",
+			"bytes": 11680
+		},
+		{
+			"title": "Corpus 009",
+			"source": "blog/announcing-vite7.md",
+			"bytes": 8738
+		},
+		{
+			"title": "Corpus 010",
+			"source": "blog/announcing-vite8-1.md",
+			"bytes": 10425
+		},
+		{
+			"title": "Corpus 011",
+			"source": "blog/announcing-vite8-beta.md",
+			"bytes": 9043
+		},
+		{
+			"title": "Corpus 012",
+			"source": "blog/announcing-vite8.md",
+			"bytes": 15394
+		},
+		{
+			"title": "Corpus 013",
+			"source": "blog/cloudflare-supports-vite.md",
+			"bytes": 4087
+		},
+		{
+			"title": "Corpus 014",
+			"source": "changes/hotupdate-hook.md",
+			"bytes": 3570
+		},
+		{
+			"title": "Corpus 015",
+			"source": "changes/index.md",
+			"bytes": 1558
+		},
+		{
+			"title": "Corpus 016",
+			"source": "changes/per-environment-apis.md",
+			"bytes": 2296
+		},
+		{
+			"title": "Corpus 017",
+			"source": "changes/shared-plugins-during-build.md",
+			"bytes": 2288
+		},
+		{
+			"title": "Corpus 018",
+			"source": "changes/ssr-using-modulerunner.md",
+			"bytes": 1305
+		},
+		{
+			"title": "Corpus 019",
+			"source": "changes/this-environment-in-hooks.md",
+			"bytes": 2416
+		},
+		{
+			"title": "Corpus 020",
+			"source": "config/build-options.md",
+			"bytes": 17369
+		},
+		{
+			"title": "Corpus 021",
+			"source": "config/dep-optimization-options.md",
+			"bytes": 6158
+		},
+		{
+			"title": "Corpus 022",
+			"source": "config/index.md",
+			"bytes": 7269
+		},
+		{
+			"title": "Corpus 023",
+			"source": "config/preview-options.md",
+			"bytes": 3164
+		},
+		{
+			"title": "Corpus 024",
+			"source": "config/server-options.md",
+			"bytes": 21219
+		},
+		{
+			"title": "Corpus 025",
+			"source": "config/shared-options.md",
+			"bytes": 24934
+		},
+		{
+			"title": "Corpus 026",
+			"source": "config/ssr-options.md",
+			"bytes": 3282
+		},
+		{
+			"title": "Corpus 027",
+			"source": "config/worker-options.md",
+			"bytes": 1016
+		},
+		{
+			"title": "Corpus 028",
+			"source": "guide/api-environment-frameworks.md",
+			"bytes": 15857
+		},
+		{
+			"title": "Corpus 029",
+			"source": "guide/api-environment-instances.md",
+			"bytes": 11092
+		},
+		{
+			"title": "Corpus 030",
+			"source": "guide/api-environment-plugins.md",
+			"bytes": 16108
+		},
+		{
+			"title": "Corpus 031",
+			"source": "guide/api-environment-runtimes.md",
+			"bytes": 17438
+		},
+		{
+			"title": "Corpus 032",
+			"source": "guide/api-environment.md",
+			"bytes": 9080
+		},
+		{
+			"title": "Corpus 033",
+			"source": "guide/api-hmr.md",
+			"bytes": 9488
+		},
+		{
+			"title": "Corpus 034",
+			"source": "guide/api-javascript.md",
+			"bytes": 13734
+		},
+		{
+			"title": "Corpus 035",
+			"source": "guide/api-plugin.md",
+			"bytes": 31921
+		},
+		{
+			"title": "Corpus 036",
+			"source": "guide/assets.md",
+			"bytes": 6607
+		},
+		{
+			"title": "Corpus 037",
+			"source": "guide/backend-integration.md",
+			"bytes": 11608
+		},
+		{
+			"title": "Corpus 038",
+			"source": "guide/build.md",
+			"bytes": 14607
+		},
+		{
+			"title": "Corpus 039",
+			"source": "guide/cli.md",
+			"bytes": 15558
+		},
+		{
+			"title": "Corpus 040",
+			"source": "guide/dep-pre-bundling.md",
+			"bytes": 5692
+		},
+		{
+			"title": "Corpus 041",
+			"source": "guide/env-and-mode.md",
+			"bytes": 10924
+		},
+		{
+			"title": "Corpus 042",
+			"source": "guide/features.md",
+			"bytes": 41460
+		},
+		{
+			"title": "Corpus 043",
+			"source": "guide/index.md",
+			"bytes": 11593
+		},
+		{
+			"title": "Corpus 044",
+			"source": "guide/migration.md",
+			"bytes": 21510
+		},
+		{
+			"title": "Corpus 045",
+			"source": "guide/performance.md",
+			"bytes": 8225
+		},
+		{
+			"title": "Corpus 046",
+			"source": "guide/philosophy.md",
+			"bytes": 3616
+		},
+		{
+			"title": "Corpus 047",
+			"source": "guide/ssr.md",
+			"bytes": 14704
+		},
+		{
+			"title": "Corpus 048",
+			"source": "guide/static-deploy.md",
+			"bytes": 14519
+		},
+		{
+			"title": "Corpus 049",
+			"source": "guide/troubleshooting.md",
+			"bytes": 16467
+		},
+		{
+			"title": "Book alice",
+			"source": "alice.txt",
+			"bytes": 170590
+		},
+		{
+			"title": "Book dracula",
+			"source": "dracula.txt",
+			"bytes": 874540
+		}
+	],
+	"completedRuns": 5,
+	"scenarioFailures": [
+		{
+			"run": 1,
+			"scenario": "returningServiceWorker",
+			"elapsedMs": 77741.436922,
+			"message": "offlineOpen: Error: expect(received).toBe(expected) // Object.is equality\n\n- Expected  - 10929\n+ Received  +     1\n\n@@ -4927,10934 +4927,6 @@\n  “My young sir, I do not ask so much as that--not the last!”\n\n  “What shall I do?” There was fire in his eyes, and his open nostril\n  quivered with intent. Van Helsing slapped him on the shoulder. “Come!”\n  he said. “You are a man, and it is a man we want. You are better than\n- me, better than my friend John.” Arthur looked bewildered, and the\n- Professor went on by explaining in a kindly way:--\n-\n- “Young miss is bad, very bad. She wants blood, and blood she must have\n- or die. My friend John and I have consulted; and we are about to perform\n- what we call transfusion of blood--to transfer from full veins of one to\n- the empty veins which pine for him. John was to give his blood, as he is\n- the more young and strong than me”--here Arthur took my hand and wrung\n- it hard in silence--“but, now you are here, you are more good than us,\n- old or you"
+		},
+		{
+			"run": 1,
+			"scenario": "returningServiceWorker",
+			"elapsedMs": 78290.243259,
+			"message": "offlineOpen: Error: expect(received).toBe(expected) // Object.is equality\n\n- Expected  - 10855\n+ Received  +     1\n\n@@ -5001,10860 +5001,6 @@\n  and showed a red mark on her throat. Arthur did not notice it, but I\n  could hear the deep hiss of indrawn breath which is one of Van Helsing’s\n  ways of betraying emotion. He said nothing at the moment, but turned to\n  me, saying: “Now take down our brave young lover, give him of the port\n  wine, and let him lie down a while. He must then go home and rest, sleep\n- much and eat much, that he may be recruited of what he has so given to\n- his love. He must not stay here. Hold! a moment. I may take it, sir,\n- that you are anxious of result. Then bring it with you that in all ways\n- the operation is successful. You have saved her life this time, and you\n- can go home and rest easy in mind that all that can be is. I shall tell\n- her all when she is well; she shall love you none the less for what you\n- have done. Good-bye.”\n-\n- When Arthur had gone I"
+		},
+		{
+			"run": 1,
+			"scenario": "returningServiceWorker",
+			"elapsedMs": 77780.97133999999,
+			"message": "offlineOpen: Error: expect(received).toBe(expected) // Object.is equality\n\n- Expected  - 11018\n+ Received  +     1\n\n@@ -4838,11023 +4838,6 @@\n  he reached over and took my ear in his hand and pulled it playfully, as\n  he used long ago to do at lectures, and said: “The good husbandman tell\n  you so then because he knows, but not till then. But you do not find the\n  good husbandman dig up his planted corn to see if he grow; that is for\n  the children who play at husbandry, and not for those who take it as of\n- the work of their life. See you now, friend John? I have sown my corn,\n- and Nature has her work to do in making it sprout; if he sprout at all,\n- there’s some promise; and I wait till the ear begins to swell.” He broke\n- off, for he evidently saw that I understood. Then he went on, and very\n- gravely:--\n-\n- “You were always a careful student, and your case-book was ever more\n- full than the rest. You were only student then; now you are master, and\n- I trust that good habit have no"
+		},
+		{
+			"run": 1,
+			"scenario": "returningServiceWorker",
+			"elapsedMs": 78232.02417399999,
+			"message": "offlineOpen: Error: expect(received).toBe(expected) // Object.is equality\n\n- Expected  - 10855\n+ Received  +     1\n\n@@ -5001,10860 +5001,6 @@\n  and showed a red mark on her throat. Arthur did not notice it, but I\n  could hear the deep hiss of indrawn breath which is one of Van Helsing’s\n  ways of betraying emotion. He said nothing at the moment, but turned to\n  me, saying: “Now take down our brave young lover, give him of the port\n  wine, and let him lie down a while. He must then go home and rest, sleep\n- much and eat much, that he may be recruited of what he has so given to\n- his love. He must not stay here. Hold! a moment. I may take it, sir,\n- that you are anxious of result. Then bring it with you that in all ways\n- the operation is successful. You have saved her life this time, and you\n- can go home and rest easy in mind that all that can be is. I shall tell\n- her all when she is well; she shall love you none the less for what you\n- have done. Good-bye.”\n-\n- When Arthur had gone I"
+		},
+		{
+			"run": 1,
+			"scenario": "returningServiceWorker",
+			"elapsedMs": 79037.005918,
+			"message": "offlineOpen: Error: expect(received).toBe(expected) // Object.is equality\n\n- Expected  - 10870\n+ Received  +     0\n\n@@ -4986,10875 +4986,5 @@\n  was. It gave me an idea of what a terrible strain Lucy’s system must\n  have undergone that what weakened Arthur only partially restored her.\n  But the Professor’s face was set, and he stood watch in hand and with\n  his eyes fixed now on the patient and now on Arthur. I could hear my own\n  heart beat. Presently he said in a soft voice: “Do not stir an instant.\n- It is enough. You attend him; I will look to her.” When all was over I\n- could see how much Arthur was weakened. I dressed the wound and took his\n- arm to bring him away, when Van Helsing spoke without turning round--the\n- man seems to have eyes in the back of his head:--\n-\n- “The brave lover, I think, deserve another kiss, which he shall have\n- presently.” And as he had now finished his operation, he adjusted the\n- pillow to the patient’s head. As he did so the narrow black velvet band\n"
+		}
+	],
+	"metrics": {
+		"importMs": {
+			"sampleCount": 5,
+			"median": 40929.505266,
+			"p95": 41379.114931
+		},
+		"indexedDBBytes": {
+			"sampleCount": 5,
+			"median": 142296709,
+			"p95": 181339550
+		},
+		"coldListMs": {
+			"sampleCount": 5,
+			"median": 6148.600455,
+			"p95": 6305.466183000004
+		},
+		"firstLoadJsWasmBytes": {
+			"sampleCount": 5,
+			"median": 2964586,
+			"p95": 2964621
+		},
+		"coldLargeOpenMs": {
+			"sampleCount": 5,
+			"median": 11219.841168999992,
+			"p95": 11382.306864000006
+		},
+		"warmListMs": {
+			"sampleCount": 5,
+			"median": 2524.244280999992,
+			"p95": 2707.583004999993
+		},
+		"freshDeviceWholeDatasetMs": {
+			"sampleCount": 5,
+			"median": 19497.928327999995,
+			"p95": 19615.804984000002
+		},
+		"syncEditMs": {
+			"sampleCount": 25,
+			"median": 288.0551609999966,
+			"p95": 306.9039769999945
+		},
+		"smallEventDurationMs": {
+			"sampleCount": 4916,
+			"median": 16,
+			"p95": 24
+		},
+		"smallEventInputDelayMs": {
+			"sampleCount": 4916,
+			"median": 0.19999998807907104,
+			"p95": 1
+		},
+		"smallEventProcessingMs": {
+			"sampleCount": 4916,
+			"median": 0.30000001192092896,
+			"p95": 4.300000011920929
+		},
+		"smallEventPresentationMs": {
+			"sampleCount": 4916,
+			"median": 15.300000011920929,
+			"p95": 18.80000001192093
+		},
+		"smallInputToPaintMs": {
+			"sampleCount": 965,
+			"median": 30.599999964237213,
+			"p95": 32
+		},
+		"smallDispatchToPaintMs": {
+			"sampleCount": 1000,
+			"median": 33.31328299999586,
+			"p95": 34.30086400000437
+		},
+		"smallLongTaskCount": {
+			"sampleCount": 5,
+			"median": 0,
+			"p95": 0
+		},
+		"smallLongTaskTotalMs": {
+			"sampleCount": 5,
+			"median": 0,
+			"p95": 0
+		},
+		"smallSentBytesPerEdit": {
+			"sampleCount": 5,
+			"median": 183.055,
+			"p95": 183.06
+		},
+		"smallReceivedWsBytesPerEdit": {
+			"sampleCount": 5,
+			"median": 8.78,
+			"p95": 8.78
+		},
+		"smallJsHeapBytes": {
+			"sampleCount": 5,
+			"median": 52858460,
+			"p95": 52896544
+		},
+		"mediumEventDurationMs": {
+			"sampleCount": 4959,
+			"median": 16,
+			"p95": 16
+		},
+		"mediumEventInputDelayMs": {
+			"sampleCount": 4959,
+			"median": 0.10000002384185791,
+			"p95": 0.5
+		},
+		"mediumEventProcessingMs": {
+			"sampleCount": 4959,
+			"median": 0.30000001192092896,
+			"p95": 3.600000023841858
+		},
+		"mediumEventPresentationMs": {
+			"sampleCount": 4959,
+			"median": 15.5,
+			"p95": 16
+		},
+		"mediumInputToPaintMs": {
+			"sampleCount": 965,
+			"median": 31.700000047683716,
+			"p95": 32.69999998807907
+		},
+		"mediumDispatchToPaintMs": {
+			"sampleCount": 1000,
+			"median": 33.311874000006355,
+			"p95": 33.987747999999556
+		},
+		"mediumLongTaskCount": {
+			"sampleCount": 5,
+			"median": 1,
+			"p95": 1
+		},
+		"mediumLongTaskTotalMs": {
+			"sampleCount": 5,
+			"median": 116,
+			"p95": 120
+		},
+		"mediumSentBytesPerEdit": {
+			"sampleCount": 5,
+			"median": 181.335,
+			"p95": 181.34
+		},
+		"mediumReceivedWsBytesPerEdit": {
+			"sampleCount": 5,
+			"median": 6.215,
+			"p95": 6.215
+		},
+		"mediumJsHeapBytes": {
+			"sampleCount": 5,
+			"median": 140991824,
+			"p95": 143893968
+		},
+		"largeEventDurationMs": {
+			"sampleCount": 4976,
+			"median": 16,
+			"p95": 16
+		},
+		"largeEventInputDelayMs": {
+			"sampleCount": 4976,
+			"median": 0.10000002384185791,
+			"p95": 0.5
+		},
+		"largeEventProcessingMs": {
+			"sampleCount": 4976,
+			"median": 0.2999999523162842,
+			"p95": 3.300000011920929
+		},
+		"largeEventPresentationMs": {
+			"sampleCount": 4976,
+			"median": 15.600000023841858,
+			"p95": 16
+		},
+		"largeInputToPaintMs": {
+			"sampleCount": 965,
+			"median": 31.899999976158142,
+			"p95": 32.80000001192093
+		},
+		"largeDispatchToPaintMs": {
+			"sampleCount": 1000,
+			"median": 33.32462800000212,
+			"p95": 33.77543300000252
+		},
+		"largeLongTaskCount": {
+			"sampleCount": 5,
+			"median": 1,
+			"p95": 1
+		},
+		"largeLongTaskTotalMs": {
+			"sampleCount": 5,
+			"median": 312,
+			"p95": 331
+		},
+		"largeSentBytesPerEdit": {
+			"sampleCount": 5,
+			"median": 181.335,
+			"p95": 181.335
+		},
+		"largeReceivedWsBytesPerEdit": {
+			"sampleCount": 5,
+			"median": 6.55,
+			"p95": 6.55
+		},
+		"largeJsHeapBytes": {
+			"sampleCount": 5,
+			"median": 473222176,
+			"p95": 490596156
+		},
+		"returningSwListMs": {
+			"sampleCount": 5,
+			"median": 3530.7048680000007,
+			"p95": 3813.352488000004
+		}
+	},
+	"serviceWorkerRuns": [
+		{
+			"replayVerifications": [],
+			"runLoads": [
+				{
+					"run": 1,
+					"start": [
+						4.16,
+						3.52,
+						3.5
+					],
+					"end": [
+						3.58,
+						3.61,
+						3.55
+					]
+				}
+			],
+			"label": "classic",
+			"target": "https://classic-main-alkalye-typing.cshed.carlassmann.com",
+			"createdAt": "2026-11-14T05:20:51.574Z",
+			"environment": {
+				"platform": "linux",
+				"release": "7.2.8-9-omarchy",
+				"cpu": "AMD RYZEN AI MAX+ 395 w/ Radeon 8060S",
+				"cores": 32,
+				"browser": "145.0.7632.6",
+				"cpuThrottle": 1,
+				"networkCapture": "CDP pages, iframes, dedicated workers and SharedWorkers",
+				"serverRuntime": "Node production; identical Brotli-6 serving; Classic jazz-run 0.20.19 (32 GB); v2 isolated SQLite",
+				"jazz": "0.20.18",
+				"gitHead": "8379d4e",
+				"server": "production Node adapter; local store; first visit SW blocked, returning SW installed"
+			},
+			"config": {
+				"runs": 1,
+				"notes": 50,
+				"edits": 200,
+				"totalTraceEdits": 259778,
+				"serviceWorkersOnly": true,
+				"largeOnly": false,
+				"performanceOnly": false,
+				"loadOnly": false,
+				"firstVisitHttpCache": "fresh context, enabled",
+				"literalNewlines": true,
+				"verifyPersistence": false,
+				"automaticPairsAndCompletion": false,
+				"replayTimeoutMs": 120000
+			},
+			"sources": [
+				{
+					"file": "vite.tar.gz",
+					"url": "https://codeload.github.com/vitejs/vite/tar.gz/4d21dc4ebcabecc13a35d73ef7dcac704cdbc817",
+					"sha256": "e3bd67ccafd837066cf8d263f871089424da7eabb87c48e7d29f9d52f2c69291",
+					"license": "MIT",
+					"attribution": "Vite contributors",
+					"licenseUrl": "https://github.com/vitejs/vite/blob/4d21dc4ebcabecc13a35d73ef7dcac704cdbc817/LICENSE"
+				},
+				{
+					"file": "trace.js",
+					"url": "https://raw.githubusercontent.com/automerge/automerge-perf/da212e984c777d31ee7d888f82637288aa4c61d3/edit-by-index/editing-trace.js",
+					"sha256": "23116070719243e2950c310006dd50b3d80744be7542a86c62e7d5c2ed7326d0",
+					"license": "CC-BY-4.0",
+					"attribution": "Martin Kleppmann and Alastair R. Beresford, A Conflict-Free Replicated JSON Datatype",
+					"licenseUrl": "https://github.com/automerge/automerge-perf/blob/da212e984c777d31ee7d888f82637288aa4c61d3/README.md#license"
+				},
+				{
+					"file": "alice.txt",
+					"url": "https://www.gutenberg.org/ebooks/11.txt.utf-8",
+					"sha256": "01b38ea4c710a84bc18d0bd41271a5a1a92b94e97b2812f4dece97d4a694725e",
+					"license": "Public domain in USA; Project Gutenberg license retained in text",
+					"attribution": "Lewis Carroll, Alice's Adventures in Wonderland; Project Gutenberg",
+					"licenseUrl": "https://www.gutenberg.org/policy/license.html"
+				},
+				{
+					"file": "dracula.txt",
+					"url": "https://www.gutenberg.org/ebooks/345.txt.utf-8",
+					"sha256": "96cd16eacdbfebae8fdda5591f66e0cc8ee76be18e0cd1aca02bc00615782d28",
+					"license": "Public domain in USA; Project Gutenberg license retained in text",
+					"attribution": "Bram Stoker, Dracula; Project Gutenberg",
+					"licenseUrl": "https://www.gutenberg.org/policy/license.html"
+				}
+			],
+			"datasets": [
+				{
+					"title": "Corpus 000",
+					"source": "acknowledgements.md",
+					"bytes": 6218
+				},
+				{
+					"title": "Corpus 001",
+					"source": "blog.md",
+					"bytes": 232
+				},
+				{
+					"title": "Corpus 002",
+					"source": "blog/announcing-vite2.md",
+					"bytes": 5936
+				},
+				{
+					"title": "Corpus 003",
+					"source": "blog/announcing-vite3.md",
+					"bytes": 20753
+				},
+				{
+					"title": "Corpus 004",
+					"source": "blog/announcing-vite4-3.md",
+					"bytes": 4606
+				},
+				{
+					"title": "Corpus 005",
+					"source": "blog/announcing-vite4.md",
+					"bytes": 12080
+				},
+				{
+					"title": "Corpus 006",
+					"source": "blog/announcing-vite5-1.md",
+					"bytes": 11126
+				},
+				{
+					"title": "Corpus 007",
+					"source": "blog/announcing-vite5.md",
+					"bytes": 10567
+				},
+				{
+					"title": "Corpus 008",
+					"source": "blog/announcing-vite6.md",
+					"bytes": 11680
+				},
+				{
+					"title": "Corpus 009",
+					"source": "blog/announcing-vite7.md",
+					"bytes": 8738
+				},
+				{
+					"title": "Corpus 010",
+					"source": "blog/announcing-vite8-1.md",
+					"bytes": 10425
+				},
+				{
+					"title": "Corpus 011",
+					"source": "blog/announcing-vite8-beta.md",
+					"bytes": 9043
+				},
+				{
+					"title": "Corpus 012",
+					"source": "blog/announcing-vite8.md",
+					"bytes": 15394
+				},
+				{
+					"title": "Corpus 013",
+					"source": "blog/cloudflare-supports-vite.md",
+					"bytes": 4087
+				},
+				{
+					"title": "Corpus 014",
+					"source": "changes/hotupdate-hook.md",
+					"bytes": 3570
+				},
+				{
+					"title": "Corpus 015",
+					"source": "changes/index.md",
+					"bytes": 1558
+				},
+				{
+					"title": "Corpus 016",
+					"source": "changes/per-environment-apis.md",
+					"bytes": 2296
+				},
+				{
+					"title": "Corpus 017",
+					"source": "changes/shared-plugins-during-build.md",
+					"bytes": 2288
+				},
+				{
+					"title": "Corpus 018",
+					"source": "changes/ssr-using-modulerunner.md",
+					"bytes": 1305
+				},
+				{
+					"title": "Corpus 019",
+					"source": "changes/this-environment-in-hooks.md",
+					"bytes": 2416
+				},
+				{
+					"title": "Corpus 020",
+					"source": "config/build-options.md",
+					"bytes": 17369
+				},
+				{
+					"title": "Corpus 021",
+					"source": "config/dep-optimization-options.md",
+					"bytes": 6158
+				},
+				{
+					"title": "Corpus 022",
+					"source": "config/index.md",
+					"bytes": 7269
+				},
+				{
+					"title": "Corpus 023",
+					"source": "config/preview-options.md",
+					"bytes": 3164
+				},
+				{
+					"title": "Corpus 024",
+					"source": "config/server-options.md",
+					"bytes": 21219
+				},
+				{
+					"title": "Corpus 025",
+					"source": "config/shared-options.md",
+					"bytes": 24934
+				},
+				{
+					"title": "Corpus 026",
+					"source": "config/ssr-options.md",
+					"bytes": 3282
+				},
+				{
+					"title": "Corpus 027",
+					"source": "config/worker-options.md",
+					"bytes": 1016
+				},
+				{
+					"title": "Corpus 028",
+					"source": "guide/api-environment-frameworks.md",
+					"bytes": 15857
+				},
+				{
+					"title": "Corpus 029",
+					"source": "guide/api-environment-instances.md",
+					"bytes": 11092
+				},
+				{
+					"title": "Corpus 030",
+					"source": "guide/api-environment-plugins.md",
+					"bytes": 16108
+				},
+				{
+					"title": "Corpus 031",
+					"source": "guide/api-environment-runtimes.md",
+					"bytes": 17438
+				},
+				{
+					"title": "Corpus 032",
+					"source": "guide/api-environment.md",
+					"bytes": 9080
+				},
+				{
+					"title": "Corpus 033",
+					"source": "guide/api-hmr.md",
+					"bytes": 9488
+				},
+				{
+					"title": "Corpus 034",
+					"source": "guide/api-javascript.md",
+					"bytes": 13734
+				},
+				{
+					"title": "Corpus 035",
+					"source": "guide/api-plugin.md",
+					"bytes": 31921
+				},
+				{
+					"title": "Corpus 036",
+					"source": "guide/assets.md",
+					"bytes": 6607
+				},
+				{
+					"title": "Corpus 037",
+					"source": "guide/backend-integration.md",
+					"bytes": 11608
+				},
+				{
+					"title": "Corpus 038",
+					"source": "guide/build.md",
+					"bytes": 14607
+				},
+				{
+					"title": "Corpus 039",
+					"source": "guide/cli.md",
+					"bytes": 15558
+				},
+				{
+					"title": "Corpus 040",
+					"source": "guide/dep-pre-bundling.md",
+					"bytes": 5692
+				},
+				{
+					"title": "Corpus 041",
+					"source": "guide/env-and-mode.md",
+					"bytes": 10924
+				},
+				{
+					"title": "Corpus 042",
+					"source": "guide/features.md",
+					"bytes": 41460
+				},
+				{
+					"title": "Corpus 043",
+					"source": "guide/index.md",
+					"bytes": 11593
+				},
+				{
+					"title": "Corpus 044",
+					"source": "guide/migration.md",
+					"bytes": 21510
+				},
+				{
+					"title": "Corpus 045",
+					"source": "guide/performance.md",
+					"bytes": 8225
+				},
+				{
+					"title": "Corpus 046",
+					"source": "guide/philosophy.md",
+					"bytes": 3616
+				},
+				{
+					"title": "Corpus 047",
+					"source": "guide/ssr.md",
+					"bytes": 14704
+				},
+				{
+					"title": "Corpus 048",
+					"source": "guide/static-deploy.md",
+					"bytes": 14519
+				},
+				{
+					"title": "Corpus 049",
+					"source": "guide/troubleshooting.md",
+					"bytes": 16467
+				},
+				{
+					"title": "Book alice",
+					"source": "alice.txt",
+					"bytes": 170590
+				},
+				{
+					"title": "Book dracula",
+					"source": "dracula.txt",
+					"bytes": 874540
+				}
+			],
+			"completedRuns": 1,
+			"scenarioFailures": [
+				{
+					"run": 1,
+					"scenario": "returningServiceWorker",
+					"elapsedMs": 77741.436922,
+					"message": "offlineOpen: Error: expect(received).toBe(expected) // Object.is equality\n\n- Expected  - 10929\n+ Received  +     1\n\n@@ -4927,10934 +4927,6 @@\n  “My young sir, I do not ask so much as that--not the last!”\n\n  “What shall I do?” There was fire in his eyes, and his open nostril\n  quivered with intent. Van Helsing slapped him on the shoulder. “Come!”\n  he said. “You are a man, and it is a man we want. You are better than\n- me, better than my friend John.” Arthur looked bewildered, and the\n- Professor went on by explaining in a kindly way:--\n-\n- “Young miss is bad, very bad. She wants blood, and blood she must have\n- or die. My friend John and I have consulted; and we are about to perform\n- what we call transfusion of blood--to transfer from full veins of one to\n- the empty veins which pine for him. John was to give his blood, as he is\n- the more young and strong than me”--here Arthur took my hand and wrung\n- it hard in silence--“but, now you are here, you are more good than us,\n- old or you"
+				}
+			],
+			"metrics": {
+				"importMs": {
+					"sampleCount": 1,
+					"median": 41260.70117,
+					"p95": 41260.70117
+				},
+				"indexedDBBytes": {
+					"sampleCount": 1,
+					"median": 147726213,
+					"p95": 147726213
+				},
+				"returningSwListMs": {
+					"sampleCount": 1,
+					"median": 3455.710942999998,
+					"p95": 3455.710942999998
+				}
+			}
+		},
+		{
+			"replayVerifications": [],
+			"runLoads": [
+				{
+					"run": 1,
+					"start": [
+						4.11,
+						3.81,
+						3.62
+					],
+					"end": [
+						3.26,
+						3.65,
+						3.59
+					]
+				}
+			],
+			"label": "classic",
+			"target": "https://classic-main-alkalye-typing.cshed.carlassmann.com",
+			"createdAt": "2026-11-14T05:23:56.677Z",
+			"environment": {
+				"platform": "linux",
+				"release": "7.2.8-9-omarchy",
+				"cpu": "AMD RYZEN AI MAX+ 395 w/ Radeon 8060S",
+				"cores": 32,
+				"browser": "145.0.7632.6",
+				"cpuThrottle": 1,
+				"networkCapture": "CDP pages, iframes, dedicated workers and SharedWorkers",
+				"serverRuntime": "Node production; identical Brotli-6 serving; Classic jazz-run 0.20.19 (32 GB); v2 isolated SQLite",
+				"jazz": "0.20.18",
+				"gitHead": "8379d4e",
+				"server": "production Node adapter; local store; first visit SW blocked, returning SW installed"
+			},
+			"config": {
+				"runs": 1,
+				"notes": 50,
+				"edits": 200,
+				"totalTraceEdits": 259778,
+				"serviceWorkersOnly": true,
+				"largeOnly": false,
+				"performanceOnly": false,
+				"loadOnly": false,
+				"firstVisitHttpCache": "fresh context, enabled",
+				"literalNewlines": true,
+				"verifyPersistence": false,
+				"automaticPairsAndCompletion": false,
+				"replayTimeoutMs": 120000
+			},
+			"sources": [
+				{
+					"file": "vite.tar.gz",
+					"url": "https://codeload.github.com/vitejs/vite/tar.gz/4d21dc4ebcabecc13a35d73ef7dcac704cdbc817",
+					"sha256": "e3bd67ccafd837066cf8d263f871089424da7eabb87c48e7d29f9d52f2c69291",
+					"license": "MIT",
+					"attribution": "Vite contributors",
+					"licenseUrl": "https://github.com/vitejs/vite/blob/4d21dc4ebcabecc13a35d73ef7dcac704cdbc817/LICENSE"
+				},
+				{
+					"file": "trace.js",
+					"url": "https://raw.githubusercontent.com/automerge/automerge-perf/da212e984c777d31ee7d888f82637288aa4c61d3/edit-by-index/editing-trace.js",
+					"sha256": "23116070719243e2950c310006dd50b3d80744be7542a86c62e7d5c2ed7326d0",
+					"license": "CC-BY-4.0",
+					"attribution": "Martin Kleppmann and Alastair R. Beresford, A Conflict-Free Replicated JSON Datatype",
+					"licenseUrl": "https://github.com/automerge/automerge-perf/blob/da212e984c777d31ee7d888f82637288aa4c61d3/README.md#license"
+				},
+				{
+					"file": "alice.txt",
+					"url": "https://www.gutenberg.org/ebooks/11.txt.utf-8",
+					"sha256": "01b38ea4c710a84bc18d0bd41271a5a1a92b94e97b2812f4dece97d4a694725e",
+					"license": "Public domain in USA; Project Gutenberg license retained in text",
+					"attribution": "Lewis Carroll, Alice's Adventures in Wonderland; Project Gutenberg",
+					"licenseUrl": "https://www.gutenberg.org/policy/license.html"
+				},
+				{
+					"file": "dracula.txt",
+					"url": "https://www.gutenberg.org/ebooks/345.txt.utf-8",
+					"sha256": "96cd16eacdbfebae8fdda5591f66e0cc8ee76be18e0cd1aca02bc00615782d28",
+					"license": "Public domain in USA; Project Gutenberg license retained in text",
+					"attribution": "Bram Stoker, Dracula; Project Gutenberg",
+					"licenseUrl": "https://www.gutenberg.org/policy/license.html"
+				}
+			],
+			"datasets": [
+				{
+					"title": "Corpus 000",
+					"source": "acknowledgements.md",
+					"bytes": 6218
+				},
+				{
+					"title": "Corpus 001",
+					"source": "blog.md",
+					"bytes": 232
+				},
+				{
+					"title": "Corpus 002",
+					"source": "blog/announcing-vite2.md",
+					"bytes": 5936
+				},
+				{
+					"title": "Corpus 003",
+					"source": "blog/announcing-vite3.md",
+					"bytes": 20753
+				},
+				{
+					"title": "Corpus 004",
+					"source": "blog/announcing-vite4-3.md",
+					"bytes": 4606
+				},
+				{
+					"title": "Corpus 005",
+					"source": "blog/announcing-vite4.md",
+					"bytes": 12080
+				},
+				{
+					"title": "Corpus 006",
+					"source": "blog/announcing-vite5-1.md",
+					"bytes": 11126
+				},
+				{
+					"title": "Corpus 007",
+					"source": "blog/announcing-vite5.md",
+					"bytes": 10567
+				},
+				{
+					"title": "Corpus 008",
+					"source": "blog/announcing-vite6.md",
+					"bytes": 11680
+				},
+				{
+					"title": "Corpus 009",
+					"source": "blog/announcing-vite7.md",
+					"bytes": 8738
+				},
+				{
+					"title": "Corpus 010",
+					"source": "blog/announcing-vite8-1.md",
+					"bytes": 10425
+				},
+				{
+					"title": "Corpus 011",
+					"source": "blog/announcing-vite8-beta.md",
+					"bytes": 9043
+				},
+				{
+					"title": "Corpus 012",
+					"source": "blog/announcing-vite8.md",
+					"bytes": 15394
+				},
+				{
+					"title": "Corpus 013",
+					"source": "blog/cloudflare-supports-vite.md",
+					"bytes": 4087
+				},
+				{
+					"title": "Corpus 014",
+					"source": "changes/hotupdate-hook.md",
+					"bytes": 3570
+				},
+				{
+					"title": "Corpus 015",
+					"source": "changes/index.md",
+					"bytes": 1558
+				},
+				{
+					"title": "Corpus 016",
+					"source": "changes/per-environment-apis.md",
+					"bytes": 2296
+				},
+				{
+					"title": "Corpus 017",
+					"source": "changes/shared-plugins-during-build.md",
+					"bytes": 2288
+				},
+				{
+					"title": "Corpus 018",
+					"source": "changes/ssr-using-modulerunner.md",
+					"bytes": 1305
+				},
+				{
+					"title": "Corpus 019",
+					"source": "changes/this-environment-in-hooks.md",
+					"bytes": 2416
+				},
+				{
+					"title": "Corpus 020",
+					"source": "config/build-options.md",
+					"bytes": 17369
+				},
+				{
+					"title": "Corpus 021",
+					"source": "config/dep-optimization-options.md",
+					"bytes": 6158
+				},
+				{
+					"title": "Corpus 022",
+					"source": "config/index.md",
+					"bytes": 7269
+				},
+				{
+					"title": "Corpus 023",
+					"source": "config/preview-options.md",
+					"bytes": 3164
+				},
+				{
+					"title": "Corpus 024",
+					"source": "config/server-options.md",
+					"bytes": 21219
+				},
+				{
+					"title": "Corpus 025",
+					"source": "config/shared-options.md",
+					"bytes": 24934
+				},
+				{
+					"title": "Corpus 026",
+					"source": "config/ssr-options.md",
+					"bytes": 3282
+				},
+				{
+					"title": "Corpus 027",
+					"source": "config/worker-options.md",
+					"bytes": 1016
+				},
+				{
+					"title": "Corpus 028",
+					"source": "guide/api-environment-frameworks.md",
+					"bytes": 15857
+				},
+				{
+					"title": "Corpus 029",
+					"source": "guide/api-environment-instances.md",
+					"bytes": 11092
+				},
+				{
+					"title": "Corpus 030",
+					"source": "guide/api-environment-plugins.md",
+					"bytes": 16108
+				},
+				{
+					"title": "Corpus 031",
+					"source": "guide/api-environment-runtimes.md",
+					"bytes": 17438
+				},
+				{
+					"title": "Corpus 032",
+					"source": "guide/api-environment.md",
+					"bytes": 9080
+				},
+				{
+					"title": "Corpus 033",
+					"source": "guide/api-hmr.md",
+					"bytes": 9488
+				},
+				{
+					"title": "Corpus 034",
+					"source": "guide/api-javascript.md",
+					"bytes": 13734
+				},
+				{
+					"title": "Corpus 035",
+					"source": "guide/api-plugin.md",
+					"bytes": 31921
+				},
+				{
+					"title": "Corpus 036",
+					"source": "guide/assets.md",
+					"bytes": 6607
+				},
+				{
+					"title": "Corpus 037",
+					"source": "guide/backend-integration.md",
+					"bytes": 11608
+				},
+				{
+					"title": "Corpus 038",
+					"source": "guide/build.md",
+					"bytes": 14607
+				},
+				{
+					"title": "Corpus 039",
+					"source": "guide/cli.md",
+					"bytes": 15558
+				},
+				{
+					"title": "Corpus 040",
+					"source": "guide/dep-pre-bundling.md",
+					"bytes": 5692
+				},
+				{
+					"title": "Corpus 041",
+					"source": "guide/env-and-mode.md",
+					"bytes": 10924
+				},
+				{
+					"title": "Corpus 042",
+					"source": "guide/features.md",
+					"bytes": 41460
+				},
+				{
+					"title": "Corpus 043",
+					"source": "guide/index.md",
+					"bytes": 11593
+				},
+				{
+					"title": "Corpus 044",
+					"source": "guide/migration.md",
+					"bytes": 21510
+				},
+				{
+					"title": "Corpus 045",
+					"source": "guide/performance.md",
+					"bytes": 8225
+				},
+				{
+					"title": "Corpus 046",
+					"source": "guide/philosophy.md",
+					"bytes": 3616
+				},
+				{
+					"title": "Corpus 047",
+					"source": "guide/ssr.md",
+					"bytes": 14704
+				},
+				{
+					"title": "Corpus 048",
+					"source": "guide/static-deploy.md",
+					"bytes": 14519
+				},
+				{
+					"title": "Corpus 049",
+					"source": "guide/troubleshooting.md",
+					"bytes": 16467
+				},
+				{
+					"title": "Book alice",
+					"source": "alice.txt",
+					"bytes": 170590
+				},
+				{
+					"title": "Book dracula",
+					"source": "dracula.txt",
+					"bytes": 874540
+				}
+			],
+			"completedRuns": 1,
+			"scenarioFailures": [
+				{
+					"run": 1,
+					"scenario": "returningServiceWorker",
+					"elapsedMs": 78290.243259,
+					"message": "offlineOpen: Error: expect(received).toBe(expected) // Object.is equality\n\n- Expected  - 10855\n+ Received  +     1\n\n@@ -5001,10860 +5001,6 @@\n  and showed a red mark on her throat. Arthur did not notice it, but I\n  could hear the deep hiss of indrawn breath which is one of Van Helsing’s\n  ways of betraying emotion. He said nothing at the moment, but turned to\n  me, saying: “Now take down our brave young lover, give him of the port\n  wine, and let him lie down a while. He must then go home and rest, sleep\n- much and eat much, that he may be recruited of what he has so given to\n- his love. He must not stay here. Hold! a moment. I may take it, sir,\n- that you are anxious of result. Then bring it with you that in all ways\n- the operation is successful. You have saved her life this time, and you\n- can go home and rest easy in mind that all that can be is. I shall tell\n- her all when she is well; she shall love you none the less for what you\n- have done. Good-bye.”\n-\n- When Arthur had gone I"
+				}
+			],
+			"metrics": {
+				"importMs": {
+					"sampleCount": 1,
+					"median": 40096.177565,
+					"p95": 40096.177565
+				},
+				"indexedDBBytes": {
+					"sampleCount": 1,
+					"median": 123265844,
+					"p95": 123265844
+				},
+				"returningSwListMs": {
+					"sampleCount": 1,
+					"median": 3434.792168999993,
+					"p95": 3434.792168999993
+				}
+			}
+		},
+		{
+			"replayVerifications": [],
+			"runLoads": [
+				{
+					"run": 1,
+					"start": [
+						2.83,
+						3.5,
+						3.55
+					],
+					"end": [
+						3.35,
+						3.41,
+						3.5
+					]
+				}
+			],
+			"label": "classic",
+			"target": "https://classic-main-alkalye-typing.cshed.carlassmann.com",
+			"createdAt": "2026-11-14T05:26:56.979Z",
+			"environment": {
+				"platform": "linux",
+				"release": "7.2.8-9-omarchy",
+				"cpu": "AMD RYZEN AI MAX+ 395 w/ Radeon 8060S",
+				"cores": 32,
+				"browser": "145.0.7632.6",
+				"cpuThrottle": 1,
+				"networkCapture": "CDP pages, iframes, dedicated workers and SharedWorkers",
+				"serverRuntime": "Node production; identical Brotli-6 serving; Classic jazz-run 0.20.19 (32 GB); v2 isolated SQLite",
+				"jazz": "0.20.18",
+				"gitHead": "8379d4e",
+				"server": "production Node adapter; local store; first visit SW blocked, returning SW installed"
+			},
+			"config": {
+				"runs": 1,
+				"notes": 50,
+				"edits": 200,
+				"totalTraceEdits": 259778,
+				"serviceWorkersOnly": true,
+				"largeOnly": false,
+				"performanceOnly": false,
+				"loadOnly": false,
+				"firstVisitHttpCache": "fresh context, enabled",
+				"literalNewlines": true,
+				"verifyPersistence": false,
+				"automaticPairsAndCompletion": false,
+				"replayTimeoutMs": 120000
+			},
+			"sources": [
+				{
+					"file": "vite.tar.gz",
+					"url": "https://codeload.github.com/vitejs/vite/tar.gz/4d21dc4ebcabecc13a35d73ef7dcac704cdbc817",
+					"sha256": "e3bd67ccafd837066cf8d263f871089424da7eabb87c48e7d29f9d52f2c69291",
+					"license": "MIT",
+					"attribution": "Vite contributors",
+					"licenseUrl": "https://github.com/vitejs/vite/blob/4d21dc4ebcabecc13a35d73ef7dcac704cdbc817/LICENSE"
+				},
+				{
+					"file": "trace.js",
+					"url": "https://raw.githubusercontent.com/automerge/automerge-perf/da212e984c777d31ee7d888f82637288aa4c61d3/edit-by-index/editing-trace.js",
+					"sha256": "23116070719243e2950c310006dd50b3d80744be7542a86c62e7d5c2ed7326d0",
+					"license": "CC-BY-4.0",
+					"attribution": "Martin Kleppmann and Alastair R. Beresford, A Conflict-Free Replicated JSON Datatype",
+					"licenseUrl": "https://github.com/automerge/automerge-perf/blob/da212e984c777d31ee7d888f82637288aa4c61d3/README.md#license"
+				},
+				{
+					"file": "alice.txt",
+					"url": "https://www.gutenberg.org/ebooks/11.txt.utf-8",
+					"sha256": "01b38ea4c710a84bc18d0bd41271a5a1a92b94e97b2812f4dece97d4a694725e",
+					"license": "Public domain in USA; Project Gutenberg license retained in text",
+					"attribution": "Lewis Carroll, Alice's Adventures in Wonderland; Project Gutenberg",
+					"licenseUrl": "https://www.gutenberg.org/policy/license.html"
+				},
+				{
+					"file": "dracula.txt",
+					"url": "https://www.gutenberg.org/ebooks/345.txt.utf-8",
+					"sha256": "96cd16eacdbfebae8fdda5591f66e0cc8ee76be18e0cd1aca02bc00615782d28",
+					"license": "Public domain in USA; Project Gutenberg license retained in text",
+					"attribution": "Bram Stoker, Dracula; Project Gutenberg",
+					"licenseUrl": "https://www.gutenberg.org/policy/license.html"
+				}
+			],
+			"datasets": [
+				{
+					"title": "Corpus 000",
+					"source": "acknowledgements.md",
+					"bytes": 6218
+				},
+				{
+					"title": "Corpus 001",
+					"source": "blog.md",
+					"bytes": 232
+				},
+				{
+					"title": "Corpus 002",
+					"source": "blog/announcing-vite2.md",
+					"bytes": 5936
+				},
+				{
+					"title": "Corpus 003",
+					"source": "blog/announcing-vite3.md",
+					"bytes": 20753
+				},
+				{
+					"title": "Corpus 004",
+					"source": "blog/announcing-vite4-3.md",
+					"bytes": 4606
+				},
+				{
+					"title": "Corpus 005",
+					"source": "blog/announcing-vite4.md",
+					"bytes": 12080
+				},
+				{
+					"title": "Corpus 006",
+					"source": "blog/announcing-vite5-1.md",
+					"bytes": 11126
+				},
+				{
+					"title": "Corpus 007",
+					"source": "blog/announcing-vite5.md",
+					"bytes": 10567
+				},
+				{
+					"title": "Corpus 008",
+					"source": "blog/announcing-vite6.md",
+					"bytes": 11680
+				},
+				{
+					"title": "Corpus 009",
+					"source": "blog/announcing-vite7.md",
+					"bytes": 8738
+				},
+				{
+					"title": "Corpus 010",
+					"source": "blog/announcing-vite8-1.md",
+					"bytes": 10425
+				},
+				{
+					"title": "Corpus 011",
+					"source": "blog/announcing-vite8-beta.md",
+					"bytes": 9043
+				},
+				{
+					"title": "Corpus 012",
+					"source": "blog/announcing-vite8.md",
+					"bytes": 15394
+				},
+				{
+					"title": "Corpus 013",
+					"source": "blog/cloudflare-supports-vite.md",
+					"bytes": 4087
+				},
+				{
+					"title": "Corpus 014",
+					"source": "changes/hotupdate-hook.md",
+					"bytes": 3570
+				},
+				{
+					"title": "Corpus 015",
+					"source": "changes/index.md",
+					"bytes": 1558
+				},
+				{
+					"title": "Corpus 016",
+					"source": "changes/per-environment-apis.md",
+					"bytes": 2296
+				},
+				{
+					"title": "Corpus 017",
+					"source": "changes/shared-plugins-during-build.md",
+					"bytes": 2288
+				},
+				{
+					"title": "Corpus 018",
+					"source": "changes/ssr-using-modulerunner.md",
+					"bytes": 1305
+				},
+				{
+					"title": "Corpus 019",
+					"source": "changes/this-environment-in-hooks.md",
+					"bytes": 2416
+				},
+				{
+					"title": "Corpus 020",
+					"source": "config/build-options.md",
+					"bytes": 17369
+				},
+				{
+					"title": "Corpus 021",
+					"source": "config/dep-optimization-options.md",
+					"bytes": 6158
+				},
+				{
+					"title": "Corpus 022",
+					"source": "config/index.md",
+					"bytes": 7269
+				},
+				{
+					"title": "Corpus 023",
+					"source": "config/preview-options.md",
+					"bytes": 3164
+				},
+				{
+					"title": "Corpus 024",
+					"source": "config/server-options.md",
+					"bytes": 21219
+				},
+				{
+					"title": "Corpus 025",
+					"source": "config/shared-options.md",
+					"bytes": 24934
+				},
+				{
+					"title": "Corpus 026",
+					"source": "config/ssr-options.md",
+					"bytes": 3282
+				},
+				{
+					"title": "Corpus 027",
+					"source": "config/worker-options.md",
+					"bytes": 1016
+				},
+				{
+					"title": "Corpus 028",
+					"source": "guide/api-environment-frameworks.md",
+					"bytes": 15857
+				},
+				{
+					"title": "Corpus 029",
+					"source": "guide/api-environment-instances.md",
+					"bytes": 11092
+				},
+				{
+					"title": "Corpus 030",
+					"source": "guide/api-environment-plugins.md",
+					"bytes": 16108
+				},
+				{
+					"title": "Corpus 031",
+					"source": "guide/api-environment-runtimes.md",
+					"bytes": 17438
+				},
+				{
+					"title": "Corpus 032",
+					"source": "guide/api-environment.md",
+					"bytes": 9080
+				},
+				{
+					"title": "Corpus 033",
+					"source": "guide/api-hmr.md",
+					"bytes": 9488
+				},
+				{
+					"title": "Corpus 034",
+					"source": "guide/api-javascript.md",
+					"bytes": 13734
+				},
+				{
+					"title": "Corpus 035",
+					"source": "guide/api-plugin.md",
+					"bytes": 31921
+				},
+				{
+					"title": "Corpus 036",
+					"source": "guide/assets.md",
+					"bytes": 6607
+				},
+				{
+					"title": "Corpus 037",
+					"source": "guide/backend-integration.md",
+					"bytes": 11608
+				},
+				{
+					"title": "Corpus 038",
+					"source": "guide/build.md",
+					"bytes": 14607
+				},
+				{
+					"title": "Corpus 039",
+					"source": "guide/cli.md",
+					"bytes": 15558
+				},
+				{
+					"title": "Corpus 040",
+					"source": "guide/dep-pre-bundling.md",
+					"bytes": 5692
+				},
+				{
+					"title": "Corpus 041",
+					"source": "guide/env-and-mode.md",
+					"bytes": 10924
+				},
+				{
+					"title": "Corpus 042",
+					"source": "guide/features.md",
+					"bytes": 41460
+				},
+				{
+					"title": "Corpus 043",
+					"source": "guide/index.md",
+					"bytes": 11593
+				},
+				{
+					"title": "Corpus 044",
+					"source": "guide/migration.md",
+					"bytes": 21510
+				},
+				{
+					"title": "Corpus 045",
+					"source": "guide/performance.md",
+					"bytes": 8225
+				},
+				{
+					"title": "Corpus 046",
+					"source": "guide/philosophy.md",
+					"bytes": 3616
+				},
+				{
+					"title": "Corpus 047",
+					"source": "guide/ssr.md",
+					"bytes": 14704
+				},
+				{
+					"title": "Corpus 048",
+					"source": "guide/static-deploy.md",
+					"bytes": 14519
+				},
+				{
+					"title": "Corpus 049",
+					"source": "guide/troubleshooting.md",
+					"bytes": 16467
+				},
+				{
+					"title": "Book alice",
+					"source": "alice.txt",
+					"bytes": 170590
+				},
+				{
+					"title": "Book dracula",
+					"source": "dracula.txt",
+					"bytes": 874540
+				}
+			],
+			"completedRuns": 1,
+			"scenarioFailures": [
+				{
+					"run": 1,
+					"scenario": "returningServiceWorker",
+					"elapsedMs": 77780.97133999999,
+					"message": "offlineOpen: Error: expect(received).toBe(expected) // Object.is equality\n\n- Expected  - 11018\n+ Received  +     1\n\n@@ -4838,11023 +4838,6 @@\n  he reached over and took my ear in his hand and pulled it playfully, as\n  he used long ago to do at lectures, and said: “The good husbandman tell\n  you so then because he knows, but not till then. But you do not find the\n  good husbandman dig up his planted corn to see if he grow; that is for\n  the children who play at husbandry, and not for those who take it as of\n- the work of their life. See you now, friend John? I have sown my corn,\n- and Nature has her work to do in making it sprout; if he sprout at all,\n- there’s some promise; and I wait till the ear begins to swell.” He broke\n- off, for he evidently saw that I understood. Then he went on, and very\n- gravely:--\n-\n- “You were always a careful student, and your case-book was ever more\n- full than the rest. You were only student then; now you are master, and\n- I trust that good habit have no"
+				}
+			],
+			"metrics": {
+				"importMs": {
+					"sampleCount": 1,
+					"median": 40709.75303,
+					"p95": 40709.75303
+				},
+				"indexedDBBytes": {
+					"sampleCount": 1,
+					"median": 154299101,
+					"p95": 154299101
+				},
+				"returningSwListMs": {
+					"sampleCount": 1,
+					"median": 3530.7048680000007,
+					"p95": 3530.7048680000007
+				}
+			}
+		},
+		{
+			"replayVerifications": [],
+			"runLoads": [
+				{
+					"run": 1,
+					"start": [
+						4.52,
+						3.79,
+						3.63
+					],
+					"end": [
+						3.65,
+						3.81,
+						3.67
+					]
+				}
+			],
+			"label": "classic",
+			"target": "https://classic-main-alkalye-typing.cshed.carlassmann.com",
+			"createdAt": "2026-11-14T05:29:57.985Z",
+			"environment": {
+				"platform": "linux",
+				"release": "7.2.8-9-omarchy",
+				"cpu": "AMD RYZEN AI MAX+ 395 w/ Radeon 8060S",
+				"cores": 32,
+				"browser": "145.0.7632.6",
+				"cpuThrottle": 1,
+				"networkCapture": "CDP pages, iframes, dedicated workers and SharedWorkers",
+				"serverRuntime": "Node production; identical Brotli-6 serving; Classic jazz-run 0.20.19 (32 GB); v2 isolated SQLite",
+				"jazz": "0.20.18",
+				"gitHead": "8379d4e",
+				"server": "production Node adapter; local store; first visit SW blocked, returning SW installed"
+			},
+			"config": {
+				"runs": 1,
+				"notes": 50,
+				"edits": 200,
+				"totalTraceEdits": 259778,
+				"serviceWorkersOnly": true,
+				"largeOnly": false,
+				"performanceOnly": false,
+				"loadOnly": false,
+				"firstVisitHttpCache": "fresh context, enabled",
+				"literalNewlines": true,
+				"verifyPersistence": false,
+				"automaticPairsAndCompletion": false,
+				"replayTimeoutMs": 120000
+			},
+			"sources": [
+				{
+					"file": "vite.tar.gz",
+					"url": "https://codeload.github.com/vitejs/vite/tar.gz/4d21dc4ebcabecc13a35d73ef7dcac704cdbc817",
+					"sha256": "e3bd67ccafd837066cf8d263f871089424da7eabb87c48e7d29f9d52f2c69291",
+					"license": "MIT",
+					"attribution": "Vite contributors",
+					"licenseUrl": "https://github.com/vitejs/vite/blob/4d21dc4ebcabecc13a35d73ef7dcac704cdbc817/LICENSE"
+				},
+				{
+					"file": "trace.js",
+					"url": "https://raw.githubusercontent.com/automerge/automerge-perf/da212e984c777d31ee7d888f82637288aa4c61d3/edit-by-index/editing-trace.js",
+					"sha256": "23116070719243e2950c310006dd50b3d80744be7542a86c62e7d5c2ed7326d0",
+					"license": "CC-BY-4.0",
+					"attribution": "Martin Kleppmann and Alastair R. Beresford, A Conflict-Free Replicated JSON Datatype",
+					"licenseUrl": "https://github.com/automerge/automerge-perf/blob/da212e984c777d31ee7d888f82637288aa4c61d3/README.md#license"
+				},
+				{
+					"file": "alice.txt",
+					"url": "https://www.gutenberg.org/ebooks/11.txt.utf-8",
+					"sha256": "01b38ea4c710a84bc18d0bd41271a5a1a92b94e97b2812f4dece97d4a694725e",
+					"license": "Public domain in USA; Project Gutenberg license retained in text",
+					"attribution": "Lewis Carroll, Alice's Adventures in Wonderland; Project Gutenberg",
+					"licenseUrl": "https://www.gutenberg.org/policy/license.html"
+				},
+				{
+					"file": "dracula.txt",
+					"url": "https://www.gutenberg.org/ebooks/345.txt.utf-8",
+					"sha256": "96cd16eacdbfebae8fdda5591f66e0cc8ee76be18e0cd1aca02bc00615782d28",
+					"license": "Public domain in USA; Project Gutenberg license retained in text",
+					"attribution": "Bram Stoker, Dracula; Project Gutenberg",
+					"licenseUrl": "https://www.gutenberg.org/policy/license.html"
+				}
+			],
+			"datasets": [
+				{
+					"title": "Corpus 000",
+					"source": "acknowledgements.md",
+					"bytes": 6218
+				},
+				{
+					"title": "Corpus 001",
+					"source": "blog.md",
+					"bytes": 232
+				},
+				{
+					"title": "Corpus 002",
+					"source": "blog/announcing-vite2.md",
+					"bytes": 5936
+				},
+				{
+					"title": "Corpus 003",
+					"source": "blog/announcing-vite3.md",
+					"bytes": 20753
+				},
+				{
+					"title": "Corpus 004",
+					"source": "blog/announcing-vite4-3.md",
+					"bytes": 4606
+				},
+				{
+					"title": "Corpus 005",
+					"source": "blog/announcing-vite4.md",
+					"bytes": 12080
+				},
+				{
+					"title": "Corpus 006",
+					"source": "blog/announcing-vite5-1.md",
+					"bytes": 11126
+				},
+				{
+					"title": "Corpus 007",
+					"source": "blog/announcing-vite5.md",
+					"bytes": 10567
+				},
+				{
+					"title": "Corpus 008",
+					"source": "blog/announcing-vite6.md",
+					"bytes": 11680
+				},
+				{
+					"title": "Corpus 009",
+					"source": "blog/announcing-vite7.md",
+					"bytes": 8738
+				},
+				{
+					"title": "Corpus 010",
+					"source": "blog/announcing-vite8-1.md",
+					"bytes": 10425
+				},
+				{
+					"title": "Corpus 011",
+					"source": "blog/announcing-vite8-beta.md",
+					"bytes": 9043
+				},
+				{
+					"title": "Corpus 012",
+					"source": "blog/announcing-vite8.md",
+					"bytes": 15394
+				},
+				{
+					"title": "Corpus 013",
+					"source": "blog/cloudflare-supports-vite.md",
+					"bytes": 4087
+				},
+				{
+					"title": "Corpus 014",
+					"source": "changes/hotupdate-hook.md",
+					"bytes": 3570
+				},
+				{
+					"title": "Corpus 015",
+					"source": "changes/index.md",
+					"bytes": 1558
+				},
+				{
+					"title": "Corpus 016",
+					"source": "changes/per-environment-apis.md",
+					"bytes": 2296
+				},
+				{
+					"title": "Corpus 017",
+					"source": "changes/shared-plugins-during-build.md",
+					"bytes": 2288
+				},
+				{
+					"title": "Corpus 018",
+					"source": "changes/ssr-using-modulerunner.md",
+					"bytes": 1305
+				},
+				{
+					"title": "Corpus 019",
+					"source": "changes/this-environment-in-hooks.md",
+					"bytes": 2416
+				},
+				{
+					"title": "Corpus 020",
+					"source": "config/build-options.md",
+					"bytes": 17369
+				},
+				{
+					"title": "Corpus 021",
+					"source": "config/dep-optimization-options.md",
+					"bytes": 6158
+				},
+				{
+					"title": "Corpus 022",
+					"source": "config/index.md",
+					"bytes": 7269
+				},
+				{
+					"title": "Corpus 023",
+					"source": "config/preview-options.md",
+					"bytes": 3164
+				},
+				{
+					"title": "Corpus 024",
+					"source": "config/server-options.md",
+					"bytes": 21219
+				},
+				{
+					"title": "Corpus 025",
+					"source": "config/shared-options.md",
+					"bytes": 24934
+				},
+				{
+					"title": "Corpus 026",
+					"source": "config/ssr-options.md",
+					"bytes": 3282
+				},
+				{
+					"title": "Corpus 027",
+					"source": "config/worker-options.md",
+					"bytes": 1016
+				},
+				{
+					"title": "Corpus 028",
+					"source": "guide/api-environment-frameworks.md",
+					"bytes": 15857
+				},
+				{
+					"title": "Corpus 029",
+					"source": "guide/api-environment-instances.md",
+					"bytes": 11092
+				},
+				{
+					"title": "Corpus 030",
+					"source": "guide/api-environment-plugins.md",
+					"bytes": 16108
+				},
+				{
+					"title": "Corpus 031",
+					"source": "guide/api-environment-runtimes.md",
+					"bytes": 17438
+				},
+				{
+					"title": "Corpus 032",
+					"source": "guide/api-environment.md",
+					"bytes": 9080
+				},
+				{
+					"title": "Corpus 033",
+					"source": "guide/api-hmr.md",
+					"bytes": 9488
+				},
+				{
+					"title": "Corpus 034",
+					"source": "guide/api-javascript.md",
+					"bytes": 13734
+				},
+				{
+					"title": "Corpus 035",
+					"source": "guide/api-plugin.md",
+					"bytes": 31921
+				},
+				{
+					"title": "Corpus 036",
+					"source": "guide/assets.md",
+					"bytes": 6607
+				},
+				{
+					"title": "Corpus 037",
+					"source": "guide/backend-integration.md",
+					"bytes": 11608
+				},
+				{
+					"title": "Corpus 038",
+					"source": "guide/build.md",
+					"bytes": 14607
+				},
+				{
+					"title": "Corpus 039",
+					"source": "guide/cli.md",
+					"bytes": 15558
+				},
+				{
+					"title": "Corpus 040",
+					"source": "guide/dep-pre-bundling.md",
+					"bytes": 5692
+				},
+				{
+					"title": "Corpus 041",
+					"source": "guide/env-and-mode.md",
+					"bytes": 10924
+				},
+				{
+					"title": "Corpus 042",
+					"source": "guide/features.md",
+					"bytes": 41460
+				},
+				{
+					"title": "Corpus 043",
+					"source": "guide/index.md",
+					"bytes": 11593
+				},
+				{
+					"title": "Corpus 044",
+					"source": "guide/migration.md",
+					"bytes": 21510
+				},
+				{
+					"title": "Corpus 045",
+					"source": "guide/performance.md",
+					"bytes": 8225
+				},
+				{
+					"title": "Corpus 046",
+					"source": "guide/philosophy.md",
+					"bytes": 3616
+				},
+				{
+					"title": "Corpus 047",
+					"source": "guide/ssr.md",
+					"bytes": 14704
+				},
+				{
+					"title": "Corpus 048",
+					"source": "guide/static-deploy.md",
+					"bytes": 14519
+				},
+				{
+					"title": "Corpus 049",
+					"source": "guide/troubleshooting.md",
+					"bytes": 16467
+				},
+				{
+					"title": "Book alice",
+					"source": "alice.txt",
+					"bytes": 170590
+				},
+				{
+					"title": "Book dracula",
+					"source": "dracula.txt",
+					"bytes": 874540
+				}
+			],
+			"completedRuns": 1,
+			"scenarioFailures": [
+				{
+					"run": 1,
+					"scenario": "returningServiceWorker",
+					"elapsedMs": 78232.02417399999,
+					"message": "offlineOpen: Error: expect(received).toBe(expected) // Object.is equality\n\n- Expected  - 10855\n+ Received  +     1\n\n@@ -5001,10860 +5001,6 @@\n  and showed a red mark on her throat. Arthur did not notice it, but I\n  could hear the deep hiss of indrawn breath which is one of Van Helsing’s\n  ways of betraying emotion. He said nothing at the moment, but turned to\n  me, saying: “Now take down our brave young lover, give him of the port\n  wine, and let him lie down a while. He must then go home and rest, sleep\n- much and eat much, that he may be recruited of what he has so given to\n- his love. He must not stay here. Hold! a moment. I may take it, sir,\n- that you are anxious of result. Then bring it with you that in all ways\n- the operation is successful. You have saved her life this time, and you\n- can go home and rest easy in mind that all that can be is. I shall tell\n- her all when she is well; she shall love you none the less for what you\n- have done. Good-bye.”\n-\n- When Arthur had gone I"
+				}
+			],
+			"metrics": {
+				"importMs": {
+					"sampleCount": 1,
+					"median": 41001.314454,
+					"p95": 41001.314454
+				},
+				"indexedDBBytes": {
+					"sampleCount": 1,
+					"median": 124478785,
+					"p95": 124478785
+				},
+				"returningSwListMs": {
+					"sampleCount": 1,
+					"median": 3813.352488000004,
+					"p95": 3813.352488000004
+				}
+			}
+		},
+		{
+			"replayVerifications": [],
+			"runLoads": [
+				{
+					"run": 1,
+					"start": [
+						2.79,
+						3.57,
+						3.59
+					],
+					"end": [
+						3,
+						3.42,
+						3.53
+					]
+				}
+			],
+			"label": "classic",
+			"target": "https://classic-main-alkalye-typing.cshed.carlassmann.com",
+			"createdAt": "2026-11-14T05:32:59.630Z",
+			"environment": {
+				"platform": "linux",
+				"release": "7.2.8-9-omarchy",
+				"cpu": "AMD RYZEN AI MAX+ 395 w/ Radeon 8060S",
+				"cores": 32,
+				"browser": "145.0.7632.6",
+				"cpuThrottle": 1,
+				"networkCapture": "CDP pages, iframes, dedicated workers and SharedWorkers",
+				"serverRuntime": "Node production; identical Brotli-6 serving; Classic jazz-run 0.20.19 (32 GB); v2 isolated SQLite",
+				"jazz": "0.20.18",
+				"gitHead": "8379d4e",
+				"server": "production Node adapter; local store; first visit SW blocked, returning SW installed"
+			},
+			"config": {
+				"runs": 1,
+				"notes": 50,
+				"edits": 200,
+				"totalTraceEdits": 259778,
+				"serviceWorkersOnly": true,
+				"largeOnly": false,
+				"performanceOnly": false,
+				"loadOnly": false,
+				"firstVisitHttpCache": "fresh context, enabled",
+				"literalNewlines": true,
+				"verifyPersistence": false,
+				"automaticPairsAndCompletion": false,
+				"replayTimeoutMs": 120000
+			},
+			"sources": [
+				{
+					"file": "vite.tar.gz",
+					"url": "https://codeload.github.com/vitejs/vite/tar.gz/4d21dc4ebcabecc13a35d73ef7dcac704cdbc817",
+					"sha256": "e3bd67ccafd837066cf8d263f871089424da7eabb87c48e7d29f9d52f2c69291",
+					"license": "MIT",
+					"attribution": "Vite contributors",
+					"licenseUrl": "https://github.com/vitejs/vite/blob/4d21dc4ebcabecc13a35d73ef7dcac704cdbc817/LICENSE"
+				},
+				{
+					"file": "trace.js",
+					"url": "https://raw.githubusercontent.com/automerge/automerge-perf/da212e984c777d31ee7d888f82637288aa4c61d3/edit-by-index/editing-trace.js",
+					"sha256": "23116070719243e2950c310006dd50b3d80744be7542a86c62e7d5c2ed7326d0",
+					"license": "CC-BY-4.0",
+					"attribution": "Martin Kleppmann and Alastair R. Beresford, A Conflict-Free Replicated JSON Datatype",
+					"licenseUrl": "https://github.com/automerge/automerge-perf/blob/da212e984c777d31ee7d888f82637288aa4c61d3/README.md#license"
+				},
+				{
+					"file": "alice.txt",
+					"url": "https://www.gutenberg.org/ebooks/11.txt.utf-8",
+					"sha256": "01b38ea4c710a84bc18d0bd41271a5a1a92b94e97b2812f4dece97d4a694725e",
+					"license": "Public domain in USA; Project Gutenberg license retained in text",
+					"attribution": "Lewis Carroll, Alice's Adventures in Wonderland; Project Gutenberg",
+					"licenseUrl": "https://www.gutenberg.org/policy/license.html"
+				},
+				{
+					"file": "dracula.txt",
+					"url": "https://www.gutenberg.org/ebooks/345.txt.utf-8",
+					"sha256": "96cd16eacdbfebae8fdda5591f66e0cc8ee76be18e0cd1aca02bc00615782d28",
+					"license": "Public domain in USA; Project Gutenberg license retained in text",
+					"attribution": "Bram Stoker, Dracula; Project Gutenberg",
+					"licenseUrl": "https://www.gutenberg.org/policy/license.html"
+				}
+			],
+			"datasets": [
+				{
+					"title": "Corpus 000",
+					"source": "acknowledgements.md",
+					"bytes": 6218
+				},
+				{
+					"title": "Corpus 001",
+					"source": "blog.md",
+					"bytes": 232
+				},
+				{
+					"title": "Corpus 002",
+					"source": "blog/announcing-vite2.md",
+					"bytes": 5936
+				},
+				{
+					"title": "Corpus 003",
+					"source": "blog/announcing-vite3.md",
+					"bytes": 20753
+				},
+				{
+					"title": "Corpus 004",
+					"source": "blog/announcing-vite4-3.md",
+					"bytes": 4606
+				},
+				{
+					"title": "Corpus 005",
+					"source": "blog/announcing-vite4.md",
+					"bytes": 12080
+				},
+				{
+					"title": "Corpus 006",
+					"source": "blog/announcing-vite5-1.md",
+					"bytes": 11126
+				},
+				{
+					"title": "Corpus 007",
+					"source": "blog/announcing-vite5.md",
+					"bytes": 10567
+				},
+				{
+					"title": "Corpus 008",
+					"source": "blog/announcing-vite6.md",
+					"bytes": 11680
+				},
+				{
+					"title": "Corpus 009",
+					"source": "blog/announcing-vite7.md",
+					"bytes": 8738
+				},
+				{
+					"title": "Corpus 010",
+					"source": "blog/announcing-vite8-1.md",
+					"bytes": 10425
+				},
+				{
+					"title": "Corpus 011",
+					"source": "blog/announcing-vite8-beta.md",
+					"bytes": 9043
+				},
+				{
+					"title": "Corpus 012",
+					"source": "blog/announcing-vite8.md",
+					"bytes": 15394
+				},
+				{
+					"title": "Corpus 013",
+					"source": "blog/cloudflare-supports-vite.md",
+					"bytes": 4087
+				},
+				{
+					"title": "Corpus 014",
+					"source": "changes/hotupdate-hook.md",
+					"bytes": 3570
+				},
+				{
+					"title": "Corpus 015",
+					"source": "changes/index.md",
+					"bytes": 1558
+				},
+				{
+					"title": "Corpus 016",
+					"source": "changes/per-environment-apis.md",
+					"bytes": 2296
+				},
+				{
+					"title": "Corpus 017",
+					"source": "changes/shared-plugins-during-build.md",
+					"bytes": 2288
+				},
+				{
+					"title": "Corpus 018",
+					"source": "changes/ssr-using-modulerunner.md",
+					"bytes": 1305
+				},
+				{
+					"title": "Corpus 019",
+					"source": "changes/this-environment-in-hooks.md",
+					"bytes": 2416
+				},
+				{
+					"title": "Corpus 020",
+					"source": "config/build-options.md",
+					"bytes": 17369
+				},
+				{
+					"title": "Corpus 021",
+					"source": "config/dep-optimization-options.md",
+					"bytes": 6158
+				},
+				{
+					"title": "Corpus 022",
+					"source": "config/index.md",
+					"bytes": 7269
+				},
+				{
+					"title": "Corpus 023",
+					"source": "config/preview-options.md",
+					"bytes": 3164
+				},
+				{
+					"title": "Corpus 024",
+					"source": "config/server-options.md",
+					"bytes": 21219
+				},
+				{
+					"title": "Corpus 025",
+					"source": "config/shared-options.md",
+					"bytes": 24934
+				},
+				{
+					"title": "Corpus 026",
+					"source": "config/ssr-options.md",
+					"bytes": 3282
+				},
+				{
+					"title": "Corpus 027",
+					"source": "config/worker-options.md",
+					"bytes": 1016
+				},
+				{
+					"title": "Corpus 028",
+					"source": "guide/api-environment-frameworks.md",
+					"bytes": 15857
+				},
+				{
+					"title": "Corpus 029",
+					"source": "guide/api-environment-instances.md",
+					"bytes": 11092
+				},
+				{
+					"title": "Corpus 030",
+					"source": "guide/api-environment-plugins.md",
+					"bytes": 16108
+				},
+				{
+					"title": "Corpus 031",
+					"source": "guide/api-environment-runtimes.md",
+					"bytes": 17438
+				},
+				{
+					"title": "Corpus 032",
+					"source": "guide/api-environment.md",
+					"bytes": 9080
+				},
+				{
+					"title": "Corpus 033",
+					"source": "guide/api-hmr.md",
+					"bytes": 9488
+				},
+				{
+					"title": "Corpus 034",
+					"source": "guide/api-javascript.md",
+					"bytes": 13734
+				},
+				{
+					"title": "Corpus 035",
+					"source": "guide/api-plugin.md",
+					"bytes": 31921
+				},
+				{
+					"title": "Corpus 036",
+					"source": "guide/assets.md",
+					"bytes": 6607
+				},
+				{
+					"title": "Corpus 037",
+					"source": "guide/backend-integration.md",
+					"bytes": 11608
+				},
+				{
+					"title": "Corpus 038",
+					"source": "guide/build.md",
+					"bytes": 14607
+				},
+				{
+					"title": "Corpus 039",
+					"source": "guide/cli.md",
+					"bytes": 15558
+				},
+				{
+					"title": "Corpus 040",
+					"source": "guide/dep-pre-bundling.md",
+					"bytes": 5692
+				},
+				{
+					"title": "Corpus 041",
+					"source": "guide/env-and-mode.md",
+					"bytes": 10924
+				},
+				{
+					"title": "Corpus 042",
+					"source": "guide/features.md",
+					"bytes": 41460
+				},
+				{
+					"title": "Corpus 043",
+					"source": "guide/index.md",
+					"bytes": 11593
+				},
+				{
+					"title": "Corpus 044",
+					"source": "guide/migration.md",
+					"bytes": 21510
+				},
+				{
+					"title": "Corpus 045",
+					"source": "guide/performance.md",
+					"bytes": 8225
+				},
+				{
+					"title": "Corpus 046",
+					"source": "guide/philosophy.md",
+					"bytes": 3616
+				},
+				{
+					"title": "Corpus 047",
+					"source": "guide/ssr.md",
+					"bytes": 14704
+				},
+				{
+					"title": "Corpus 048",
+					"source": "guide/static-deploy.md",
+					"bytes": 14519
+				},
+				{
+					"title": "Corpus 049",
+					"source": "guide/troubleshooting.md",
+					"bytes": 16467
+				},
+				{
+					"title": "Book alice",
+					"source": "alice.txt",
+					"bytes": 170590
+				},
+				{
+					"title": "Book dracula",
+					"source": "dracula.txt",
+					"bytes": 874540
+				}
+			],
+			"completedRuns": 1,
+			"scenarioFailures": [
+				{
+					"run": 1,
+					"scenario": "returningServiceWorker",
+					"elapsedMs": 79037.005918,
+					"message": "offlineOpen: Error: expect(received).toBe(expected) // Object.is equality\n\n- Expected  - 10870\n+ Received  +     0\n\n@@ -4986,10875 +4986,5 @@\n  was. It gave me an idea of what a terrible strain Lucy’s system must\n  have undergone that what weakened Arthur only partially restored her.\n  But the Professor’s face was set, and he stood watch in hand and with\n  his eyes fixed now on the patient and now on Arthur. I could hear my own\n  heart beat. Presently he said in a soft voice: “Do not stir an instant.\n- It is enough. You attend him; I will look to her.” When all was over I\n- could see how much Arthur was weakened. I dressed the wound and took his\n- arm to bring him away, when Van Helsing spoke without turning round--the\n- man seems to have eyes in the back of his head:--\n-\n- “The brave lover, I think, deserve another kiss, which he shall have\n- presently.” And as he had now finished his operation, he adjusted the\n- pillow to the patient’s head. As he did so the narrow black velvet band\n"
+				}
+			],
+			"metrics": {
+				"importMs": {
+					"sampleCount": 1,
+					"median": 41455.236283000006,
+					"p95": 41455.236283000006
+				},
+				"indexedDBBytes": {
+					"sampleCount": 1,
+					"median": 118375630,
+					"p95": 118375630
+				},
+				"returningSwListMs": {
+					"sampleCount": 1,
+					"median": 3627.6873849999974,
+					"p95": 3627.6873849999974
+				}
+			}
+		}
+	],
+	"individualRuns": [
+		{
+			"replayVerifications": [
+				{
+					"run": 1,
+					"document": "small",
+					"persistence": false
+				},
+				{
+					"run": 1,
+					"document": "medium",
+					"persistence": false
+				},
+				{
+					"run": 1,
+					"document": "large",
+					"persistence": false
+				}
+			],
+			"runLoads": [
+				{
+					"run": 1,
+					"start": [
+						2.61,
+						3.11,
+						3.84
+					],
+					"end": [
+						2.79,
+						3.06,
+						3.71
+					]
+				}
+			],
+			"label": "classic",
+			"target": "https://classic-main-alkalye-typing.cshed.carlassmann.com",
+			"createdAt": "2026-11-14T05:00:11.859Z",
+			"environment": {
+				"platform": "linux",
+				"release": "7.2.8-9-omarchy",
+				"cpu": "AMD RYZEN AI MAX+ 395 w/ Radeon 8060S",
+				"cores": 32,
+				"browser": "145.0.7632.6",
+				"cpuThrottle": 1,
+				"networkCapture": "CDP pages, iframes, dedicated workers and SharedWorkers",
+				"serverRuntime": "Node production; identical Brotli-6 serving; Classic jazz-run 0.20.19 (32 GB); v2 isolated SQLite",
+				"jazz": "0.20.18",
+				"gitHead": "8379d4e",
+				"server": "production Node adapter; local store; first visit SW blocked, returning SW installed"
+			},
+			"config": {
+				"runs": 1,
+				"notes": 50,
+				"edits": 200,
+				"totalTraceEdits": 259778,
+				"serviceWorkersOnly": false,
+				"largeOnly": false,
+				"performanceOnly": false,
+				"loadOnly": false,
+				"firstVisitHttpCache": "fresh context, enabled",
+				"literalNewlines": true,
+				"verifyPersistence": false,
+				"automaticPairsAndCompletion": false,
+				"replayTimeoutMs": 120000
+			},
+			"sources": [
+				{
+					"file": "vite.tar.gz",
+					"url": "https://codeload.github.com/vitejs/vite/tar.gz/4d21dc4ebcabecc13a35d73ef7dcac704cdbc817",
+					"sha256": "e3bd67ccafd837066cf8d263f871089424da7eabb87c48e7d29f9d52f2c69291",
+					"license": "MIT",
+					"attribution": "Vite contributors",
+					"licenseUrl": "https://github.com/vitejs/vite/blob/4d21dc4ebcabecc13a35d73ef7dcac704cdbc817/LICENSE"
+				},
+				{
+					"file": "trace.js",
+					"url": "https://raw.githubusercontent.com/automerge/automerge-perf/da212e984c777d31ee7d888f82637288aa4c61d3/edit-by-index/editing-trace.js",
+					"sha256": "23116070719243e2950c310006dd50b3d80744be7542a86c62e7d5c2ed7326d0",
+					"license": "CC-BY-4.0",
+					"attribution": "Martin Kleppmann and Alastair R. Beresford, A Conflict-Free Replicated JSON Datatype",
+					"licenseUrl": "https://github.com/automerge/automerge-perf/blob/da212e984c777d31ee7d888f82637288aa4c61d3/README.md#license"
+				},
+				{
+					"file": "alice.txt",
+					"url": "https://www.gutenberg.org/ebooks/11.txt.utf-8",
+					"sha256": "01b38ea4c710a84bc18d0bd41271a5a1a92b94e97b2812f4dece97d4a694725e",
+					"license": "Public domain in USA; Project Gutenberg license retained in text",
+					"attribution": "Lewis Carroll, Alice's Adventures in Wonderland; Project Gutenberg",
+					"licenseUrl": "https://www.gutenberg.org/policy/license.html"
+				},
+				{
+					"file": "dracula.txt",
+					"url": "https://www.gutenberg.org/ebooks/345.txt.utf-8",
+					"sha256": "96cd16eacdbfebae8fdda5591f66e0cc8ee76be18e0cd1aca02bc00615782d28",
+					"license": "Public domain in USA; Project Gutenberg license retained in text",
+					"attribution": "Bram Stoker, Dracula; Project Gutenberg",
+					"licenseUrl": "https://www.gutenberg.org/policy/license.html"
+				}
+			],
+			"datasets": [
+				{
+					"title": "Corpus 000",
+					"source": "acknowledgements.md",
+					"bytes": 6218
+				},
+				{
+					"title": "Corpus 001",
+					"source": "blog.md",
+					"bytes": 232
+				},
+				{
+					"title": "Corpus 002",
+					"source": "blog/announcing-vite2.md",
+					"bytes": 5936
+				},
+				{
+					"title": "Corpus 003",
+					"source": "blog/announcing-vite3.md",
+					"bytes": 20753
+				},
+				{
+					"title": "Corpus 004",
+					"source": "blog/announcing-vite4-3.md",
+					"bytes": 4606
+				},
+				{
+					"title": "Corpus 005",
+					"source": "blog/announcing-vite4.md",
+					"bytes": 12080
+				},
+				{
+					"title": "Corpus 006",
+					"source": "blog/announcing-vite5-1.md",
+					"bytes": 11126
+				},
+				{
+					"title": "Corpus 007",
+					"source": "blog/announcing-vite5.md",
+					"bytes": 10567
+				},
+				{
+					"title": "Corpus 008",
+					"source": "blog/announcing-vite6.md",
+					"bytes": 11680
+				},
+				{
+					"title": "Corpus 009",
+					"source": "blog/announcing-vite7.md",
+					"bytes": 8738
+				},
+				{
+					"title": "Corpus 010",
+					"source": "blog/announcing-vite8-1.md",
+					"bytes": 10425
+				},
+				{
+					"title": "Corpus 011",
+					"source": "blog/announcing-vite8-beta.md",
+					"bytes": 9043
+				},
+				{
+					"title": "Corpus 012",
+					"source": "blog/announcing-vite8.md",
+					"bytes": 15394
+				},
+				{
+					"title": "Corpus 013",
+					"source": "blog/cloudflare-supports-vite.md",
+					"bytes": 4087
+				},
+				{
+					"title": "Corpus 014",
+					"source": "changes/hotupdate-hook.md",
+					"bytes": 3570
+				},
+				{
+					"title": "Corpus 015",
+					"source": "changes/index.md",
+					"bytes": 1558
+				},
+				{
+					"title": "Corpus 016",
+					"source": "changes/per-environment-apis.md",
+					"bytes": 2296
+				},
+				{
+					"title": "Corpus 017",
+					"source": "changes/shared-plugins-during-build.md",
+					"bytes": 2288
+				},
+				{
+					"title": "Corpus 018",
+					"source": "changes/ssr-using-modulerunner.md",
+					"bytes": 1305
+				},
+				{
+					"title": "Corpus 019",
+					"source": "changes/this-environment-in-hooks.md",
+					"bytes": 2416
+				},
+				{
+					"title": "Corpus 020",
+					"source": "config/build-options.md",
+					"bytes": 17369
+				},
+				{
+					"title": "Corpus 021",
+					"source": "config/dep-optimization-options.md",
+					"bytes": 6158
+				},
+				{
+					"title": "Corpus 022",
+					"source": "config/index.md",
+					"bytes": 7269
+				},
+				{
+					"title": "Corpus 023",
+					"source": "config/preview-options.md",
+					"bytes": 3164
+				},
+				{
+					"title": "Corpus 024",
+					"source": "config/server-options.md",
+					"bytes": 21219
+				},
+				{
+					"title": "Corpus 025",
+					"source": "config/shared-options.md",
+					"bytes": 24934
+				},
+				{
+					"title": "Corpus 026",
+					"source": "config/ssr-options.md",
+					"bytes": 3282
+				},
+				{
+					"title": "Corpus 027",
+					"source": "config/worker-options.md",
+					"bytes": 1016
+				},
+				{
+					"title": "Corpus 028",
+					"source": "guide/api-environment-frameworks.md",
+					"bytes": 15857
+				},
+				{
+					"title": "Corpus 029",
+					"source": "guide/api-environment-instances.md",
+					"bytes": 11092
+				},
+				{
+					"title": "Corpus 030",
+					"source": "guide/api-environment-plugins.md",
+					"bytes": 16108
+				},
+				{
+					"title": "Corpus 031",
+					"source": "guide/api-environment-runtimes.md",
+					"bytes": 17438
+				},
+				{
+					"title": "Corpus 032",
+					"source": "guide/api-environment.md",
+					"bytes": 9080
+				},
+				{
+					"title": "Corpus 033",
+					"source": "guide/api-hmr.md",
+					"bytes": 9488
+				},
+				{
+					"title": "Corpus 034",
+					"source": "guide/api-javascript.md",
+					"bytes": 13734
+				},
+				{
+					"title": "Corpus 035",
+					"source": "guide/api-plugin.md",
+					"bytes": 31921
+				},
+				{
+					"title": "Corpus 036",
+					"source": "guide/assets.md",
+					"bytes": 6607
+				},
+				{
+					"title": "Corpus 037",
+					"source": "guide/backend-integration.md",
+					"bytes": 11608
+				},
+				{
+					"title": "Corpus 038",
+					"source": "guide/build.md",
+					"bytes": 14607
+				},
+				{
+					"title": "Corpus 039",
+					"source": "guide/cli.md",
+					"bytes": 15558
+				},
+				{
+					"title": "Corpus 040",
+					"source": "guide/dep-pre-bundling.md",
+					"bytes": 5692
+				},
+				{
+					"title": "Corpus 041",
+					"source": "guide/env-and-mode.md",
+					"bytes": 10924
+				},
+				{
+					"title": "Corpus 042",
+					"source": "guide/features.md",
+					"bytes": 41460
+				},
+				{
+					"title": "Corpus 043",
+					"source": "guide/index.md",
+					"bytes": 11593
+				},
+				{
+					"title": "Corpus 044",
+					"source": "guide/migration.md",
+					"bytes": 21510
+				},
+				{
+					"title": "Corpus 045",
+					"source": "guide/performance.md",
+					"bytes": 8225
+				},
+				{
+					"title": "Corpus 046",
+					"source": "guide/philosophy.md",
+					"bytes": 3616
+				},
+				{
+					"title": "Corpus 047",
+					"source": "guide/ssr.md",
+					"bytes": 14704
+				},
+				{
+					"title": "Corpus 048",
+					"source": "guide/static-deploy.md",
+					"bytes": 14519
+				},
+				{
+					"title": "Corpus 049",
+					"source": "guide/troubleshooting.md",
+					"bytes": 16467
+				},
+				{
+					"title": "Book alice",
+					"source": "alice.txt",
+					"bytes": 170590
+				},
+				{
+					"title": "Book dracula",
+					"source": "dracula.txt",
+					"bytes": 874540
+				}
+			],
+			"completedRuns": 1,
+			"scenarioFailures": [],
+			"metrics": {
+				"importMs": {
+					"sampleCount": 1,
+					"median": 40531.988358999995,
+					"p95": 40531.988358999995
+				},
+				"indexedDBBytes": {
+					"sampleCount": 1,
+					"median": 142296709,
+					"p95": 142296709
+				},
+				"coldListMs": {
+					"sampleCount": 1,
+					"median": 6305.466183000004,
+					"p95": 6305.466183000004
+				},
+				"firstLoadJsWasmBytes": {
+					"sampleCount": 1,
+					"median": 2964621,
+					"p95": 2964621
+				},
+				"coldLargeOpenMs": {
+					"sampleCount": 1,
+					"median": 10902.559140000005,
+					"p95": 10902.559140000005
+				},
+				"warmListMs": {
+					"sampleCount": 1,
+					"median": 2386.161301,
+					"p95": 2386.161301
+				},
+				"freshDeviceWholeDatasetMs": {
+					"sampleCount": 1,
+					"median": 19414.71804400001,
+					"p95": 19414.71804400001
+				},
+				"syncEditMs": {
+					"sampleCount": 5,
+					"median": 276.21864600000845,
+					"p95": 306.9039769999945
+				},
+				"smallEventDurationMs": {
+					"sampleCount": 994,
+					"median": 16,
+					"p95": 16
+				},
+				"smallEventInputDelayMs": {
+					"sampleCount": 994,
+					"median": 0.10000002384185791,
+					"p95": 1
+				},
+				"smallEventProcessingMs": {
+					"sampleCount": 994,
+					"median": 0.30000001192092896,
+					"p95": 3.699999988079071
+				},
+				"smallEventPresentationMs": {
+					"sampleCount": 994,
+					"median": 15.400000035762787,
+					"p95": 16
+				},
+				"smallInputToPaintMs": {
+					"sampleCount": 193,
+					"median": 31.30000001192093,
+					"p95": 32.09999996423721
+				},
+				"smallDispatchToPaintMs": {
+					"sampleCount": 200,
+					"median": 33.28073500000755,
+					"p95": 33.8607200000115
+				},
+				"smallLongTaskCount": {
+					"sampleCount": 1,
+					"median": 0,
+					"p95": 0
+				},
+				"smallLongTaskTotalMs": {
+					"sampleCount": 1,
+					"median": 0,
+					"p95": 0
+				},
+				"smallSentBytesPerEdit": {
+					"sampleCount": 1,
+					"median": 183.06,
+					"p95": 183.06
+				},
+				"smallReceivedWsBytesPerEdit": {
+					"sampleCount": 1,
+					"median": 8.78,
+					"p95": 8.78
+				},
+				"smallJsHeapBytes": {
+					"sampleCount": 1,
+					"median": 52859764,
+					"p95": 52859764
+				},
+				"mediumEventDurationMs": {
+					"sampleCount": 995,
+					"median": 16,
+					"p95": 16
+				},
+				"mediumEventInputDelayMs": {
+					"sampleCount": 995,
+					"median": 0.10000002384185791,
+					"p95": 0.5
+				},
+				"mediumEventProcessingMs": {
+					"sampleCount": 995,
+					"median": 0.30000001192092896,
+					"p95": 3.5
+				},
+				"mediumEventPresentationMs": {
+					"sampleCount": 995,
+					"median": 15.599999964237213,
+					"p95": 16
+				},
+				"mediumInputToPaintMs": {
+					"sampleCount": 193,
+					"median": 31.899999976158142,
+					"p95": 33
+				},
+				"mediumDispatchToPaintMs": {
+					"sampleCount": 200,
+					"median": 33.31213299999945,
+					"p95": 34.30298100000073
+				},
+				"mediumLongTaskCount": {
+					"sampleCount": 1,
+					"median": 1,
+					"p95": 1
+				},
+				"mediumLongTaskTotalMs": {
+					"sampleCount": 1,
+					"median": 113,
+					"p95": 113
+				},
+				"mediumSentBytesPerEdit": {
+					"sampleCount": 1,
+					"median": 181.335,
+					"p95": 181.335
+				},
+				"mediumReceivedWsBytesPerEdit": {
+					"sampleCount": 1,
+					"median": 6.21,
+					"p95": 6.21
+				},
+				"mediumJsHeapBytes": {
+					"sampleCount": 1,
+					"median": 140301684,
+					"p95": 140301684
+				},
+				"largeEventDurationMs": {
+					"sampleCount": 988,
+					"median": 16,
+					"p95": 16
+				},
+				"largeEventInputDelayMs": {
+					"sampleCount": 988,
+					"median": 0.10000002384185791,
+					"p95": 0.5999999642372131
+				},
+				"largeEventProcessingMs": {
+					"sampleCount": 988,
+					"median": 0.30000001192092896,
+					"p95": 3.699999988079071
+				},
+				"largeEventPresentationMs": {
+					"sampleCount": 988,
+					"median": 15.5,
+					"p95": 16
+				},
+				"largeInputToPaintMs": {
+					"sampleCount": 193,
+					"median": 31.600000023841858,
+					"p95": 32.30000001192093
+				},
+				"largeDispatchToPaintMs": {
+					"sampleCount": 200,
+					"median": 33.330735000025015,
+					"p95": 33.795931000000564
+				},
+				"largeLongTaskCount": {
+					"sampleCount": 1,
+					"median": 1,
+					"p95": 1
+				},
+				"largeLongTaskTotalMs": {
+					"sampleCount": 1,
+					"median": 331,
+					"p95": 331
+				},
+				"largeSentBytesPerEdit": {
+					"sampleCount": 1,
+					"median": 181.33,
+					"p95": 181.33
+				},
+				"largeReceivedWsBytesPerEdit": {
+					"sampleCount": 1,
+					"median": 6.545,
+					"p95": 6.545
+				},
+				"largeJsHeapBytes": {
+					"sampleCount": 1,
+					"median": 473468028,
+					"p95": 473468028
+				}
+			}
+		},
+		{
+			"replayVerifications": [
+				{
+					"run": 1,
+					"document": "small",
+					"persistence": false
+				},
+				{
+					"run": 1,
+					"document": "medium",
+					"persistence": false
+				},
+				{
+					"run": 1,
+					"document": "large",
+					"persistence": false
+				}
+			],
+			"runLoads": [
+				{
+					"run": 1,
+					"start": [
+						2.95,
+						3.02,
+						3.63
+					],
+					"end": [
+						2.56,
+						2.96,
+						3.52
+					]
+				}
+			],
+			"label": "classic",
+			"target": "https://classic-main-alkalye-typing.cshed.carlassmann.com",
+			"createdAt": "2026-11-14T05:04:20.448Z",
+			"environment": {
+				"platform": "linux",
+				"release": "7.2.8-9-omarchy",
+				"cpu": "AMD RYZEN AI MAX+ 395 w/ Radeon 8060S",
+				"cores": 32,
+				"browser": "145.0.7632.6",
+				"cpuThrottle": 1,
+				"networkCapture": "CDP pages, iframes, dedicated workers and SharedWorkers",
+				"serverRuntime": "Node production; identical Brotli-6 serving; Classic jazz-run 0.20.19 (32 GB); v2 isolated SQLite",
+				"jazz": "0.20.18",
+				"gitHead": "8379d4e",
+				"server": "production Node adapter; local store; first visit SW blocked, returning SW installed"
+			},
+			"config": {
+				"runs": 1,
+				"notes": 50,
+				"edits": 200,
+				"totalTraceEdits": 259778,
+				"serviceWorkersOnly": false,
+				"largeOnly": false,
+				"performanceOnly": false,
+				"loadOnly": false,
+				"firstVisitHttpCache": "fresh context, enabled",
+				"literalNewlines": true,
+				"verifyPersistence": false,
+				"automaticPairsAndCompletion": false,
+				"replayTimeoutMs": 120000
+			},
+			"sources": [
+				{
+					"file": "vite.tar.gz",
+					"url": "https://codeload.github.com/vitejs/vite/tar.gz/4d21dc4ebcabecc13a35d73ef7dcac704cdbc817",
+					"sha256": "e3bd67ccafd837066cf8d263f871089424da7eabb87c48e7d29f9d52f2c69291",
+					"license": "MIT",
+					"attribution": "Vite contributors",
+					"licenseUrl": "https://github.com/vitejs/vite/blob/4d21dc4ebcabecc13a35d73ef7dcac704cdbc817/LICENSE"
+				},
+				{
+					"file": "trace.js",
+					"url": "https://raw.githubusercontent.com/automerge/automerge-perf/da212e984c777d31ee7d888f82637288aa4c61d3/edit-by-index/editing-trace.js",
+					"sha256": "23116070719243e2950c310006dd50b3d80744be7542a86c62e7d5c2ed7326d0",
+					"license": "CC-BY-4.0",
+					"attribution": "Martin Kleppmann and Alastair R. Beresford, A Conflict-Free Replicated JSON Datatype",
+					"licenseUrl": "https://github.com/automerge/automerge-perf/blob/da212e984c777d31ee7d888f82637288aa4c61d3/README.md#license"
+				},
+				{
+					"file": "alice.txt",
+					"url": "https://www.gutenberg.org/ebooks/11.txt.utf-8",
+					"sha256": "01b38ea4c710a84bc18d0bd41271a5a1a92b94e97b2812f4dece97d4a694725e",
+					"license": "Public domain in USA; Project Gutenberg license retained in text",
+					"attribution": "Lewis Carroll, Alice's Adventures in Wonderland; Project Gutenberg",
+					"licenseUrl": "https://www.gutenberg.org/policy/license.html"
+				},
+				{
+					"file": "dracula.txt",
+					"url": "https://www.gutenberg.org/ebooks/345.txt.utf-8",
+					"sha256": "96cd16eacdbfebae8fdda5591f66e0cc8ee76be18e0cd1aca02bc00615782d28",
+					"license": "Public domain in USA; Project Gutenberg license retained in text",
+					"attribution": "Bram Stoker, Dracula; Project Gutenberg",
+					"licenseUrl": "https://www.gutenberg.org/policy/license.html"
+				}
+			],
+			"datasets": [
+				{
+					"title": "Corpus 000",
+					"source": "acknowledgements.md",
+					"bytes": 6218
+				},
+				{
+					"title": "Corpus 001",
+					"source": "blog.md",
+					"bytes": 232
+				},
+				{
+					"title": "Corpus 002",
+					"source": "blog/announcing-vite2.md",
+					"bytes": 5936
+				},
+				{
+					"title": "Corpus 003",
+					"source": "blog/announcing-vite3.md",
+					"bytes": 20753
+				},
+				{
+					"title": "Corpus 004",
+					"source": "blog/announcing-vite4-3.md",
+					"bytes": 4606
+				},
+				{
+					"title": "Corpus 005",
+					"source": "blog/announcing-vite4.md",
+					"bytes": 12080
+				},
+				{
+					"title": "Corpus 006",
+					"source": "blog/announcing-vite5-1.md",
+					"bytes": 11126
+				},
+				{
+					"title": "Corpus 007",
+					"source": "blog/announcing-vite5.md",
+					"bytes": 10567
+				},
+				{
+					"title": "Corpus 008",
+					"source": "blog/announcing-vite6.md",
+					"bytes": 11680
+				},
+				{
+					"title": "Corpus 009",
+					"source": "blog/announcing-vite7.md",
+					"bytes": 8738
+				},
+				{
+					"title": "Corpus 010",
+					"source": "blog/announcing-vite8-1.md",
+					"bytes": 10425
+				},
+				{
+					"title": "Corpus 011",
+					"source": "blog/announcing-vite8-beta.md",
+					"bytes": 9043
+				},
+				{
+					"title": "Corpus 012",
+					"source": "blog/announcing-vite8.md",
+					"bytes": 15394
+				},
+				{
+					"title": "Corpus 013",
+					"source": "blog/cloudflare-supports-vite.md",
+					"bytes": 4087
+				},
+				{
+					"title": "Corpus 014",
+					"source": "changes/hotupdate-hook.md",
+					"bytes": 3570
+				},
+				{
+					"title": "Corpus 015",
+					"source": "changes/index.md",
+					"bytes": 1558
+				},
+				{
+					"title": "Corpus 016",
+					"source": "changes/per-environment-apis.md",
+					"bytes": 2296
+				},
+				{
+					"title": "Corpus 017",
+					"source": "changes/shared-plugins-during-build.md",
+					"bytes": 2288
+				},
+				{
+					"title": "Corpus 018",
+					"source": "changes/ssr-using-modulerunner.md",
+					"bytes": 1305
+				},
+				{
+					"title": "Corpus 019",
+					"source": "changes/this-environment-in-hooks.md",
+					"bytes": 2416
+				},
+				{
+					"title": "Corpus 020",
+					"source": "config/build-options.md",
+					"bytes": 17369
+				},
+				{
+					"title": "Corpus 021",
+					"source": "config/dep-optimization-options.md",
+					"bytes": 6158
+				},
+				{
+					"title": "Corpus 022",
+					"source": "config/index.md",
+					"bytes": 7269
+				},
+				{
+					"title": "Corpus 023",
+					"source": "config/preview-options.md",
+					"bytes": 3164
+				},
+				{
+					"title": "Corpus 024",
+					"source": "config/server-options.md",
+					"bytes": 21219
+				},
+				{
+					"title": "Corpus 025",
+					"source": "config/shared-options.md",
+					"bytes": 24934
+				},
+				{
+					"title": "Corpus 026",
+					"source": "config/ssr-options.md",
+					"bytes": 3282
+				},
+				{
+					"title": "Corpus 027",
+					"source": "config/worker-options.md",
+					"bytes": 1016
+				},
+				{
+					"title": "Corpus 028",
+					"source": "guide/api-environment-frameworks.md",
+					"bytes": 15857
+				},
+				{
+					"title": "Corpus 029",
+					"source": "guide/api-environment-instances.md",
+					"bytes": 11092
+				},
+				{
+					"title": "Corpus 030",
+					"source": "guide/api-environment-plugins.md",
+					"bytes": 16108
+				},
+				{
+					"title": "Corpus 031",
+					"source": "guide/api-environment-runtimes.md",
+					"bytes": 17438
+				},
+				{
+					"title": "Corpus 032",
+					"source": "guide/api-environment.md",
+					"bytes": 9080
+				},
+				{
+					"title": "Corpus 033",
+					"source": "guide/api-hmr.md",
+					"bytes": 9488
+				},
+				{
+					"title": "Corpus 034",
+					"source": "guide/api-javascript.md",
+					"bytes": 13734
+				},
+				{
+					"title": "Corpus 035",
+					"source": "guide/api-plugin.md",
+					"bytes": 31921
+				},
+				{
+					"title": "Corpus 036",
+					"source": "guide/assets.md",
+					"bytes": 6607
+				},
+				{
+					"title": "Corpus 037",
+					"source": "guide/backend-integration.md",
+					"bytes": 11608
+				},
+				{
+					"title": "Corpus 038",
+					"source": "guide/build.md",
+					"bytes": 14607
+				},
+				{
+					"title": "Corpus 039",
+					"source": "guide/cli.md",
+					"bytes": 15558
+				},
+				{
+					"title": "Corpus 040",
+					"source": "guide/dep-pre-bundling.md",
+					"bytes": 5692
+				},
+				{
+					"title": "Corpus 041",
+					"source": "guide/env-and-mode.md",
+					"bytes": 10924
+				},
+				{
+					"title": "Corpus 042",
+					"source": "guide/features.md",
+					"bytes": 41460
+				},
+				{
+					"title": "Corpus 043",
+					"source": "guide/index.md",
+					"bytes": 11593
+				},
+				{
+					"title": "Corpus 044",
+					"source": "guide/migration.md",
+					"bytes": 21510
+				},
+				{
+					"title": "Corpus 045",
+					"source": "guide/performance.md",
+					"bytes": 8225
+				},
+				{
+					"title": "Corpus 046",
+					"source": "guide/philosophy.md",
+					"bytes": 3616
+				},
+				{
+					"title": "Corpus 047",
+					"source": "guide/ssr.md",
+					"bytes": 14704
+				},
+				{
+					"title": "Corpus 048",
+					"source": "guide/static-deploy.md",
+					"bytes": 14519
+				},
+				{
+					"title": "Corpus 049",
+					"source": "guide/troubleshooting.md",
+					"bytes": 16467
+				},
+				{
+					"title": "Book alice",
+					"source": "alice.txt",
+					"bytes": 170590
+				},
+				{
+					"title": "Book dracula",
+					"source": "dracula.txt",
+					"bytes": 874540
+				}
+			],
+			"completedRuns": 1,
+			"scenarioFailures": [],
+			"metrics": {
+				"importMs": {
+					"sampleCount": 1,
+					"median": 40929.505266,
+					"p95": 40929.505266
+				},
+				"indexedDBBytes": {
+					"sampleCount": 1,
+					"median": 156409206,
+					"p95": 156409206
+				},
+				"coldListMs": {
+					"sampleCount": 1,
+					"median": 6199.786601,
+					"p95": 6199.786601
+				},
+				"firstLoadJsWasmBytes": {
+					"sampleCount": 1,
+					"median": 2964585,
+					"p95": 2964585
+				},
+				"coldLargeOpenMs": {
+					"sampleCount": 1,
+					"median": 10912.634782999994,
+					"p95": 10912.634782999994
+				},
+				"warmListMs": {
+					"sampleCount": 1,
+					"median": 2707.583004999993,
+					"p95": 2707.583004999993
+				},
+				"freshDeviceWholeDatasetMs": {
+					"sampleCount": 1,
+					"median": 19615.804984000002,
+					"p95": 19615.804984000002
+				},
+				"syncEditMs": {
+					"sampleCount": 5,
+					"median": 276.1931489999988,
+					"p95": 295.9310860000114
+				},
+				"smallEventDurationMs": {
+					"sampleCount": 977,
+					"median": 16,
+					"p95": 24
+				},
+				"smallEventInputDelayMs": {
+					"sampleCount": 977,
+					"median": 0.19999998807907104,
+					"p95": 0.8999999761581421
+				},
+				"smallEventProcessingMs": {
+					"sampleCount": 977,
+					"median": 0.30000001192092896,
+					"p95": 4.5
+				},
+				"smallEventPresentationMs": {
+					"sampleCount": 977,
+					"median": 15.299999952316284,
+					"p95": 18.80000001192093
+				},
+				"smallInputToPaintMs": {
+					"sampleCount": 193,
+					"median": 30.5,
+					"p95": 31.399999976158142
+				},
+				"smallDispatchToPaintMs": {
+					"sampleCount": 200,
+					"median": 33.3231589999923,
+					"p95": 34.506520000009914
+				},
+				"smallLongTaskCount": {
+					"sampleCount": 1,
+					"median": 0,
+					"p95": 0
+				},
+				"smallLongTaskTotalMs": {
+					"sampleCount": 1,
+					"median": 0,
+					"p95": 0
+				},
+				"smallSentBytesPerEdit": {
+					"sampleCount": 1,
+					"median": 183.055,
+					"p95": 183.055
+				},
+				"smallReceivedWsBytesPerEdit": {
+					"sampleCount": 1,
+					"median": 8.78,
+					"p95": 8.78
+				},
+				"smallJsHeapBytes": {
+					"sampleCount": 1,
+					"median": 52849368,
+					"p95": 52849368
+				},
+				"mediumEventDurationMs": {
+					"sampleCount": 996,
+					"median": 16,
+					"p95": 16
+				},
+				"mediumEventInputDelayMs": {
+					"sampleCount": 996,
+					"median": 0.09999996423721313,
+					"p95": 0.40000003576278687
+				},
+				"mediumEventProcessingMs": {
+					"sampleCount": 996,
+					"median": 0.19999998807907104,
+					"p95": 2.5
+				},
+				"mediumEventPresentationMs": {
+					"sampleCount": 996,
+					"median": 15.699999988079071,
+					"p95": 16
+				},
+				"mediumInputToPaintMs": {
+					"sampleCount": 193,
+					"median": 32.39999997615814,
+					"p95": 32.80000001192093
+				},
+				"mediumDispatchToPaintMs": {
+					"sampleCount": 200,
+					"median": 33.310412999999244,
+					"p95": 33.691009999995
+				},
+				"mediumLongTaskCount": {
+					"sampleCount": 1,
+					"median": 1,
+					"p95": 1
+				},
+				"mediumLongTaskTotalMs": {
+					"sampleCount": 1,
+					"median": 112,
+					"p95": 112
+				},
+				"mediumSentBytesPerEdit": {
+					"sampleCount": 1,
+					"median": 181.335,
+					"p95": 181.335
+				},
+				"mediumReceivedWsBytesPerEdit": {
+					"sampleCount": 1,
+					"median": 6.215,
+					"p95": 6.215
+				},
+				"mediumJsHeapBytes": {
+					"sampleCount": 1,
+					"median": 142616384,
+					"p95": 142616384
+				},
+				"largeEventDurationMs": {
+					"sampleCount": 998,
+					"median": 16,
+					"p95": 16
+				},
+				"largeEventInputDelayMs": {
+					"sampleCount": 998,
+					"median": 0.09999996423721313,
+					"p95": 0.3999999761581421
+				},
+				"largeEventProcessingMs": {
+					"sampleCount": 998,
+					"median": 0.19999998807907104,
+					"p95": 2.199999988079071
+				},
+				"largeEventPresentationMs": {
+					"sampleCount": 998,
+					"median": 15.699999988079071,
+					"p95": 16
+				},
+				"largeInputToPaintMs": {
+					"sampleCount": 193,
+					"median": 32.5,
+					"p95": 32.80000001192093
+				},
+				"largeDispatchToPaintMs": {
+					"sampleCount": 200,
+					"median": 33.32462800000212,
+					"p95": 33.623531999997795
+				},
+				"largeLongTaskCount": {
+					"sampleCount": 1,
+					"median": 1,
+					"p95": 1
+				},
+				"largeLongTaskTotalMs": {
+					"sampleCount": 1,
+					"median": 318,
+					"p95": 318
+				},
+				"largeSentBytesPerEdit": {
+					"sampleCount": 1,
+					"median": 181.335,
+					"p95": 181.335
+				},
+				"largeReceivedWsBytesPerEdit": {
+					"sampleCount": 1,
+					"median": 6.55,
+					"p95": 6.55
+				},
+				"largeJsHeapBytes": {
+					"sampleCount": 1,
+					"median": 426056936,
+					"p95": 426056936
+				}
+			}
+		},
+		{
+			"replayVerifications": [
+				{
+					"run": 1,
+					"document": "small",
+					"persistence": false
+				},
+				{
+					"run": 1,
+					"document": "medium",
+					"persistence": false
+				},
+				{
+					"run": 1,
+					"document": "large",
+					"persistence": false
+				}
+			],
+			"runLoads": [
+				{
+					"run": 1,
+					"start": [
+						2.84,
+						2.95,
+						3.46
+					],
+					"end": [
+						3.76,
+						3.22,
+						3.48
+					]
+				}
+			],
+			"label": "classic",
+			"target": "https://classic-main-alkalye-typing.cshed.carlassmann.com",
+			"createdAt": "2026-11-14T05:08:28.814Z",
+			"environment": {
+				"platform": "linux",
+				"release": "7.2.8-9-omarchy",
+				"cpu": "AMD RYZEN AI MAX+ 395 w/ Radeon 8060S",
+				"cores": 32,
+				"browser": "145.0.7632.6",
+				"cpuThrottle": 1,
+				"networkCapture": "CDP pages, iframes, dedicated workers and SharedWorkers",
+				"serverRuntime": "Node production; identical Brotli-6 serving; Classic jazz-run 0.20.19 (32 GB); v2 isolated SQLite",
+				"jazz": "0.20.18",
+				"gitHead": "8379d4e",
+				"server": "production Node adapter; local store; first visit SW blocked, returning SW installed"
+			},
+			"config": {
+				"runs": 1,
+				"notes": 50,
+				"edits": 200,
+				"totalTraceEdits": 259778,
+				"serviceWorkersOnly": false,
+				"largeOnly": false,
+				"performanceOnly": false,
+				"loadOnly": false,
+				"firstVisitHttpCache": "fresh context, enabled",
+				"literalNewlines": true,
+				"verifyPersistence": false,
+				"automaticPairsAndCompletion": false,
+				"replayTimeoutMs": 120000
+			},
+			"sources": [
+				{
+					"file": "vite.tar.gz",
+					"url": "https://codeload.github.com/vitejs/vite/tar.gz/4d21dc4ebcabecc13a35d73ef7dcac704cdbc817",
+					"sha256": "e3bd67ccafd837066cf8d263f871089424da7eabb87c48e7d29f9d52f2c69291",
+					"license": "MIT",
+					"attribution": "Vite contributors",
+					"licenseUrl": "https://github.com/vitejs/vite/blob/4d21dc4ebcabecc13a35d73ef7dcac704cdbc817/LICENSE"
+				},
+				{
+					"file": "trace.js",
+					"url": "https://raw.githubusercontent.com/automerge/automerge-perf/da212e984c777d31ee7d888f82637288aa4c61d3/edit-by-index/editing-trace.js",
+					"sha256": "23116070719243e2950c310006dd50b3d80744be7542a86c62e7d5c2ed7326d0",
+					"license": "CC-BY-4.0",
+					"attribution": "Martin Kleppmann and Alastair R. Beresford, A Conflict-Free Replicated JSON Datatype",
+					"licenseUrl": "https://github.com/automerge/automerge-perf/blob/da212e984c777d31ee7d888f82637288aa4c61d3/README.md#license"
+				},
+				{
+					"file": "alice.txt",
+					"url": "https://www.gutenberg.org/ebooks/11.txt.utf-8",
+					"sha256": "01b38ea4c710a84bc18d0bd41271a5a1a92b94e97b2812f4dece97d4a694725e",
+					"license": "Public domain in USA; Project Gutenberg license retained in text",
+					"attribution": "Lewis Carroll, Alice's Adventures in Wonderland; Project Gutenberg",
+					"licenseUrl": "https://www.gutenberg.org/policy/license.html"
+				},
+				{
+					"file": "dracula.txt",
+					"url": "https://www.gutenberg.org/ebooks/345.txt.utf-8",
+					"sha256": "96cd16eacdbfebae8fdda5591f66e0cc8ee76be18e0cd1aca02bc00615782d28",
+					"license": "Public domain in USA; Project Gutenberg license retained in text",
+					"attribution": "Bram Stoker, Dracula; Project Gutenberg",
+					"licenseUrl": "https://www.gutenberg.org/policy/license.html"
+				}
+			],
+			"datasets": [
+				{
+					"title": "Corpus 000",
+					"source": "acknowledgements.md",
+					"bytes": 6218
+				},
+				{
+					"title": "Corpus 001",
+					"source": "blog.md",
+					"bytes": 232
+				},
+				{
+					"title": "Corpus 002",
+					"source": "blog/announcing-vite2.md",
+					"bytes": 5936
+				},
+				{
+					"title": "Corpus 003",
+					"source": "blog/announcing-vite3.md",
+					"bytes": 20753
+				},
+				{
+					"title": "Corpus 004",
+					"source": "blog/announcing-vite4-3.md",
+					"bytes": 4606
+				},
+				{
+					"title": "Corpus 005",
+					"source": "blog/announcing-vite4.md",
+					"bytes": 12080
+				},
+				{
+					"title": "Corpus 006",
+					"source": "blog/announcing-vite5-1.md",
+					"bytes": 11126
+				},
+				{
+					"title": "Corpus 007",
+					"source": "blog/announcing-vite5.md",
+					"bytes": 10567
+				},
+				{
+					"title": "Corpus 008",
+					"source": "blog/announcing-vite6.md",
+					"bytes": 11680
+				},
+				{
+					"title": "Corpus 009",
+					"source": "blog/announcing-vite7.md",
+					"bytes": 8738
+				},
+				{
+					"title": "Corpus 010",
+					"source": "blog/announcing-vite8-1.md",
+					"bytes": 10425
+				},
+				{
+					"title": "Corpus 011",
+					"source": "blog/announcing-vite8-beta.md",
+					"bytes": 9043
+				},
+				{
+					"title": "Corpus 012",
+					"source": "blog/announcing-vite8.md",
+					"bytes": 15394
+				},
+				{
+					"title": "Corpus 013",
+					"source": "blog/cloudflare-supports-vite.md",
+					"bytes": 4087
+				},
+				{
+					"title": "Corpus 014",
+					"source": "changes/hotupdate-hook.md",
+					"bytes": 3570
+				},
+				{
+					"title": "Corpus 015",
+					"source": "changes/index.md",
+					"bytes": 1558
+				},
+				{
+					"title": "Corpus 016",
+					"source": "changes/per-environment-apis.md",
+					"bytes": 2296
+				},
+				{
+					"title": "Corpus 017",
+					"source": "changes/shared-plugins-during-build.md",
+					"bytes": 2288
+				},
+				{
+					"title": "Corpus 018",
+					"source": "changes/ssr-using-modulerunner.md",
+					"bytes": 1305
+				},
+				{
+					"title": "Corpus 019",
+					"source": "changes/this-environment-in-hooks.md",
+					"bytes": 2416
+				},
+				{
+					"title": "Corpus 020",
+					"source": "config/build-options.md",
+					"bytes": 17369
+				},
+				{
+					"title": "Corpus 021",
+					"source": "config/dep-optimization-options.md",
+					"bytes": 6158
+				},
+				{
+					"title": "Corpus 022",
+					"source": "config/index.md",
+					"bytes": 7269
+				},
+				{
+					"title": "Corpus 023",
+					"source": "config/preview-options.md",
+					"bytes": 3164
+				},
+				{
+					"title": "Corpus 024",
+					"source": "config/server-options.md",
+					"bytes": 21219
+				},
+				{
+					"title": "Corpus 025",
+					"source": "config/shared-options.md",
+					"bytes": 24934
+				},
+				{
+					"title": "Corpus 026",
+					"source": "config/ssr-options.md",
+					"bytes": 3282
+				},
+				{
+					"title": "Corpus 027",
+					"source": "config/worker-options.md",
+					"bytes": 1016
+				},
+				{
+					"title": "Corpus 028",
+					"source": "guide/api-environment-frameworks.md",
+					"bytes": 15857
+				},
+				{
+					"title": "Corpus 029",
+					"source": "guide/api-environment-instances.md",
+					"bytes": 11092
+				},
+				{
+					"title": "Corpus 030",
+					"source": "guide/api-environment-plugins.md",
+					"bytes": 16108
+				},
+				{
+					"title": "Corpus 031",
+					"source": "guide/api-environment-runtimes.md",
+					"bytes": 17438
+				},
+				{
+					"title": "Corpus 032",
+					"source": "guide/api-environment.md",
+					"bytes": 9080
+				},
+				{
+					"title": "Corpus 033",
+					"source": "guide/api-hmr.md",
+					"bytes": 9488
+				},
+				{
+					"title": "Corpus 034",
+					"source": "guide/api-javascript.md",
+					"bytes": 13734
+				},
+				{
+					"title": "Corpus 035",
+					"source": "guide/api-plugin.md",
+					"bytes": 31921
+				},
+				{
+					"title": "Corpus 036",
+					"source": "guide/assets.md",
+					"bytes": 6607
+				},
+				{
+					"title": "Corpus 037",
+					"source": "guide/backend-integration.md",
+					"bytes": 11608
+				},
+				{
+					"title": "Corpus 038",
+					"source": "guide/build.md",
+					"bytes": 14607
+				},
+				{
+					"title": "Corpus 039",
+					"source": "guide/cli.md",
+					"bytes": 15558
+				},
+				{
+					"title": "Corpus 040",
+					"source": "guide/dep-pre-bundling.md",
+					"bytes": 5692
+				},
+				{
+					"title": "Corpus 041",
+					"source": "guide/env-and-mode.md",
+					"bytes": 10924
+				},
+				{
+					"title": "Corpus 042",
+					"source": "guide/features.md",
+					"bytes": 41460
+				},
+				{
+					"title": "Corpus 043",
+					"source": "guide/index.md",
+					"bytes": 11593
+				},
+				{
+					"title": "Corpus 044",
+					"source": "guide/migration.md",
+					"bytes": 21510
+				},
+				{
+					"title": "Corpus 045",
+					"source": "guide/performance.md",
+					"bytes": 8225
+				},
+				{
+					"title": "Corpus 046",
+					"source": "guide/philosophy.md",
+					"bytes": 3616
+				},
+				{
+					"title": "Corpus 047",
+					"source": "guide/ssr.md",
+					"bytes": 14704
+				},
+				{
+					"title": "Corpus 048",
+					"source": "guide/static-deploy.md",
+					"bytes": 14519
+				},
+				{
+					"title": "Corpus 049",
+					"source": "guide/troubleshooting.md",
+					"bytes": 16467
+				},
+				{
+					"title": "Book alice",
+					"source": "alice.txt",
+					"bytes": 170590
+				},
+				{
+					"title": "Book dracula",
+					"source": "dracula.txt",
+					"bytes": 874540
+				}
+			],
+			"completedRuns": 1,
+			"scenarioFailures": [],
+			"metrics": {
+				"importMs": {
+					"sampleCount": 1,
+					"median": 39792.209914,
+					"p95": 39792.209914
+				},
+				"indexedDBBytes": {
+					"sampleCount": 1,
+					"median": 134695438,
+					"p95": 134695438
+				},
+				"coldListMs": {
+					"sampleCount": 1,
+					"median": 6148.600455,
+					"p95": 6148.600455
+				},
+				"firstLoadJsWasmBytes": {
+					"sampleCount": 1,
+					"median": 2964382,
+					"p95": 2964382
+				},
+				"coldLargeOpenMs": {
+					"sampleCount": 1,
+					"median": 11382.306864000006,
+					"p95": 11382.306864000006
+				},
+				"warmListMs": {
+					"sampleCount": 1,
+					"median": 2524.244280999992,
+					"p95": 2524.244280999992
+				},
+				"freshDeviceWholeDatasetMs": {
+					"sampleCount": 1,
+					"median": 19497.928327999995,
+					"p95": 19497.928327999995
+				},
+				"syncEditMs": {
+					"sampleCount": 5,
+					"median": 295.44077200000174,
+					"p95": 297.9388809999946
+				},
+				"smallEventDurationMs": {
+					"sampleCount": 984,
+					"median": 16,
+					"p95": 24
+				},
+				"smallEventInputDelayMs": {
+					"sampleCount": 984,
+					"median": 0.19999998807907104,
+					"p95": 1
+				},
+				"smallEventProcessingMs": {
+					"sampleCount": 984,
+					"median": 0.30000001192092896,
+					"p95": 4.400000035762787
+				},
+				"smallEventPresentationMs": {
+					"sampleCount": 984,
+					"median": 15.300000011920929,
+					"p95": 22.200000047683716
+				},
+				"smallInputToPaintMs": {
+					"sampleCount": 193,
+					"median": 30.5,
+					"p95": 31.900000035762787
+				},
+				"smallDispatchToPaintMs": {
+					"sampleCount": 200,
+					"median": 33.32147900000564,
+					"p95": 34.541769000003114
+				},
+				"smallLongTaskCount": {
+					"sampleCount": 1,
+					"median": 0,
+					"p95": 0
+				},
+				"smallLongTaskTotalMs": {
+					"sampleCount": 1,
+					"median": 0,
+					"p95": 0
+				},
+				"smallSentBytesPerEdit": {
+					"sampleCount": 1,
+					"median": 183.055,
+					"p95": 183.055
+				},
+				"smallReceivedWsBytesPerEdit": {
+					"sampleCount": 1,
+					"median": 8.78,
+					"p95": 8.78
+				},
+				"smallJsHeapBytes": {
+					"sampleCount": 1,
+					"median": 52833112,
+					"p95": 52833112
+				},
+				"mediumEventDurationMs": {
+					"sampleCount": 992,
+					"median": 16,
+					"p95": 16
+				},
+				"mediumEventInputDelayMs": {
+					"sampleCount": 992,
+					"median": 0.10000002384185791,
+					"p95": 0.5999999642372131
+				},
+				"mediumEventProcessingMs": {
+					"sampleCount": 992,
+					"median": 0.30000001192092896,
+					"p95": 3.699999988079071
+				},
+				"mediumEventPresentationMs": {
+					"sampleCount": 992,
+					"median": 15.5,
+					"p95": 16
+				},
+				"mediumInputToPaintMs": {
+					"sampleCount": 193,
+					"median": 31.5,
+					"p95": 32.10000002384186
+				},
+				"mediumDispatchToPaintMs": {
+					"sampleCount": 200,
+					"median": 33.31113899999764,
+					"p95": 33.85440199999721
+				},
+				"mediumLongTaskCount": {
+					"sampleCount": 1,
+					"median": 1,
+					"p95": 1
+				},
+				"mediumLongTaskTotalMs": {
+					"sampleCount": 1,
+					"median": 117,
+					"p95": 117
+				},
+				"mediumSentBytesPerEdit": {
+					"sampleCount": 1,
+					"median": 181.33,
+					"p95": 181.33
+				},
+				"mediumReceivedWsBytesPerEdit": {
+					"sampleCount": 1,
+					"median": 6.21,
+					"p95": 6.21
+				},
+				"mediumJsHeapBytes": {
+					"sampleCount": 1,
+					"median": 143893968,
+					"p95": 143893968
+				},
+				"largeEventDurationMs": {
+					"sampleCount": 999,
+					"median": 16,
+					"p95": 16
+				},
+				"largeEventInputDelayMs": {
+					"sampleCount": 999,
+					"median": 0.10000002384185791,
+					"p95": 0.5
+				},
+				"largeEventProcessingMs": {
+					"sampleCount": 999,
+					"median": 0.30000001192092896,
+					"p95": 3.199999988079071
+				},
+				"largeEventPresentationMs": {
+					"sampleCount": 999,
+					"median": 15.600000023841858,
+					"p95": 16
+				},
+				"largeInputToPaintMs": {
+					"sampleCount": 193,
+					"median": 31.900000035762787,
+					"p95": 32.80000001192093
+				},
+				"largeDispatchToPaintMs": {
+					"sampleCount": 200,
+					"median": 33.323681000008946,
+					"p95": 33.73592799998005
+				},
+				"largeLongTaskCount": {
+					"sampleCount": 1,
+					"median": 1,
+					"p95": 1
+				},
+				"largeLongTaskTotalMs": {
+					"sampleCount": 1,
+					"median": 253,
+					"p95": 253
+				},
+				"largeSentBytesPerEdit": {
+					"sampleCount": 1,
+					"median": 181.335,
+					"p95": 181.335
+				},
+				"largeReceivedWsBytesPerEdit": {
+					"sampleCount": 1,
+					"median": 6.55,
+					"p95": 6.55
+				},
+				"largeJsHeapBytes": {
+					"sampleCount": 1,
+					"median": 473020040,
+					"p95": 473020040
+				}
+			}
+		},
+		{
+			"replayVerifications": [
+				{
+					"run": 1,
+					"document": "small",
+					"persistence": false
+				},
+				{
+					"run": 1,
+					"document": "medium",
+					"persistence": false
+				},
+				{
+					"run": 1,
+					"document": "large",
+					"persistence": false
+				}
+			],
+			"runLoads": [
+				{
+					"run": 1,
+					"start": [
+						3.87,
+						3.38,
+						3.51
+					],
+					"end": [
+						3.26,
+						3.35,
+						3.48
+					]
+				}
+			],
+			"label": "classic",
+			"target": "https://classic-main-alkalye-typing.cshed.carlassmann.com",
+			"createdAt": "2026-11-14T05:12:35.635Z",
+			"environment": {
+				"platform": "linux",
+				"release": "7.2.8-9-omarchy",
+				"cpu": "AMD RYZEN AI MAX+ 395 w/ Radeon 8060S",
+				"cores": 32,
+				"browser": "145.0.7632.6",
+				"cpuThrottle": 1,
+				"networkCapture": "CDP pages, iframes, dedicated workers and SharedWorkers",
+				"serverRuntime": "Node production; identical Brotli-6 serving; Classic jazz-run 0.20.19 (32 GB); v2 isolated SQLite",
+				"jazz": "0.20.18",
+				"gitHead": "8379d4e",
+				"server": "production Node adapter; local store; first visit SW blocked, returning SW installed"
+			},
+			"config": {
+				"runs": 1,
+				"notes": 50,
+				"edits": 200,
+				"totalTraceEdits": 259778,
+				"serviceWorkersOnly": false,
+				"largeOnly": false,
+				"performanceOnly": false,
+				"loadOnly": false,
+				"firstVisitHttpCache": "fresh context, enabled",
+				"literalNewlines": true,
+				"verifyPersistence": false,
+				"automaticPairsAndCompletion": false,
+				"replayTimeoutMs": 120000
+			},
+			"sources": [
+				{
+					"file": "vite.tar.gz",
+					"url": "https://codeload.github.com/vitejs/vite/tar.gz/4d21dc4ebcabecc13a35d73ef7dcac704cdbc817",
+					"sha256": "e3bd67ccafd837066cf8d263f871089424da7eabb87c48e7d29f9d52f2c69291",
+					"license": "MIT",
+					"attribution": "Vite contributors",
+					"licenseUrl": "https://github.com/vitejs/vite/blob/4d21dc4ebcabecc13a35d73ef7dcac704cdbc817/LICENSE"
+				},
+				{
+					"file": "trace.js",
+					"url": "https://raw.githubusercontent.com/automerge/automerge-perf/da212e984c777d31ee7d888f82637288aa4c61d3/edit-by-index/editing-trace.js",
+					"sha256": "23116070719243e2950c310006dd50b3d80744be7542a86c62e7d5c2ed7326d0",
+					"license": "CC-BY-4.0",
+					"attribution": "Martin Kleppmann and Alastair R. Beresford, A Conflict-Free Replicated JSON Datatype",
+					"licenseUrl": "https://github.com/automerge/automerge-perf/blob/da212e984c777d31ee7d888f82637288aa4c61d3/README.md#license"
+				},
+				{
+					"file": "alice.txt",
+					"url": "https://www.gutenberg.org/ebooks/11.txt.utf-8",
+					"sha256": "01b38ea4c710a84bc18d0bd41271a5a1a92b94e97b2812f4dece97d4a694725e",
+					"license": "Public domain in USA; Project Gutenberg license retained in text",
+					"attribution": "Lewis Carroll, Alice's Adventures in Wonderland; Project Gutenberg",
+					"licenseUrl": "https://www.gutenberg.org/policy/license.html"
+				},
+				{
+					"file": "dracula.txt",
+					"url": "https://www.gutenberg.org/ebooks/345.txt.utf-8",
+					"sha256": "96cd16eacdbfebae8fdda5591f66e0cc8ee76be18e0cd1aca02bc00615782d28",
+					"license": "Public domain in USA; Project Gutenberg license retained in text",
+					"attribution": "Bram Stoker, Dracula; Project Gutenberg",
+					"licenseUrl": "https://www.gutenberg.org/policy/license.html"
+				}
+			],
+			"datasets": [
+				{
+					"title": "Corpus 000",
+					"source": "acknowledgements.md",
+					"bytes": 6218
+				},
+				{
+					"title": "Corpus 001",
+					"source": "blog.md",
+					"bytes": 232
+				},
+				{
+					"title": "Corpus 002",
+					"source": "blog/announcing-vite2.md",
+					"bytes": 5936
+				},
+				{
+					"title": "Corpus 003",
+					"source": "blog/announcing-vite3.md",
+					"bytes": 20753
+				},
+				{
+					"title": "Corpus 004",
+					"source": "blog/announcing-vite4-3.md",
+					"bytes": 4606
+				},
+				{
+					"title": "Corpus 005",
+					"source": "blog/announcing-vite4.md",
+					"bytes": 12080
+				},
+				{
+					"title": "Corpus 006",
+					"source": "blog/announcing-vite5-1.md",
+					"bytes": 11126
+				},
+				{
+					"title": "Corpus 007",
+					"source": "blog/announcing-vite5.md",
+					"bytes": 10567
+				},
+				{
+					"title": "Corpus 008",
+					"source": "blog/announcing-vite6.md",
+					"bytes": 11680
+				},
+				{
+					"title": "Corpus 009",
+					"source": "blog/announcing-vite7.md",
+					"bytes": 8738
+				},
+				{
+					"title": "Corpus 010",
+					"source": "blog/announcing-vite8-1.md",
+					"bytes": 10425
+				},
+				{
+					"title": "Corpus 011",
+					"source": "blog/announcing-vite8-beta.md",
+					"bytes": 9043
+				},
+				{
+					"title": "Corpus 012",
+					"source": "blog/announcing-vite8.md",
+					"bytes": 15394
+				},
+				{
+					"title": "Corpus 013",
+					"source": "blog/cloudflare-supports-vite.md",
+					"bytes": 4087
+				},
+				{
+					"title": "Corpus 014",
+					"source": "changes/hotupdate-hook.md",
+					"bytes": 3570
+				},
+				{
+					"title": "Corpus 015",
+					"source": "changes/index.md",
+					"bytes": 1558
+				},
+				{
+					"title": "Corpus 016",
+					"source": "changes/per-environment-apis.md",
+					"bytes": 2296
+				},
+				{
+					"title": "Corpus 017",
+					"source": "changes/shared-plugins-during-build.md",
+					"bytes": 2288
+				},
+				{
+					"title": "Corpus 018",
+					"source": "changes/ssr-using-modulerunner.md",
+					"bytes": 1305
+				},
+				{
+					"title": "Corpus 019",
+					"source": "changes/this-environment-in-hooks.md",
+					"bytes": 2416
+				},
+				{
+					"title": "Corpus 020",
+					"source": "config/build-options.md",
+					"bytes": 17369
+				},
+				{
+					"title": "Corpus 021",
+					"source": "config/dep-optimization-options.md",
+					"bytes": 6158
+				},
+				{
+					"title": "Corpus 022",
+					"source": "config/index.md",
+					"bytes": 7269
+				},
+				{
+					"title": "Corpus 023",
+					"source": "config/preview-options.md",
+					"bytes": 3164
+				},
+				{
+					"title": "Corpus 024",
+					"source": "config/server-options.md",
+					"bytes": 21219
+				},
+				{
+					"title": "Corpus 025",
+					"source": "config/shared-options.md",
+					"bytes": 24934
+				},
+				{
+					"title": "Corpus 026",
+					"source": "config/ssr-options.md",
+					"bytes": 3282
+				},
+				{
+					"title": "Corpus 027",
+					"source": "config/worker-options.md",
+					"bytes": 1016
+				},
+				{
+					"title": "Corpus 028",
+					"source": "guide/api-environment-frameworks.md",
+					"bytes": 15857
+				},
+				{
+					"title": "Corpus 029",
+					"source": "guide/api-environment-instances.md",
+					"bytes": 11092
+				},
+				{
+					"title": "Corpus 030",
+					"source": "guide/api-environment-plugins.md",
+					"bytes": 16108
+				},
+				{
+					"title": "Corpus 031",
+					"source": "guide/api-environment-runtimes.md",
+					"bytes": 17438
+				},
+				{
+					"title": "Corpus 032",
+					"source": "guide/api-environment.md",
+					"bytes": 9080
+				},
+				{
+					"title": "Corpus 033",
+					"source": "guide/api-hmr.md",
+					"bytes": 9488
+				},
+				{
+					"title": "Corpus 034",
+					"source": "guide/api-javascript.md",
+					"bytes": 13734
+				},
+				{
+					"title": "Corpus 035",
+					"source": "guide/api-plugin.md",
+					"bytes": 31921
+				},
+				{
+					"title": "Corpus 036",
+					"source": "guide/assets.md",
+					"bytes": 6607
+				},
+				{
+					"title": "Corpus 037",
+					"source": "guide/backend-integration.md",
+					"bytes": 11608
+				},
+				{
+					"title": "Corpus 038",
+					"source": "guide/build.md",
+					"bytes": 14607
+				},
+				{
+					"title": "Corpus 039",
+					"source": "guide/cli.md",
+					"bytes": 15558
+				},
+				{
+					"title": "Corpus 040",
+					"source": "guide/dep-pre-bundling.md",
+					"bytes": 5692
+				},
+				{
+					"title": "Corpus 041",
+					"source": "guide/env-and-mode.md",
+					"bytes": 10924
+				},
+				{
+					"title": "Corpus 042",
+					"source": "guide/features.md",
+					"bytes": 41460
+				},
+				{
+					"title": "Corpus 043",
+					"source": "guide/index.md",
+					"bytes": 11593
+				},
+				{
+					"title": "Corpus 044",
+					"source": "guide/migration.md",
+					"bytes": 21510
+				},
+				{
+					"title": "Corpus 045",
+					"source": "guide/performance.md",
+					"bytes": 8225
+				},
+				{
+					"title": "Corpus 046",
+					"source": "guide/philosophy.md",
+					"bytes": 3616
+				},
+				{
+					"title": "Corpus 047",
+					"source": "guide/ssr.md",
+					"bytes": 14704
+				},
+				{
+					"title": "Corpus 048",
+					"source": "guide/static-deploy.md",
+					"bytes": 14519
+				},
+				{
+					"title": "Corpus 049",
+					"source": "guide/troubleshooting.md",
+					"bytes": 16467
+				},
+				{
+					"title": "Book alice",
+					"source": "alice.txt",
+					"bytes": 170590
+				},
+				{
+					"title": "Book dracula",
+					"source": "dracula.txt",
+					"bytes": 874540
+				}
+			],
+			"completedRuns": 1,
+			"scenarioFailures": [],
+			"metrics": {
+				"importMs": {
+					"sampleCount": 1,
+					"median": 41379.114931,
+					"p95": 41379.114931
+				},
+				"indexedDBBytes": {
+					"sampleCount": 1,
+					"median": 125813025,
+					"p95": 125813025
+				},
+				"coldListMs": {
+					"sampleCount": 1,
+					"median": 6049.4590769999995,
+					"p95": 6049.4590769999995
+				},
+				"firstLoadJsWasmBytes": {
+					"sampleCount": 1,
+					"median": 2964613,
+					"p95": 2964613
+				},
+				"coldLargeOpenMs": {
+					"sampleCount": 1,
+					"median": 11247.062168999997,
+					"p95": 11247.062168999997
+				},
+				"warmListMs": {
+					"sampleCount": 1,
+					"median": 2591.126514000003,
+					"p95": 2591.126514000003
+				},
+				"freshDeviceWholeDatasetMs": {
+					"sampleCount": 1,
+					"median": 19579.51500999999,
+					"p95": 19579.51500999999
+				},
+				"syncEditMs": {
+					"sampleCount": 5,
+					"median": 296.198378999994,
+					"p95": 332.3117499999935
+				},
+				"smallEventDurationMs": {
+					"sampleCount": 978,
+					"median": 16,
+					"p95": 16
+				},
+				"smallEventInputDelayMs": {
+					"sampleCount": 978,
+					"median": 0.19999998807907104,
+					"p95": 1
+				},
+				"smallEventProcessingMs": {
+					"sampleCount": 978,
+					"median": 0.30000001192092896,
+					"p95": 4.399999976158142
+				},
+				"smallEventPresentationMs": {
+					"sampleCount": 978,
+					"median": 15.300000011920929,
+					"p95": 16
+				},
+				"smallInputToPaintMs": {
+					"sampleCount": 193,
+					"median": 30.5,
+					"p95": 31.900000035762787
+				},
+				"smallDispatchToPaintMs": {
+					"sampleCount": 200,
+					"median": 33.307772999993176,
+					"p95": 33.76607699999295
+				},
+				"smallLongTaskCount": {
+					"sampleCount": 1,
+					"median": 0,
+					"p95": 0
+				},
+				"smallLongTaskTotalMs": {
+					"sampleCount": 1,
+					"median": 0,
+					"p95": 0
+				},
+				"smallSentBytesPerEdit": {
+					"sampleCount": 1,
+					"median": 183.055,
+					"p95": 183.055
+				},
+				"smallReceivedWsBytesPerEdit": {
+					"sampleCount": 1,
+					"median": 8.775,
+					"p95": 8.775
+				},
+				"smallJsHeapBytes": {
+					"sampleCount": 1,
+					"median": 52896544,
+					"p95": 52896544
+				},
+				"mediumEventDurationMs": {
+					"sampleCount": 988,
+					"median": 16,
+					"p95": 16
+				},
+				"mediumEventInputDelayMs": {
+					"sampleCount": 988,
+					"median": 0.10000002384185791,
+					"p95": 0.5999999642372131
+				},
+				"mediumEventProcessingMs": {
+					"sampleCount": 988,
+					"median": 0.30000001192092896,
+					"p95": 3.799999952316284
+				},
+				"mediumEventPresentationMs": {
+					"sampleCount": 988,
+					"median": 15.5,
+					"p95": 16
+				},
+				"mediumInputToPaintMs": {
+					"sampleCount": 193,
+					"median": 31.599999964237213,
+					"p95": 32.19999998807907
+				},
+				"mediumDispatchToPaintMs": {
+					"sampleCount": 200,
+					"median": 33.30902499999502,
+					"p95": 34.09068799999659
+				},
+				"mediumLongTaskCount": {
+					"sampleCount": 1,
+					"median": 1,
+					"p95": 1
+				},
+				"mediumLongTaskTotalMs": {
+					"sampleCount": 1,
+					"median": 116,
+					"p95": 116
+				},
+				"mediumSentBytesPerEdit": {
+					"sampleCount": 1,
+					"median": 181.34,
+					"p95": 181.34
+				},
+				"mediumReceivedWsBytesPerEdit": {
+					"sampleCount": 1,
+					"median": 6.215,
+					"p95": 6.215
+				},
+				"mediumJsHeapBytes": {
+					"sampleCount": 1,
+					"median": 124606304,
+					"p95": 124606304
+				},
+				"largeEventDurationMs": {
+					"sampleCount": 997,
+					"median": 16,
+					"p95": 16
+				},
+				"largeEventInputDelayMs": {
+					"sampleCount": 997,
+					"median": 0.10000002384185791,
+					"p95": 0.5999999642372131
+				},
+				"largeEventProcessingMs": {
+					"sampleCount": 997,
+					"median": 0.30000001192092896,
+					"p95": 3.699999988079071
+				},
+				"largeEventPresentationMs": {
+					"sampleCount": 997,
+					"median": 15.5,
+					"p95": 16
+				},
+				"largeInputToPaintMs": {
+					"sampleCount": 193,
+					"median": 31.600000023841858,
+					"p95": 32.5
+				},
+				"largeDispatchToPaintMs": {
+					"sampleCount": 200,
+					"median": 33.311298999993596,
+					"p95": 33.95731600001454
+				},
+				"largeLongTaskCount": {
+					"sampleCount": 1,
+					"median": 1,
+					"p95": 1
+				},
+				"largeLongTaskTotalMs": {
+					"sampleCount": 1,
+					"median": 302,
+					"p95": 302
+				},
+				"largeSentBytesPerEdit": {
+					"sampleCount": 1,
+					"median": 181.3,
+					"p95": 181.3
+				},
+				"largeReceivedWsBytesPerEdit": {
+					"sampleCount": 1,
+					"median": 6.55,
+					"p95": 6.55
+				},
+				"largeJsHeapBytes": {
+					"sampleCount": 1,
+					"median": 473222176,
+					"p95": 473222176
+				}
+			}
+		},
+		{
+			"replayVerifications": [
+				{
+					"run": 1,
+					"document": "small",
+					"persistence": false
+				},
+				{
+					"run": 1,
+					"document": "medium",
+					"persistence": false
+				},
+				{
+					"run": 1,
+					"document": "large",
+					"persistence": false
+				}
+			],
+			"runLoads": [
+				{
+					"run": 1,
+					"start": [
+						3.84,
+						3.55,
+						3.54
+					],
+					"end": [
+						2.69,
+						3.26,
+						3.44
+					]
+				}
+			],
+			"label": "classic",
+			"target": "https://classic-main-alkalye-typing.cshed.carlassmann.com",
+			"createdAt": "2026-11-14T05:16:44.354Z",
+			"environment": {
+				"platform": "linux",
+				"release": "7.2.8-9-omarchy",
+				"cpu": "AMD RYZEN AI MAX+ 395 w/ Radeon 8060S",
+				"cores": 32,
+				"browser": "145.0.7632.6",
+				"cpuThrottle": 1,
+				"networkCapture": "CDP pages, iframes, dedicated workers and SharedWorkers",
+				"serverRuntime": "Node production; identical Brotli-6 serving; Classic jazz-run 0.20.19 (32 GB); v2 isolated SQLite",
+				"jazz": "0.20.18",
+				"gitHead": "8379d4e",
+				"server": "production Node adapter; local store; first visit SW blocked, returning SW installed"
+			},
+			"config": {
+				"runs": 1,
+				"notes": 50,
+				"edits": 200,
+				"totalTraceEdits": 259778,
+				"serviceWorkersOnly": false,
+				"largeOnly": false,
+				"performanceOnly": false,
+				"loadOnly": false,
+				"firstVisitHttpCache": "fresh context, enabled",
+				"literalNewlines": true,
+				"verifyPersistence": false,
+				"automaticPairsAndCompletion": false,
+				"replayTimeoutMs": 120000
+			},
+			"sources": [
+				{
+					"file": "vite.tar.gz",
+					"url": "https://codeload.github.com/vitejs/vite/tar.gz/4d21dc4ebcabecc13a35d73ef7dcac704cdbc817",
+					"sha256": "e3bd67ccafd837066cf8d263f871089424da7eabb87c48e7d29f9d52f2c69291",
+					"license": "MIT",
+					"attribution": "Vite contributors",
+					"licenseUrl": "https://github.com/vitejs/vite/blob/4d21dc4ebcabecc13a35d73ef7dcac704cdbc817/LICENSE"
+				},
+				{
+					"file": "trace.js",
+					"url": "https://raw.githubusercontent.com/automerge/automerge-perf/da212e984c777d31ee7d888f82637288aa4c61d3/edit-by-index/editing-trace.js",
+					"sha256": "23116070719243e2950c310006dd50b3d80744be7542a86c62e7d5c2ed7326d0",
+					"license": "CC-BY-4.0",
+					"attribution": "Martin Kleppmann and Alastair R. Beresford, A Conflict-Free Replicated JSON Datatype",
+					"licenseUrl": "https://github.com/automerge/automerge-perf/blob/da212e984c777d31ee7d888f82637288aa4c61d3/README.md#license"
+				},
+				{
+					"file": "alice.txt",
+					"url": "https://www.gutenberg.org/ebooks/11.txt.utf-8",
+					"sha256": "01b38ea4c710a84bc18d0bd41271a5a1a92b94e97b2812f4dece97d4a694725e",
+					"license": "Public domain in USA; Project Gutenberg license retained in text",
+					"attribution": "Lewis Carroll, Alice's Adventures in Wonderland; Project Gutenberg",
+					"licenseUrl": "https://www.gutenberg.org/policy/license.html"
+				},
+				{
+					"file": "dracula.txt",
+					"url": "https://www.gutenberg.org/ebooks/345.txt.utf-8",
+					"sha256": "96cd16eacdbfebae8fdda5591f66e0cc8ee76be18e0cd1aca02bc00615782d28",
+					"license": "Public domain in USA; Project Gutenberg license retained in text",
+					"attribution": "Bram Stoker, Dracula; Project Gutenberg",
+					"licenseUrl": "https://www.gutenberg.org/policy/license.html"
+				}
+			],
+			"datasets": [
+				{
+					"title": "Corpus 000",
+					"source": "acknowledgements.md",
+					"bytes": 6218
+				},
+				{
+					"title": "Corpus 001",
+					"source": "blog.md",
+					"bytes": 232
+				},
+				{
+					"title": "Corpus 002",
+					"source": "blog/announcing-vite2.md",
+					"bytes": 5936
+				},
+				{
+					"title": "Corpus 003",
+					"source": "blog/announcing-vite3.md",
+					"bytes": 20753
+				},
+				{
+					"title": "Corpus 004",
+					"source": "blog/announcing-vite4-3.md",
+					"bytes": 4606
+				},
+				{
+					"title": "Corpus 005",
+					"source": "blog/announcing-vite4.md",
+					"bytes": 12080
+				},
+				{
+					"title": "Corpus 006",
+					"source": "blog/announcing-vite5-1.md",
+					"bytes": 11126
+				},
+				{
+					"title": "Corpus 007",
+					"source": "blog/announcing-vite5.md",
+					"bytes": 10567
+				},
+				{
+					"title": "Corpus 008",
+					"source": "blog/announcing-vite6.md",
+					"bytes": 11680
+				},
+				{
+					"title": "Corpus 009",
+					"source": "blog/announcing-vite7.md",
+					"bytes": 8738
+				},
+				{
+					"title": "Corpus 010",
+					"source": "blog/announcing-vite8-1.md",
+					"bytes": 10425
+				},
+				{
+					"title": "Corpus 011",
+					"source": "blog/announcing-vite8-beta.md",
+					"bytes": 9043
+				},
+				{
+					"title": "Corpus 012",
+					"source": "blog/announcing-vite8.md",
+					"bytes": 15394
+				},
+				{
+					"title": "Corpus 013",
+					"source": "blog/cloudflare-supports-vite.md",
+					"bytes": 4087
+				},
+				{
+					"title": "Corpus 014",
+					"source": "changes/hotupdate-hook.md",
+					"bytes": 3570
+				},
+				{
+					"title": "Corpus 015",
+					"source": "changes/index.md",
+					"bytes": 1558
+				},
+				{
+					"title": "Corpus 016",
+					"source": "changes/per-environment-apis.md",
+					"bytes": 2296
+				},
+				{
+					"title": "Corpus 017",
+					"source": "changes/shared-plugins-during-build.md",
+					"bytes": 2288
+				},
+				{
+					"title": "Corpus 018",
+					"source": "changes/ssr-using-modulerunner.md",
+					"bytes": 1305
+				},
+				{
+					"title": "Corpus 019",
+					"source": "changes/this-environment-in-hooks.md",
+					"bytes": 2416
+				},
+				{
+					"title": "Corpus 020",
+					"source": "config/build-options.md",
+					"bytes": 17369
+				},
+				{
+					"title": "Corpus 021",
+					"source": "config/dep-optimization-options.md",
+					"bytes": 6158
+				},
+				{
+					"title": "Corpus 022",
+					"source": "config/index.md",
+					"bytes": 7269
+				},
+				{
+					"title": "Corpus 023",
+					"source": "config/preview-options.md",
+					"bytes": 3164
+				},
+				{
+					"title": "Corpus 024",
+					"source": "config/server-options.md",
+					"bytes": 21219
+				},
+				{
+					"title": "Corpus 025",
+					"source": "config/shared-options.md",
+					"bytes": 24934
+				},
+				{
+					"title": "Corpus 026",
+					"source": "config/ssr-options.md",
+					"bytes": 3282
+				},
+				{
+					"title": "Corpus 027",
+					"source": "config/worker-options.md",
+					"bytes": 1016
+				},
+				{
+					"title": "Corpus 028",
+					"source": "guide/api-environment-frameworks.md",
+					"bytes": 15857
+				},
+				{
+					"title": "Corpus 029",
+					"source": "guide/api-environment-instances.md",
+					"bytes": 11092
+				},
+				{
+					"title": "Corpus 030",
+					"source": "guide/api-environment-plugins.md",
+					"bytes": 16108
+				},
+				{
+					"title": "Corpus 031",
+					"source": "guide/api-environment-runtimes.md",
+					"bytes": 17438
+				},
+				{
+					"title": "Corpus 032",
+					"source": "guide/api-environment.md",
+					"bytes": 9080
+				},
+				{
+					"title": "Corpus 033",
+					"source": "guide/api-hmr.md",
+					"bytes": 9488
+				},
+				{
+					"title": "Corpus 034",
+					"source": "guide/api-javascript.md",
+					"bytes": 13734
+				},
+				{
+					"title": "Corpus 035",
+					"source": "guide/api-plugin.md",
+					"bytes": 31921
+				},
+				{
+					"title": "Corpus 036",
+					"source": "guide/assets.md",
+					"bytes": 6607
+				},
+				{
+					"title": "Corpus 037",
+					"source": "guide/backend-integration.md",
+					"bytes": 11608
+				},
+				{
+					"title": "Corpus 038",
+					"source": "guide/build.md",
+					"bytes": 14607
+				},
+				{
+					"title": "Corpus 039",
+					"source": "guide/cli.md",
+					"bytes": 15558
+				},
+				{
+					"title": "Corpus 040",
+					"source": "guide/dep-pre-bundling.md",
+					"bytes": 5692
+				},
+				{
+					"title": "Corpus 041",
+					"source": "guide/env-and-mode.md",
+					"bytes": 10924
+				},
+				{
+					"title": "Corpus 042",
+					"source": "guide/features.md",
+					"bytes": 41460
+				},
+				{
+					"title": "Corpus 043",
+					"source": "guide/index.md",
+					"bytes": 11593
+				},
+				{
+					"title": "Corpus 044",
+					"source": "guide/migration.md",
+					"bytes": 21510
+				},
+				{
+					"title": "Corpus 045",
+					"source": "guide/performance.md",
+					"bytes": 8225
+				},
+				{
+					"title": "Corpus 046",
+					"source": "guide/philosophy.md",
+					"bytes": 3616
+				},
+				{
+					"title": "Corpus 047",
+					"source": "guide/ssr.md",
+					"bytes": 14704
+				},
+				{
+					"title": "Corpus 048",
+					"source": "guide/static-deploy.md",
+					"bytes": 14519
+				},
+				{
+					"title": "Corpus 049",
+					"source": "guide/troubleshooting.md",
+					"bytes": 16467
+				},
+				{
+					"title": "Book alice",
+					"source": "alice.txt",
+					"bytes": 170590
+				},
+				{
+					"title": "Book dracula",
+					"source": "dracula.txt",
+					"bytes": 874540
+				}
+			],
+			"completedRuns": 1,
+			"scenarioFailures": [],
+			"metrics": {
+				"importMs": {
+					"sampleCount": 1,
+					"median": 40940.756895,
+					"p95": 40940.756895
+				},
+				"indexedDBBytes": {
+					"sampleCount": 1,
+					"median": 181339550,
+					"p95": 181339550
+				},
+				"coldListMs": {
+					"sampleCount": 1,
+					"median": 5141.022563999999,
+					"p95": 5141.022563999999
+				},
+				"firstLoadJsWasmBytes": {
+					"sampleCount": 1,
+					"median": 2964586,
+					"p95": 2964586
+				},
+				"coldLargeOpenMs": {
+					"sampleCount": 1,
+					"median": 11219.841168999992,
+					"p95": 11219.841168999992
+				},
+				"warmListMs": {
+					"sampleCount": 1,
+					"median": 2376.269023999994,
+					"p95": 2376.269023999994
+				},
+				"freshDeviceWholeDatasetMs": {
+					"sampleCount": 1,
+					"median": 19406.570743000004,
+					"p95": 19406.570743000004
+				},
+				"syncEditMs": {
+					"sampleCount": 5,
+					"median": 289.89037599999574,
+					"p95": 299.7415089999995
+				},
+				"smallEventDurationMs": {
+					"sampleCount": 983,
+					"median": 16,
+					"p95": 24
+				},
+				"smallEventInputDelayMs": {
+					"sampleCount": 983,
+					"median": 0.19999998807907104,
+					"p95": 0.9000000357627869
+				},
+				"smallEventProcessingMs": {
+					"sampleCount": 983,
+					"median": 0.30000001192092896,
+					"p95": 4.399999976158142
+				},
+				"smallEventPresentationMs": {
+					"sampleCount": 983,
+					"median": 15.200000047683716,
+					"p95": 19.30000001192093
+				},
+				"smallInputToPaintMs": {
+					"sampleCount": 193,
+					"median": 30.599999964237213,
+					"p95": 31.80000001192093
+				},
+				"smallDispatchToPaintMs": {
+					"sampleCount": 200,
+					"median": 33.31667400000151,
+					"p95": 34.370369999989634
+				},
+				"smallLongTaskCount": {
+					"sampleCount": 1,
+					"median": 0,
+					"p95": 0
+				},
+				"smallLongTaskTotalMs": {
+					"sampleCount": 1,
+					"median": 0,
+					"p95": 0
+				},
+				"smallSentBytesPerEdit": {
+					"sampleCount": 1,
+					"median": 183.05,
+					"p95": 183.05
+				},
+				"smallReceivedWsBytesPerEdit": {
+					"sampleCount": 1,
+					"median": 8.78,
+					"p95": 8.78
+				},
+				"smallJsHeapBytes": {
+					"sampleCount": 1,
+					"median": 52858460,
+					"p95": 52858460
+				},
+				"mediumEventDurationMs": {
+					"sampleCount": 988,
+					"median": 16,
+					"p95": 16
+				},
+				"mediumEventInputDelayMs": {
+					"sampleCount": 988,
+					"median": 0.10000002384185791,
+					"p95": 0.5
+				},
+				"mediumEventProcessingMs": {
+					"sampleCount": 988,
+					"median": 0.30000001192092896,
+					"p95": 3.699999988079071
+				},
+				"mediumEventPresentationMs": {
+					"sampleCount": 988,
+					"median": 15.5,
+					"p95": 16
+				},
+				"mediumInputToPaintMs": {
+					"sampleCount": 193,
+					"median": 31.700000047683716,
+					"p95": 32.40000003576279
+				},
+				"mediumDispatchToPaintMs": {
+					"sampleCount": 200,
+					"median": 33.32264499999292,
+					"p95": 33.92081199999666
+				},
+				"mediumLongTaskCount": {
+					"sampleCount": 1,
+					"median": 1,
+					"p95": 1
+				},
+				"mediumLongTaskTotalMs": {
+					"sampleCount": 1,
+					"median": 120,
+					"p95": 120
+				},
+				"mediumSentBytesPerEdit": {
+					"sampleCount": 1,
+					"median": 181.335,
+					"p95": 181.335
+				},
+				"mediumReceivedWsBytesPerEdit": {
+					"sampleCount": 1,
+					"median": 6.215,
+					"p95": 6.215
+				},
+				"mediumJsHeapBytes": {
+					"sampleCount": 1,
+					"median": 140991824,
+					"p95": 140991824
+				},
+				"largeEventDurationMs": {
+					"sampleCount": 994,
+					"median": 16,
+					"p95": 16
+				},
+				"largeEventInputDelayMs": {
+					"sampleCount": 994,
+					"median": 0.10000002384185791,
+					"p95": 0.5
+				},
+				"largeEventProcessingMs": {
+					"sampleCount": 994,
+					"median": 0.19999998807907104,
+					"p95": 2.5
+				},
+				"largeEventPresentationMs": {
+					"sampleCount": 994,
+					"median": 15.600000023841858,
+					"p95": 16
+				},
+				"largeInputToPaintMs": {
+					"sampleCount": 193,
+					"median": 32.09999996423721,
+					"p95": 32.80000001192093
+				},
+				"largeDispatchToPaintMs": {
+					"sampleCount": 200,
+					"median": 33.34101800000644,
+					"p95": 33.770587999984855
+				},
+				"largeLongTaskCount": {
+					"sampleCount": 1,
+					"median": 1,
+					"p95": 1
+				},
+				"largeLongTaskTotalMs": {
+					"sampleCount": 1,
+					"median": 312,
+					"p95": 312
+				},
+				"largeSentBytesPerEdit": {
+					"sampleCount": 1,
+					"median": 181.335,
+					"p95": 181.335
+				},
+				"largeReceivedWsBytesPerEdit": {
+					"sampleCount": 1,
+					"median": 6.55,
+					"p95": 6.55
+				},
+				"largeJsHeapBytes": {
+					"sampleCount": 1,
+					"median": 490596156,
+					"p95": 490596156
+				}
+			}
+		}
+	]
+}

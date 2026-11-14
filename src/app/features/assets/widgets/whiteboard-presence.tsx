@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react"
-import { Group } from "jazz-tools"
-import { useAccount, useCoState } from "jazz-tools/react"
+import { app } from "@/jazz/schema"
+import { useAll, useOne, useDb, useSession } from "jazz-tools/react"
 import { Users } from "lucide-react"
-import { UserAccount } from "@/schema"
 import { useIntl } from "@/shared/intl/setup"
-import { TldrawAsset, WhiteboardPresenceFeed } from "../lib/schema"
 
 export { WhiteboardPresence, countActiveWhiteboardSessions }
 
@@ -22,63 +20,65 @@ type PresenceSessions = Record<
 
 function WhiteboardPresence({ assetId }: { assetId: string }) {
 	let t = useIntl()
-	let me = useAccount(UserAccount)
-	let asset = useCoState(TldrawAsset, assetId, {
-		resolve: { presence: true },
-	})
-	let [now, setNow] = useState(() => Date.now())
-	let mySessionId = me.$isLoaded ? (me.$jazz.sessionID ?? null) : null
-	let presence = asset?.$isLoaded ? asset.presence : undefined
 
+	let db = useDb()
+	let accountId = useSession()?.user
+	let { data: asset } = useOne(
+		app.assets.where({ id: assetId }).select("documentId"),
+	)
+	let documentId = asset?.documentId
+	let [deviceId] = useState(() => crypto.randomUUID())
+	let { data: rows = [] } = useAll(
+		app.presence.where({
+			documentId: documentId ?? "00000000-0000-0000-0000-000000000000",
+		}),
+	)
+	let [now, setNow] = useState(Date.now)
 	useEffect(() => {
-		if (!mySessionId) return
-		let activePresence: typeof presence
-		let heartbeat: number | undefined
+		if (!documentId || !accountId) return
+		let id: string | undefined
 		let stopped = false
-
-		function publishOpen() {
-			if (!activePresence?.$isLoaded) return
-			activePresence.$jazz.push({ open: true })
+		async function publish() {
+			if (stopped) return
 			setNow(Date.now())
-		}
-
-		function publishClosed() {
-			if (activePresence?.$isLoaded) activePresence.$jazz.push({ open: false })
-		}
-
-		async function startHeartbeat() {
-			let loaded = await TldrawAsset.load(assetId, {
-				resolve: { presence: true },
-			})
-			if (!loaded.$isLoaded || stopped) return
-
-			activePresence = loaded.presence
-			if (!activePresence) {
-				let owner = loaded.$jazz.owner
-				if (!(owner instanceof Group)) return
-				activePresence = WhiteboardPresenceFeed.create([], { owner })
-				loaded.$jazz.set("presence", activePresence)
+			if (id)
+				await db
+					.update(app.presence, id, {
+						updatedAt: new Date(),
+						whiteboardOpen: true,
+					})
+					.wait({ tier: "local" })
+			else {
+				let write = db.insert(app.presence, {
+					documentId: documentId!,
+					accountId: accountId!,
+					deviceId,
+					whiteboardOpen: true,
+					updatedAt: new Date(),
+				})
+				id = write.value.id
+				await write.wait({ tier: "local" })
+				if (stopped) void db.delete(app.presence, id)
 			}
-
-			publishOpen()
-			heartbeat = window.setInterval(publishOpen, HEARTBEAT_MS)
 		}
-
-		void startHeartbeat()
-		window.addEventListener("pagehide", publishClosed)
+		void publish().catch(console.error)
+		let interval = window.setInterval(
+			() => void publish().catch(console.error),
+			HEARTBEAT_MS,
+		)
 		return () => {
 			stopped = true
-			if (heartbeat !== undefined) window.clearInterval(heartbeat)
-			window.removeEventListener("pagehide", publishClosed)
-			publishClosed()
+			clearInterval(interval)
+			if (id) void db.delete(app.presence, id)
 		}
-	}, [assetId, mySessionId])
+	}, [db, documentId, accountId, deviceId])
+	let count = rows.filter(
+		row =>
+			row.deviceId !== deviceId &&
+			row.whiteboardOpen &&
+			now - row.updatedAt.getTime() <= STALE_AFTER_MS,
+	).length
 
-	let count = countActiveWhiteboardSessions(
-		presence?.$isLoaded ? presence.perSession : {},
-		mySessionId,
-		now,
-	)
 	if (count === 0) return null
 
 	let label =

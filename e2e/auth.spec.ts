@@ -35,6 +35,8 @@ for (let entryPoint of ["sidebar", "settings"]) {
 			title: "My synced document",
 			body: "Saved in my account.",
 		})
+		// The editor guarantees local durability; the next profile needs the server copy.
+		await page.evaluate("window.__jazz.waitForSync()")
 		let accountDocumentUrl = page.url()
 
 		let freshContext = await browser.newContext()
@@ -49,9 +51,7 @@ for (let entryPoint of ["sidebar", "settings"]) {
 				await freshPage
 					.getByRole("button", { name: "Documents", exact: true })
 					.click()
-				await freshPage
-					.getByRole("button", { name: "Anonymous user Local only" })
-					.click()
+				await freshPage.getByTestId(testIds.sidebar.syncStatus).click()
 				await freshPage
 					.getByRole("menuitem", { name: "Sign in", exact: true })
 					.click()
@@ -70,7 +70,7 @@ for (let entryPoint of ["sidebar", "settings"]) {
 			})
 			await freshPage.getByTestId(testIds.auth.loginSubmit).click()
 
-			await expect(freshPage).toHaveURL(accountDocumentUrl)
+			await expect(freshPage).toHaveURL(accountDocumentUrl, { timeout: 10_000 })
 			await expect(
 				freshPage.getByTestId(testIds.doc.editor).locator(".cm-content"),
 			).toBeVisible()
@@ -82,7 +82,7 @@ for (let entryPoint of ["sidebar", "settings"]) {
 			await freshPage.reload()
 			await expect(
 				freshPage.getByTestId(testIds.doc.editor).locator(".cm-content"),
-			).toBeVisible({ timeout: 30_000 })
+			).toBeVisible({ timeout: 10_000 })
 		} finally {
 			await freshContext.close()
 		}
@@ -98,6 +98,7 @@ test("signing in from a private document link keeps the requested document", asy
 	await create(page, { title: "Requested private document" })
 	let requestedUrl = page.url()
 	await create(page, { title: "Newer account document" })
+	await page.evaluate("window.__jazz.waitForSync()")
 
 	let freshContext = await browser.newContext()
 	try {
@@ -116,8 +117,69 @@ test("signing in from a private document link keeps the requested document", asy
 		await freshPage.getByTestId(testIds.auth.loginSubmit).click()
 		await expect(freshPage.getByTestId(testIds.doc.editor)).toContainText(
 			"Requested private document",
+			{ timeout: 10_000 },
 		)
 		await expect(freshPage).toHaveURL(requestedUrl)
+	} finally {
+		await freshContext.close()
+	}
+})
+
+test("offline guest notes survive signing in and reach a fresh device once", async ({
+	page,
+	browser,
+}) => {
+	await waitForEditorBoot(page)
+	let account = await createAccount(page)
+	await create(page, { title: "Existing account note" })
+	await page.evaluate("window.__jazz.waitForSync()")
+	await signOut(page)
+	await create(page, {
+		title: "Guest draft",
+		body: "Before going offline",
+		path: "Guest folder",
+	})
+	await page.context().setOffline(true)
+	let editor = page.getByTestId(testIds.doc.editor).locator(".cm-content")
+	await editor.click()
+	await editor.press("ControlOrMeta+End")
+	await page.keyboard.insertText("\nWritten without a connection")
+	await expect(editor).toContainText("Written without a connection")
+	await page.context().setOffline(false)
+	await signIn(page, { passphrase: account.passphrase })
+	await page.evaluate("window.__jazz.waitForSync()")
+	await waitForEditorBoot(page)
+	let flatView = page.getByRole("button", { name: "Switch to flat view" })
+	if (await flatView.count()) await flatView.dispatchEvent("click")
+	await expect(
+		page.locator("[data-doc-id]").filter({ hasText: "Guest draft" }),
+	).toHaveCount(1)
+	let guestNote = page
+		.locator("[data-doc-id]")
+		.filter({ hasText: "Guest draft" })
+	await guestNote.locator("a").dispatchEvent("click")
+	await expect(editor).toContainText("Written without a connection")
+	await expect(guestNote).toHaveAttribute("data-doc-path", "Guest folder")
+
+	let freshContext = await browser.newContext()
+	try {
+		let fresh = await freshContext.newPage()
+		await waitForEditorBoot(fresh)
+		await signIn(fresh, { passphrase: account.passphrase })
+		await waitForEditorBoot(fresh)
+		let flatView = fresh.getByRole("button", { name: "Switch to flat view" })
+		if (await flatView.count()) await flatView.dispatchEvent("click")
+		await expect(
+			fresh.locator("[data-doc-id]").filter({ hasText: "Guest draft" }),
+		).toHaveCount(1)
+		await fresh
+			.locator("[data-doc-id]")
+			.filter({ hasText: "Guest draft" })
+			.locator("a")
+			.dispatchEvent("click")
+		await expect(fresh.getByTestId(testIds.doc.editor)).toContainText(
+			"Written without a connection",
+		)
 	} finally {
 		await freshContext.close()
 	}

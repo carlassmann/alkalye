@@ -2,18 +2,14 @@ import { useEffect, useRef, useState } from "react"
 import React from "react"
 import type { Extension } from "@codemirror/state"
 import { Link } from "@tanstack/react-router"
-import { useAccount } from "jazz-tools/react"
-import { UserAccount } from "@/schema"
+import { useLibrary } from "../lib/library"
 import {
 	MarkdownEditor,
 	useMarkdownEditorRef,
 	SidebarEditorNavigation,
 	type CommandId,
 } from "@/app/features/editor"
-import {
-	getPresentationMode,
-	presentationExtensions,
-} from "@/app/features/presentation"
+import { getPresentationMode } from "@/app/features/presentation"
 import { useEditorSettings } from "@/app/features/editor"
 import { getDocumentTitle } from "../lib/title"
 import { EditorToolbar } from "@/app/features/editor"
@@ -117,7 +113,7 @@ import {
 	readDirectoryFile,
 	refreshLocalFile,
 } from "@/app/lib/local-file"
-import { CopyToSyncedDialog } from "@/app/features/spaces"
+import { CopyToSyncedDialog } from "../widgets/copy-to-synced-dialog"
 import {
 	imageExtensions,
 	SidebarAssets,
@@ -1391,8 +1387,6 @@ function downloadLocalBlob(blob: File) {
 	URL.revokeObjectURL(url)
 }
 
-let meResolve = { root: { settings: true } } as const
-
 function LocalEditorContent({
 	isPreview,
 	setIsPreview,
@@ -1507,9 +1501,7 @@ function LocalEditorContent({
 		},
 	})
 
-	let me = useAccount(UserAccount, { resolve: meResolve })
-	let editorSettings =
-		me.$isLoaded && me.root?.settings?.$isLoaded ? me.root.settings : undefined
+	let { settings: editorSettings } = useLibrary()
 
 	useEditorSettings(editorSettings)
 
@@ -1847,7 +1839,7 @@ function LocalEditorContent({
 						key={activeFile.id}
 						ref={editor}
 						value={editorContent}
-						onChange={handleEditorChange}
+						onChange={content => handleEditorChange(() => content)}
 						assets={editorAssets}
 						onUploadImage={
 							activeFile.workspaceId
@@ -1889,7 +1881,7 @@ function LocalEditorContent({
 						tabIndent={editorSettings?.editor?.tabIndent ?? true}
 						smartPaste={editorSettings?.editor?.smartPaste ?? true}
 						autocomplete={editorSettings?.editor?.autocomplete ?? true}
-						extensions={[...localImageExtensions, ...presentationExtensions()]}
+						extensions={[...localImageExtensions]}
 					/>
 				)}
 				<EditorToolbar

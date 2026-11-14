@@ -1,0 +1,140 @@
+{
+	"excludedClassicAttempt": {
+		"reason": "Small replay exceeded the 120-second outer deadline before its first 50-edit progress message. The exact stage was not captured. All timing metrics from this attempt are excluded from final distributions; the replacement used a fresh account. No latency outlier was excluded.",
+		"environment": {
+			"platform": "linux",
+			"release": "7.2.8-9-omarchy",
+			"cpu": "AMD RYZEN AI MAX+ 395 w/ Radeon 8060S",
+			"cores": 32,
+			"browser": "145.0.7632.6",
+			"cpuThrottle": 1,
+			"networkCapture": "CDP pages, iframes, dedicated workers and SharedWorkers",
+			"serverRuntime": "Node production; Brotli q6; local backend; stock Jazz; sequential fresh pairs",
+			"jazz": "0.20.18",
+			"gitHead": "8379d4e",
+			"server": "production Node adapter; local store; first visit SW blocked, returning SW installed"
+		},
+		"config": {
+			"runs": 1,
+			"notes": 50,
+			"edits": 200,
+			"totalTraceEdits": 259778,
+			"serviceWorkersOnly": false,
+			"largeOnly": false,
+			"performanceOnly": false,
+			"loadOnly": false,
+			"firstVisitHttpCache": "fresh context, enabled",
+			"literalNewlines": true,
+			"verifyPersistence": false,
+			"automaticPairsAndCompletion": false,
+			"replayTimeoutMs": 120000
+		},
+		"runLoads": [
+			{
+				"run": 1,
+				"start": [10.05, 20.97, 20.35],
+				"end": [30.97, 24.46, 21.82]
+			}
+		],
+		"scenarioFailures": [
+			{
+				"run": 1,
+				"scenario": "smallReplay",
+				"elapsedMs": 120033.75827399999,
+				"message": "small replay exceeded 120000 ms deadline"
+			}
+		]
+	},
+	"stockAssets": {
+		"wasmRawBytes": 8812317,
+		"wasmSha256": "793d17d49189ac682d527c4b119a19d0dd52c8276a6d70241f3de725e07c0aff",
+		"runs": [
+			{
+				"run": 1,
+				"wasmRequests": 2,
+				"wireTransfers": 1,
+				"diskCacheReads": 1,
+				"wireBytes": 2518137,
+				"encodings": ["br"]
+			},
+			{
+				"run": 2,
+				"wasmRequests": 2,
+				"wireTransfers": 1,
+				"diskCacheReads": 1,
+				"wireBytes": 2518164,
+				"encodings": ["br"]
+			},
+			{
+				"run": 3,
+				"wasmRequests": 2,
+				"wireTransfers": 1,
+				"diskCacheReads": 1,
+				"wireBytes": 2518164,
+				"encodings": ["br"]
+			},
+			{
+				"run": 4,
+				"wasmRequests": 2,
+				"wireTransfers": 1,
+				"diskCacheReads": 1,
+				"wireBytes": 2518119,
+				"encodings": ["br"]
+			},
+			{
+				"run": 5,
+				"wasmRequests": 2,
+				"wireTransfers": 1,
+				"diskCacheReads": 1,
+				"wireBytes": 2518164,
+				"encodings": ["br"]
+			}
+		]
+	},
+	"validation": {
+		"checkCommand": "VITEST_MAX_WORKERS=1 bun run check",
+		"unitTests": 862,
+		"testFiles": 84,
+		"e2eCommand": "PLAYWRIGHT_BASE_URL=https://web-main-alkalye-stock.cshed.carlassmann.com bun run test:e2e --workers=2",
+		"e2ePassed": 17,
+		"appSource": "afdb0a65343e856d4f41516a0679700b26d26ebf"
+	},
+	"publishedRuntimeVerification": [
+		{
+			"package": "jazz-wasm@2.0.0-alpha.61",
+			"file": "pkg/jazz_wasm.js",
+			"sha256": "ac25312703a674d0791981277555635dc22c17c2753365dc08896c79c27dae59",
+			"matchesPublishedArchive": true
+		},
+		{
+			"package": "jazz-wasm@2.0.0-alpha.61",
+			"file": "pkg/jazz_wasm_bg.wasm",
+			"sha256": "793d17d49189ac682d527c4b119a19d0dd52c8276a6d70241f3de725e07c0aff",
+			"matchesPublishedArchive": true
+		},
+		{
+			"package": "jazz-tools@2.0.0-alpha.61",
+			"file": "dist/runtime/db.js",
+			"sha256": "77a4ca901a12bee99af2a2076c47d2da7513ed1f7a4e74d513408eed4e37bcb2",
+			"matchesPublishedArchive": true
+		},
+		{
+			"package": "jazz-tools@2.0.0-alpha.61",
+			"file": "dist/subscriptions-orchestrator.js",
+			"sha256": "869fa734d23892ce0bc86bb3b07603441f3e17d641e1465891751f9b9aa31af4",
+			"matchesPublishedArchive": true
+		},
+		{
+			"package": "jazz-tools@2.0.0-alpha.61",
+			"file": "dist/worker/jazz-broker-worker.js",
+			"sha256": "d3cc5175a1fa5f73be28144674651ce35b7f420d30e715b55416a7c50715dd44",
+			"matchesPublishedArchive": true
+		},
+		{
+			"package": "jazz-tools@2.0.0-alpha.61",
+			"file": "dist/runtime/native-artifact-fingerprint-wasm.js",
+			"sha256": "e646d8c46f88a19bb9d4e8a6118c2e20280320b9ce96bbf8b9ed325e26b3d254",
+			"matchesPublishedArchive": true
+		}
+	]
+}

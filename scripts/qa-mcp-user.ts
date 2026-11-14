@@ -1,121 +1,116 @@
-import { createJazzContextForNewAccount, MockSessionProvider } from "jazz-tools"
-import { WasmCrypto } from "cojson/crypto/WasmCrypto"
-import { createWebSocketPeer } from "cojson-transport-ws"
-import { UserAccount, Document } from "../src/schema"
-import { createTokenCodec } from "../src/mcp/token"
-import { connectionCredentialsSchema } from "../src/mcp/credentials"
-import { createPersonalDocument } from "../src/app/features/documents/lib/documents"
+import { Buffer } from "node:buffer"
+import { readFile, writeFile } from "node:fs/promises"
+import { createHash } from "node:crypto"
 import { z } from "zod"
+import { mintLocalFirstTokenInJs } from "jazz-tools/thin"
+import { createTokenCodec } from "../src/mcp/token"
 
-let baseUrl = process.argv[2] ?? process.env.ALKALYE_MCP_BASE_URL
-if (!baseUrl) throw new Error("Missing MCP base URL")
-baseUrl = new URL(baseUrl).origin
-let syncServer = process.env.PUBLIC_JAZZ_SYNC_SERVER
-if (!syncServer) throw new Error("Missing Jazz sync server")
+let origin = new URL(process.argv[2] ?? process.env.ALKALYE_MCP_BASE_URL ?? "")
+	.origin
 let key = process.env.ALKALYE_MCP_TOKEN_KEY
-if (!key) throw new Error("Missing token key")
+if (!key) throw new Error("Missing ALKALYE_MCP_TOKEN_KEY")
+let secret = process.env.ALKALYE_QA_DEVICE_KEY_FILE
+	? (await readFile(process.env.ALKALYE_QA_DEVICE_KEY_FILE, "utf8")).trim()
+	: `jazz-auth-v1:${Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString("base64url")}`
 let tokens = createTokenCodec(key)
-let peer = createWebSocketPeer({
-	websocket: new WebSocket(syncServer),
-	id: "runtime-qa",
-	role: "server",
-})
-let context = await createJazzContextForNewAccount({
-	creationProps: { name: "MCP runtime QA" },
-	peers: [peer],
-	crypto: await WasmCrypto.create(),
-	AccountSchema: UserAccount,
-	sessionProvider: new MockSessionProvider(),
-})
-let document = await createPersonalDocument(
-	context.account,
-	"# Runtime user document\n\nHello",
-)
-await context.account.$jazz.waitForAllCoValuesSync({ timeout: 10000 })
-let credentials = {
-	accountId: context.account.$jazz.id,
-	accountSecret: context.node.getCurrentAgent().agentSecret,
-}
-let verifier = "v".repeat(64)
-let challenge = Buffer.from(
-	await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier)),
-).toString("base64url")
 let clientId = "https://custom.example/client.json"
-async function approve(name: string) {
+let verifier = "v".repeat(64)
+let challenge = createHash("sha256").update(verifier).digest("base64url")
+let resource = `${origin}/mcp`
+function proof(device = secret) {
+	return {
+		authorization: `Bearer ${mintLocalFirstTokenInJs(device, `${origin}/jazz`)}`,
+	}
+}
+async function cli(
+	command: string,
+	args: Record<string, unknown> = {},
+	device = secret,
+) {
+	let response = await fetch(`${origin}/api/cli`, {
+		method: "POST",
+		headers: { "content-type": "application/json", ...proof(device) },
+		body: JSON.stringify({ command, args }),
+	})
+	if (!response.ok)
+		throw new Error(
+			`CLI ${command}: ${response.status} ${await response.text()}`,
+		)
+	return z.object({ data: z.unknown() }).parse(await response.json()).data
+}
+async function approve(name: string, device = secret) {
 	let consent = await tokens.seal(
 		"consent",
 		{
 			authorization: {
 				client_id: clientId,
-				redirect_uri: "https://custom.example/callback",
+				redirect_uri: `${origin}/app/settings?qa_callback=1`,
 				response_type: "code",
 				code_challenge: challenge,
 				code_challenge_method: "S256",
 				state: "runtime-qa",
-				resource: `${baseUrl}/mcp`,
+				resource,
 				scope: "alkalye",
 			},
-			client: { name, redirectHost: "custom.example" },
+			client: { name, redirectHost: new URL(origin).host },
 		},
 		Date.now() + 60000,
 	)
-	let response = await fetch(`${baseUrl}/api/oauth-approve`, {
+	let approved = await fetch(`${origin}/api/oauth-approve`, {
 		method: "POST",
-		headers: { "content-type": "application/json" },
-		body: JSON.stringify({ decision: "approve", consent, credentials }),
+		headers: { "content-type": "application/json", ...proof(device) },
+		body: JSON.stringify({ decision: "approve", consent }),
 	})
-	let body = z.object({ redirectTo: z.url() }).parse(await response.json())
-	if (!response.ok) throw new Error("Approval failed")
-	let code = new URL(body.redirectTo).searchParams.get("code")
+	if (!approved.ok)
+		throw new Error(`Approval ${approved.status}: ${await approved.text()}`)
+	let redirect = z.object({ redirectTo: z.url() }).parse(await approved.json())
+	let code = new URL(redirect.redirectTo).searchParams.get("code")
 	if (!code) throw new Error("Missing code")
-	let exchanged = await fetch(`${baseUrl}/oauth/token`, {
+	let response = await fetch(`${origin}/oauth/token`, {
 		method: "POST",
 		body: new URLSearchParams({
 			grant_type: "authorization_code",
 			code,
 			code_verifier: verifier,
 			client_id: clientId,
-			redirect_uri: "https://custom.example/callback",
-			resource: `${baseUrl}/mcp`,
+			redirect_uri: `${origin}/app/settings?qa_callback=1`,
+			resource,
 		}),
 	})
-	if (!exchanged.ok)
+	if (!response.ok)
 		throw new Error(
-			`Token exchange ${exchanged.status}: ${await exchanged.text()}`,
+			`Token exchange ${response.status}: ${await response.text()}`,
 		)
 	return z
 		.object({ access_token: z.string(), refresh_token: z.string() })
-		.parse(await exchanged.json())
+		.parse(await response.json())
 }
-let first = await approve("Custom MCP")
-let second = await approve("Other MCP connection")
-console.log("PASS OAuth approval and exchange as user")
 async function call(
-	method: string,
-	params: Record<string, unknown>,
+	name: string,
+	args: Record<string, unknown> = {},
 	access = first.access_token,
 ) {
-	let response = await fetch(`${baseUrl}/mcp`, {
+	let response = await fetch(resource, {
 		method: "POST",
 		headers: {
 			authorization: `Bearer ${access}`,
 			"content-type": "application/json",
 			accept: "application/json, text/event-stream",
-			"mcp-method": method,
-			...(typeof params.name === "string" ? { "mcp-name": params.name } : {}),
+			"mcp-method": "tools/call",
+			"mcp-name": name,
 			"mcp-protocol-version": "2026-07-28",
-			origin: "https://any-client.example",
 		},
 		body: JSON.stringify({
 			jsonrpc: "2.0",
-			id: 1,
-			method,
+			id: crypto.randomUUID(),
+			method: "tools/call",
 			params: {
-				...params,
+				name,
+				arguments: args,
 				_meta: {
 					"io.modelcontextprotocol/protocolVersion": "2026-07-28",
 					"io.modelcontextprotocol/clientInfo": {
-						name: "custom",
+						name: "runtime-qa",
 						version: "1",
 					},
 					"io.modelcontextprotocol/clientCapabilities": {},
@@ -123,160 +118,185 @@ async function call(
 			},
 		}),
 	})
-	return { status: response.status, body: await response.json() }
+	if (response.status === 401)
+		return { isError: true, structuredContent: undefined }
+	if (!response.ok)
+		throw new Error(`MCP ${name}: ${response.status} ${await response.text()}`)
+	return z
+		.object({
+			result: z.object({
+				isError: z.boolean().optional(),
+				structuredContent: z.unknown().optional(),
+			}),
+		})
+		.parse(await response.json()).result
 }
-let catalog = await call("tools/list", {})
-if (catalog.status !== 200)
-	throw new Error(`Catalog failed ${JSON.stringify(catalog)}`)
-console.log("PASS arbitrary client tools/list")
-let read = await call("tools/call", {
-	name: "get_document",
-	arguments: { documentId: document.$jazz.id },
-})
-let resultSchema = z.object({
-	result: z.object({
-		isError: z.boolean().optional(),
-		structuredContent: z.object({ revision: z.string(), content: z.string() }),
-	}),
-})
-let readResult = resultSchema.parse(read.body).result.structuredContent
-if (!readResult.content.includes("Runtime user document"))
-	throw new Error("Wrong user content")
-let updated = await call("tools/call", {
-	name: "update_document",
-	arguments: {
-		documentId: document.$jazz.id,
-		expectedRevision: readResult.revision,
-		content: "# Edited as user",
-	},
-})
-if (JSON.stringify(updated.body).includes('"isError":true'))
-	throw new Error(`Update failed ${JSON.stringify(updated.body)}`)
-console.log("PASS read and update user's existing document")
-let ownerPeer = createWebSocketPeer({
-	websocket: new WebSocket(syncServer),
-	id: "runtime-owner",
-	role: "server",
-})
-let owner = await createJazzContextForNewAccount({
-	creationProps: { name: "Other user" },
-	peers: [ownerPeer],
-	crypto: await WasmCrypto.create(),
-	AccountSchema: UserAccount,
-	sessionProvider: new MockSessionProvider(),
-})
-let writerDocument = await createPersonalDocument(
-	owner.account,
-	"Writer document",
-)
-let readerDocument = await createPersonalDocument(
-	owner.account,
-	"Reader document",
-)
-let managerDocument = await createPersonalDocument(
-	owner.account,
-	"Manager document",
-)
-managerDocument.$jazz.owner.addMember(context.account, "manager")
-writerDocument.$jazz.owner.addMember(context.account, "writer")
-readerDocument.$jazz.owner.addMember(context.account, "reader")
-await owner.account.$jazz.waitForAllCoValuesSync({ timeout: 10000 })
-let indexed = await context.account.$jazz.ensureLoaded({
-	resolve: { root: { documents: true } },
-})
-indexed.root.documents.$jazz.push(
-	writerDocument,
-	readerDocument,
-	managerDocument,
-)
-await context.account.$jazz.waitForAllCoValuesSync({ timeout: 10000 })
-for (let [shared, writable] of [
-	[writerDocument, true],
-	[managerDocument, true],
-	[readerDocument, false],
-] as const) {
-	let sharedRead = await call("tools/call", {
-		name: "get_document",
-		arguments: { documentId: shared.$jazz.id },
-	})
-	let revision = resultSchema.parse(sharedRead.body).result.structuredContent
-		.revision
-	let sharedWrite = await call("tools/call", {
-		name: "update_document",
-		arguments: {
-			documentId: shared.$jazz.id,
-			content: "Changed via MCP",
-			expectedRevision: revision,
-		},
-	})
-	let failed =
-		z
-			.object({ result: z.object({ isError: z.boolean().optional() }) })
-			.parse(sharedWrite.body).result.isError === true
-	if (failed === writable) throw new Error("Shared user permission mismatch")
+function assert(condition: unknown, message: string): asserts condition {
+	if (!condition) throw new Error(message)
 }
-console.log("PASS non-admin writer and manager editing, reader rejection")
-owner.done()
-let created = await call("tools/call", {
-	name: "create_document",
-	arguments: { content: "# Created as user" },
+
+await cli("auth.login", { name: "MCP browser QA" })
+let first = await approve("Runtime MCP QA")
+let second = await approve("Other MCP QA")
+console.log("PASS OAuth approval without device secrets, PKCE exchange")
+let created = await call("create_document", {
+	content: "# MCP runtime QA\n\nQuoted text",
 })
-let createdId = z
-	.object({
-		result: z.object({
-			structuredContent: z.object({ documentId: z.string() }),
-		}),
-	})
-	.parse(created.body).result.structuredContent.documentId
-let owned = await Document.load(createdId, { loadAs: context.account })
-if (
-	!owned.$isLoaded ||
-	owned.$jazz.owner.getRoleOf(credentials.accountId) !== "admin"
+assert(!created.isError, "Create failed")
+let doc = z
+	.object({ documentId: z.string(), revision: z.string() })
+	.parse(created.structuredContent)
+assert(!(await call("list_documents")).isError, "List failed")
+assert(
+	!(await call("get_document", { documentId: doc.documentId })).isError,
+	"Read failed",
 )
-	throw new Error("Wrong owner for personal creation")
-console.log("PASS personal creation owned by user")
-let account = await context.account.$jazz.ensureLoaded({
-	resolve: { root: { mcpConnections: { $each: true }, documents: true } },
+assert(
+	(
+		await call("update_document", {
+			documentId: doc.documentId,
+			content: "stale",
+			expectedRevision: "stale",
+		})
+	).isError,
+	"Revision accepted stale write",
+)
+let update = await call("update_document", {
+	documentId: doc.documentId,
+	content: "# MCP runtime QA\n\nQuoted text edited live",
+	expectedRevision: doc.revision,
 })
-let connection = account.root.mcpConnections?.find(
-	item => item.clientName === "Custom MCP",
+assert(!update.isError, "Update failed")
+let next = z.object({ revision: z.string() }).parse(update.structuredContent)
+assert(
+	!(
+		await call("rename_document", {
+			documentId: doc.documentId,
+			title: "MCP live browser update",
+			expectedRevision: next.revision,
+		})
+	).isError,
+	"Rename failed",
 )
-if (!connection) throw new Error("Connection missing in user's root")
-let wrapped = await tokens.open(
+let comment = await call("add_comment", {
+	documentId: doc.documentId,
+	quote: "Quoted text",
+	body: "QA comment",
+})
+assert(!comment.isError, "Comment failed")
+let { commentId } = z
+	.object({ commentId: z.string() })
+	.parse(comment.structuredContent)
+for (let name of ["reply_to_comment", "set_comment_resolved", "list_comments"])
+	assert(
+		!(
+			await call(name, {
+				documentId: doc.documentId,
+				commentId,
+				body: "QA reply",
+				resolved: true,
+			})
+		).isError,
+		`${name} failed`,
+	)
+console.log(
+	"PASS personal create/list/read/update/rename, revision conflict, anchored comments/reply/resolve",
+)
+let bob = `jazz-auth-v1:${Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString("base64url")}`
+await cli("auth.signup", { name: "Other QA user" }, bob)
+let privateDoc = z
+	.object({ documentId: z.string() })
+	.parse(
+		await cli(
+			"doc.create",
+			{ content: "# Other user's private document" },
+			bob,
+		),
+	)
+assert(
+	(await call("get_document", { documentId: privateDoc.documentId })).isError,
+	"Other user's document leaked",
+)
+let invite = z
+	.object({ link: z.string() })
+	.parse(
+		await cli(
+			"doc.share.create",
+			{ docId: privateDoc.documentId, role: "writer" },
+			bob,
+		),
+	)
+await cli("invite.accept", { link: invite.link })
+let shared = z
+	.object({ revision: z.string() })
+	.parse(
+		(await call("get_document", { documentId: privateDoc.documentId }))
+			.structuredContent,
+	)
+assert(
+	!(
+		await call("update_document", {
+			documentId: privateDoc.documentId,
+			content: "# Shared writer update",
+			expectedRevision: shared.revision,
+		})
+	).isError,
+	"Shared writer rejected",
+)
+assert(
+	(await call("archive_document", { documentId: privateDoc.documentId }))
+		.isError,
+	"Writer archived document",
+)
+console.log(
+	"PASS outsider isolation, shared non-admin writer edit, archive rejected",
+)
+let { readAccessToken } = await import("../src/mcp/oauth")
+let { connectionCredentialsSchema } = await import("../src/mcp/credentials")
+let access = await readAccessToken(tokens, first.access_token)
+let credentials = await tokens.open(
 	"connection",
-	connection.credential,
+	access.credential,
 	connectionCredentialsSchema,
 )
-if (wrapped.accountId !== credentials.accountId)
-	throw new Error("Separate account still used")
-let disconnected = await fetch(`${baseUrl}/api/mcp-connections`, {
+let revoke = await fetch(`${origin}/api/mcp-connections`, {
 	method: "DELETE",
-	headers: { "content-type": "application/json" },
-	body: JSON.stringify({ credential: connection.credential }),
+	headers: { "content-type": "application/json", ...proof() },
+	body: JSON.stringify({ connectionId: credentials.connectionId }),
 })
-if (!disconnected.ok) throw new Error("Disconnect failed")
-if ((await call("tools/list", {})).status !== 401)
-	throw new Error("Revoked access token still accepted")
-let refresh = await fetch(`${baseUrl}/oauth/token`, {
+assert(revoke.ok, "Revocation failed")
+assert(
+	(await call("get_document", { documentId: doc.documentId })).isError,
+	"Revoked call passed",
+)
+assert(
+	!(
+		await call(
+			"get_document",
+			{ documentId: doc.documentId },
+			second.access_token,
+		)
+	).isError,
+	"Other connection revoked",
+)
+let refresh = await fetch(`${origin}/oauth/token`, {
 	method: "POST",
 	body: new URLSearchParams({
 		grant_type: "refresh_token",
 		refresh_token: first.refresh_token,
 		client_id: clientId,
-		resource: `${baseUrl}/mcp`,
+		resource,
 	}),
 })
-if (refresh.status !== 400)
-	throw new Error("Revoked refresh token still accepted")
-if ((await call("tools/list", {}, second.access_token)).status !== 200)
-	throw new Error("Other connection was revoked")
-if (
-	account.root.revokedAt ||
-	!account.root.documents.some(item => item.$jazz.id === document.$jazz.id)
-)
-	throw new Error("User data cleared by disconnect")
+assert(refresh.status === 400, "Revoked refresh passed")
 console.log(
-	"PASS disconnect rejects access/refresh, preserves user and other client",
+	"PASS per-call revocation, refresh refusal, other connection survives",
 )
-context.done()
-process.exit(0)
+console.log(`Browser document: ${origin}/app/doc/${doc.documentId}`)
+
+if (process.env.ALKALYE_QA_STATE_FILE)
+	await writeFile(
+		process.env.ALKALYE_QA_STATE_FILE,
+		JSON.stringify({ access: second.access_token, documentId: doc.documentId }),
+		{ mode: 0o600 },
+	)

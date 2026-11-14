@@ -1,25 +1,26 @@
 import { useEffect, useState } from "react"
 import { Copy, Globe2 } from "lucide-react"
-import type { co } from "jazz-tools"
+import { useAll, useJazzSession, useSession } from "jazz-tools/react"
+import type { JazzClient } from "jazz-tools/client"
+import { schema } from "jazz-tools"
 import { AuthDialog } from "@/app/features/auth"
 import { Button } from "@/app/components/ui/button"
-import { McpConnection, UserAccount } from "@/schema"
+import { app } from "@/jazz/schema"
 import { useIntl } from "@/shared/intl/setup"
 import {
 	SettingsSection,
 	SettingsPanel,
 } from "@/app/components/ui/settings-layout"
-import { readJsonResponse, disconnectMcpConnection } from "../lib/agent-api"
+import {
+	readJsonResponse,
+	disconnectMcpConnection,
+	deviceAuthorization,
+} from "../lib/agent-api"
 
-export { AgentConnectionsSection, agentConnectionsQuery }
+export { AgentConnectionsSection }
 
-let agentConnectionsQuery = {
-	root: { mcpConnections: { $each: true } },
-} as const
-
-type User = co.loaded<typeof UserAccount, typeof agentConnectionsQuery>
+type McpConnection = schema.RowOf<typeof app.mcpConnections>
 interface AgentConnectionsSectionProps {
-	account: User | null
 	isAuthenticated: boolean
 	oauth?: string
 }
@@ -29,11 +30,15 @@ interface Consent {
 }
 
 function AgentConnectionsSection({
-	account,
 	isAuthenticated,
 	oauth,
 }: AgentConnectionsSectionProps) {
 	let t = useIntl()
+	let auth = useJazzSession<JazzClient>()
+	let account = useSession()?.user ?? undefined
+	let { data: connections = [] } = useAll(
+		app.mcpConnections.where({ ownerId: account }),
+	)
 	let [busy, setBusy] = useState(false)
 	let [authOpen, setAuthOpen] = useState(false)
 	let [error, setError] = useState<string>()
@@ -70,18 +75,15 @@ function AgentConnectionsSection({
 		setBusy(true)
 		setError(undefined)
 		try {
-			let credentials =
-				decision === "approve" && account
-					? {
-							accountId: account.$jazz.id,
-							accountSecret:
-								account.$jazz.localNode.getCurrentAgent().agentSecret,
-						}
-					: undefined
 			let response = await fetch("/api/oauth-approve", {
 				method: "POST",
-				headers: { "content-type": "application/json" },
-				body: JSON.stringify({ decision, consent: oauth, credentials }),
+				headers: {
+					"content-type": "application/json",
+					...(decision === "approve"
+						? deviceAuthorization(auth.exportDeviceKey())
+						: {}),
+				},
+				body: JSON.stringify({ decision, consent: oauth }),
 			})
 			let result = await readJsonResponse(response)
 			if (!response.ok || !hasRedirect(result))
@@ -106,15 +108,12 @@ function AgentConnectionsSection({
 	function handleDeny() {
 		void authorize("deny")
 	}
-	function handleDisconnect(connection: co.loaded<typeof McpConnection>) {
+	function handleDisconnect(connection: McpConnection) {
 		return async function disconnect() {
 			setBusy(true)
 			setError(undefined)
 			try {
-				await disconnectMcpConnection(connection, async () => {
-					if (account)
-						await account.$jazz.waitForAllCoValuesSync({ timeout: 10_000 })
-				})
+				await disconnectMcpConnection(connection.id, auth.exportDeviceKey())
 				setStatus(t("settings.agents.revoked"))
 			} catch (cause) {
 				setError(cause instanceof Error ? cause.message : "Disconnect failed")
@@ -207,11 +206,11 @@ function AgentConnectionsSection({
 						</div>
 					</div>
 				)}
-				{(account?.root.mcpConnections ?? [])
+				{connections
 					.filter(connection => !connection.revokedAt)
 					.map(connection => (
 						<div
-							key={connection.$jazz.id}
+							key={connection.id}
 							className="border-border flex items-center justify-between gap-3 border-t p-4"
 						>
 							<div className="min-w-0">

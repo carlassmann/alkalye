@@ -1,121 +1,41 @@
-# Jazz Patterns
+# Jazz v2 patterns
 
-## Type Helpers
+Pinned to `jazz-tools@2.0.0-alpha.61`. Verify APIs against `/tmp/jazzref/jazz-a61`, not Jazz main or Classic examples.
 
-Use Jazz-tools' built-in type utilities for loaded data:
+## Shared contract
 
-```ts
-type ReminderData = Parameters<typeof Reminder.create>[0]
-type LoadedUser = co.loaded<typeof UserAccount, typeof query>
-type NotificationSettings = NonNullable<
-	LoadedUser["root"]["notificationSettings"]
->
-```
+`src/jazz/schema.ts` defines the tables. `src/schema/index.ts` re-exports the app and document row types. Use `schema.RowOf<typeof app.table>` for row types. Nullable columns read as `null`. Settings JSON uses `EditorSettings` from `src/jazz/value-types.ts`.
 
-- `co.loaded<Schema, Query>` - type for loaded CoValue with specific depth
-- `ResolveQuery<>` - resolve query types
+Document content is a `string().merge("markdown")` column. Documents have stable UUIDs. Personal ordering, pins and folder assignments belong to `userDocuments`, not the shared document. Space memberships and document grants carry explicit roles. Blobs use `bytes()`; comment anchors use JSON captured by `db.textAnchors()`. Presence and laser tables retain latest history only. Laser rows are private to the publishing account, matching Classic’s account-owned hub. Document writers can publish; `ownerId` binds the sender account, while `senderId` identifies its tab. Other accounts cannot read or inject controls.
 
-## Bounded Replay
+`classicImports` and `documentVersions` are backend-written. The importer must verify Classic membership before granting v2 access. Invite redemption must verify the token and current grantor authority in one serializable transaction before adding membership. Member/grant writes use backend sharing operations so removals and demotions invalidate outstanding invites atomically. Client writes to those tables are denied.
 
-Jazz CoValues retain immutable transaction history. Any CoValue resolved during
-startup must therefore have bounded history, independent of total editing time.
+The explicit `createdAt` and `updatedAt` columns preserve original Classic timestamps for the importer. Jazz also tracks its own `$createdAt` and `$updatedAt`. Imported authors and timestamps belong to `documentVersions`; they must not impersonate Jazz provenance.
 
-- Keep account root values limited to stable references and rare preferences.
-- Store device navigation state locally instead of syncing it through the root.
-- Trigger synced writes from stable user-intent IDs, never from a subscription to
-  the same CoValue being written.
-- Rotate a bloated CoValue by creating its current snapshot as a new CoValue and
-  swapping the parent reference. Jazz history cannot be compacted in place.
-- Version rotated roots, but also re-rotate current roots that exceed a fixed
-  replay budget because stale clients may continue writing them.
-- Never carry a migration version between roots during recovery. The version
-  describes the physical replay history of that specific CoValue.
-- Load document content, comments, assets, and presence only after routing.
-- Wait for local storage before navigating away from newly created spaces or documents. An immediate reload can otherwise miss their list membership.
+## Backend and clients
 
-Tests for startup CoValues should create large histories, rotate them, and assert
-that the replacement's transaction count stays within a fixed replay budget.
+Astro's catch-all `/jazz/[...path].ts` delegates to `jazz.handle(request)`. `src/jazz/server.ts` uses an isolated `.jazz/` SQLite directory locally and Jazz Cloud via `remote()` in production. Production needs `JAZZ_APP_ID`, `JAZZ_SERVER_URL`, `JAZZ_ADMIN_SECRET`, and `JAZZ_PUBLIC_URL`. Data is readable by Alkalye's backend and Jazz Cloud.
 
-### Document Content Generations
+Vite 6/7 must exclude both `jazz-tools` and `jazz-wasm` from prebundling. Externalize `jazz-tools` and `jazz-napi` on the server. The Fetch handler uses HTTP streaming when WebSocket upgrade is unavailable. Set the public URL to the browser-facing `/jazz` URL.
 
-- Keep the `Document` identity stable. Links, sharing, comments, and list
-  membership depend on it.
-- Rotate only its active `CoPlainText` after 2,000 transactions.
-- Store retired content in `archivedContent`; normal routes must not resolve it.
-- Time Machine follows the archive chain ending at the active content and hides
-  each successor's seed transaction.
-- Preserve comment ranges by rebuilding their operation anchors against the new
-  content before editing resumes.
-- Wait for sync and reject cutover while another cursor is active.
-- Reconcile late archived writes after startup with a three-way merge. Apply
-  non-conflicting changes only; conflicting content remains available in Time
-  Machine.
-- Write document timestamps on editing idle, not for every content transaction.
-  Derived title/path/tag fields may write only when their values actually change.
+`JazzProvider` opens a device account local-first immediately. `useAll` and `useOne` subscribe to queries. The library selects saved metadata only. Use `readDocument(db, id)` when an action needs a body; never assume a `LibraryDocument` contains text. New writes store path and frontmatter pin metadata alongside title/tags. Legacy rows derive that metadata once without retaining their bodies. `useSession().user` is the UUID used for ownership. `useJazzSession` exports/restores device keys and signs out. `RecoveryPhrase` turns the device key into 24 BIP39 English words. Never log those words. Account changes replace the database, so key account-owned UI by account ID.
 
-### Presentation pointers
+## Writes and editor
 
-Presentation discovery and laser positions live under `UserRoot.laserHub`, in a
-private group owned by the account. Document sharing never grants access to this
-group. Load it only while presenting or using the teleprompter.
+Use `db.transaction` to create a document together with its personal library entry. Inside the transaction, `tx.insert` returns the row directly. Await the transaction, then `write.wait({ tier: "local" })` before navigation. Local durability works offline. Global durability waits for the backend and must not gate typing. Subscribe to `db.onMutationError` to report rejected writes.
 
-Each mounted display or controller gets a new writer ID and its own `LaserSender`.
-This avoids reusing a busy transaction stream when Jazz restores a browser session
-after reload. Suspend writes on `pagehide`; never flush pointer state during unload.
+`codeMirrorSync` writes every change with `editedFrom` set to the text last shown or written by that editor. It ignores delayed local echoes, applies incoming diffs with `Transaction.addToHistory.of(false)`, maps selections through changes and holds remote text during IME composition. The editor subscribes to `content` with `splices`. It applies sequential UTF-16 splices when the previous subscription value matches the editor, and falls back to a minimal diff after skipped updates, local echoes or composition. Public splices still materialize full text inside alpha.61. Bindings and undo history are keyed by document. Do not reintroduce save timers, content generations, compaction, caches or workers for saving text.
 
-Rotate sender streams, the discovery record, and its hub after 256 transactions.
-Keep at most 64 sender references and prune inactive senders when a new session
-starts. Root compaction must preserve the hub reference. Rotation bounds replay;
-it does not delete encrypted historical transactions from storage. Queue the latest
-message while a replacement is loading. After replacing a hub or registry, read
-back the winning reference before publishing; another device's timestamp can win.
-Catch unavailable sender references individually so they cannot block healthy
-writers. A loading hub or registry still queues writes rather than replacing data.
+Wikilinks keep `[[id]]` and `[[id|alias]]` syntax. Backlinks preserve the original frontmatter representation: add or remove source IDs in editable targets within the same library. Use the document operations in `features/documents/lib/library.tsx`; do not mutate another editor’s text directly. These writes use `editedFrom` in immediate mergeable transactions.
 
-A controller must receive a response to its own discovery request before offering
-a display. Selecting a display stays fixed until the user changes it, including
-when that display disconnects. Never redirect a held pointer to another screen.
+## Permissions and tests
 
-The display issues short-lived tokens tied to its slide, dimensions, and
-appearance. It validates them using its own monotonic clock. Remote timestamps
-are only cleanup hints, never proof that a pointer is live. This prevents replayed
-positions after reconnect and supports devices with different wall clocks. Tokens
-expire after five seconds, allowing renewal over a 1.5-second round trip; this also
-permits delayed points within that window. Layout changes invalidate tokens immediately.
+`src/jazz/permissions.ts` is the backend authority. Document readers can read; writers edit content; admins manage sharing and deletion. Space writers and managers can create/edit documents; space admins manage members. Public read grants no write access. Ownership and protected sharing fields cannot be changed by writers. Scope every membership check to the current document or space.
 
-The preview uses a separate iframe viewport at the target dimensions and
-appearance. Its explicit `laserPreview` flag suppresses display registration and
-app prompts, and mutes video. Video playback is independent of the projector.
+`exists.where` accepts only a where object in alpha.61. For inherited access use explicit relationship names with `allowedTo.read/update/delete`. In policy tests, `createPolicyTestApp` starts a real policy server; await global durability, and use `expectDenied` for rejected writes. Run policy tests under Node, editor tests under jsdom.
 
-Laser sync uses latest-value CoMaps, not a CoFeed. We need the current position
-and a short recovery window, not an append-only event history. Each update carries
-up to 128 indexed samples from its stroke, including browser-coalesced movement.
-On the wire, samples are integer triples with coordinates scaled by 10,000. This
-keeps the recovery window with at most 0.00005 normalized coordinate error.
-The channel decodes samples before delivering them to the renderer.
-Keep the sample limit shared by validation and publishing. Receivers deduplicate
-overlapping batches so missed intermediate updates do not flatten fast curves.
-This window is bounded: a longer gap can still lose older samples.
+## Schema evolution
 
-Laser strokes carry IDs so separate gestures never join. Leaving the preview
-pauses drawing; re-entry starts a new segment within the captured drag. Release,
-cancellation, hiding the preview, or a slide/layout change ends the gesture.
-Zero-area previews must not publish coordinates. Each renderer retains
-at most 2,048 points and uses its own monotonic clock. Like tldraw, a stroke stays
-visible while drawing, then waits 1,200 ms and fades over 500 ms. Heartbeats keep
-a held stroke alive; lost connections still expire. Heartbeats publish only after
-500 ms without a point update, so moving strokes do not also send heartbeats.
-Deduplicate samples per stroke, including when controllers alternate. Slide and layout changes clear
-the trail immediately. Cache the SVG path until its points change; fading only
-changes opacity. Hiding the preview preserves the chosen display for reopening.
+A snapshot of the foundation contract lives in `src/jazz/migrations/snapshots/`. Before changing it, read alpha.61's migrations guide and generate a lens with `bun x jazz-tools migrations create --schema-dir src/jazz --migrations-dir src/jazz/migrations --name <change>`. Import the generated graph into `defineApp` before starting a backend against existing data. Changing a typed JSON schema in place is unsupported in alpha.61. Add a column and copy values instead.
 
-Below 768 px, the preview occupies a dialog instead of sharing space with the
-teleprompter. Keep the teleprompter mounted to preserve its scroll and timer, but
-suspend its keyboard shortcuts while the dialog is open. Wider viewports use an
-inline preview. Mobile dialog state and desktop visibility are independent so
-resizing never opens a mobile dialog merely because the desktop preview was shown.
-
-Local storage notifications include the changed CoValue IDs. Reload only matching
-known values; notifications from older tabs without IDs still trigger a full reload.
-
-Written with GPT-6 in Codex.
+written with gpt-6.1-sol in T3 Code (Codex)

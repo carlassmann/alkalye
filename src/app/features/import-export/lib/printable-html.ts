@@ -1,8 +1,7 @@
 import { Marked } from "marked"
 import markedFootnote from "marked-footnote"
 import markedShiki from "marked-shiki"
-import { co } from "jazz-tools"
-import { type Theme, type ThemeAsset } from "@/schema"
+import type { ThemeRow, ThemeAssetRow } from "@/app/features/themes/lib/schema"
 import { parseFrontmatter } from "@/app/features/editor/lib/frontmatter"
 import {
 	findThemeByName,
@@ -14,7 +13,6 @@ import {
 	getThemePresets,
 	findPresetByAppearance,
 	type LoadedThemes,
-	type ThemesQuery,
 	type ThemePresetType,
 } from "@/app/features/themes/lib/document-theme"
 import { scopeThemeCss } from "@/app/features/themes/lib/renderer"
@@ -46,8 +44,8 @@ export {
 	type HtmlParser,
 }
 
-type LoadedTheme = co.loaded<typeof Theme, ThemesQuery["$each"]>
-type LoadedAsset = co.loaded<typeof ThemeAsset, { data: true }>
+type LoadedTheme = ThemeRow & { assets?: ThemeAssetRow[] }
+type LoadedAsset = ThemeAssetRow
 
 type PrintTheme = {
 	name: string
@@ -124,14 +122,12 @@ async function toPrintTheme(
 	theme: LoadedTheme,
 	preset: ThemePresetType | null,
 ): Promise<PrintTheme> {
-	let css = theme.css?.$isLoaded ? theme.css.toString() : ""
+	let css = theme.css ?? ""
 	return {
 		name: theme.name,
 		css: theme.sourceDocId ? scopeThemeCss(css, PRINT_THEME_SCOPE) : css,
-		template: theme.template?.$isLoaded ? theme.template.toString() : null,
-		slideTemplate: theme.slideTemplate?.$isLoaded
-			? theme.slideTemplate.toString()
-			: null,
+		template: theme.template ?? null,
+		slideTemplate: theme.slideTemplate ?? null,
 		fontFaceRules: await buildFontFaceRulesBase64(theme),
 		presetVariables: preset ? buildPresetVariables(preset) : "",
 	}
@@ -435,18 +431,20 @@ function renderTemplateWithContent(
 }
 
 async function buildFontFaceRulesBase64(theme: LoadedTheme): Promise<string> {
-	if (!theme.assets?.$isLoaded) return ""
+	if (!theme.assets) return ""
 
 	let rules: string[] = []
 
 	for (let asset of theme.assets.values()) {
-		if (!asset?.$isLoaded) continue
+		if (!asset) continue
 		let loaded: LoadedAsset = asset
-		if (!loaded.data?.$isLoaded) continue
+
 		if (!loaded.mimeType.startsWith("font/")) continue
 
 		// toBlob() skips fonts whose chunks are still syncing.
-		let blob = await co.fileStream().loadAsBlob(loaded.data.$jazz.id)
+		let blob = new Blob([new Uint8Array(loaded.data)], {
+			type: loaded.mimeType,
+		})
 		if (!blob) continue
 
 		let base64 = await blobToBase64(blob)

@@ -1,10 +1,9 @@
-import { useAccount } from "jazz-tools/react"
+import { useAll, useSession } from "jazz-tools/react"
 import { z } from "zod"
+import { app } from "@/jazz/schema"
+import { useLibrary, type Database } from "@/app/features/documents/lib/library"
 import { parseFrontmatter } from "@/app/features/editor/lib/frontmatter"
-import { UserAccount } from "@/schema"
-import { type Theme, ThemePreset } from "./schema"
-import { type co } from "jazz-tools"
-
+import { ThemePreset, type ThemeRow, type ThemeAssetRow } from "./schema"
 export {
 	getThemeName,
 	getThemeId,
@@ -19,31 +18,17 @@ export {
 	loadThemesForPdf,
 }
 
-export type { ResolvedTheme, ThemesQuery, LoadedThemes, ThemePresetType }
+export type { ResolvedTheme, LoadedThemes, ThemePresetType }
 
 type ThemePresetType = z.infer<typeof ThemePreset>
 
 type ResolvedTheme = {
-	theme: co.loaded<typeof Theme, ThemesQuery["$each"]> | null
+	theme: (ThemeRow & { assets?: ThemeAssetRow[] }) | null
 	preset: ThemePresetType | null
 	warning: string | null
 	isLoading: boolean
 }
-
-type ThemeQuery = {
-	css: true
-	template: true
-	slideTemplate: true
-	assets: { $each: { data: true } }
-}
-type ThemesQuery = {
-	$each: ThemeQuery & { $onError: "catch" }
-}
-type LoadedThemes = co.loaded<
-	ReturnType<typeof co.list<typeof Theme>>,
-	ThemesQuery
->
-
+type LoadedThemes = ThemeRow[]
 function getThemeName(content: string): string | null {
 	let { frontmatter } = parseFrontmatter(content)
 	if (!frontmatter) return null
@@ -73,12 +58,12 @@ function getPresetName(content: string): string | null {
 function findThemeByName(
 	themes: LoadedThemes | null | undefined,
 	themeName: string,
-): co.loaded<typeof Theme, ThemeQuery> | null {
+): ThemeRow | null {
 	if (!themes) return null
 
 	let lowerName = themeName.toLowerCase()
 	for (let theme of themes) {
-		if (theme?.$isLoaded && theme.name.toLowerCase() === lowerName) {
+		if (theme.name.toLowerCase() === lowerName) {
 			return theme
 		}
 	}
@@ -88,34 +73,37 @@ function findThemeByName(
 function findThemeById(
 	themes: LoadedThemes | null | undefined,
 	themeId: string,
-): co.loaded<typeof Theme, ThemeQuery> | null {
+): ThemeRow | null {
 	if (!themes) return null
 	for (let theme of themes) {
-		if (theme?.$isLoaded && theme.$jazz.id === themeId) return theme
+		if (theme.id === themeId) return theme
 	}
 	return null
 }
 
-function getThemePresets(theme: {
-	presets?: string | null
-}): ThemePresetType[] {
-	if (!theme.presets) {
-		return []
-	}
-
+function getThemePresets(theme: { presets?: unknown }): ThemePresetType[] {
 	try {
-		let parsed = JSON.parse(theme.presets) as
-			| ThemePresetType[]
-			| { presets: ThemePresetType[] }
-		let presets = Array.isArray(parsed) ? parsed : (parsed.presets ?? [])
-		return presets
+		let value =
+			typeof theme.presets === "string"
+				? JSON.parse(theme.presets)
+				: theme.presets
+		let parsed = z
+			.union([
+				z.array(ThemePreset),
+				z.object({ presets: z.array(ThemePreset) }),
+			])
+			.safeParse(value)
+		return parsed.success
+			? Array.isArray(parsed.data)
+				? parsed.data
+				: parsed.data.presets
+			: []
 	} catch {
 		return []
 	}
 }
-
 function findPresetByName(
-	theme: { presets?: string | null },
+	theme: { presets?: unknown },
 	presetName: string,
 ): ThemePresetType | null {
 	let presets = getThemePresets(theme)
@@ -204,54 +192,46 @@ function useDocumentTheme(
 	appearance?: Appearance | null,
 	themeOverrideId?: string,
 ): ResolvedTheme {
-	let me = useAccount(UserAccount, { resolve: themesQuery })
-
-	if (!me.$isLoaded || !me.root?.themes) {
-		return { theme: null, preset: null, warning: null, isLoading: true }
-	}
-
-	let settings = me.root.settings
-	let defaultThemeName = settings
-		? mode === "slideshow"
-			? (settings.defaultSlideshowTheme ?? null)
-			: (settings.defaultPreviewTheme ?? null)
-		: null
-
+	let ownerId = useSession()?.user ?? undefined
+	let { data: themes = [], isLoading } = useAll(app.themes.where({ ownerId }))
+	let { settings } = useLibrary()
+	let defaultThemeName =
+		(mode === "slideshow"
+			? settings?.defaultSlideshowTheme
+			: settings?.defaultPreviewTheme) ?? null
 	let resolved = resolveDocumentTheme({
 		content,
-		themes: me.root.themes as LoadedThemes,
+		themes,
 		defaultThemeName,
 		appearance,
 		themeOverrideId,
 	})
-
-	return { ...resolved, isLoading: false }
-}
-
-let themesQuery = {
-	root: {
-		settings: true,
-		themes: {
-			$each: {
-				css: true,
-				template: true,
-				slideTemplate: true,
-				assets: { $each: { data: true } },
-				$onError: "catch",
-			},
-		},
-	},
-} as const
-
-// Themes carry binary assets (fonts, images), so they are loaded on demand
-// when exporting instead of being subscribed eagerly on every editor mount.
-async function loadThemesForPdf(me: co.loaded<typeof UserAccount>) {
-	let { root } = await me.$jazz.ensureLoaded({ resolve: themesQuery })
+	let { data: assets = [], isLoading: assetsLoading } = useAll(
+		app.themeAssets.where({
+			themeId: resolved.theme?.id ?? "00000000-0000-0000-0000-000000000000",
+		}),
+	)
 	return {
-		themes: root.themes,
-		defaultPreviewTheme: root.settings?.defaultPreviewTheme ?? null,
-		defaultSlideshowTheme: root.settings?.defaultSlideshowTheme ?? null,
-		defaultSyntaxTheme: root.settings?.syntaxTheme ?? null,
+		...resolved,
+		theme:
+			resolved.theme && !assetsLoading ? { ...resolved.theme, assets } : null,
+		isLoading: isLoading || assetsLoading,
+	}
+}
+async function loadThemesForPdf(db: Database) {
+	let rows = await db.all(app.themes)
+	let themes = await Promise.all(
+		rows.map(async theme => ({
+			...theme,
+			assets: await db.all(app.themeAssets.where({ themeId: theme.id })),
+		})),
+	)
+	let settings = await db.one(app.settings)
+	return {
+		themes,
+		defaultPreviewTheme: settings?.defaultPreviewTheme ?? null,
+		defaultSlideshowTheme: settings?.defaultSlideshowTheme ?? null,
+		defaultSyntaxTheme: settings?.syntaxTheme ?? null,
 	}
 }
 
@@ -259,7 +239,7 @@ type ThemeMode = "preview" | "slideshow"
 type Appearance = "light" | "dark"
 
 function findPresetByAppearance(
-	theme: { presets?: string | null },
+	theme: { presets?: unknown },
 	appearance: Appearance,
 ): ThemePresetType | null {
 	let presets = getThemePresets(theme)

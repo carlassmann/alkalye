@@ -1,34 +1,23 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 import { useNavigate } from "@tanstack/react-router"
-import { co, Group, type ResolveQuery } from "jazz-tools"
-import { useCoState, useAccount } from "jazz-tools/react"
+import { useOne, useAll, useDb } from "jazz-tools/react"
 import { toast } from "sonner"
-import { Document, UserAccount, Asset, TldrawRevision, Space } from "@/schema"
-import { MarkdownEditor, useMarkdownEditorRef } from "@/app/features/editor"
-import { useEditorSettings } from "@/app/features/editor"
+import { app, type DocumentRow } from "@/jazz/schema"
 import {
-	applyContentDiffWithCommentAnchors,
-	copyCommentsAndApplyContent,
-} from "@/app/features/comments"
+	MarkdownEditor,
+	useMarkdownEditorRef,
+	useEditorSettings,
+} from "@/app/features/editor"
 import {
-	createDocumentMetadata,
-	getDocumentTitle,
-	syncDocumentMetadata,
+	useLibrary,
+	updateContent,
+	useDocumentAccess,
 } from "@/app/features/documents"
-import { canEdit } from "@/app/features/sharing"
-import { getSpaceGroup } from "@/app/features/spaces"
-import {
-	DocumentNotFound,
-	DocumentUnauthorized,
-} from "@/app/components/error-states"
-
+import { DocumentNotFound } from "@/app/components/error-states"
 import {
 	getEditHistory,
-	getContentAtEdit,
-	getEditTimestamp,
+	historyQuery,
 	restoreAssetsAtTime,
-	getHistoricalAssetIds,
-	getAuthorName,
 	formatEditDate,
 	groupEditsByDay,
 } from "../lib/time-machine"
@@ -37,164 +26,85 @@ import {
 	useConfirmDialog,
 } from "@/app/components/ui/confirm-dialog"
 import { SidebarProvider } from "@/app/components/ui/sidebar"
-import { useIntl } from "@/shared/intl/setup"
+import { createTimeMachineCopy } from "../lib/create-copy"
+import { useHistoricalEditorAssets } from "../lib/historical-assets"
 import { useResolvedTheme } from "@/app/components/appearance"
-import {
-	assetContentResolve,
-	assetPreviewResolve,
-	copyAsset,
-} from "@/app/features/assets"
+import { useIntl } from "@/shared/intl/setup"
 import {
 	TimeMachineBottomBar,
 	TimeMachineToolbar,
 	type ViewMode,
 } from "../widgets/time-machine-bars"
-
-export { TimeMachineScreen, resolve, settingsResolve }
+export { TimeMachineScreen }
 export type { ViewMode }
-
-let resolve = {
-	content: true,
-	archivedContent: { $each: { content: true, successor: true } },
-	assets: {
-		$each: assetContentResolve,
-	},
-	comments: { $each: { replies: true } },
-} as const satisfies ResolveQuery<typeof Document>
-
-let settingsResolve = {
-	root: { settings: true },
-} as const satisfies ResolveQuery<typeof UserAccount>
-
-let meResolve = {
-	root: {
-		documents: { $each: { content: true, comments: { $each: true } } },
-		spaces: {
-			$each: {
-				documents: { $each: { content: true, comments: { $each: true } } },
-			},
-		},
-		settings: true,
-	},
-} as const satisfies ResolveQuery<typeof UserAccount>
-
-type LoadedDocument = co.loaded<typeof Document, typeof resolve>
-type LoadedMe = ReturnType<
-	typeof useAccount<typeof UserAccount, typeof meResolve>
->
-type LoadedSettingsMe = co.loaded<typeof UserAccount, typeof settingsResolve>
-
-interface TimeMachineScreenProps {
+function TimeMachineScreen({
+	id,
+	search,
+}: {
 	id: string
-	loaderData: {
-		doc: LoadedDocument | null
-		loadingState: string | null
-		me: LoadedSettingsMe | null
-	}
 	search: { edit?: number; mode?: ViewMode }
-}
-
-function TimeMachineScreen({ id, loaderData, search }: TimeMachineScreenProps) {
-	let { edit, mode } = search
-
-	let subscribedDoc = useCoState(Document, id, { resolve })
-
-	if (!loaderData.doc) {
-		if (loaderData.loadingState === "unauthorized")
-			return <DocumentUnauthorized />
-		return <DocumentNotFound />
-	}
-
-	if (
-		!subscribedDoc.$isLoaded &&
-		subscribedDoc.$jazz.loadingState !== "loading"
-	) {
-		if (subscribedDoc.$jazz.loadingState === "unauthorized")
-			return <DocumentUnauthorized />
-		return <DocumentNotFound />
-	}
-
-	let doc = subscribedDoc.$isLoaded ? subscribedDoc : loaderData.doc
-
+}) {
+	let { data: doc, isLoading } = useOne(app.documents.where({ id }))
+	if (isLoading) return <p role="status">Opening document…</p>
+	if (!doc || doc.deletedAt) return <DocumentNotFound />
 	return (
 		<SidebarProvider>
 			<TimeMachineContent
+				key={id}
 				doc={doc}
 				docId={id}
-				initialEdit={edit}
-				initialMode={mode}
-				loaderMe={loaderData.me}
+				initialEdit={search.edit}
+				initialMode={search.mode}
 			/>
 		</SidebarProvider>
 	)
 }
-
-interface TimeMachineContentProps {
-	doc: LoadedDocument
-	docId: string
-	initialEdit?: number
-	initialMode?: ViewMode
-	loaderMe: LoadedSettingsMe | null
-}
-
 function TimeMachineContent({
 	doc,
 	docId,
 	initialEdit,
 	initialMode,
-	loaderMe,
-}: TimeMachineContentProps) {
-	let t = useIntl()
-	let navigate = useNavigate()
-	let editor = useMarkdownEditorRef()
-	let restoreDialog = useConfirmDialog()
-	let colorScheme = useResolvedTheme()
-
-	let me = useAccount(UserAccount, { resolve: meResolve })
-
-	let editorSettings =
-		me.$isLoaded && me.root?.settings?.$isLoaded
-			? me.root.settings
-			: loaderMe?.root?.settings
-
-	useEditorSettings(editorSettings)
-
-	let content = doc.content?.toString() ?? ""
-	let docTitle = getDocumentTitle(content)
-
-	let editHistory = getEditHistory(doc)
-	let totalEdits = editHistory.length
-	let dayGroups = groupEditsByDay(editHistory)
-
+}: {
+	doc: DocumentRow
+	docId: string
+	initialEdit?: number
+	initialMode?: ViewMode
+}) {
+	let t = useIntl(),
+		navigate = useNavigate(),
+		editor = useMarkdownEditorRef(),
+		restoreDialog = useConfirmDialog(),
+		db = useDb()
+	let { ownerId, settings } = useLibrary()
+	useEditorSettings(settings)
+	let { data: versions = [] } = useAll(historyQuery(docId))
+	let { data: imported = [] } = useAll(
+		app.documentVersions.where({ documentId: docId }),
+	)
+	let { data: profiles = [] } = useAll(app.profiles)
+	let { canEdit } = useDocumentAccess(doc)
+	let docTitle = doc.title
+	let editHistory = getEditHistory(versions, imported),
+		totalEdits = editHistory.length,
+		dayGroups = groupEditsByDay(editHistory)
 	let currentEditIndex =
 		initialEdit !== undefined
 			? Math.min(Math.max(0, initialEdit), totalEdits - 1)
 			: totalEdits - 1
-
 	let currentEdit = editHistory[currentEditIndex]
-	let timeMachineContent = getContentAtEdit(doc, currentEditIndex)
-	let historicalTimestamp = getEditTimestamp(doc, currentEditIndex)
+	let timeMachineContent = currentEdit?.content ?? doc.content
+	let historicalTimestamp =
+		currentEdit?.madeAt.getTime() ?? doc.updatedAt.getTime()
 	let historicalAssets = useHistoricalEditorAssets(
-		doc,
+		docId,
 		historicalTimestamp,
-		colorScheme,
+		useResolvedTheme(),
 	)
-
 	let viewMode: ViewMode = initialMode ?? "days"
-	let selectedDayIndex: number | null = null
-	if (viewMode === "edits") {
-		selectedDayIndex = dayGroups.findIndex(day =>
-			day.edits.some(e => e.index === currentEditIndex),
-		)
-		if (selectedDayIndex === -1) selectedDayIndex = null
-	}
-
-	let currentEditAuthor = useCoState(
-		UserAccount,
-		currentEdit?.accountId ?? undefined,
-		{ resolve: { profile: true } },
+	let dayIndex = dayGroups.findIndex(day =>
+		day.edits.some(edit => edit.index === currentEditIndex),
 	)
-
+	let selectedDayIndex = viewMode === "edits" && dayIndex >= 0 ? dayIndex : null
 	useEffect(() => {
 		if (initialEdit === undefined && totalEdits > 0) {
 			navigate({
@@ -344,10 +254,15 @@ function TimeMachineContent({
 				/>
 				<TimeMachineToolbar
 					editDate={currentEdit?.madeAt ?? doc.createdAt}
-					authorName={getAuthorName(
-						currentEditAuthor?.$isLoaded ? currentEditAuthor : null,
-						me.$isLoaded ? me.$jazz.id : undefined,
-					)}
+					authorName={
+						currentEdit?.accountId === ownerId
+							? "you"
+							: (currentEdit?.authorName ??
+								profiles.find(
+									profile => profile.ownerId === currentEdit?.accountId,
+								)?.name ??
+								"Unknown")
+					}
 					onExit={() => {
 						navigate({
 							to: "/doc/$id",
@@ -355,15 +270,21 @@ function TimeMachineContent({
 							search: {},
 						})
 					}}
-					onCreateCopy={makeTimeMachineCreateCopy({
-						doc,
-						historicalContent: timeMachineContent,
-						originalTitle: docTitle,
-						editDate: currentEdit?.madeAt ?? doc.createdAt,
-						historicalTimestamp,
-						me,
-						navigate,
-					})}
+					onCreateCopy={async () => {
+						try {
+							let copy = await createTimeMachineCopy(
+								db,
+								ownerId,
+								doc,
+								timeMachineContent,
+								historicalTimestamp,
+							)
+							void navigate({ to: "/doc/$id", params: { id: copy.id } })
+						} catch (error) {
+							console.error(error)
+							toast.error(t("timeMachine.restoreFailed"))
+						}
+					}}
 					onRestore={() => restoreDialog.setOpen(true)}
 				/>
 				<ConfirmDialog
@@ -375,14 +296,18 @@ function TimeMachineContent({
 					})}
 					confirmLabel={t("timeMachine.restoreConfirm")}
 					cancelLabel={t("timeMachine.cancel")}
-					onConfirm={makeTimeMachineRestore({
-						doc,
-						historicalContent: timeMachineContent,
-						historicalTimestamp,
-						navigate,
-						docId,
-						restoreFailedMessage: t("timeMachine.restoreFailed"),
-					})}
+					onConfirm={async () => {
+						try {
+							if (!canEdit) return
+							if (!imported.some(version => version.id === currentEdit?.key))
+								await restoreAssetsAtTime(db, doc.id, historicalTimestamp)
+							await updateContent(db, doc, timeMachineContent)
+							void navigate({ to: "/doc/$id", params: { id: docId } })
+						} catch (error) {
+							console.error(error)
+							toast.error(t("timeMachine.restoreFailed"))
+						}
+					}}
 				/>
 				<TimeMachineBottomBar
 					editHistory={editHistory}
@@ -403,283 +328,4 @@ function TimeMachineContent({
 			</div>
 		</>
 	)
-}
-
-interface HistoricalEditorAsset {
-	id: string
-	name: string
-	type: "image" | "video" | "tldraw"
-	imageId?: string
-	video?: { $isLoaded?: boolean; toBlob?: () => Blob | undefined }
-	muteAudio?: boolean
-}
-
-function useHistoricalEditorAssets(
-	doc: LoadedDocument,
-	timestamp: number,
-	colorScheme: "light" | "dark",
-) {
-	let [assets, setAssets] = useState<HistoricalEditorAsset[]>([])
-
-	useEffect(() => {
-		let cancelled = false
-		void loadHistoricalEditorAssets(doc, timestamp, colorScheme).then(
-			result => {
-				if (!cancelled) setAssets(result)
-			},
-		)
-		return () => {
-			cancelled = true
-		}
-	}, [doc, timestamp, colorScheme])
-
-	return assets
-}
-
-async function loadHistoricalEditorAssets(
-	doc: LoadedDocument,
-	timestamp: number,
-	colorScheme: "light" | "dark",
-): Promise<HistoricalEditorAsset[]> {
-	let assetIds = getHistoricalAssetIds(doc, timestamp)
-	let loaded = await Promise.all(
-		assetIds.map(assetId =>
-			Asset.load(assetId, {
-				resolve: assetPreviewResolve,
-			}),
-		),
-	)
-	let result: HistoricalEditorAsset[] = []
-
-	for (let asset of loaded) {
-		if (!asset?.$isLoaded) continue
-		let historical = asset.$jazz.raw.atTime(timestamp)
-		let historicalName = historical.get("name")
-		let name = typeof historicalName === "string" ? historicalName : asset.name
-
-		if (asset.type === "image") {
-			let imageId = historical.get("image")
-			result.push({
-				id: asset.$jazz.id,
-				name,
-				type: "image",
-				imageId: typeof imageId === "string" ? imageId : undefined,
-			})
-			continue
-		}
-		if (asset.type === "video") {
-			result.push({
-				id: asset.$jazz.id,
-				name,
-				type: "video",
-				video: asset.video?.$isLoaded ? asset.video : undefined,
-				muteAudio: asset.muteAudio,
-			})
-			continue
-		}
-
-		let revisionId = historical.get("revision")
-		if (typeof revisionId !== "string") continue
-		let revision = await TldrawRevision.load(revisionId, {
-			resolve: { lightPreview: true, darkPreview: true },
-		})
-		if (!revision?.$isLoaded) continue
-		let preview =
-			colorScheme === "dark" ? revision.darkPreview : revision.lightPreview
-		result.push({
-			id: asset.$jazz.id,
-			name,
-			type: "tldraw",
-			imageId: preview?.$isLoaded ? preview.$jazz.id : undefined,
-		})
-	}
-
-	return result
-}
-
-type TimeMachineCopyParams = {
-	doc: LoadedDocument
-	historicalContent: string
-	originalTitle: string
-	editDate: Date
-	historicalTimestamp: number
-	me: LoadedMe
-	navigate: ReturnType<typeof useNavigate>
-}
-
-type LoadedSpace = co.loaded<typeof Space, { documents: true }>
-
-function makeTimeMachineCreateCopy(params: TimeMachineCopyParams) {
-	return async function handleTimeMachineCreateCopy() {
-		let {
-			doc,
-			historicalContent,
-			originalTitle,
-			editDate,
-			historicalTimestamp,
-			me,
-			navigate,
-		} = params
-		if (!me.$isLoaded || !me.root?.documents?.$isLoaded) return
-
-		let owner: Group
-		let targetSpace: LoadedSpace | undefined
-
-		if (doc.spaceId) {
-			let space = me.root.spaces?.find(s => s?.$jazz.id === doc.spaceId)
-			if (space?.$isLoaded) {
-				targetSpace = space as LoadedSpace
-				let spaceGroup = getSpaceGroup(space as LoadedSpace)
-				if (spaceGroup) {
-					owner = Group.create()
-					owner.addMember(spaceGroup)
-				} else {
-					owner = Group.create()
-				}
-			} else {
-				owner = Group.create()
-			}
-		} else {
-			owner = Group.create()
-		}
-
-		let assetIdMap = new Map<string, string>()
-		let newAssets = co.list(Asset).create([], owner)
-		let assetIds = getHistoricalAssetIds(doc, historicalTimestamp)
-		let assets = await Promise.all(
-			assetIds.map(assetId =>
-				Asset.load(assetId, {
-					resolve: assetContentResolve,
-				}),
-			),
-		)
-
-		for (let asset of assets) {
-			if (!asset?.$isLoaded) continue
-			let historical = asset.$jazz.raw.atTime(historicalTimestamp)
-			let historicalName = historical.get("name")
-			let name =
-				typeof historicalName === "string" ? historicalName : asset.name
-
-			try {
-				let revision =
-					asset.type === "tldraw"
-						? await loadHistoricalTldrawRevision(asset, historicalTimestamp)
-						: undefined
-				if (asset.type === "tldraw" && !revision) continue
-				let newAsset = await copyAsset(asset, owner, {
-					name,
-					tldrawRevision: revision,
-				})
-
-				newAssets.$jazz.push(newAsset)
-				assetIdMap.set(asset.$jazz.id, newAsset.$jazz.id)
-			} catch (err) {
-				console.error("Failed to copy asset:", err)
-				toast.error(`Failed to copy asset: ${asset.name}`)
-			}
-		}
-
-		let content = historicalContent
-		for (let [oldId, newId] of assetIdMap) {
-			content = content.replace(
-				new RegExp(`\\(asset:${oldId}\\)`, "g"),
-				`(asset:${newId})`,
-			)
-		}
-
-		let formattedDate = formatEditDate(editDate)
-		let frontmatter = `---\ntimemachine: restored from ${originalTitle} at ${formattedDate}\n---\n\n`
-
-		let lines = content.split("\n")
-		let newTitle = `${originalTitle} (restored)`
-
-		if (lines[0]?.startsWith("#")) {
-			lines[0] = `# ${newTitle}`
-		} else {
-			lines.unshift(`# ${newTitle}`)
-		}
-
-		let finalContent = frontmatter + lines.join("\n")
-
-		let now = new Date()
-		let newDoc = Document.create(
-			{
-				version: 1,
-				content: co.plainText().create(doc.content.toString(), owner),
-				assets: newAssets,
-				...createDocumentMetadata(finalContent, now),
-				createdAt: now,
-				updatedAt: now,
-				spaceId: doc.spaceId,
-			},
-			owner,
-		)
-		try {
-			await copyCommentsAndApplyContent(doc, newDoc, finalContent)
-		} catch (error) {
-			console.error("Failed to create document copy:", error)
-			toast.error("Failed to create document copy")
-			return
-		}
-
-		if (targetSpace?.documents?.$isLoaded) {
-			targetSpace.documents.$jazz.push(newDoc)
-		} else {
-			me.root.documents.$jazz.push(newDoc)
-		}
-
-		navigate({ to: "/doc/$id", params: { id: newDoc.$jazz.id } })
-	}
-}
-
-async function loadHistoricalTldrawRevision(
-	asset: co.loaded<typeof Asset>,
-	timestamp: number,
-) {
-	let revisionId = asset.$jazz.raw.atTime(timestamp).get("revision")
-	if (typeof revisionId !== "string") return undefined
-	let revision = await TldrawRevision.load(revisionId, {
-		resolve: {
-			snapshot: true,
-			lightPreview: true,
-			darkPreview: true,
-		},
-	})
-	return revision?.$isLoaded ? revision : undefined
-}
-
-type TimeMachineRestoreParams = {
-	doc: LoadedDocument
-	historicalContent: string
-	historicalTimestamp: number
-	navigate: ReturnType<typeof useNavigate>
-	docId: string
-	restoreFailedMessage: string
-}
-
-function makeTimeMachineRestore(params: TimeMachineRestoreParams) {
-	return async function handleTimeMachineRestore() {
-		let { doc, historicalContent, historicalTimestamp, navigate, docId } =
-			params
-		if (!doc.content) return
-		if (!canEdit(doc)) return
-
-		try {
-			await restoreAssetsAtTime(doc, historicalTimestamp)
-			applyContentDiffWithCommentAnchors(doc, historicalContent)
-			doc.$jazz.set("updatedAt", new Date())
-			syncDocumentMetadata(doc)
-		} catch (error) {
-			console.error("Failed to restore document version:", error)
-			toast.error(params.restoreFailedMessage)
-			return
-		}
-
-		navigate({
-			to: "/doc/$id",
-			params: { id: docId },
-			search: {},
-		})
-	}
 }

@@ -1,9 +1,9 @@
 import { useState } from "react"
 import { Link, useNavigate } from "@tanstack/react-router"
-import { useCoState } from "jazz-tools/react"
-import { type ResolveQuery, co } from "jazz-tools"
+import { useOne, useDb } from "jazz-tools/react"
+import { app } from "@/jazz/schema"
+import { useLibrary, useDocumentAccess } from "@/app/features/documents"
 import { FileText } from "lucide-react"
-import { Document } from "@/schema"
 import {
 	DocumentNotFound,
 	DocumentUnauthorized,
@@ -16,12 +16,6 @@ import {
 	EmptyContent,
 } from "@/app/components/ui/empty"
 import { Button } from "@/app/components/ui/button"
-import { parseWikiLinks } from "@/app/features/editor"
-import {
-	resolveDocTitles,
-	useDocTitles,
-	type ResolvedDoc,
-} from "@/app/features/documents"
 import { useWidePresentation } from "../lib/presentation-layout"
 import { LaserPreview } from "../widgets/laser-pointer"
 import { Teleprompter, groupBySlide } from "../widgets/teleprompter"
@@ -30,36 +24,11 @@ import { parsePresentation } from "../lib/presentation"
 import { useScreenWakeLock } from "../lib/screen-wake-lock"
 import { T } from "@/shared/intl/setup"
 
-export { TeleprompterScreen, resolve, loadWikilinkCache }
-export type { LoaderData }
-
-let resolve = {
-	content: true,
-} as const satisfies ResolveQuery<typeof Document>
-
-type LoadedDoc = co.loaded<typeof Document, typeof resolve>
-
-interface LoaderData {
-	doc: LoadedDoc | null
-	loadingState: "unauthorized" | "unavailable" | null
-	wikilinkCache: Map<string, ResolvedDoc>
-}
-
-async function loadWikilinkCache(
-	doc: LoadedDoc,
-): Promise<Map<string, ResolvedDoc>> {
-	let content = doc.content?.toString() ?? ""
-	let wikilinks = parseWikiLinks(content)
-	let wikilinkIds = wikilinks.map(w => w.id)
-	return resolveDocTitles(wikilinkIds)
-}
-
-interface TeleprompterScreenProps {
-	id: string
-	loaderData: LoaderData
-}
-
-function TeleprompterScreen({ id, loaderData }: TeleprompterScreenProps) {
+export { TeleprompterScreen }
+function TeleprompterScreen({ id }: { id: string }) {
+	let db = useDb()
+	let { documents } = useLibrary()
+	let { data: doc, isLoading } = useOne(app.documents.where({ id }))
 	let navigate = useNavigate()
 	let wide = useWidePresentation()
 	let [desktopPreview, setDesktopPreview] = useState(true)
@@ -70,34 +39,24 @@ function TeleprompterScreen({ id, loaderData }: TeleprompterScreenProps) {
 		else setMobilePreview(visible)
 	}
 
+	let { canEdit: canEdit } = useDocumentAccess(doc)
 	useScreenWakeLock()
 
-	let subscribedDoc = useCoState(Document, id, { resolve })
-
-	let content =
-		(subscribedDoc.$isLoaded
-			? subscribedDoc
-			: loaderData.doc
-		)?.content?.toString() ?? ""
-	let wikilinkIds = parseWikiLinks(content).map(w => w.id)
-	let wikilinks = useDocTitles(wikilinkIds, loaderData.wikilinkCache)
-
-	if (!loaderData.doc) {
-		if (loaderData.loadingState === "unauthorized")
-			return <DocumentUnauthorized />
-		return <DocumentNotFound />
-	}
-
-	if (
-		!subscribedDoc.$isLoaded &&
-		subscribedDoc.$jazz.loadingState !== "loading"
-	) {
-		if (subscribedDoc.$jazz.loadingState === "unauthorized")
-			return <DocumentUnauthorized />
-		return <DocumentNotFound />
-	}
-
-	let doc = subscribedDoc.$isLoaded ? subscribedDoc : loaderData.doc
+	if (isLoading) return <p role="status">Opening document…</p>
+	if (!doc || doc.deletedAt) return <DocumentNotFound />
+	if (!canEdit) return <DocumentUnauthorized />
+	let content = doc.content
+	let wikilinks = new Map(
+		documents.map(doc => [
+			doc.id,
+			{
+				id: doc.id,
+				title: doc.title,
+				exists: !doc.deletedAt,
+				isPresentation: doc.isPresentation,
+			},
+		]),
+	)
 	let items = content ? parsePresentation(content) : []
 
 	if (items.length === 0) {
@@ -127,7 +86,7 @@ function TeleprompterScreen({ id, loaderData }: TeleprompterScreenProps) {
 
 	let slideGroups = groupBySlide(items)
 	let currentSlideNumber =
-		doc.presentationLine !== undefined && items[doc.presentationLine]
+		doc.presentationLine !== null && items[doc.presentationLine]
 			? items[doc.presentationLine].slideNumber
 			: 0
 	let currentSlideIdx = slideGroups.findIndex(
@@ -138,7 +97,7 @@ function TeleprompterScreen({ id, loaderData }: TeleprompterScreenProps) {
 		<div className="bg-background fixed inset-0 flex flex-col">
 			<TeleprompterTopBar
 				editorLink={<Link to="/doc/$id" params={{ id }} />}
-				slideshowHref={`/doc/${id}/slideshow`}
+				slideshowHref={`/app/doc/${id}/slideshow`}
 				wide={wide}
 				previewVisible={previewVisible}
 				onTogglePreview={() => setPreviewVisible(!previewVisible)}
@@ -151,8 +110,10 @@ function TeleprompterScreen({ id, loaderData }: TeleprompterScreenProps) {
 						inactive={!wide && mobilePreview}
 						items={items}
 						wikilinks={wikilinks}
-						presentationIndex={doc.presentationLine}
-						onIndexChange={index => doc.$jazz.set("presentationLine", index)}
+						presentationIndex={doc.presentationLine ?? undefined}
+						onIndexChange={index =>
+							void db.update(app.documents, id, { presentationLine: index })
+						}
 						onExit={() => navigate({ to: "/doc/$id", params: { id } })}
 					/>
 				</div>

@@ -1,0 +1,1723 @@
+{
+	"method": {
+		"editsPerCase": 200,
+		"units": "sampled milliseconds per trace edit",
+		"scope": "Entire replay profile, including cursor movement, final verification and 3-second settling; excludes account/import/startup. Idle/program/GC retained separately. Parallel worker CPU must not be added to dispatch-to-double-rAF latency.",
+		"sampling": "CDP V8 CPU profiler; timeDeltas charged to leaf frames; exact totals of reported samples, not instrumented per-key phase timers.",
+		"phasePriority": [
+			"subscription fanout/poll/decode",
+			"write staging/commit",
+			"replication/tick",
+			"React render/effects",
+			"remaining app/CodeMirror/SDK JS or engine runtime"
+		],
+		"before": "fe49b12 fresh production build",
+		"after": "5f0f339 app/runtime and harness; Wasm engine patch f937a0491c80b8ffaaf35d7e9543cb960f9798be21bb24ba8ce5d7d0ad1aca7f"
+	},
+	"cases": {
+		"large": {
+			"before": {
+				"sharedWorker": {
+					"unsymbolizedJsMsPerEdit": 0.0,
+					"profileDurationMs": 21471.909,
+					"sampledDurationMs": 21471.722,
+					"sampleCount": 20144,
+					"groupsMsPerEdit": {
+						"idle": 68.9423,
+						"wasm": 34.1698,
+						"js": 4.0036,
+						"gc": 0.0793,
+						"program": 0.1636
+					},
+					"phasesMsPerEdit": {
+						"idle": 68.9423,
+						"otherRuntime": 0.4864,
+						"replication": 19.5511,
+						"subscription": 14.4867,
+						"otherAppAndSdk": 3.6492,
+						"gc": 0.0793,
+						"program": 0.1636
+					},
+					"phaseRuntimeMsPerEdit": {
+						"gc/gc": 0.0793,
+						"idle/idle": 68.9423,
+						"otherAppAndSdk/js": 3.6492,
+						"otherRuntime/wasm": 0.4864,
+						"program/program": 0.1636,
+						"replication/js": 0.3384,
+						"replication/wasm": 19.2127,
+						"subscription/js": 0.016,
+						"subscription/wasm": 14.4708
+					},
+					"topSelfMsPerEdit": [
+						{
+							"function": "(idle)",
+							"ms": 68.9423
+						},
+						{
+							"function": "sha2::sha256::compress256",
+							"ms": 5.6476
+						},
+						{
+							"function": "jazz_types::large_values::materialize_attempt",
+							"ms": 2.5334
+						},
+						{
+							"function": "core::ptr::drop_in_place<alloc::vec::splice::Splice<core::iter::adapters::copied::Copied<core::slice::iter::Iter<u8>>>>",
+							"ms": 1.9969
+						},
+						{
+							"function": "talc::base::Talc<S,B>::allocate",
+							"ms": 1.9146
+						},
+						{
+							"function": "core::str::converts::from_utf8",
+							"ms": 1.6467
+						},
+						{
+							"function": "alloc::collections::btree::remove::<impl alloc::collections::btree::node::Handle<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Mut,K,V,alloc::collections::btree::node::marker::Leaf>,alloc::collections::btree::node::marker::KV>>::remove_leaf_kv",
+							"ms": 1.4649
+						},
+						{
+							"function": "talc::base::Talc<S,B>::deallocate",
+							"ms": 1.3905
+						},
+						{
+							"function": "jazz_types::records::BorrowedRecord::validate_inner::{{closure}}",
+							"ms": 1.3441
+						},
+						{
+							"function": "put",
+							"ms": 1.2839
+						},
+						{
+							"function": "",
+							"ms": 1.1211
+						},
+						{
+							"function": "jazz_types::records::values::validate_value_inner",
+							"ms": 1.1001
+						},
+						{
+							"function": "alloc::collections::btree::map::BTreeMap<K,V,A>::remove",
+							"ms": 0.931
+						},
+						{
+							"function": "jazz_types::large_values::DurableLargeValueRecordSchema::ordered_values",
+							"ms": 0.9195
+						},
+						{
+							"function": "memcmp",
+							"ms": 0.6618
+						},
+						{
+							"function": "jazz_types::records::values::encode_value_into",
+							"ms": 0.6293
+						},
+						{
+							"function": "jazz_types::large_values::LargeValueFormat::decode_node",
+							"ms": 0.6232
+						},
+						{
+							"function": "jazz_types::large_values::chunked_values",
+							"ms": 0.5976
+						},
+						{
+							"function": "jazz_types::records::RecordDescriptor::create_with_encoded_fields",
+							"ms": 0.5976
+						},
+						{
+							"function": "memcpy",
+							"ms": 0.5549
+						},
+						{
+							"function": "jazz_types::records::values::ensure_value_type",
+							"ms": 0.5497
+						},
+						{
+							"function": "alloc::collections::btree::map::BTreeMap<K,V,A>::insert",
+							"ms": 0.5024
+						},
+						{
+							"function": "sqlite3VdbeExec",
+							"ms": 0.4442
+						},
+						{
+							"function": "<talc::cell::TalcCell<S,B> as core::alloc::global::GlobalAlloc>::realloc",
+							"ms": 0.4386
+						},
+						{
+							"function": "talc::base::Talc<S,B>::register_gap",
+							"ms": 0.3973
+						}
+					]
+				},
+				"statsWorker": {
+					"unsymbolizedJsMsPerEdit": 0.0,
+					"profileDurationMs": 21447.755,
+					"sampledDurationMs": 21447.221,
+					"sampleCount": 20135,
+					"groupsMsPerEdit": {
+						"idle": 107.1201,
+						"js": 0.0581,
+						"gc": 0.0579
+					},
+					"phasesMsPerEdit": {
+						"idle": 107.1201,
+						"otherAppAndSdk": 0.0581,
+						"gc": 0.0579
+					},
+					"phaseRuntimeMsPerEdit": {
+						"gc/gc": 0.0579,
+						"idle/idle": 107.1201,
+						"otherAppAndSdk/js": 0.0581
+					},
+					"topSelfMsPerEdit": [
+						{
+							"function": "(idle)",
+							"ms": 107.1201
+						},
+						{
+							"function": "(garbage collector)",
+							"ms": 0.0579
+						},
+						{
+							"function": "o",
+							"ms": 0.0422
+						},
+						{
+							"function": "i",
+							"ms": 0.0106
+						},
+						{
+							"function": "p",
+							"ms": 0.0053
+						}
+					]
+				},
+				"page": {
+					"unsymbolizedJsMsPerEdit": 0.3434,
+					"profileDurationMs": 21442.958,
+					"sampledDurationMs": 21442.726,
+					"sampleCount": 20100,
+					"groupsMsPerEdit": {
+						"program": 6.9499,
+						"idle": 19.1803,
+						"js": 36.2153,
+						"wasm": 41.973,
+						"gc": 2.8952
+					},
+					"phasesMsPerEdit": {
+						"program": 6.9499,
+						"idle": 19.1803,
+						"otherAppAndSdk": 5.4356,
+						"write": 19.8919,
+						"subscription": 23.3615,
+						"otherRuntime": 1.6717,
+						"react": 23.9038,
+						"gc": 2.8952,
+						"replication": 3.9238
+					},
+					"phaseRuntimeMsPerEdit": {
+						"gc/gc": 2.8952,
+						"idle/idle": 19.1803,
+						"otherAppAndSdk/js": 5.4356,
+						"otherRuntime/wasm": 1.6717,
+						"program/program": 6.9499,
+						"react/js": 23.8722,
+						"react/wasm": 0.0316,
+						"replication/js": 0.0634,
+						"replication/wasm": 3.8605,
+						"subscription/js": 2.3394,
+						"subscription/wasm": 21.022,
+						"write/js": 4.5047,
+						"write/wasm": 15.3871
+					},
+					"topSelfMsPerEdit": [
+						{
+							"function": "(idle)",
+							"ms": 19.1803
+						},
+						{
+							"function": "sha2::sha256::compress256",
+							"ms": 14.0117
+						},
+						{
+							"function": "(program)",
+							"ms": 6.9499
+						},
+						{
+							"function": "jazz_types::large_values::materialize_attempt",
+							"ms": 6.4174
+						},
+						{
+							"function": "core::ptr::drop_in_place<alloc::vec::splice::Splice<core::iter::adapters::copied::Copied<core::slice::iter::Iter<u8>>>>",
+							"ms": 4.5101
+						},
+						{
+							"function": "core::str::converts::from_utf8",
+							"ms": 3.9053
+						},
+						{
+							"function": "encodeInto",
+							"ms": 3.3009
+						},
+						{
+							"function": "(garbage collector)",
+							"ms": 2.8952
+						},
+						{
+							"function": "",
+							"ms": 2.3844
+						},
+						{
+							"function": "Zf",
+							"ms": 1.7818
+						},
+						{
+							"function": "jazz_types::large_values::LargeValueFormat::decode_node",
+							"ms": 1.6486
+						},
+						{
+							"function": "decode",
+							"ms": 1.6135
+						},
+						{
+							"function": "memcmp",
+							"ms": 1.5694
+						},
+						{
+							"function": "gDe",
+							"ms": 1.4976
+						},
+						{
+							"function": "sliceString",
+							"ms": 1.1314
+						},
+						{
+							"function": "h",
+							"ms": 0.9194
+						},
+						{
+							"function": "Rf",
+							"ms": 0.9064
+						},
+						{
+							"function": "serde_core::ser::impls::<impl serde_core::ser::Serialize for alloc::vec::Vec<T>>::serialize",
+							"ms": 0.8929
+						},
+						{
+							"function": "Wt",
+							"ms": 0.7575
+						},
+						{
+							"function": "u",
+							"ms": 0.7347
+						},
+						{
+							"function": "xa",
+							"ms": 0.7232
+						},
+						{
+							"function": "ll",
+							"ms": 0.7042
+						},
+						{
+							"function": "F0",
+							"ms": 0.667
+						},
+						{
+							"function": "pr",
+							"ms": 0.613
+						},
+						{
+							"function": "talc::base::Talc<S,B>::allocate",
+							"ms": 0.5662
+						}
+					]
+				}
+			},
+			"after": {
+				"sharedWorker": {
+					"unsymbolizedJsMsPerEdit": 0.0,
+					"profileDurationMs": 10697.952,
+					"sampledDurationMs": 10697.38,
+					"sampleCount": 10021,
+					"groupsMsPerEdit": {
+						"idle": 33.4115,
+						"wasm": 16.4429,
+						"js": 3.479,
+						"program": 0.0952,
+						"gc": 0.0583
+					},
+					"phasesMsPerEdit": {
+						"idle": 33.4115,
+						"replication": 14.0675,
+						"otherAppAndSdk": 3.2508,
+						"subscription": 2.0428,
+						"program": 0.0952,
+						"otherRuntime": 0.5608,
+						"gc": 0.0583
+					},
+					"phaseRuntimeMsPerEdit": {
+						"gc/gc": 0.0583,
+						"idle/idle": 33.4115,
+						"otherAppAndSdk/js": 3.2508,
+						"otherRuntime/wasm": 0.5608,
+						"program/program": 0.0952,
+						"replication/js": 0.2229,
+						"replication/wasm": 13.8446,
+						"subscription/js": 0.0053,
+						"subscription/wasm": 2.0375
+					},
+					"topSelfMsPerEdit": [
+						{
+							"function": "(idle)",
+							"ms": 33.4115
+						},
+						{
+							"function": "talc::base::Talc<S,B>::allocate",
+							"ms": 1.311
+						},
+						{
+							"function": "put",
+							"ms": 1.2148
+						},
+						{
+							"function": "alloc::collections::btree::remove::<impl alloc::collections::btree::node::Handle<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Mut,K,V,alloc::collections::btree::node::marker::Leaf>,alloc::collections::btree::node::marker::KV>>::remove_leaf_kv",
+							"ms": 1.0353
+						},
+						{
+							"function": "talc::base::Talc<S,B>::deallocate",
+							"ms": 0.9882
+						},
+						{
+							"function": "",
+							"ms": 0.9708
+						},
+						{
+							"function": "jazz_types::records::BorrowedRecord::validate_inner::{{closure}}",
+							"ms": 0.9251
+						},
+						{
+							"function": "jazz_types::records::values::validate_value_inner",
+							"ms": 0.7612
+						},
+						{
+							"function": "alloc::collections::btree::map::BTreeMap<K,V,A>::remove",
+							"ms": 0.6549
+						},
+						{
+							"function": "jazz_types::large_values::DurableLargeValueRecordSchema::ordered_values",
+							"ms": 0.6187
+						},
+						{
+							"function": "alloc::collections::btree::map::BTreeMap<K,V,A>::insert",
+							"ms": 0.4692
+						},
+						{
+							"function": "jazz_types::records::RecordDescriptor::create_with_encoded_fields",
+							"ms": 0.4494
+						},
+						{
+							"function": "core::str::converts::from_utf8",
+							"ms": 0.4443
+						},
+						{
+							"function": "jazz_types::records::values::encode_value_into",
+							"ms": 0.3966
+						},
+						{
+							"function": "sqlite3VdbeExec",
+							"ms": 0.3653
+						},
+						{
+							"function": "memjrnlWrite",
+							"ms": 0.3645
+						},
+						{
+							"function": "<talc::cell::TalcCell<S,B> as core::alloc::global::GlobalAlloc>::realloc",
+							"ms": 0.3544
+						},
+						{
+							"function": "jazz_types::records::values::ensure_value_type",
+							"ms": 0.349
+						},
+						{
+							"function": "jazz_types::records::values::validate_embedded_record",
+							"ms": 0.3386
+						},
+						{
+							"function": "fetch",
+							"ms": 0.3337
+						},
+						{
+							"function": "jazz_types::large_values::chunked_values",
+							"ms": 0.3332
+						},
+						{
+							"function": "jazz_db::names::Names::stored_type",
+							"ms": 0.2904
+						},
+						{
+							"function": "talc::base::Talc<S,B>::register_gap",
+							"ms": 0.2856
+						},
+						{
+							"function": "memcmp",
+							"ms": 0.2544
+						},
+						{
+							"function": "jazz_types::records::values::ValueType::fixed_size",
+							"ms": 0.2534
+						}
+					]
+				},
+				"statsWorker": {
+					"unsymbolizedJsMsPerEdit": 0.0,
+					"profileDurationMs": 10660.828,
+					"sampledDurationMs": 10660.022,
+					"sampleCount": 10024,
+					"groupsMsPerEdit": {
+						"idle": 53.1787,
+						"js": 0.0633,
+						"gc": 0.0581
+					},
+					"phasesMsPerEdit": {
+						"idle": 53.1787,
+						"otherAppAndSdk": 0.0633,
+						"gc": 0.0581
+					},
+					"phaseRuntimeMsPerEdit": {
+						"gc/gc": 0.0581,
+						"idle/idle": 53.1787,
+						"otherAppAndSdk/js": 0.0633
+					},
+					"topSelfMsPerEdit": [
+						{
+							"function": "(idle)",
+							"ms": 53.1787
+						},
+						{
+							"function": "(garbage collector)",
+							"ms": 0.0581
+						},
+						{
+							"function": "o",
+							"ms": 0.0422
+						},
+						{
+							"function": "i",
+							"ms": 0.0158
+						},
+						{
+							"function": "self.onmessage",
+							"ms": 0.0052
+						}
+					]
+				},
+				"page": {
+					"unsymbolizedJsMsPerEdit": 0.4659,
+					"profileDurationMs": 10652.72,
+					"sampledDurationMs": 10652.246,
+					"sampleCount": 9823,
+					"groupsMsPerEdit": {
+						"program": 6.3762,
+						"idle": 24.8772,
+						"js": 10.7797,
+						"wasm": 10.4342,
+						"gc": 0.7939
+					},
+					"phasesMsPerEdit": {
+						"program": 6.3762,
+						"idle": 24.8772,
+						"otherAppAndSdk": 5.78,
+						"otherRuntime": 1.8525,
+						"write": 4.0421,
+						"subscription": 5.429,
+						"react": 1.5564,
+						"replication": 2.5539,
+						"gc": 0.7939
+					},
+					"phaseRuntimeMsPerEdit": {
+						"gc/gc": 0.7939,
+						"idle/idle": 24.8772,
+						"otherAppAndSdk/js": 5.78,
+						"otherRuntime/wasm": 1.8525,
+						"program/program": 6.3762,
+						"react/js": 1.546,
+						"react/wasm": 0.0104,
+						"replication/js": 0.0477,
+						"replication/wasm": 2.5062,
+						"subscription/js": 2.4136,
+						"subscription/wasm": 3.0155,
+						"write/js": 0.9924,
+						"write/wasm": 3.0497
+					},
+					"topSelfMsPerEdit": [
+						{
+							"function": "(idle)",
+							"ms": 24.8772
+						},
+						{
+							"function": "(program)",
+							"ms": 6.3762
+						},
+						{
+							"function": "decode",
+							"ms": 1.5594
+						},
+						{
+							"function": "",
+							"ms": 1.4709
+						},
+						{
+							"function": "serde_core::ser::impls::<impl serde_core::ser::Serialize for alloc::vec::Vec<T>>::serialize",
+							"ms": 1.0508
+						},
+						{
+							"function": "memcmp",
+							"ms": 0.8657
+						},
+						{
+							"function": "(garbage collector)",
+							"ms": 0.7939
+						},
+						{
+							"function": "core::str::converts::from_utf8",
+							"ms": 0.7733
+						},
+						{
+							"function": "__wbg_is_3ce118e1fc3aa47e",
+							"ms": 0.7486
+						},
+						{
+							"function": "v",
+							"ms": 0.6213
+						},
+						{
+							"function": "sha2::sha256::compress256",
+							"ms": 0.6128
+						},
+						{
+							"function": "sliceString",
+							"ms": 0.5851
+						},
+						{
+							"function": "RegExp: \\[\\[([^\\]]*)\\]\\](\\w*)",
+							"ms": 0.5185
+						},
+						{
+							"function": "<jazz_types::records::values::Value as core::cmp::PartialEq>::eq",
+							"ms": 0.4654
+						},
+						{
+							"function": "jazz_db::db::large_ops::byte_splices",
+							"ms": 0.3701
+						},
+						{
+							"function": "sqlite3VdbeExec",
+							"ms": 0.3072
+						},
+						{
+							"function": "talc::base::Talc<S,B>::allocate",
+							"ms": 0.302
+						},
+						{
+							"function": "talc::base::Talc<S,B>::deallocate",
+							"ms": 0.2961
+						},
+						{
+							"function": "__wbg_new_from_slice_2580ff33d0d10520",
+							"ms": 0.2276
+						},
+						{
+							"function": "sqlite3RunParser",
+							"ms": 0.1748
+						},
+						{
+							"function": "collapse",
+							"ms": 0.1689
+						},
+						{
+							"function": "jazz_db::large::Chunks::value_bytes",
+							"ms": 0.1585
+						},
+						{
+							"function": "measure",
+							"ms": 0.1425
+						},
+						{
+							"function": "alloc::collections::btree::remove::<impl alloc::collections::btree::node::Handle<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Mut,K,V,alloc::collections::btree::node::marker::Leaf>,alloc::collections::btree::node::marker::KV>>::remove_leaf_kv",
+							"ms": 0.1271
+						},
+						{
+							"function": "<alloc::string::String as core::clone::Clone>::clone",
+							"ms": 0.1168
+						}
+					]
+				}
+			}
+		},
+		"small": {
+			"before": {
+				"sharedWorker": {
+					"unsymbolizedJsMsPerEdit": 0.0,
+					"profileDurationMs": 15589.51,
+					"sampledDurationMs": 15588.855,
+					"sampleCount": 14590,
+					"groupsMsPerEdit": {
+						"idle": 52.782,
+						"gc": 0.0962,
+						"wasm": 21.227,
+						"js": 3.744,
+						"program": 0.0951
+					},
+					"phasesMsPerEdit": {
+						"idle": 52.782,
+						"gc": 0.0962,
+						"otherRuntime": 0.5399,
+						"replication": 19.4755,
+						"subscription": 1.4502,
+						"otherAppAndSdk": 3.5053,
+						"program": 0.0951
+					},
+					"phaseRuntimeMsPerEdit": {
+						"gc/gc": 0.0962,
+						"idle/idle": 52.782,
+						"otherAppAndSdk/js": 3.5053,
+						"otherRuntime/wasm": 0.5399,
+						"program/program": 0.0951,
+						"replication/js": 0.2279,
+						"replication/wasm": 19.2476,
+						"subscription/js": 0.0107,
+						"subscription/wasm": 1.4395
+					},
+					"topSelfMsPerEdit": [
+						{
+							"function": "(idle)",
+							"ms": 52.782
+						},
+						{
+							"function": "talc::base::Talc<S,B>::allocate",
+							"ms": 1.8009
+						},
+						{
+							"function": "talc::base::Talc<S,B>::deallocate",
+							"ms": 1.4671
+						},
+						{
+							"function": "alloc::collections::btree::remove::<impl alloc::collections::btree::node::Handle<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Mut,K,V,alloc::collections::btree::node::marker::Leaf>,alloc::collections::btree::node::marker::KV>>::remove_leaf_kv",
+							"ms": 1.4497
+						},
+						{
+							"function": "jazz_types::records::BorrowedRecord::validate_inner::{{closure}}",
+							"ms": 1.4317
+						},
+						{
+							"function": "put",
+							"ms": 1.3657
+						},
+						{
+							"function": "jazz_types::records::values::validate_value_inner",
+							"ms": 1.0951
+						},
+						{
+							"function": "alloc::collections::btree::map::BTreeMap<K,V,A>::remove",
+							"ms": 1.0625
+						},
+						{
+							"function": "jazz_types::large_values::DurableLargeValueRecordSchema::ordered_values",
+							"ms": 0.9417
+						},
+						{
+							"function": "",
+							"ms": 0.938
+						},
+						{
+							"function": "alloc::collections::btree::map::BTreeMap<K,V,A>::insert",
+							"ms": 0.6447
+						},
+						{
+							"function": "jazz_types::records::values::encode_value_into",
+							"ms": 0.6346
+						},
+						{
+							"function": "jazz_types::records::RecordDescriptor::create_with_encoded_fields",
+							"ms": 0.5894
+						},
+						{
+							"function": "memcpy",
+							"ms": 0.582
+						},
+						{
+							"function": "jazz_types::large_values::chunked_values",
+							"ms": 0.5553
+						},
+						{
+							"function": "jazz_types::records::values::ensure_value_type",
+							"ms": 0.523
+						},
+						{
+							"function": "sqlite3VdbeExec",
+							"ms": 0.4754
+						},
+						{
+							"function": "<talc::cell::TalcCell<S,B> as core::alloc::global::GlobalAlloc>::realloc",
+							"ms": 0.4285
+						},
+						{
+							"function": "jazz_types::records::values::validate_embedded_record",
+							"ms": 0.423
+						},
+						{
+							"function": "jazz_db::names::Names::stored_type",
+							"ms": 0.3699
+						},
+						{
+							"function": "fetch",
+							"ms": 0.3393
+						},
+						{
+							"function": "talc::base::Talc<S,B>::register_gap",
+							"ms": 0.333
+						},
+						{
+							"function": "jazz_db::db::sync::<impl jazz_db::db::Inner>::images_where",
+							"ms": 0.3278
+						},
+						{
+							"function": "core::ptr::drop_in_place<jazz_types::records::values::Value>",
+							"ms": 0.3173
+						},
+						{
+							"function": "jazz_types::large_values::epoch::decode_edits",
+							"ms": 0.2273
+						}
+					]
+				},
+				"statsWorker": {
+					"unsymbolizedJsMsPerEdit": 0.0,
+					"profileDurationMs": 15560.604,
+					"sampledDurationMs": 15559.855,
+					"sampleCount": 14602,
+					"groupsMsPerEdit": {
+						"idle": 77.794,
+						"js": 0.0053
+					},
+					"phasesMsPerEdit": {
+						"idle": 77.794,
+						"otherAppAndSdk": 0.0053
+					},
+					"phaseRuntimeMsPerEdit": {
+						"idle/idle": 77.794,
+						"otherAppAndSdk/js": 0.0053
+					},
+					"topSelfMsPerEdit": [
+						{
+							"function": "(idle)",
+							"ms": 77.794
+						},
+						{
+							"function": "i",
+							"ms": 0.0053
+						}
+					]
+				},
+				"page": {
+					"unsymbolizedJsMsPerEdit": 0.1481,
+					"profileDurationMs": 15561.167,
+					"sampledDurationMs": 15560.028,
+					"sampleCount": 14488,
+					"groupsMsPerEdit": {
+						"program": 8.5573,
+						"idle": 30.5321,
+						"js": 26.1705,
+						"wasm": 10.1283,
+						"gc": 2.412
+					},
+					"phasesMsPerEdit": {
+						"program": 8.5573,
+						"idle": 30.5321,
+						"react": 20.5702,
+						"otherAppAndSdk": 4.2542,
+						"write": 4.4828,
+						"otherRuntime": 0.5718,
+						"subscription": 2.542,
+						"replication": 3.8778,
+						"gc": 2.412
+					},
+					"phaseRuntimeMsPerEdit": {
+						"gc/gc": 2.412,
+						"idle/idle": 30.5321,
+						"otherAppAndSdk/js": 4.2542,
+						"otherRuntime/wasm": 0.5718,
+						"program/program": 8.5573,
+						"react/js": 20.549,
+						"react/wasm": 0.0212,
+						"replication/js": 0.0691,
+						"replication/wasm": 3.8087,
+						"subscription/js": 0.7048,
+						"subscription/wasm": 1.8372,
+						"write/js": 0.5934,
+						"write/wasm": 3.8894
+					},
+					"topSelfMsPerEdit": [
+						{
+							"function": "(idle)",
+							"ms": 30.5321
+						},
+						{
+							"function": "(program)",
+							"ms": 8.5573
+						},
+						{
+							"function": "(garbage collector)",
+							"ms": 2.412
+						},
+						{
+							"function": "",
+							"ms": 2.1488
+						},
+						{
+							"function": "Zf",
+							"ms": 1.4665
+						},
+						{
+							"function": "Rf",
+							"ms": 0.9246
+						},
+						{
+							"function": "F0",
+							"ms": 0.8876
+						},
+						{
+							"function": "Wt",
+							"ms": 0.8122
+						},
+						{
+							"function": "talc::base::Talc<S,B>::allocate",
+							"ms": 0.7562
+						},
+						{
+							"function": "Ie",
+							"ms": 0.6527
+						},
+						{
+							"function": "xa",
+							"ms": 0.6526
+						},
+						{
+							"function": "ll",
+							"ms": 0.5712
+						},
+						{
+							"function": "matchMedia",
+							"ms": 0.5249
+						},
+						{
+							"function": "talc::base::Talc<S,B>::deallocate",
+							"ms": 0.524
+						},
+						{
+							"function": "effect",
+							"ms": 0.4812
+						},
+						{
+							"function": "pr",
+							"ms": 0.4548
+						},
+						{
+							"function": "alloc::collections::btree::remove::<impl alloc::collections::btree::node::Handle<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Mut,K,V,alloc::collections::btree::node::marker::Leaf>,alloc::collections::btree::node::marker::KV>>::remove_leaf_kv",
+							"ms": 0.4015
+						},
+						{
+							"function": "sqlite3VdbeExec",
+							"ms": 0.386
+						},
+						{
+							"function": "o0",
+							"ms": 0.3856
+						},
+						{
+							"function": "measure",
+							"ms": 0.3707
+						},
+						{
+							"function": "jazz_types::records::BorrowedRecord::validate_inner::{{closure}}",
+							"ms": 0.3699
+						},
+						{
+							"function": "Qm",
+							"ms": 0.3474
+						},
+						{
+							"function": "K0",
+							"ms": 0.3226
+						},
+						{
+							"function": "update",
+							"ms": 0.3225
+						},
+						{
+							"function": "k0",
+							"ms": 0.2912
+						}
+					]
+				}
+			},
+			"after": {
+				"sharedWorker": {
+					"unsymbolizedJsMsPerEdit": 0.0,
+					"profileDurationMs": 10247.574,
+					"sampledDurationMs": 10247.26,
+					"sampleCount": 9570,
+					"groupsMsPerEdit": {
+						"idle": 30.632,
+						"gc": 0.0821,
+						"wasm": 16.8336,
+						"js": 3.5984,
+						"program": 0.0901
+					},
+					"phasesMsPerEdit": {
+						"idle": 30.632,
+						"gc": 0.0821,
+						"replication": 15.2127,
+						"subscription": 1.2927,
+						"otherRuntime": 0.5726,
+						"otherAppAndSdk": 3.3541,
+						"program": 0.0901
+					},
+					"phaseRuntimeMsPerEdit": {
+						"gc/gc": 0.0821,
+						"idle/idle": 30.632,
+						"otherAppAndSdk/js": 3.3541,
+						"otherRuntime/wasm": 0.5726,
+						"program/program": 0.0901,
+						"replication/js": 0.2337,
+						"replication/wasm": 14.979,
+						"subscription/js": 0.0106,
+						"subscription/wasm": 1.2821
+					},
+					"topSelfMsPerEdit": [
+						{
+							"function": "(idle)",
+							"ms": 30.632
+						},
+						{
+							"function": "talc::base::Talc<S,B>::allocate",
+							"ms": 1.4421
+						},
+						{
+							"function": "put",
+							"ms": 1.1947
+						},
+						{
+							"function": "alloc::collections::btree::remove::<impl alloc::collections::btree::node::Handle<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Mut,K,V,alloc::collections::btree::node::marker::Leaf>,alloc::collections::btree::node::marker::KV>>::remove_leaf_kv",
+							"ms": 1.179
+						},
+						{
+							"function": "talc::base::Talc<S,B>::deallocate",
+							"ms": 1.1174
+						},
+						{
+							"function": "",
+							"ms": 1.109
+						},
+						{
+							"function": "jazz_types::records::BorrowedRecord::validate_inner::{{closure}}",
+							"ms": 0.9573
+						},
+						{
+							"function": "jazz_types::records::values::validate_value_inner",
+							"ms": 0.8362
+						},
+						{
+							"function": "jazz_types::large_values::DurableLargeValueRecordSchema::ordered_values",
+							"ms": 0.7621
+						},
+						{
+							"function": "alloc::collections::btree::map::BTreeMap<K,V,A>::remove",
+							"ms": 0.667
+						},
+						{
+							"function": "jazz_types::records::RecordDescriptor::create_with_encoded_fields",
+							"ms": 0.5178
+						},
+						{
+							"function": "jazz_types::records::values::ensure_value_type",
+							"ms": 0.4918
+						},
+						{
+							"function": "jazz_types::records::values::encode_value_into",
+							"ms": 0.4397
+						},
+						{
+							"function": "sqlite3VdbeExec",
+							"ms": 0.3708
+						},
+						{
+							"function": "memjrnlWrite",
+							"ms": 0.3652
+						},
+						{
+							"function": "alloc::collections::btree::map::BTreeMap<K,V,A>::insert",
+							"ms": 0.3597
+						},
+						{
+							"function": "jazz_types::large_values::chunked_values",
+							"ms": 0.3334
+						},
+						{
+							"function": "talc::base::Talc<S,B>::register_gap",
+							"ms": 0.3277
+						},
+						{
+							"function": "fetch",
+							"ms": 0.3237
+						},
+						{
+							"function": "<talc::cell::TalcCell<S,B> as core::alloc::global::GlobalAlloc>::realloc",
+							"ms": 0.3222
+						},
+						{
+							"function": "core::ptr::drop_in_place<jazz_types::records::values::Value>",
+							"ms": 0.3068
+						},
+						{
+							"function": "jazz_types::records::values::validate_embedded_record",
+							"ms": 0.2968
+						},
+						{
+							"function": "jazz_db::names::Names::stored_type",
+							"ms": 0.2916
+						},
+						{
+							"function": "jazz_types::records::values::ValueType::fixed_size",
+							"ms": 0.286
+						},
+						{
+							"function": "jazz_db::db::sync::<impl jazz_db::db::Inner>::images_where",
+							"ms": 0.2804
+						}
+					]
+				},
+				"statsWorker": {
+					"unsymbolizedJsMsPerEdit": 0.0,
+					"profileDurationMs": 10222.586,
+					"sampledDurationMs": 10221.568,
+					"sampleCount": 9604,
+					"groupsMsPerEdit": {
+						"idle": 51.1078
+					},
+					"phasesMsPerEdit": {
+						"idle": 51.1078
+					},
+					"phaseRuntimeMsPerEdit": {
+						"idle/idle": 51.1078
+					},
+					"topSelfMsPerEdit": [
+						{
+							"function": "(idle)",
+							"ms": 51.1078
+						}
+					]
+				},
+				"page": {
+					"unsymbolizedJsMsPerEdit": 0.1265,
+					"profileDurationMs": 10224.156,
+					"sampledDurationMs": 10223.426,
+					"sampleCount": 9522,
+					"groupsMsPerEdit": {
+						"program": 6.2524,
+						"idle": 31.8833,
+						"js": 6.4962,
+						"wasm": 6.1781,
+						"gc": 0.3072
+					},
+					"phasesMsPerEdit": {
+						"program": 6.2524,
+						"idle": 31.8833,
+						"otherAppAndSdk": 4.0923,
+						"react": 1.4394,
+						"otherRuntime": 0.4502,
+						"write": 1.8549,
+						"subscription": 2.1525,
+						"replication": 2.6851,
+						"gc": 0.3072
+					},
+					"phaseRuntimeMsPerEdit": {
+						"gc/gc": 0.3072,
+						"idle/idle": 31.8833,
+						"otherAppAndSdk/js": 4.0923,
+						"otherRuntime/wasm": 0.4502,
+						"program/program": 6.2524,
+						"react/js": 1.4288,
+						"react/wasm": 0.0106,
+						"replication/js": 0.0427,
+						"replication/wasm": 2.6424,
+						"subscription/js": 0.4765,
+						"subscription/wasm": 1.676,
+						"write/js": 0.4559,
+						"write/wasm": 1.399
+					},
+					"topSelfMsPerEdit": [
+						{
+							"function": "(idle)",
+							"ms": 31.8833
+						},
+						{
+							"function": "(program)",
+							"ms": 6.2524
+						},
+						{
+							"function": "",
+							"ms": 0.5703
+						},
+						{
+							"function": "sqlite3VdbeExec",
+							"ms": 0.4122
+						},
+						{
+							"function": "talc::base::Talc<S,B>::allocate",
+							"ms": 0.3762
+						},
+						{
+							"function": "collapse",
+							"ms": 0.3527
+						},
+						{
+							"function": "(garbage collector)",
+							"ms": 0.3072
+						},
+						{
+							"function": "talc::base::Talc<S,B>::deallocate",
+							"ms": 0.2542
+						},
+						{
+							"function": "memcmp",
+							"ms": 0.201
+						},
+						{
+							"function": "alloc::collections::btree::remove::<impl alloc::collections::btree::node::Handle<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Mut,K,V,alloc::collections::btree::node::marker::Leaf>,alloc::collections::btree::node::marker::KV>>::remove_leaf_kv",
+							"ms": 0.1587
+						},
+						{
+							"function": "update",
+							"ms": 0.1551
+						},
+						{
+							"function": "getClientRects",
+							"ms": 0.1443
+						},
+						{
+							"function": "sqlite3RunParser",
+							"ms": 0.1432
+						},
+						{
+							"function": "getBoundingClientRect",
+							"ms": 0.1374
+						},
+						{
+							"function": "memjrnlWrite",
+							"ms": 0.112
+						},
+						{
+							"function": "u",
+							"ms": 0.112
+						},
+						{
+							"function": "jazz_types::records::BorrowedRecord::validate_inner::{{closure}}",
+							"ms": 0.1057
+						},
+						{
+							"function": "Qm",
+							"ms": 0.0901
+						},
+						{
+							"function": "__wbg_Error_2e59b1b37a9a34c3",
+							"ms": 0.0901
+						},
+						{
+							"function": "sha2::sha256::compress256",
+							"ms": 0.085
+						},
+						{
+							"function": "jazz_types::large_values::DurableLargeValueRecordSchema::ordered_values",
+							"ms": 0.0849
+						},
+						{
+							"function": "alloc::collections::btree::map::BTreeMap<K,V,A>::remove",
+							"ms": 0.0796
+						},
+						{
+							"function": "onMessage",
+							"ms": 0.0792
+						},
+						{
+							"function": "jazz_types::large_values::DurableLargeValueRecordSchema::decode_values",
+							"ms": 0.0745
+						},
+						{
+							"function": "jazz_types::records::values::validate_value_inner",
+							"ms": 0.0743
+						}
+					]
+				}
+			}
+		}
+	},
+	"retentionProbe": {
+		"method": "Separate 1,000-edit production diagnostics with allocation sampling and explicit GC, not the final latency series. A heap snapshot of the rejected stress candidate identified the strong retaining path; raw heap data was deleted after analysis.",
+		"before": {
+			"app": "0c2f239",
+			"heapBeforeGcBytes": 495349876,
+			"heapAfterGcBytes": 331171160
+		},
+		"after": {
+			"app": "0b38c27",
+			"heapBeforeGcBytes": 67912932,
+			"heapAfterGcBytes": 47436168,
+			"exactReloadVerified": true
+		},
+		"retainerPath": [
+			"window.__jazzWindowStorageContexts__",
+			"db.runtimeSource.ownerRuntime.localStorageFailureWaiters",
+			"pending Promise chains",
+			"saved-notification closure",
+			"large document string"
+		],
+		"largestRetainedTextBytes": 1736128,
+		"fix": "Only the latest saved-notification body is stored per document. Older receipt closures capture document IDs and tokens; committed writes and error observers continue."
+	},
+	"stressProfile": {
+		"method": {
+			"edits": 5000,
+			"units": "sampled milliseconds per trace edit",
+			"scope": "Separate diagnostic after both unprofiled stress cases; complete replay including cursor movement, the final full-text read and three-second settling. Reload/durability verification runs after CPU capture. Profiles are excluded from the latency comparison. Worker CPU runs in parallel."
+		},
+		"threads": {
+			"sharedWorker": {
+				"profileDurationMs": 735458.618,
+				"sampledDurationMs": 735457.851,
+				"sampleCount": 691372,
+				"groupsMsPerEdit": {
+					"idle": 43.5556,
+					"js": 1.432,
+					"wasm": 102.0064,
+					"program": 0.058,
+					"gc": 0.0396
+				},
+				"phasesMsPerEdit": {
+					"idle": 43.5556,
+					"otherAppAndSdk": 1.2453,
+					"replication": 100.0289,
+					"subscription": 0.8815,
+					"otherRuntime": 1.2827,
+					"program": 0.058,
+					"gc": 0.0396
+				},
+				"phaseRuntimeMsPerEdit": {
+					"gc/gc": 0.0396,
+					"idle/idle": 43.5556,
+					"otherAppAndSdk/js": 1.2453,
+					"otherRuntime/wasm": 1.2827,
+					"program/program": 0.058,
+					"replication/js": 0.184,
+					"replication/wasm": 99.8449,
+					"subscription/js": 0.0027,
+					"subscription/wasm": 0.8788
+				},
+				"topSelfMsPerEdit": [
+					{
+						"function": "(idle)",
+						"ms": 43.5556
+					},
+					{
+						"function": "talc::base::Talc<S,B>::allocate",
+						"ms": 10.4067
+					},
+					{
+						"function": "alloc::collections::btree::remove::<impl alloc::collections::btree::node::Handle<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Mut,K,V,alloc::collections::btree::node::marker::Leaf>,alloc::collections::btree::node::marker::KV>>::remove_leaf_kv",
+						"ms": 9.6134
+					},
+					{
+						"function": "talc::base::Talc<S,B>::deallocate",
+						"ms": 8.3092
+					},
+					{
+						"function": "jazz_types::records::BorrowedRecord::validate_inner::{{closure}}",
+						"ms": 7.8538
+					},
+					{
+						"function": "jazz_types::records::values::validate_value_inner",
+						"ms": 6.7206
+					},
+					{
+						"function": "jazz_types::large_values::DurableLargeValueRecordSchema::ordered_values",
+						"ms": 6.3053
+					},
+					{
+						"function": "alloc::collections::btree::map::BTreeMap<K,V,A>::remove",
+						"ms": 6.2137
+					},
+					{
+						"function": "jazz_types::records::values::encode_value_into",
+						"ms": 3.9442
+					},
+					{
+						"function": "jazz_types::large_values::chunked_values",
+						"ms": 3.4459
+					},
+					{
+						"function": "alloc::collections::btree::map::BTreeMap<K,V,A>::insert",
+						"ms": 3.4423
+					},
+					{
+						"function": "jazz_types::records::RecordDescriptor::create_with_encoded_fields",
+						"ms": 3.4066
+					},
+					{
+						"function": "jazz_types::records::values::ensure_value_type",
+						"ms": 3.3323
+					},
+					{
+						"function": "jazz_types::records::values::validate_embedded_record",
+						"ms": 2.6484
+					},
+					{
+						"function": "<talc::cell::TalcCell<S,B> as core::alloc::global::GlobalAlloc>::realloc",
+						"ms": 2.1821
+					},
+					{
+						"function": "talc::base::Talc<S,B>::register_gap",
+						"ms": 2.1676
+					},
+					{
+						"function": "jazz_db::db::sync::<impl jazz_db::db::Inner>::images_where",
+						"ms": 2.1059
+					},
+					{
+						"function": "jazz_db::names::Names::stored_type",
+						"ms": 2.0632
+					},
+					{
+						"function": "jazz_types::records::values::ValueType::fixed_size",
+						"ms": 1.9908
+					},
+					{
+						"function": "core::ptr::drop_in_place<jazz_types::records::values::Value>",
+						"ms": 1.7658
+					},
+					{
+						"function": "jazz_types::large_values::epoch::decode_edits",
+						"ms": 1.7657
+					},
+					{
+						"function": "jazz_types::records::values::encode_fixed_value",
+						"ms": 1.3925
+					},
+					{
+						"function": "sqlite3VdbeExec",
+						"ms": 1.0903
+					},
+					{
+						"function": "<core::iter::adapters::GenericShunt<I,R> as core::iter::traits::iterator::Iterator>::next",
+						"ms": 0.8356
+					},
+					{
+						"function": "jazz_types::large_values::epoch::Reader::relative",
+						"ms": 0.7319
+					},
+					{
+						"function": "core::str::converts::from_utf8",
+						"ms": 0.7029
+					},
+					{
+						"function": "jazz_types::large_values::validate_descriptor_shape_v1",
+						"ms": 0.5031
+					},
+					{
+						"function": "alloc::raw_vec::RawVecInner<A>::finish_grow",
+						"ms": 0.4206
+					},
+					{
+						"function": "jazz_types::large_values::encode_large_value_ref",
+						"ms": 0.3961
+					},
+					{
+						"function": "fetch",
+						"ms": 0.3699
+					}
+				]
+			},
+			"statsWorker": {
+				"profileDurationMs": 735550.046,
+				"sampledDurationMs": 735549.605,
+				"sampleCount": 690514,
+				"groupsMsPerEdit": {
+					"idle": 146.8441,
+					"gc": 0.0818,
+					"js": 0.1821,
+					"program": 0.0019
+				},
+				"phasesMsPerEdit": {
+					"idle": 146.8441,
+					"gc": 0.0818,
+					"otherAppAndSdk": 0.1821,
+					"program": 0.0019
+				},
+				"phaseRuntimeMsPerEdit": {
+					"gc/gc": 0.0818,
+					"idle/idle": 146.8441,
+					"otherAppAndSdk/js": 0.1821,
+					"program/program": 0.0019
+				},
+				"topSelfMsPerEdit": [
+					{
+						"function": "(idle)",
+						"ms": 146.8441
+					},
+					{
+						"function": "o",
+						"ms": 0.0861
+					},
+					{
+						"function": "(garbage collector)",
+						"ms": 0.0818
+					},
+					{
+						"function": "RegExp: \\s+",
+						"ms": 0.0448
+					},
+					{
+						"function": "p",
+						"ms": 0.0108
+					},
+					{
+						"function": "RegExp: [.!?]+(?:\\s|$)",
+						"ms": 0.0083
+					},
+					{
+						"function": "i",
+						"ms": 0.0074
+					},
+					{
+						"function": "self.onmessage",
+						"ms": 0.0057
+					},
+					{
+						"function": "RegExp: !\\[.*?\\]\\(.*?\\)",
+						"ms": 0.0042
+					},
+					{
+						"function": "RegExp: `[^`]+`",
+						"ms": 0.004
+					},
+					{
+						"function": "RegExp: ^#+\\s*",
+						"ms": 0.0034
+					},
+					{
+						"function": "RegExp: \\[([^\\]]+)\\]\\(.*?\\)",
+						"ms": 0.0032
+					},
+					{
+						"function": "",
+						"ms": 0.0025
+					},
+					{
+						"function": "(program)",
+						"ms": 0.0019
+					},
+					{
+						"function": "RegExp: ```[\\s\\S]*?```",
+						"ms": 0.0011
+					},
+					{
+						"function": "postMessage",
+						"ms": 0.0004
+					},
+					{
+						"function": "c",
+						"ms": 0.0002
+					}
+				]
+			},
+			"page": {
+				"profileDurationMs": 735635.312,
+				"sampledDurationMs": 735634.586,
+				"sampleCount": 690851,
+				"groupsMsPerEdit": {
+					"program": 12.7685,
+					"idle": 10.8463,
+					"js": 82.1986,
+					"wasm": 40.0331,
+					"gc": 1.2804
+				},
+				"phasesMsPerEdit": {
+					"program": 12.7685,
+					"idle": 10.8463,
+					"react": 1.7409,
+					"otherAppAndSdk": 76.7318,
+					"otherRuntime": 11.4284,
+					"write": 4.4128,
+					"subscription": 4.321,
+					"gc": 1.2804,
+					"replication": 23.5969
+				},
+				"phaseRuntimeMsPerEdit": {
+					"gc/gc": 1.2804,
+					"idle/idle": 10.8463,
+					"otherAppAndSdk/js": 76.7318,
+					"otherRuntime/wasm": 11.4284,
+					"program/program": 12.7685,
+					"react/js": 1.7195,
+					"react/wasm": 0.0214,
+					"replication/js": 0.0836,
+					"replication/wasm": 23.5133,
+					"subscription/js": 2.4981,
+					"subscription/wasm": 1.8229,
+					"write/js": 1.1656,
+					"write/wasm": 3.2472
+				},
+				"topSelfMsPerEdit": [
+					{
+						"function": "collapse",
+						"ms": 69.5379
+					},
+					{
+						"function": "(program)",
+						"ms": 12.7685
+					},
+					{
+						"function": "(idle)",
+						"ms": 10.8463
+					},
+					{
+						"function": "<jazz_db::binding_host::Parked<F> as core::future::future::Future>::poll",
+						"ms": 7.5234
+					},
+					{
+						"function": "sqlite3VdbeExec",
+						"ms": 3.3509
+					},
+					{
+						"function": "talc::base::Talc<S,B>::allocate",
+						"ms": 2.3443
+					},
+					{
+						"function": "decode",
+						"ms": 1.692
+					},
+					{
+						"function": "<alloc::vec::Vec<T,A> as core::clone::Clone>::clone",
+						"ms": 1.6452
+					},
+					{
+						"function": "talc::base::Talc<S,B>::deallocate",
+						"ms": 1.4417
+					},
+					{
+						"function": "(garbage collector)",
+						"ms": 1.2804
+					},
+					{
+						"function": "",
+						"ms": 1.2395
+					},
+					{
+						"function": "serde_core::ser::impls::<impl serde_core::ser::Serialize for alloc::vec::Vec<T>>::serialize",
+						"ms": 1.0893
+					},
+					{
+						"function": "js_sys::futures::future_to_promise::{{closure}}::{{closure}}",
+						"ms": 0.8175
+					},
+					{
+						"function": "memcmp",
+						"ms": 0.7479
+					},
+					{
+						"function": "__wbg_is_3ce118e1fc3aa47e",
+						"ms": 0.7422
+					},
+					{
+						"function": "jazz_db::db::sync::<impl jazz_db::db::Db>::wait_for_transaction::{{closure}}",
+						"ms": 0.7164
+					},
+					{
+						"function": "core::str::converts::from_utf8",
+						"ms": 0.6347
+					},
+					{
+						"function": "sliceString",
+						"ms": 0.6135
+					},
+					{
+						"function": "<alloc::string::String as core::fmt::Write>::write_str::h5e2146c598670080[9]",
+						"ms": 0.6089
+					},
+					{
+						"function": "memjrnlWrite",
+						"ms": 0.573
+					},
+					{
+						"function": "RegExp: \\[\\[([^\\]]*)\\]\\](\\w*)",
+						"ms": 0.5413
+					},
+					{
+						"function": "js_sys::futures::queue::Queue::new::{{closure}}",
+						"ms": 0.5178
+					},
+					{
+						"function": "core::fmt::write",
+						"ms": 0.4763
+					},
+					{
+						"function": "<talc::cell::TalcCell<S,B> as core::alloc::global::GlobalAlloc>::realloc",
+						"ms": 0.4454
+					},
+					{
+						"function": "getClientRects",
+						"ms": 0.4389
+					},
+					{
+						"function": "jazz_db::db::sync::<impl jazz_db::db::Db>::rebase",
+						"ms": 0.3973
+					},
+					{
+						"function": "update",
+						"ms": 0.3932
+					},
+					{
+						"function": "alloc::fmt::format::format_inner",
+						"ms": 0.388
+					},
+					{
+						"function": "jazz_db::db::large_ops::byte_splices",
+						"ms": 0.3815
+					},
+					{
+						"function": "jazz_types::large_values::epoch::encode_edit",
+						"ms": 0.3502
+					}
+				]
+			}
+		},
+		"observations": {
+			"selectionCollapseMsPerTraceEdit": 69.5386,
+			"selectionCollapseObservedParents": [
+				"ignore",
+				"updateSelection",
+				"update",
+				"dispatch"
+			],
+			"selectionCollapseCategory": "Browser Selection builtin invoked from CodeMirror during many individual arrow-key moves; counted in JS/API samples.",
+			"pageParkedTransactionWaitMsPerTraceEdit": 7.5234,
+			"workerAllocationAndFreeMsPerTraceEdit": 18.72,
+			"workerRecordAndValueValidationMsPerTraceEdit": 14.58,
+			"limitation": "Exclusive leaf samples identify work, not a particular waiter leak or a text-versus-presence split."
+		}
+	}
+}

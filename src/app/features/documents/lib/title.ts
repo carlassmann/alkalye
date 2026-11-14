@@ -111,7 +111,11 @@ function countMatches(text: string, query: string): number {
 }
 
 function findTitleLine(body: string): string {
-	for (let line of body.split("\n")) {
+	for (let start = 0; start < body.length; ) {
+		let end = body.indexOf("\n", start)
+		if (end === -1) end = body.length
+		let line = body.slice(start, end)
+		start = end + 1
 		let withoutLeadingImages = line
 			.trim()
 			.replace(/^(?:!\[[^\]]*\]\([^)]+\)\s*)+/, "")

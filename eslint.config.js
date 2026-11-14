@@ -153,6 +153,7 @@ export default [
 			"dist/",
 			"build/",
 			"node_modules/",
+			"bench/datasets/",
 			".reference/",
 			"*.config.{js,mjs,ts}",
 			"src/routeTree.gen.ts",

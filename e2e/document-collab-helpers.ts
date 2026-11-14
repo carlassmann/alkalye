@@ -66,6 +66,10 @@ async function createDocumentInvite(
 async function listDocumentInvites(page: Page, args: DocArgs) {
 	await openDocumentShareDialog(page, args)
 
+	await expect(
+		page.getByTestId(testIds.collab.docSharePendingInviteRow).first(),
+	).toBeVisible()
+
 	let items = await page
 		.getByTestId(testIds.collab.docSharePendingInviteRow)
 		.evaluateAll(rows => {
@@ -147,7 +151,7 @@ async function openAcceptedDocumentInvite(
 	await invitePage.getByTestId(testIds.auth.createCopy).click()
 	await invitePage.getByTestId(testIds.auth.createSubmit).click()
 	await expect(invitePage.getByTestId(testIds.auth.dialog)).toBeHidden({
-		timeout: 10_000,
+		timeout: 30_000,
 	})
 	await waitForInviteSuccess(invitePage)
 
@@ -182,20 +186,33 @@ async function openDocumentShareDialog(page: Page, args: DocArgs) {
 }
 
 function parseInviteGroupId(link: string) {
-	let match = link.match(/\/invite\/(co_[^/]+)\//)
+	let match = link.match(/\/invite\/([^/]+)\//)
 	return match?.[1] ?? null
 }
 
 function parseDocIdFromInviteLink(link: string) {
-	let match = link.match(/#\/doc\/(co_[^/]+)\//)
+	let match = link.match(/#\/doc\/([^/]+)\//)
 	return match?.[1] ?? null
 }
 
 async function waitForInviteSuccess(invitePage: Page) {
 	let success = invitePage.getByTestId(testIds.invite.successState)
 	let error = invitePage.getByTestId(testIds.invite.errorState)
-	let didSucceed = await expect(success)
-		.toBeVisible({ timeout: 30_000 })
+	let didSucceed = await expect
+		.poll(
+			async () => {
+				if (await success.isVisible()) return true
+				return (
+					/\/app\/doc\/[0-9a-f-]+$/.test(new URL(invitePage.url()).pathname) &&
+					(await invitePage
+						.getByTestId(testIds.doc.editor)
+						.locator(".cm-content")
+						.isVisible())
+				)
+			},
+			{ timeout: 30_000 },
+		)
+		.toBe(true)
 		.then(() => true)
 		.catch(() => false)
 

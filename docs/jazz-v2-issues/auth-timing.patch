@@ -1,0 +1,43 @@
+--- a/src/app/main.tsx
++++ b/src/app/main.tsx
+@@ -12,11 +12,13 @@
+ 
+ export { PWA }
+ 
++performance.mark("auth:app-module")
++
+ let config = {
+ 	serverUrl: "/jazz",
+ 	initial: "device",
+ 	localFirst: "now",
+-	client: () => import("jazz-tools/local-first"),
++	client: () => { performance.mark("auth:local-first-load"); return import("jazz-tools/local-first") },
+ } satisfies import("jazz-tools/client").JazzClientConfig
+ 
+ let router = createRouter({
+@@ -51,6 +53,7 @@
+ }
+ function AccountApp() {
+ 	let user = useSession()?.user
++	performance.mark("auth:client-ready", { detail: user })
+ 	return (
+ 		<LibraryProvider key={user}>
+ 			<Application />
+@@ -76,14 +79,17 @@
+ 	let { db } = useLibrary()
+ 	let sync = useSyncStatus()
+ 	let [ready, setReady] = useState(false)
++	useEffect(() => { performance.mark("auth:link:" + sync.link.state) }, [sync.link.state])
+ 	useEffect(() => {
+ 		let restoring = sessionStorage.getItem("alkalye-restoring-account")
+ 		if (ready || (restoring && sync.link.state !== "connected")) return
+ 		let cancelled = false
+ 		async function routeAccount() {
++			performance.mark("auth:query-start")
+ 			let documents = restoring
+ 				? await db.all(app.documents.where({ ownerId }), { tier: "remote" })
+ 				: []
++			performance.mark("auth:query-end")
+ 			if (cancelled) return
+ 			router.update({ context: { ownerId } })
+ 			let switched = routedOwnerId !== null && routedOwnerId !== ownerId

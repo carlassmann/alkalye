@@ -47,3 +47,5 @@ export {
 	handleImportFiles,
 	type ImportOptions,
 } from "./widgets/sidebar-import-export"
+
+export { exportComments, importComments } from "./lib/comment-format"

@@ -1,7 +1,8 @@
+import { useIsBackedUp } from "@/app/features/auth"
 import { IconTransition } from "@/app/components/ui/icon-transition"
 import { useState, useEffect } from "react"
 import { toast } from "sonner"
-import { useAccount, useIsAuthenticated } from "jazz-tools/react"
+import { useLibrary } from "@/app/features/documents"
 import { useNavigate, Link, useLocation } from "@tanstack/react-router"
 import {
 	Copy,
@@ -13,7 +14,6 @@ import {
 	Globe,
 	Lock,
 } from "lucide-react"
-import { co } from "jazz-tools"
 import {
 	Dialog,
 	DialogContent,
@@ -30,7 +30,7 @@ import {
 } from "@/app/components/ui/select"
 import { Badge } from "@/app/components/ui/badge"
 import { Button } from "@/app/components/ui/button"
-import { Space, UserAccount } from "@/schema"
+import type { Space } from "@/app/features/spaces"
 import { useIntl, T } from "@/shared/intl/setup"
 import {
 	createSpaceInvite,
@@ -58,7 +58,7 @@ type Collaborator = {
 	inviteGroupId: string
 }
 
-type LoadedSpace = co.loaded<typeof Space, { documents: true }>
+type LoadedSpace = Space
 
 interface SpaceShareDialogProps {
 	space: LoadedSpace
@@ -74,7 +74,8 @@ function SpaceShareDialog({
 	let t = useIntl()
 	let navigate = useNavigate()
 	let location = useLocation()
-	let isAuthenticated = useIsAuthenticated()
+	let { db, ownerId } = useLibrary()
+	let isAuthenticated = useIsBackedUp()
 	let [internalOpen, setInternalOpen] = useState(false)
 
 	let open = controlledOpen ?? internalOpen
@@ -90,17 +91,16 @@ function SpaceShareDialog({
 	let [owner, setOwner] = useState<{ id: string; name: string } | null>(null)
 	let [spaceIsPublic, setSpaceIsPublic] = useState(() => isSpacePublic(space))
 	let [publicCopied, setPublicCopied] = useState(false)
-	let me = useAccount(UserAccount, { resolve: { root: { spaces: true } } })
 
 	let spaceGroup = getSpaceGroup(space)
 	let isAdmin = spaceGroup?.myRole() === "admin"
 	let isCollaborator = spaceGroup && !isAdmin
 
 	async function refreshCollaborators() {
-		let result = await listSpaceCollaborators(space)
+		let result = await listSpaceCollaborators(db, space)
 		setCollaborators(result.collaborators)
 		setPendingInvites(result.pendingInvites)
-		let spaceOwner = await getSpaceOwner(space)
+		let spaceOwner = await getSpaceOwner(db, space)
 		setOwner(spaceOwner)
 	}
 
@@ -111,12 +111,11 @@ function SpaceShareDialog({
 	}, [open, space])
 
 	async function handleCreateLink(role: InviteRole) {
-		if (!me?.$isLoaded) return
 		setLoading(true)
 
 		try {
-			let { link } = await createSpaceInvite(space, role)
-			setInviteLink(link)
+			let { link } = await createSpaceInvite(db, space, role)
+			setInviteLink(link ?? null)
 			setInviteRole(role)
 			await refreshCollaborators()
 		} catch (e) {
@@ -134,8 +133,8 @@ function SpaceShareDialog({
 		setTimeout(() => setCopied(false), 2000)
 	}
 
-	function handleRevoke(inviteGroupId: string) {
-		revokeSpaceInvite(space, inviteGroupId)
+	async function handleRevoke(inviteGroupId: string) {
+		await revokeSpaceInvite(db, space, inviteGroupId)
 		refreshCollaborators()
 		if (inviteLink?.includes(inviteGroupId)) {
 			setInviteLink(null)
@@ -144,10 +143,9 @@ function SpaceShareDialog({
 	}
 
 	async function handleLeave() {
-		if (!me?.$isLoaded) return
 		setLoading(true)
 		try {
-			await leaveSpace(space, me)
+			await leaveSpace(db, space)
 			setOpen(false)
 			navigate({ to: "/" })
 		} catch (e) {
@@ -165,10 +163,10 @@ function SpaceShareDialog({
 		setTimeout(() => setPublicCopied(false), 2000)
 	}
 
-	function handleMakePublic() {
+	async function handleMakePublic() {
 		setLoading(true)
 		try {
-			makeSpacePublic(space)
+			await makeSpacePublic(db, space)
 			setSpaceIsPublic(true)
 		} catch (e) {
 			console.error("Failed to make space public:", e)
@@ -178,10 +176,10 @@ function SpaceShareDialog({
 		}
 	}
 
-	function handleMakePrivate() {
+	async function handleMakePrivate() {
 		setLoading(true)
 		try {
-			makeSpacePrivate(space)
+			await makeSpacePrivate(db, space)
 			setSpaceIsPublic(false)
 		} catch (e) {
 			console.error("Failed to make space private:", e)
@@ -193,7 +191,7 @@ function SpaceShareDialog({
 
 	async function handleChangeRole(inviteGroupId: string, newRole: InviteRole) {
 		try {
-			await changeSpaceCollaboratorRole(space, inviteGroupId, newRole)
+			await changeSpaceCollaboratorRole(db, space, inviteGroupId, newRole)
 			await refreshCollaborators()
 		} catch (e) {
 			console.error("Failed to change role:", e)
@@ -391,23 +389,21 @@ function SpaceShareDialog({
 								>
 									<span className="flex items-center gap-2">
 										{c.name}
-										{c.id === me?.$jazz.id && (
+										{c.id === ownerId && (
 											<Badge variant="secondary">
 												<T k="sharing.space.members.you" />
 											</Badge>
 										)}
 									</span>
 									<div className="flex items-center gap-2">
-										{isAdmin && c.id !== me?.$jazz.id ? (
+										{isAdmin && c.id !== ownerId ? (
 											<>
 												<Select
 													value={c.role}
-													onValueChange={newRole =>
-														handleChangeRole(
-															c.inviteGroupId,
-															newRole as InviteRole,
-														)
-													}
+													onValueChange={newRole => {
+														if (newRole === "writer" || newRole === "reader")
+															void handleChangeRole(c.inviteGroupId, newRole)
+													}}
 												>
 													<SelectTrigger size="sm" className="h-6 text-xs">
 														<SelectValue />
@@ -499,5 +495,5 @@ function SpaceShareDialog({
 
 function getSpacePublicLink(space: LoadedSpace): string {
 	let baseURL = window.location.origin
-	return `${baseURL}/spaces/${space.$jazz.id}`
+	return `${baseURL}/app/spaces/${space.id}`
 }
