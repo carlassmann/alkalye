@@ -1,82 +1,93 @@
-# Large TEXT: materialization caching helps; full-value delivery remains
+# Upstream proposal: avoid repeated large TEXT materialization
 
-Status: local patch implemented, upstream issue not submitted. Jazz
-`2.0.0-alpha.61`, source `397c8b810d99dc9a20440f17decb2c63ddaf0cf6`.
+Status: proposal only, not submitted. Target is Jazz `2.0.0-alpha.61`,
+source `397c8b810d99dc9a20440f17decb2c63ddaf0cf6`.
 
-The final production comparison is in
-[the benchmark report](../benchmarks/jazz-classic-vs-v2.md). The typing target is **not met**: large-note p95 is 40.98 ms versus Classic's 33.78 ms (7.21 ms slower). Small-note typing is 33.30 / 34.86 ms versus 33.31 / 34.30 ms. Large-note medians are 33.39 versus 33.32 ms. The 200-edit long-task counts are near Classic. The 5,000-edit case is 41.57 / 82.90 ms versus Classic's 33.37 / 50.02 ms, with 1077 versus 37 long tasks. Completed typing replays and collaboration checks pass; returning/offline failures are counted below.
+Alkalye uses the published Jazz SDK and Wasm binaries. The only SDK patch is
+the auth patch from `fe49b12`. No browser engine, Rust build, replacement
+worker, query-snapshot patch or splice-hint option ships here. The owner
+decided against maintaining a Jazz fork.
 
-A fresh, matched 200-edit profile of an 874,540-byte note attributed 14.0 ms/edit
-to SHA-256 compression and 6.4 ms/edit to `materialize_attempt` on the main page.
-This was native work inside write lowering and subscription fanout, despite
-using the persistent SharedWorker and requesting subscription `splices`.
+## Evidence from the removed experiment
 
-The committed engine patch caches one validated logical scalar per database,
-capped at 64 MiB, keyed by its complete immutable descriptor. Exact hits reuse
-validated bytes; append-only tails apply new edits and update metrics from their
-fragments. Different bases and divergent tails use full authentication. UTF-8,
-UTF-16, descriptor and stale-base tests pass. Materialization/hash CPU is much
-lower; the patch preserves stored/sync formats and merge behavior.
+The experiment recorded at `94fc4ed` used app changes plus engine changes.
+Its five production runs measured small-note dispatch-to-double-rAF at
+33.30 / 34.86 ms and large-note typing at 33.39 / 40.98 ms, median / p95.
+Classic measured 33.31 / 34.30 ms and 33.32 / 33.78 ms respectively.
+The large-note 200-edit long-task count was 0 / 0, versus Classic's 1 / 1.
+The single 5,000-edit case measured 41.57 / 82.90 ms and 1,077 long tasks,
+versus Classic's 33.37 / 50.02 ms and 37 tasks.
 
-Whole-text replacements rebuild their canonical tree after a 128-edit tail,
-using the existing whole-write path. This bounds descriptor processing that
-otherwise grows toward 4,095 edits and backpressures the durable worker.
-Append/positional writes and the format acceptance limit remain unchanged.
-Jazz's 132 large-value and 16 text-splice integration tests pass, including
-concurrent/offline Unicode writers crossing the new boundary.
+Those numbers describe the removed engine experiment, not the stock-Jazz
+implementation in the [current report](../benchmarks/jazz-classic-vs-v2.md).
+The historical summaries remain in `bench/results/final-v2.json`,
+`final-v2-5000.json` and `final-typing-cpu.json`. They do not establish
+the isolated effect of each engine change.
 
-The Wasm bridge also accepts an optional replacement hint against `edited_from`.
-It verifies that the hint reconstructs the exact replacement string before
-avoiding its second full JS-to-Rust conversion. Invalid hints use the original
-decoder. Both paths produce the original `LargeValueUpdate::TextEdit`, preserving
-its full original base and stale-base merge. A per-database conversion cache reuses
-the previous Rust string only when its JavaScript value exactly matches the base.
-It retains at most 64 MiB. CodeMirror supplies the hint from
-its ChangeSet; no whole-string JS diff is needed.
+Paired 200-edit profiles compared `fe49b12` and `5f0f339`. Large-note
+main-page sampled CPU fell from 36.22 ms JS + 41.97 ms Wasm per edit to
+10.78 + 10.43 ms. The earlier profile attributed 14.0 ms/edit to SHA-256
+compression and 6.4 ms/edit to `materialize_attempt`, inside write lowering
+and subscription fanout. The final profile retained 0.61 ms/edit in SHA-256.
+React work also fell from 23.87 to 1.55 ms/edit, so the total improvement
+cannot be credited to native materialization alone.
 
-Final main-page sampled CPU is 10.8 ms JS + 10.4 ms Wasm per trace edit, versus
-36.2 + 42.0 before. JS encoding/decoding, native serialization and comparisons still copy or scan
-full values on the page; the CPU summary identifies their remaining cost.
-The subscription still serializes and delivers a full scalar even when its
-public notification includes splices. `editedFrom` still constructs a full replacement; mismatched cached bases use
-the original full decoder. A main-thread optimistic database and a
-worker-owned durable database are intentional separate runtime instances;
-removing the page instance requires a different local-first execution path.
+The changes worth considering upstream were:
 
-The separate 5,000-edit profile adds a sustained-load finding. Main-page
-replication costs 23.60 ms/trace edit and the durable worker's replication costs
-100.03 ms. Parked transaction-wait futures use 7.52 ms on the page. Worker
-allocation/freeing uses 18.72 ms and record/value validation 14.58 ms. The page
-also spends 69.54 ms in `Selection.collapse` through CodeMirror selection updates,
-mostly across the trace's many individual arrow-key moves. This browser builtin
-is included in the JS/API bucket. These full-replay averages include cursor work;
-they cannot be added to dispatch latency or treated as proof of a waiter leak.
-The benchmark's unprofiled stress result remains separate.
+- Cache one validated logical scalar per database, capped at 64 MiB and keyed
+  by the complete immutable descriptor. Exact hits reuse validated bytes.
+  Append-only tails apply edits to the validated prefix and update UTF-16
+  metrics from edited fragments. Different roots, kinds, formats, hashes and
+  divergent tails must take the original authenticated materialization path.
+- Rebuild the canonical tree for whole-text replacements after a 128-edit
+  tail, using the existing whole-write path. This bounded descriptor work
+  before the format's 4,095-edit limit. Append/positional writes and the reader's
+  accepted format stayed unchanged.
+- Accept an advisory replacement hint against the full original
+  `edited_from`. Verify that it reconstructs the exact replacement before
+  skipping a second JS-to-Rust conversion. Invalid hints and surrogate splits
+  must use the original decoder. A bounded conversion cache can reuse the
+  previous Rust string only when its JS value exactly matches the original base.
+  The removed SDK option was named `editedSplices`.
+- Preserve unchanged selected query snapshots and notification counts.
+  Subscription resets must still notify. Alkalye now retains equivalent
+  projections at its own React boundary instead.
 
-## Relevant source
+The experiment reported 132 large-value and 16 text-splice integration tests
+passing, including concurrent/offline Unicode writers across the new rebuild
+boundary. UTF-8, UTF-16, descriptor validation and stale-base tests passed.
+These are historical validations, not a substitute for upstream review.
 
-- `packages/jazz-tools/src/runtime/db.ts`: `editedFrom` lowers to `text_edit`;
-  the local SDK patch adds the optional advisory `editedSplices` field.
-- `crates/jazz-wasm/src/lib.rs`: validates/reconstructs the hint, then produces
-  the original core TextEdit.
-- `crates/jazz/layers/db/src/large_ops.rs`: materializes the current cell and
-  compares it with `edited_from`; a stale base uses the existing three-way merge.
-- `crates/jazz/layers/db/src/large.rs` and
-  `crates/jazz/layers/types/src/large_values/mod.rs`: validated materialization
-  cache and append-only reuse.
-- `patches/jazz-query-snapshots-alpha.61.patch`: unchanged selected projections
-  retain their SDK snapshot identity; subscription resets still notify.
+## Remaining engine costs
 
-`applyDiffs` applies positions to the local current row, including staged writes,
-then enters ordinary history/Markdown merge handling. It does not compare an
-editor base. A notification sequence is not an atomic compare-and-write guard,
-so the app retains `editedFrom`. Online concurrent typing and rapid offline
-large Unicode typing converge exactly, survive reconnect and reload, and retain
-both writers' text. Jazz's own text-splice integration tests also pass.
+Even the removed experiment serialized full scalars for subscriptions requesting
+public splices. JS decoding cost 1.56 ms/edit, exact string comparison 0.75,
+native subscription serialization 1.05, native comparison 0.87 and UTF-8
+validation 0.77 in its final large-note profile. A page optimistic database and
+a worker durable database are separate instances by design.
 
-## Reproduction and further work
+The separate 5,000-edit profile attributed 23.60 ms/trace edit to page replication,
+100.03 to durable-worker replication, and 7.52 to parked page transaction waits.
+Worker allocation/freeing cost 18.72 and record/value validation 14.58.
+CodeMirror's browser `Selection.collapse` calls cost 69.54 ms/trace edit across
+26,401 Arrow movements. These whole-replay sampled averages include cursor
+work. They cannot be added to dispatch latency or treated as proof of a leak.
+They came from the patched experiment; stock-Jazz timings must be measured anew.
 
-`large-text-repro.ts` remains a local-only, non-React diagnostic. Import it through
+Delta subscriptions that avoid full-scalar conversion, and execution outside
+the page thread, remain upstream opportunities. A version-guarded splice API
+would need atomic comparison and mutation, with the original stale-base merge
+as fallback.
+
+## Merge safety and reproduction
+
+Alkalye retains `editedFrom` with the complete editor base.
+`applyDiffs` alone operates on the current local row and cannot atomically
+check that base. It is unsuitable as a replacement for concurrent editor writes.
+The stock implementation retains online, offline, rapid Unicode and reload
+convergence tests.
+
+`large-text-repro.ts` is a local-only, non-React diagnostic. Import it through
 Vite with `jazz-tools` and `jazz-wasm` excluded from dependency optimization:
 
 ```js
@@ -87,21 +98,9 @@ await runLargeTextRepro("splices")
 await runLargeTextRepro("none")
 ```
 
-Run each case separately. Every case verifies final full text and fails on a
-terminal subscription error. The optional `partialWrite=true` case is a
-single-writer positional-write diagnostic, not the collaboration adapter.
-`window` selects a fixed, valid 128-unit range, not a growing full editor body.
-These include a local-durability wait and are not production typing timings.
-
-Further engine work must remove full-scalar conversion from delta subscriptions
-or execute the remaining query/write/replication work outside the page thread.
-A version-guarded splice API would need its comparison and mutation in one native
-operation, with the original editedFrom merge as fallback. The local cache,
-bridge and UI fixes are already implemented; the benchmark report quantifies
-the remaining gap and rejected experiments.
-
-[The vendored runtime guide](../../vendor/README.md) pins and rebuilds the Wasm,
-glue and worker used by CI/Vercel. Raw profiles remain local; the committed
-CPU summary records categories and normalized sampled cost.
+Run each case separately. Every case checks full final text and fails on terminal
+subscription errors. The optional positional-write case is single-writer only.
+The range case selects a fixed valid 128-unit window. These diagnostics include
+a local-durability wait and are not production app timings.
 
 written with gpt-6.1-sol in T3 Code (Codex)
