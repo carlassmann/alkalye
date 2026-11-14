@@ -1,3 +1,5 @@
+Start with [the Jazz v2 exploration](jazz-v2-exploration.md) for the current implementation, results and upstream asks.
+
 # Jazz v2 migration
 
 Branch `jazz-v2-migration`. Goal: alkalye fully functional on Jazz v2, a seamless move for existing users, and measured performance of Classic vs v2 on real-life datasets.
