@@ -1,5 +1,11 @@
 import { expect, type Page } from "@playwright/test"
-import { editor, openDocument, readContent, replaceContent } from "./adapter"
+import {
+	editor,
+	openDocument,
+	readContent,
+	replaceContent,
+	waitForEditorBoot,
+} from "./adapter"
 import { instrument } from "./metrics"
 import { mkdir, writeFile } from "node:fs/promises"
 import type { MarkdownSync } from "../../src/app/features/documents/lib/codemirror-sync"
@@ -147,7 +153,8 @@ async function measureReplay(page: Page, options: ReplayOptions) {
 		try {
 			if (options.flushWrites)
 				await withDeadline(flushWrites(page), 120_000, "Pending text writes")
-			await openDocument(page, document)
+			await waitForEditorBoot(page, { path: `/app/doc/${document.id}` })
+			await editor(page).waitFor({ state: "visible" })
 			await expect
 				.poll(() => readContent(page), { timeout: 120_000 })
 				.toBe(expectedContent)
