@@ -1,10 +1,11 @@
 import { app, type DocumentRow } from "@/jazz/schema"
-import { getDocumentTitle, type Database } from "@/app/features/documents"
+import { getDocumentTitle } from "@/app/features/documents/lib/title"
+import type { Database } from "@/app/features/documents/lib/library"
 import {
 	loadCommentDocument,
 	getExportCommentsForContent,
 	restoreExportedComments,
-} from "@/app/features/comments"
+} from "@/app/features/comments/lib/comments"
 import { getAssetsAtTime, formatEditDate } from "./time-machine"
 
 export { createTimeMachineCopy }

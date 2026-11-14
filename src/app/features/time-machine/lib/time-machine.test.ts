@@ -162,7 +162,7 @@ test("historical copies retain assets and comments with new IDs", async () => {
 		})
 		.wait({ tier: "global" })
 	let { createCommentThreadFromQuote, loadCommentDocument, getExportComments } =
-		await import("@/app/features/comments")
+		await import("@/app/features/comments/lib/comments")
 	createCommentThreadFromQuote(
 		{ ...doc, db, comments: [] },
 		"Selected words",
