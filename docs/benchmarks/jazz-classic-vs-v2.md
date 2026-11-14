@@ -1,435 +1,348 @@
 # Jazz Classic vs v2
 
-Production comparison on 2026-11-13. Five alternating runs per implementation,
-200 trace edits in each of three document sizes. Committed summaries are `bench/results/classic.json` and `v2.json`, with optimized load, typing and 5,000-edit results beside them. They retain aggregate metrics, sample counts, environment and validation failures. Raw samples, exploratory runs and CPU profiles stay local under ignored `bench/results/raw/`, `exploratory/` and `profiles/` directories.
+Production measurements on 2026-11-14 (Europe/Berlin). The typing target is **not met**: large-note p95 is 40.98 ms versus Classic's 33.78 ms (7.21 ms slower). Small-note typing is 33.30 / 34.86 ms versus 33.31 / 34.30 ms. Large-note medians are 33.39 versus 33.32 ms. The 200-edit long-task counts are near Classic. The 5,000-edit case is 41.57 / 82.90 ms versus Classic's 33.37 / 50.02 ms, with 1077 versus 37 long tasks. Completed typing replays and collaboration checks pass; returning/offline failures are counted below.
 
-## Final comparison after optimization
+| Metric, median / p95                                        |                  Classic |                       v2 |
+| ----------------------------------------------------------- | -----------------------: | -----------------------: |
+| ZIP import + resolve                                        |          40.93 / 41.38 s |          17.76 / 18.59 s |
+| First usable list                                           |            6.15 / 6.31 s |            1.60 / 1.72 s |
+| Warm list, SW blocked                                       |            2.52 / 2.71 s |            0.64 / 0.69 s |
+| First large document                                        |          11.22 / 11.38 s |            1.27 / 1.38 s |
+| Fresh-device exact dataset export                           |          19.50 / 19.62 s |          11.74 / 11.82 s |
+| Returning SW list                                           |            3.53 / 3.81 s |            0.70 / 0.87 s |
+| Offline SW large document                                   |                        — |            0.54 / 0.59 s |
+| Small-note sync                                             |       288.06 / 306.90 ms |         59.81 / 94.10 ms |
+| IndexedDB after import                                      |       142.30 / 181.34 MB |           1.93 / 2.00 MB |
+| First-load JS/Wasm, Brotli                                  |           2.96 / 2.96 MB |           3.46 / 3.46 MB |
+| Small: Dispatch → double-rAF                                |         33.31 / 34.30 ms |         33.30 / 34.86 ms |
+| Small: Beforeinput → double-rAF                             |         30.60 / 32.00 ms |         31.20 / 32.70 ms |
+| Small: Event duration, censored                             |         16.00 / 24.00 ms |         16.00 / 24.00 ms |
+| Small: Event input delay, censored                          |           0.20 / 1.00 ms |           0.10 / 0.80 ms |
+| Small: Event processing, censored                           |           0.30 / 4.30 ms |           0.20 / 3.60 ms |
+| Small: Event presentation estimate, censored                |         15.30 / 18.80 ms |         15.60 / 20.70 ms |
+| Small: Long tasks / case                                    |              0.00 / 0.00 |              0.00 / 0.00 |
+| Small: Long-task total / case                               |           0.00 / 0.00 ms |           0.00 / 0.00 ms |
+| Small: Sent payload / edit                                  |        183.06 / 183.06 B |        245.53 / 245.91 B |
+| Small: Received WS payload / edit                           |            8.78 / 8.78 B |            0.00 / 0.00 B |
+| Small: Main-page JS heap                                    |         52.86 / 52.90 MB |         55.51 / 66.14 MB |
+| Alice: Dispatch → double-rAF                                |         33.31 / 33.99 ms |         33.33 / 35.17 ms |
+| Alice: Beforeinput → double-rAF                             |         31.70 / 32.70 ms |         32.20 / 33.80 ms |
+| Alice: Event duration, censored                             |         16.00 / 16.00 ms |         16.00 / 16.00 ms |
+| Alice: Event input delay, censored                          |           0.10 / 0.50 ms |           0.10 / 0.60 ms |
+| Alice: Event processing, censored                           |           0.30 / 3.60 ms |           0.20 / 3.20 ms |
+| Alice: Event presentation estimate, censored                |         15.50 / 16.00 ms |         15.60 / 16.00 ms |
+| Alice: Long tasks / case                                    |              1.00 / 1.00 |              0.00 / 0.00 |
+| Alice: Long-task total / case                               |       116.00 / 120.00 ms |           0.00 / 0.00 ms |
+| Alice: Sent payload / edit                                  |        181.34 / 181.34 B |    2,022.57 / 2,022.78 B |
+| Alice: Received WS payload / edit                           |            6.21 / 6.21 B |            0.00 / 0.00 B |
+| Alice: Main-page JS heap                                    |       140.99 / 143.89 MB |         58.50 / 64.73 MB |
+| Dracula: Dispatch → double-rAF                              |         33.32 / 33.78 ms |         33.39 / 40.98 ms |
+| Dracula: Beforeinput → double-rAF                           |         31.90 / 32.80 ms |         32.00 / 36.20 ms |
+| Dracula: Event duration, censored                           |         16.00 / 16.00 ms |         16.00 / 16.00 ms |
+| Dracula: Event input delay, censored                        |           0.10 / 0.50 ms |           0.10 / 2.50 ms |
+| Dracula: Event processing, censored                         |           0.30 / 3.30 ms |           0.30 / 3.90 ms |
+| Dracula: Event presentation estimate, censored              |         15.60 / 16.00 ms |         15.50 / 16.00 ms |
+| Dracula: Long tasks / case                                  |              1.00 / 1.00 |              0.00 / 0.00 |
+| Dracula: Long-task total / case                             |       312.00 / 331.00 ms |           0.00 / 0.00 ms |
+| Dracula: Sent payload / edit                                |        181.34 / 181.34 B |        953.26 / 954.40 B |
+| Dracula: Received WS payload / edit                         |            6.55 / 6.55 B |            0.00 / 0.00 B |
+| Dracula: Main-page JS heap                                  |       473.22 / 490.60 MB |        82.51 / 108.28 MB |
+| Dracula, 5,000 edits: Dispatch → double-rAF                 |         33.37 / 50.02 ms |         41.57 / 82.90 ms |
+| Dracula, 5,000 edits: Beforeinput → double-rAF              |         32.30 / 32.80 ms |         31.60 / 51.30 ms |
+| Dracula, 5,000 edits: Event duration, censored              |         24.00 / 32.00 ms |         24.00 / 40.00 ms |
+| Dracula, 5,000 edits: Event input delay, censored           |           0.10 / 1.10 ms |           0.20 / 3.70 ms |
+| Dracula, 5,000 edits: Event processing, censored            |          0.20 / 15.20 ms |          0.90 / 30.90 ms |
+| Dracula, 5,000 edits: Event presentation estimate, censored |         16.00 / 31.90 ms |         14.90 / 30.60 ms |
+| Dracula, 5,000 edits: Long tasks / case                     |            37.00 / 37.00 |      1,077.00 / 1,077.00 |
+| Dracula, 5,000 edits: Long-task total / case                | 37,426.00 / 37,426.00 ms | 61,748.00 / 61,748.00 ms |
+| Dracula, 5,000 edits: Sent payload / edit                   |        171.50 / 171.50 B |  12,630.31 / 12,630.31 B |
+| Dracula, 5,000 edits: Received WS payload / edit            |          10.66 / 10.66 B |            0.00 / 0.00 B |
+| Dracula, 5,000 edits: Main-page JS heap                     |       436.83 / 436.83 MB |         70.35 / 70.35 MB |
+| Stress setup: ZIP import + resolve                          |          40.93 / 40.93 s |          17.79 / 17.79 s |
+| Stress setup: First usable list                             |            5.17 / 5.17 s |            1.69 / 1.69 s |
+| Stress setup: Warm list                                     |            2.48 / 2.48 s |            0.73 / 0.73 s |
+| Stress setup: First large document                          |          11.23 / 11.23 s |            1.19 / 1.19 s |
+| Stress setup: IndexedDB                                     |       160.87 / 160.87 MB |           2.04 / 2.04 MB |
+| Stress setup: First-load JS/Wasm, Brotli                    |           2.96 / 2.96 MB |           3.46 / 3.46 MB |
+| Returning SW list-ready cases                               |                      5/5 |                      5/5 |
+| Offline SW exact-text cases                                 |                      0/5 |                      5/5 |
+| Stress exact reload verified                                |                      1/1 |                      1/1 |
+| Core/SW scenario failures                                   |                        5 |                        0 |
+| Stress scenario failures                                    |                        0 |                        0 |
 
-All values are median / p95. Startup, storage and typing use five new runs with the same documents and trace. Sync was not rerun after optimization. First-load modes differ in caching and compression, as detailed below.
+Recorded failures: Classic: returningServiceWorker: offlineOpen (5). All five Classic failures occurred during exact offline-text verification after list readiness; no offline timing is assigned to them.
 
-| Metric                              |            Classic |        Original v2 |      Optimized v2 |
-| ----------------------------------- | -----------------: | -----------------: | ----------------: |
-| First usable list                   |      6.19 / 7.05 s |      1.61 / 1.69 s |     1.66 / 1.71 s |
-| First large document                |    10.99 / 11.48 s |      1.25 / 1.38 s |     1.28 / 1.35 s |
-| Small-note sync                     | 279.71 / 330.35 ms |  79.47 / 135.09 ms |         not rerun |
-| IndexedDB after import              | 148.64 / 157.29 MB |     1.76 / 3.30 MB |    1.78 / 1.85 MB |
-| Small typing, dispatch → double-rAF |   33.31 / 34.33 ms |   51.43 / 67.70 ms |  50.14 / 66.95 ms |
-| Large typing, dispatch → double-rAF |   33.33 / 34.23 ms | 117.74 / 148.46 ms | 83.45 / 101.91 ms |
-| Large Event Timing processing       |     0.30 / 3.50 ms |    0.30 / 88.20 ms |   0.30 / 57.00 ms |
-| Large long-task count / 200 edits   |              1 / 1 |          200 / 200 |         196 / 199 |
-| Large long-task total / 200 edits   |      0.34 / 0.45 s |    15.78 / 17.79 s |   10.69 / 10.87 s |
-| First-load JS/Wasm, uncompressed    |     5.78 / 5.78 MB |   20.84 / 20.84 MB |  20.86 / 20.86 MB |
-| First-load JS/Wasm, Brotli          |       not measured |       not measured |    3.45 / 3.45 MB |
+All timings are median / p95; MB means decimal megabytes. Startup/resource
+metrics have five samples each, sync has 25 markers, and each typing size pools
+1,000 trace edits across five independent cases. Long-task counts/totals and
+payload/heap metrics summarize whole cases. The 5,000-edit stress case has one
+case per implementation; its count/total therefore has identical median/p95.
+Service-worker timings are conditional on verified successes; failures retain
+their error and elapsed time rather than a fabricated timing.
 
-Large-document typing remains 2.5×/3.0× slower than Classic, with almost one long task per edit. Small typing remains slower too. Uncompressed first-load transfer remains 3.6× larger. Compression helps, but Classic was not measured compressed. Post-optimization sync, returning-user reliability and the 5,000-edit stress case remain unmeasured. Issue drafts cover [large TEXT materialization](../jazz-v2-issues/large-text-materialization.md), [duplicate Wasm assets and cache behavior](../jazz-v2-issues/duplicate-wasm-assets.md), and [authentication transport timing](../jazz-v2-issues/auth-transport.md).
+The committed summaries are [Classic](../../bench/results/final-classic.json),
+[v2](../../bench/results/final-v2.json),
+[Classic stress](../../bench/results/final-classic-5000.json),
+[v2 stress](../../bench/results/final-v2-5000.json), and
+[CPU attribution](../../bench/results/final-typing-cpu.json).
+Raw samples, profiles and intermediate trials remain ignored and uncommitted.
+Stress verification drains pending writes, waits for global acceptance and
+checks exact text after an online reload. Verification traffic is excluded from
+the replay payload metrics.
 
-## Optimization follow-up, 2026-11-13
+## Per-edit CPU attribution
 
-The historical comparison below remains unchanged. New production measurements
-use the same datasets, machine, Chromium, 200-edit trace and exact-content
-assertions. Five runs of each typing size pass. The large-document target is
-**not met**: 83/102 ms is 2.5×/3.0× Classic's 33/34 ms, and there are still
-roughly 196 long tasks per 200 edits. App overhead is reduced; the remaining
-native TEXT cost is documented in an issue draft.
+Paired fresh production profiles compare `fe49b12` with `5f0f339` on the same
+200-edit trace. Each cell below is sampled CPU milliseconds per trace edit,
+**JS / Wasm**. These are exclusive leaf samples, categorized by call ancestry.
+Subscription work nested inside a write/tick is charged to subscriptions first.
 
-| Metric, median / p95                  |        Original v2 |      Optimized v2 |
-| ------------------------------------- | -----------------: | ----------------: |
-| Small typing, dispatch → double-rAF   |   51.43 / 67.70 ms |  50.14 / 66.95 ms |
-| Dracula typing, dispatch → double-rAF | 117.74 / 148.46 ms | 83.45 / 101.91 ms |
-| Dracula Event Timing processing       |    0.30 / 88.20 ms |   0.30 / 57.00 ms |
-| Dracula long-task count / 200 edits   |    200.00 / 200.00 |   196.00 / 199.00 |
-| Dracula long-task total / 200 edits   |    15.78 / 17.79 s |   10.69 / 10.87 s |
+| Thread/phase, JS / Wasm ms per edit |  Small before |  Small after |  Large before |   Large after |
+| ----------------------------------- | ------------: | -----------: | ------------: | ------------: |
+| Page: write/stage/commit            |   0.59 / 3.89 |  0.46 / 1.40 |  4.50 / 15.39 |   0.99 / 3.05 |
+| Page: query/subscription            |   0.70 / 1.84 |  0.48 / 1.68 |  2.34 / 21.02 |   2.41 / 3.02 |
+| Page: replication/tick              |   0.07 / 3.81 |  0.04 / 2.64 |   0.06 / 3.86 |   0.05 / 2.51 |
+| Page: React render/effects          |  20.55 / 0.02 |  1.43 / 0.01 |  23.87 / 0.03 |   1.55 / 0.01 |
+| Page: other app/CodeMirror/SDK      |   4.25 / 0.00 |  4.09 / 0.00 |   5.44 / 0.00 |   5.78 / 0.00 |
+| Page: other engine runtime          |   0.00 / 0.57 |  0.00 / 0.45 |   0.00 / 1.67 |   0.00 / 1.85 |
+| Page: total JS/Wasm                 | 26.17 / 10.13 |  6.50 / 6.18 | 36.22 / 41.97 | 10.78 / 10.43 |
+| SharedWorker: total JS/Wasm         |  3.74 / 21.23 | 3.60 / 16.83 |  4.00 / 34.17 |  3.48 / 16.44 |
+| Statistics worker: total JS/Wasm    |   0.01 / 0.00 |  0.00 / 0.00 |   0.06 / 0.00 |   0.06 / 0.00 |
 
-The Event Timing row includes censored slow events, as in the original report.
-Its median remains 0.3 ms; compare its p95, 88.2 → 57.0 ms. The long-task totals
-are case totals, not per-edit latency. Small-document median/p95 remains about
-50/67 ms versus 51/68 ms before; no small-document regression is observed.
+Profiles cover the active typing page and its workers. Setup clients and the
+backend are outside this CPU attribution. The full CPU summary also accounts
+for GC, browser/native `(program)` samples,
+idle time and the separate statistics worker. Profiles include cursor movement,
+final verification and three seconds of settling. They are workload-normalized
+CPU estimates, not instrumented timers around individual keystrokes. Worker
+work runs in parallel; these columns cannot be summed into dispatch latency.
+The unprofiled comparison table determines whether the typing target is met.
+The JS bucket includes JS-invoked browser builtins and unsymbolized V8 frames,
+0.47 ms/edit for unsymbolized frames in the final large
+case. Their source and finer phase are unknown; they are included in other JS.
 
-### What changed
+Small notes were spending about 20.6 ms/edit in React render/effect stacks,
+versus 1.4 ms after the change. Native row invalidations recreated unchanged
+query projections, which drove library/editor renders and cursor work. The
+editor already changed synchronously; an awaited worker response was not
+required to display its text.
 
-The library subscribed to every complete document, and the document route
-subscribed to another full row. Library summaries now select saved scalar
-metadata only. New writes save path/frontmatter pin metadata alongside existing
-title/tags; the final combined schema snapshot includes nullable columns. Classic imports populate them immediately. Legacy development rows derive
-only missing metadata once. Actions such as export, duplicate and folder moves
-read their current bodies on demand. Wikilink titles use saved titles; backlink
-updates fetch only affected targets. Presence and comments subscribe to their
-own tables, with comment anchors using the active editor body.
+Large notes previously spent 14.0 ms/edit in SHA-256 compression and 6.4 ms/edit
+in `materialize_attempt` on the main page. The patched cache removes repeated
+authentication/materialization of the same immutable text and applies new tail
+edits to a validated prefix. Remaining large-note self samples include JS string decoding 1.56 ms/edit,
+exact JavaScript string comparison 0.75 ms, native subscription serialization
+1.05 ms, native comparison 0.87 ms and UTF-8 validation 0.77 ms.
+CodeMirror string extraction costs 0.59 ms, its update listener 0.53 ms,
+binding echo handling 0.62 ms and wikilink matching 0.52 ms.
+SHA-256 remains at 0.61 ms/edit, including range authentication and periodic
+canonical rebuilds. Full-scalar transfers and record work still consume page CPU.
+GC falls from 2.41 to 0.31 ms/edit for small notes and 2.90 to 0.79 for large.
+Browser/native `(program)` samples remain 6.25/6.38 ms/edit after the change;
+these samples do not identify a finer browser phase. Idle time remains
+31.88/24.88 ms/edit, including settling. The CPU JSON retains all categories.
 
-The active editor subscribes only to content with Jazz's `splices` option. The
-binding applies sequential UTF-16 splices when their base matches, retaining
-selection mapping and undo behavior. Skipped renders, local echoes and IME use
-the existing safe fallback. Word/sentence/task counting runs in a worker after
-a short quiet period, using the same counting rules; hidden stats do no work.
-Title derivation stops after its first useful line instead of splitting the
-entire document.
+The separate 5,000-edit profile averages 82.20 ms JS +
+40.03 ms Wasm per trace edit on the page. Writes account for
+4.41 ms, subscriptions 4.32, replication
+23.60, React 1.74, other app/SDK JS
+76.73 and other engine runtime 11.43.
+GC adds 1.28 ms and unattributed browser/native program samples
+12.77 ms; idle time is 10.85 ms per edit.
+The durable worker averages 1.43 ms JS + 102.01 ms Wasm.
+Of the page's other JS/API samples, 69.54 ms/edit is the browser's
+`Selection.collapse`, called through CodeMirror's `updateSelection` during the
+many individual arrow-key moves. It is browser builtin work invoked by JS.
+Parked native transaction-wait futures account for 7.52 ms/edit on the page.
+Worker self samples include 18.72 ms/edit allocating/freeing memory and
+14.58 ms validating records/values within replication. These sampled costs
+identify remaining work; they do not establish a particular waiter leak or a
+text-versus-presence split. The JSON includes the complete phase breakdown and
+largest self samples.
+These averages cover the full trace, cursor movement, the final full-text read and settling;
+reload/durability verification runs after CPU capture. These costs
+are independent of the unprofiled stress latency result.
 
-Immediate writes retain `editedFrom`. Jazz alpha.61 still materializes the
-current scalar on that write path and full query results on subscription ticks.
-Public splices do not remove that native cost. `applyDiffs` is faster in a
-single-writer repro but lacks the stale-base protection needed for concurrent
-editor writes. Oversized range selects terminate rather than clamp and cannot
-replace a whole-document subscription. No experimental range or partial editor
-write workaround ships.
+## Changes and merge safety
 
-### Assets and compression
+The engine caches one validated scalar, capped at 64 MiB, by its complete
+immutable descriptor. A matching base with an append-only edit tail reuses the
+validated bytes and computes UTF-16 metrics from edited fragments. Different
+roots, kinds, formats, hashes or divergent tails use authenticated full
+materialization. Descriptor and Unicode boundary tests cover invalid reuse.
+Whole-text replacements rebuild through the existing whole-write path once
+128 edits accumulate. This bounds growing descriptor encoding/validation work;
+append and positional writes retain their existing policy. Readers still accept
+the original 4,095-edit format limit. The canonical rebuild stores the final
+tree instead of every intermediate edit's tree.
 
-Vite's worker asset names now match Astro's dotted asset names, emitting one
-8,812,317-byte Wasm at one public URL. The page package and Jazz's bundled
-worker previously emitted identical bytes under different names. The unused
-raw broker worker asset is excluded from precache; the executing worker remains.
-Build precache size falls from 28,369.66 to 18,910.14 KiB. Real CacheStorage
-inspection found exactly one Wasm and one executing broker worker.
+The SDK retains the previous snapshot when a native row invalidation leaves
+its selected projection unchanged; subscription resets still notify.
 
-| First-load JS/Wasm, median / p95 | Encoded transfer |
-| -------------------------------- | ---------------: |
-| Original v2, uncompressed        | 20.84 / 20.84 MB |
-| Final v2, uncompressed control   | 20.86 / 20.86 MB |
-| Final v2, Brotli preview         |   3.45 / 3.45 MB |
+CodeMirror receives content directly from the Jazz subscription. The React
+snapshot and document metadata settle after 300 ms; cursor presence is limited
+to ten updates per second and excludes this device's echo. The binding retains
+its current flat string and ignores acknowledged local echoes. The router's
+startup sync-status subscription unmounts once routing is ready. Saved notifications
+retain only the latest body per document; older durability waits keep tokens
+instead of full text. Committed writes and their error observers still run.
 
-Each final mode has five successful runs. The uncompressed control still
-records two uncached fetches of the same Wasm URL. In all five Brotli runs,
-one Wasm transfer is about 2.518 MB including headers and the worker's read is
-`fromDiskCache: true` with zero encoded bytes. Its response body is 2,516,679
-bytes with `Content-Encoding: br`; gzip negotiation returns 3,154,403 bytes.
-Both retain `Content-Type: application/wasm`. Thus naming deduplication plus
-production-like compression yields one binary wire transfer. The raw Node
-preview alone would miss this result. `v2-wasm-cache-diagnostic.json` retains
-the uncached control; final per-request cache/encoding flags are in the load JSON.
+Editor writes run after a paint, with a 40 ms deadline and a flush on page hide
+or visibility loss. Writes are ordered per document. Acknowledged text is discarded even while other writes remain pending. Unknown
+incoming snapshots wait for outstanding writes, preserving local characters.
+The paint scheduler flushes complete native transactions synchronously on page
+hide; an integration test checks ordering before Promise continuations. Local
+rendering remains immediate. Consecutive changes waiting for the same paint share
+one write only when each original exactly equals the previous replacement.
+The first original is retained for stale-base merging; different bases keep
+separate writes. Local durability observers share one receipt per handle.
 
-Vercel explicitly lists `application/wasm` for automatic Brotli/gzip negotiation:
-https://vercel.com/docs/how-vercel-cdn-works/compression
-This verifies documented behavior, not a deployed Alkalye Vercel response. The
-local wrapper uses Brotli quality 6, whose exact encoded size is not a prediction
-of Vercel's compression level. JS/CSS/Wasm keep their MIME types, immutable
-caching and `Vary: Accept-Encoding`; Jazz streams pass through unchanged.
-`serve-production.ts` is now used by the production provisioner. The original
-Classic measurements used uncompressed local assets, so 3.45 MB compressed v2
-versus 5.78 MB uncompressed Classic is not a CDN-to-CDN comparison.
+For large, bounded edits, CodeMirror supplies a UTF-16 replacement hint alongside
+both full strings. The Wasm bridge validates that applying it to `edited_from`
+reconstructs the exact replacement, including Unicode boundaries, before
+avoiding the second full JS-to-Rust string conversion. Invalid hints use the
+original decoder. Both paths construct the original `TextEdit`, including the
+original base; the core still performs its usual stale-base merge. An exact-value
+conversion cache reuses the previous Rust base, capped at 64 MiB. The core can
+compare validated current bytes with that base before repeating UTF-8 validation. Stored and
+sync encodings and the native server binary are unchanged.
 
-### Evidence and reproduction
+`applyDiffs` was read through SDK lowering, `lower_large_mutations` and Jazz's
+text-splice integration tests. Positions apply to the local store's current
+row, including staged writes; the resulting value then enters normal history
+and Markdown merge handling. This does not bind positions to an editor's older
+snapshot. The adapter has no atomic public version guard, so it keeps
+`editedFrom` rather than treating a subscription sequence as that guard.
 
-- `bench/results/v2-optimized.json`: five typing runs, implementation `425a28e`.
-- `v2-optimized-load.json` and `v2-optimized-brotli.json`: five final-code first-load
-  runs per response mode at `5c7d9ba` and `1ec31d7`, respectively. Editor/data code is identical across these revisions. `5c7d9ba` removes an
-  ineffective startup warmup; `1ec31d7` guards proxy disconnects.
-- `v2-opt-before-profile.json`, `v2-opt-metadata-profile.json`, `v2-opt-after-profile.json` and
-  `profiles/optimization-*.cpuprofile.gz`: separate diagnostic runs, excluded
-  from the five-run distributions. Fresh paired profiles reduce sampled main-page Wasm from 12.76 to 8.21 seconds. The metadata-only intermediate profile was recorded in the same local campaign. These diagnostic files are not committed.
-- `v2-text-repro.json`: hardened local-only TEXT repro, with terminal subscription
-  errors made fatal. Whole TEXT and splices both deliver 201 updates and take
-  50/67 ms; no subscription and single-writer partial writes take 33/50 ms.
-  These use a 918,761-byte synthetic note through Vite, without React/editor or
-  a backend; they are not production app timings.
+Validation on the final candidate: `bun run check` passes all 860 tests plus
+lint, types and formatting. All 17 E2E tests pass, including rapid same-position writers, simultaneous online
+writers and a new large Unicode test that disconnects both clients, types at
+zero delay at opposite ends, checks isolated values, reconnects, checks exact
+merged values and reloads both. A unit test covers stale-base large writes;
+binding tests cover delayed asynchronous snapshots, multi-range hints, IME,
+selection mapping and undo. Jazz's own 16 text-splice integration tests, 132 large-value tests, 80 DB
+tests, 237 type tests, Wasm tests and 59 subscription tests pass.
 
-After building an immutable local production snapshot, use:
+## Trials and remaining limit
 
-```sh
-bun run bench:compare --target https://web-main-alkalye-opt-preview.cshed.carlassmann.com --label v2 --out bench/results/v2-optimized.json --runs 5 --edits 200 --performance-only --skip-sw
-bun run bench:compare --target https://web-main-alkalye-opt-preview.cshed.carlassmann.com --label v2 --out bench/results/v2-optimized-load.json --runs 5 --performance-only --load-only --skip-sw
-bun run bench:compare --target https://web-main-alkalye-opt-compressed.cshed.carlassmann.com --label v2 --out bench/results/v2-optimized-brotli.json --runs 5 --performance-only --load-only --skip-sw
-```
+Metadata batching alone did not remove the regression. Stable query snapshots
+and direct content subscriptions removed most React work. Splitting staging
+from commit lost characters, including in an ordered retest, and was rejected.
+The final scheduler defers the whole write and flushes stage/commit synchronously
+when the page hides. Raw positional writes remain unused without a base guard.
 
-Both Work projects were set up and started with `--tailscale`. The compressed
-project runs `scripts/bench/serve-production.ts` with `BENCH_BUILD_ROOT` pointing
-to this checkout; `BENCH_COMPRESSION=identity` selects its raw control. No app
-build or backend restart occurs during a measurement campaign. Campaigns run
-sequentially; unrelated machine workloads remain a limitation. New first visits
-use a fresh context with HTTP caching enabled, so page/worker reuse can occur;
-the original harness disabled it. Service workers remain blocked for these
-first visits. All raw metadata records the conditions. Interrupted exploratory
-campaigns and invalid range experiments are excluded. A compressed-preview
-attempt crashed when a stream disconnected after headers were sent; its partial
-JSON is preserved under `exploratory/v2-brotli-proxy-disconnect.json`. The guarded
-proxy completes all five replacement runs.
+Longer stress runs exposed growing tail descriptors and retained text in saved
+notification waits. The 128-edit whole-write bound passes Jazz's wire/storage
+budgets; a 64-edit trial did not. A heap snapshot traced full bodies through
+local durability waits to notification closures. Keeping only the latest body
+per document reduced the separate 1,000-edit probe from 495/331 MB before/after
+GC to 68/47 MB; exact reload passed after the fix. Older receipt closures now
+keep small tokens. These diagnostics are summarized in the CPU JSON.
 
-Validation on the final document/editor implementation: `e2e/doc.spec.ts` and
-`e2e/document-collab.spec.ts` pass all five tests, including simultaneous writers
-and reload persistence. Background agent-browser profiles converged to the same
-text after simultaneous edits. A selected “middle” stayed selected after a remote
-prefix. Offline reload preserved both writers' markers with an active service
-worker. `bun run check` passes lint, types, formatting and all 787 tests across 72 files.
+CodeMirror's ChangeSet supplies hint offsets directly; an earlier whole-string
+prefix/suffix search was discarded. The final artifact uses Jazz's release
+optimization pipeline; measurements of an earlier unoptimized diagnostic build
+are excluded. Two wider batch-window trials also missed the target: a delay
+after the frame and a frame-aligned delay measured 46.0/50.1 ms large-note p95
+in separate 200-edit probes, versus 39.6 ms with the retained scheduler. Neither
+trial is included in the final comparison.
 
-Issue drafts, not submitted:
-`docs/jazz-v2-issues/large-text-materialization.md` and
-`docs/jazz-v2-issues/duplicate-wasm-assets.md`.
+The final large-note p95 gap is 7.21 ms. Classic's per-run large-note
+p95 spans 33.62–33.96 ms (0.33 ms); v2 spans 39.19–42.25 ms. The gap exceeds
+that observed variation. The current full-string query/write boundary and the page's
+optimistic replica remain active on the main thread. They are not waiting for
+worker acknowledgement before rendering, but their synchronous conversion,
+serialization and replication tasks can still delay later frames. The worker
+owns a durable store while the page owns an in-memory replica by design; the
+second core is not an accidental extra application initialization. A worker-only execution path and true delta subscriptions were not implemented. The committed cache
+and bridge are engine changes, and the remaining CPU is quantified above.
 
-## Method and environment
+## Fairness and reproduction
 
-Classic app source is exactly `8379d4e`, jazz-tools 0.20.18. Only its build
-configuration selects the Node standalone adapter instead of Vercel. An external
-HTTP proxy supplies the production SPA history fallback. No Classic app source
-was changed. Its sync backend is jazz-run 0.20.19 with a 32 GB V8 heap cap.
-v2 uses this migration branch, jazz-tools 2.0.0-alpha.61, the Node standalone
-adapter and an isolated local SQLite store. Neither result represents Jazz Cloud. v2 app source is `847b2a5` plus the
-merged benchmark infrastructure; no app source was changed for these tests.
+Classic app source is `8379d4e`, `jazz-tools` 0.20.18, with `jazz-run` 0.20.19 and
+a 32 GB heap limit. Only its build adapter and external serving infrastructure
+change. v2 app/runtime source is `5f0f339`, alpha.61 plus the committed source,
+Bun and browser-runtime patches. Harness source is `5f0f339`. Later reporting commits do not change the app.
+Both use Node production builds, local backends and tailnet HTTPS. Neither
+measurement represents Jazz Cloud.
 
-Both serve production builds over Work's local tailnet HTTPS proxy. Unlike the
-old baseline, there is no Vite compilation, HMR, or development React runtime.
-Backends restart before each measured account. The order is Classic 1, v2 1,
-Classic 2, v2 2, through Classic 5, v2 5. Each run records beginning/end load
-averages. Pilots, failed authentication attempts and their server OOMs are
-excluded. Their transient setup was not representative of the final runs.
+Both implementations use `scripts/bench/serve-production.ts`, Brotli quality 6,
+the same cache headers and MIME types. Classic's SPA fallback is enabled with
+`BENCH_HISTORY_FALLBACK=1`. First visits use fresh browser contexts with HTTP
+caching enabled and service workers blocked, permitting page/worker asset reuse.
+The first-load row measures encoded JS/Wasm bytes on that visit, including
+worker requests. This replaces the previous unmatched compression comparison.
+The provisioner now configures this server for Classic too.
 
-Client: AMD RYZEN AI MAX+ 395 w/ Radeon 8060S, 32 logical CPUs,
-linux 7.2.8-9-omarchy,
-Chromium 145.0.7632.6, CPU throttle 1×. Node 24.22.1 and Bun 1.4.4. Core-run one-minute load averages range
-from 2.08 to 10.71 on 32 logical CPUs. No latency outlier was attributed to
-external load, so all five pairs are retained.
-Other workloads were present. No network shaping or forced garbage collection.
+Client: AMD RYZEN AI MAX+ 395, 32 logical CPUs, Linux 7.2.8-9-omarchy,
+Chromium 145.0.7632.6, CPU throttle 1×, Node 24.22.1, Bun 1.4.4. The final
+campaign interleaves five Classic and five v2 core cases, then five returning/offline
+cases for each. Each account starts after a backend process restart; all cases run
+sequentially. No builds, checks, profiles or other benchmark campaigns overlap
+the timing cases. A separate stress profile runs after both unprofiled stress
+cases. Other machine workloads remain uncontrolled; beginning/end load averages
+are retained in the summaries. A partial v2-only campaign was discarded after
+host load changed, so the final comparison uses fresh interleaved references.
 
-Datasets are unchanged: 50 pinned Vite Markdown notes, Alice in Wonderland
-170,590 bytes and Dracula 874,540 bytes; 52 files total 1,595,667 bytes.
-Fixtures normalize line endings to LF and add title headings/frontmatter.
-The account retains a welcome note outside the 52-file assertions.
-The Automerge LaTeX trace contains 259,778 edits. Checksums, source URLs and
-licenses remain in `bench/datasets/sources.json`. Vite documentation is MIT;
-books retain Gutenberg attribution; the editing trace is CC-BY-4.0.
+Datasets: 50 pinned Vite Markdown notes, Alice 170,590 bytes and Dracula 874,540
+bytes; 52 files, 1,595,667 bytes. Sources, checksums and licenses are in
+[the dataset manifest](../../bench/datasets/sources.json). Account creation,
+ZIP import/export, credentials-only fresh-device restore and editing use the
+public UI. Each replay verifies exact original and final full text; whole-library
+export verifies every file. The same 200/5,000 edits from the Automerge trace are
+used for both versions. `--literal-newlines` pastes control newlines as plain
+text; printable characters remain keyboard input. Pairing/completion is disabled.
 
-Account creation, ZIP import/export, settings, editor copy/paste and edits use
-public UI only. Fresh contexts receive only account authentication: Classic's
-`jazz-logged-in-secret` with a non-anonymous provider, or v2's
-`jazz-account-selection-v1:` record reduced to its selected root secret.
-No document databases, cookies, session leases or other account caches are copied.
-The v2 `browserSecretStore` utility's key is not the account manager's actual
-persistence key in this application.
+Dispatch → double-rAF includes CDP keyboard dispatch and two animation frames,
+with a roughly 33 ms floor at 60 Hz. Beforeinput → double-rAF begins inside the
+page. Event Timing rows are censored slow-event samples (threshold 16 ms), also
+including cursor movement; they are not all-keystroke percentiles. Presentation
+is an estimate from rounded duration. Sent payload includes HTTP and WebSocket
+bodies through settling/verification; received WebSocket payload omits HTTP
+streams. Main-page JS heap excludes workers and Wasm linear memory. IndexedDB
+uses Chromium's storage estimate.
 
-First-visit cases block service workers and disable HTTP cache. Warm reload
-preserves IndexedDB and enables HTTP cache. Returning-user cases allow SW
-installation, wait for an active controller, measure a usable list after reload,
-then disable networking and reopen the large document. Returning SW cases use five separate, alternating accounts before trace replay.
-Preparation opens the large document, retries an exact whole-library export,
-verifies its full text through a fresh UI copy and settles for five seconds.
-Offline text is also verified after its readiness timer. The overall returning
-case has a 150-second deadline and the usable-list wait has a 30-second deadline. Core runs also retain exploratory post-replay SW failures in their
-individual records; those SW attempts are excluded from the returning-user
-summary. Original metrics are retained.
-
-The five-run 200-edit cases use Arrow keys, keyboard typing and text insertion
-for control characters. Their exact-content checks all pass. Extended replay uses
-`--literal-newlines`: prepare the clipboard before timing, then plain-text paste
-line breaks. An intermediate 5,000-edit run exposed extra contenteditable newlines;
-a 1,000-edit literal-newline check passes. Printable characters remain keyboard
-input in both modes. Both implementations use the same mode within each phase.
-Typing preserves trace
-coordinates before the original text. Each case verifies original content first
-and exact trace output plus original content afterward. Export checks all 52
-original files byte-for-byte after normalization. Sync polls the receiving
-editor every 20 ms for five markers per run.
-
-Double-rAF timings retain their roughly 33 ms floor. New Event Timing observations
-record duration, input delay, processing and presentation estimates, with a
-16 ms reporting threshold. They include keyboard cursor movement and are
-**censored slow-event samples**, not percentiles of every keystroke. Presentation
-is derived from rounded duration and is approximate.
-
-Network capture includes pages, iframes, dedicated workers and SharedWorkers.
-The exact-byte worker verification passes for HTTP, WebSocket and Wasm.
-Sent bytes include HTTP bodies and WebSocket payloads throughout replay, settling
-and final verification. Received WS bytes exclude HTTP-stream payloads, so v2
-zero values do not mean zero downloads. These are payload counts, excluding TLS
-and framing. Heap is main-page JS only; it excludes workers and Wasm linear memory.
-Storage is Chromium's IndexedDB usage estimate.
-
-## Original production results before optimization
-
-Ratios below divide v2 by Classic; lower is faster/smaller. SW percentiles
-are conditional on successful verified cases, with success counts shown. Failed
-cases are never represented as exact timings, and their ratios are omitted. Nearest-rank
-percentiles. Five run samples per startup/resource metric, 25 sync markers;
-typing pools samples across the five successful cases of each size.
-With only five runs, run-level p95 is the maximum. Main-thread event counts
-differ because Event Timing reports only slow events; see raw sample counts.
-
-| Metric                                   |         Classic median / p95 |              v2 median / p95 | v2/Classic median / p95 |
-| ---------------------------------------- | ---------------------------: | ---------------------------: | ----------------------: |
-| ZIP import + resolve                     |              41.45 / 44.38 s |              11.88 / 12.07 s |           0.29× / 0.27× |
-| First visit, usable list                 |                6.19 / 7.05 s |                1.61 / 1.69 s |           0.26× / 0.24× |
-| Warm list, SW blocked                    |                2.76 / 2.98 s |                0.63 / 0.75 s |           0.23× / 0.25× |
-| First visit, large document              |              10.99 / 11.48 s |                1.25 / 1.38 s |           0.11× / 0.12× |
-| Fresh device, exact whole-dataset export |              19.61 / 21.50 s |                9.12 / 9.36 s |           0.46× / 0.44× |
-| Returning user, SW-controlled list       | 7.75 / 8.57 s (2/5 verified) | 1.00 / 1.03 s (5/5 verified) |       n/a; failed cases |
-| Offline SW large-document open           | 5.40 / 5.44 s (3/5 verified) | 0.54 / 0.63 s (5/5 verified) |       n/a; failed cases |
-| Edit visible on second client            |           279.71 / 330.35 ms |            79.47 / 135.09 ms |           0.28× / 0.41× |
-| IndexedDB after import                   |           148.64 / 157.29 MB |               1.76 / 3.30 MB |          1.78 / 1.85 MB |
-| First-load JS + Wasm transfer            |               5.78 / 5.78 MB |             20.84 / 20.84 MB |           3.60× / 3.60× |
-
-| Metric                                         | Classic median / p95 |          v2 median / p95 | v2/Classic median / p95 |
-| ---------------------------------------------- | -------------------: | -----------------------: | ----------------------: |
-| small, Dispatch → double-rAF                   |     33.31 / 34.33 ms |         51.43 / 67.70 ms |           1.54× / 1.97× |
-| small, beforeinput → double-rAF                |     31.00 / 32.00 ms |         32.10 / 41.30 ms |           1.04× / 1.29× |
-| small, Event Timing duration, censored ≥16 ms  |     16.00 / 24.00 ms |         32.00 / 40.00 ms |           2.00× / 1.67× |
-| small, Event Timing input delay                |       0.10 / 0.90 ms |           0.20 / 2.30 ms |           2.00× / 2.56× |
-| small, Event Timing processing                 |       0.30 / 4.20 ms |          0.30 / 32.30 ms |           1.00× / 7.69× |
-| small, Event Timing presentation estimate      |     15.40 / 19.70 ms |         14.10 / 39.70 ms |           0.92× / 2.02× |
-| small, Long tasks                              |          0.00 / 0.00 |              1.00 / 6.00 |               n/a / n/a |
-| small, Long-task total                         |       0.00 / 0.00 ms |        56.00 / 327.00 ms |               n/a / n/a |
-| small, Sent payload/edit                       |    183.06 / 183.06 B |        414.99 / 417.31 B |           2.27× / 2.28× |
-| small, Received WS payload/edit                |        8.78 / 8.78 B |            0.00 / 0.00 B |         0.000× / 0.000× |
-| small, Main-page JS heap                       |     77.29 / 78.13 MB |        43.34 / 153.63 MB |           0.56× / 1.97× |
-| medium, Dispatch → double-rAF                  |     33.34 / 34.55 ms |         66.69 / 96.35 ms |           2.00× / 2.79× |
-| medium, beforeinput → double-rAF               |     32.10 / 32.80 ms |         36.40 / 64.00 ms |           1.13× / 1.95× |
-| medium, Event Timing duration, censored ≥16 ms |     16.00 / 24.00 ms |         40.00 / 64.00 ms |           2.50× / 2.67× |
-| medium, Event Timing input delay               |       0.10 / 0.60 ms |           0.20 / 2.00 ms |           2.00× / 3.33× |
-| medium, Event Timing processing                |       0.30 / 3.40 ms |          0.30 / 43.00 ms |          1.00× / 12.65× |
-| medium, Event Timing presentation estimate     |     15.60 / 18.00 ms |         14.40 / 48.00 ms |           0.92× / 2.67× |
-| medium, Long tasks                             |          1.00 / 1.00 |             7.00 / 56.00 |          7.00× / 56.00× |
-| medium, Long-task total                        |    88.00 / 113.00 ms |     452.00 / 4,152.00 ms |          5.14× / 36.74× |
-| medium, Sent payload/edit                      |    181.34 / 181.34 B |        412.62 / 414.68 B |           2.28× / 2.29× |
-| medium, Received WS payload/edit               |        6.21 / 6.29 B |            0.00 / 0.00 B |         0.000× / 0.000× |
-| medium, Main-page JS heap                      |   125.18 / 142.54 MB |        84.63 / 161.05 MB |           0.68× / 1.13× |
-| large, Dispatch → double-rAF                   |     33.33 / 34.23 ms |       117.74 / 148.46 ms |           3.53× / 4.34× |
-| large, beforeinput → double-rAF                |     31.80 / 32.80 ms |        79.40 / 106.00 ms |           2.50× / 3.23× |
-| large, Event Timing duration, censored ≥16 ms  |     16.00 / 16.00 ms |        80.00 / 104.00 ms |           5.00× / 6.50× |
-| large, Event Timing input delay                |       0.10 / 0.50 ms |          0.20 / 13.80 ms |          2.00× / 27.60× |
-| large, Event Timing processing                 |       0.30 / 3.50 ms |          0.30 / 88.20 ms |          1.00× / 25.20× |
-| large, Event Timing presentation estimate      |     15.50 / 16.00 ms |         14.40 / 95.50 ms |           0.93× / 5.97× |
-| large, Long tasks                              |          1.00 / 1.00 |          200.00 / 200.00 |       200.00× / 200.00× |
-| large, Long-task total                         |   341.00 / 446.00 ms | 15,780.00 / 17,786.00 ms |         46.28× / 39.88× |
-| large, Sent payload/edit                       |    181.31 / 181.34 B |        414.99 / 417.67 B |           2.29× / 2.30× |
-| large, Received WS payload/edit                |        6.55 / 6.55 B |            0.00 / 0.00 B |         0.000× / 0.000× |
-| large, Main-page JS heap                       |   473.29 / 492.55 MB |        52.98 / 150.77 MB |           0.11× / 0.31× |
-
-## Interpretation of the original campaign
-
-v2 reaches the first usable large editor 8.8× faster and completes a fresh-device,
-exact whole-library export 2.15× faster. Its IndexedDB estimate is about 85×
-smaller for these documents. The compact stored state is consistent with less
-hydration/replay work; Classic's hydration profile processes many CoValue
-transactions. This does not isolate storage encoding from encryption or UI costs. These are app-level outcomes, including routing,
-hydration and export work; they are not isolated transport throughput.
-
-Small-note sync is 280 ms median on Classic and 79 ms on v2. Classic's source
-debounces saves by 250 ms; v2 writes each change immediately. That shipped
-behavior explains much of the difference, so this is not a protocol-only win.
-
-Large-document editing regresses: dispatch-to-double-rAF rises from 33/34 ms to
-118/148 ms median/p95. Event Timing processing p95 rises from 3.5 to 88.2 ms,
-and cumulative long tasks rise from 341 to 15,780 ms per 200-edit case. The
-200-edit CPU profiles independently reproduce the difference. Classic's 10.6 s
-profile is mostly idle, while v2 spends 12.3 s of its 27.5 s profile in main-page
-Wasm. SHA-256 accounts for 4.3 s and large-value materialization for 2.1 s.
-The stack runs through `large_values::materialize_attempt`, `values::from_sql`
-and `fanout::refresh_group` during database ticks. This points to expensive
-large-string query refreshes after immediate edits. Word counting adds another
-1.6 s. A SharedWorker does not eliminate this main-thread work.
-
-The first-load transfer grows from 5.78 to 20.84 MB. A representative network
-capture downloads two identical 8.81 MB Wasm files, one with a hyphenated filename
-and one with a dotted filename. Both have SHA-256
-`793d17d49189ac682d527c4b119a19d0dd52c8276a6d70241f3de725e07c0aff`.
-Their encoded transfers total 17.63 MB, about 85% of the v2 first-load total.
-This is measured duplication, not merely two copies found on disk.
-
-v2 passes all five returning-user list and offline text checks. Classic completes
-the list check in two of five attempts and offline full-text verification in
-three of five. Three Classic cases time out waiting for the controlled-reload
-sidebar; two time out during offline opening/verification. Successful timings
-alone therefore overstate Classic reliability here. The JSON retains each failure
-stage and captured UI state. These results concern this local production preview,
-not a general claim about Jazz Cloud. A ready editor heading is weaker than a
-complete cached-library restore; this test does not isolate SW code as the cause.
-
-## Sync tails and profiles
-
-The archived dev baseline has one 21–22 s sync stall per run, on marker 3, 3
-and 2. Two separate profiled dev probes reproduce 25.92 s and 22.03 s stalls.
-Neither diagnostic contributes to production percentiles.
-
-The 22.03 s probe records complete socket lifecycle lists. Neither sender nor
-receiver opens, closes or reports a frame error during the slow marker.
-Across its five-marker profile, the sender is idle for 22.4 of 25.1 seconds.
-The receiver processes bulk CoValue transactions and dev-mode sidebar rendering.
-Stacks include `processQueues → handleSyncMessage → handleNewContent →
-tryAddTransactions`, Wasm transaction insertion, JSON parsing and React
-`DocumentItem` rendering. Its retained last 200 frame events carry 15.20 MB near
-the end of the stall. These are observer receipt times, not wire throughput
-timestamps.
-
-This reproduces the tail as a receiver hydration/processing backlog, with no
-reconnect or session-lease wait in that trace. The exact historical three stalls
-lack complete lifecycle data, so assigning each of them this cause remains an
-inference. Profiling adds overhead.
-
-The 25 unprofiled production markers top out at 359 ms on Classic and 141 ms on
-v2. No comparable 20-second tail appears in either production set.
-
-Local main-page CPU profiles can be recorded under `bench/results/raw/profiles/`. Decompress a
-`.cpuprofile.gz` file and open it in Chromium DevTools. The paired 200-edit
-profiles are separate diagnostic runs, outside the five unprofiled summaries.
-
-### Extended trace
-
-Both implementations pass exact-content validation for 5,000 edits in the large
-document. These are single profiled runs, outside the five-run summaries.
-They include 26,401 Arrow-key cursor movements, versus one in each 200-edit case.
-They stress selection, presence and background replication as well as editing;
-their elapsed time is not an estimate of a user's writing time.
-
-| Metric                                       |          Classic |                 v2 |
-| -------------------------------------------- | ---------------: | -----------------: |
-| Dispatch → double-rAF, median / p95          | 33.38 / 50.10 ms | 149.93 / 259.50 ms |
-| Long-task count                              |               40 |             13,641 |
-| Long-task total                              |          42.51 s |         1,326.30 s |
-| Profiled replay/settling/verification window |         507.67 s |         2,179.97 s |
-| Main-page JS heap after replay               |        474.58 MB |        1,522.61 MB |
-| Sent payload / edit, entire window           |         174.84 B |        28,713.71 B |
-| Received WS payload / edit                   |          10.96 B |                0 B |
-
-The heap samples have no forced GC and exclude Wasm and workers. They do not
-measure retained memory or establish a leak. The long-window wire totals include
-all cursor/presence activity and background work; they are not marginal document
-protocol costs. v2's zero received WS count excludes its HTTP-stream downloads.
-
-An earlier extended replay exposed nonliteral contenteditable line breaks:
-15 extra newlines and 20 extra characters. The corrected mode prepares the
-clipboard before timing and pastes literal newlines; printable text remains
-keyboard input. A 1,000-edit check and both final 5,000-edit runs pass. Initial invalid-input/interrupted attempts are excluded from conclusions and are not committed.
-
-## Reproduce
-
-Measurement preview processes were stopped after the runs.
+Offline cases explicitly call Jazz's `disconnect()` before network emulation;
+Chromium context-offline alone leaves the SharedWorker's existing link alive.
+Classic's existing WebSockets are also explicitly closed. Returning/SW cases
+use five separate accounts, prepare and export the entire library before going
+offline, then verify full large-document text after reopening. The verified
+export primes the full dataset before large-document navigation; this is a
+prepared warm offline case, not a cold metadata-only open. The offline timer
+starts after transport shutdown. Stress cases additionally drain committed
+writes and verify the exact full text after an online reload. This replaces
+previous offline timings that did not reliably disconnect the persistent link.
 
 ```sh
+# Work projects must first be initialized with --tailscale.
 bun scripts/bench/production.ts
-bun scripts/bench/interleaved.ts
-bun scripts/bench/summarize.ts
+BENCH_RESULT_PREFIX=final- BENCH_LITERAL_NEWLINES=1 bun scripts/bench/interleaved.ts
+
+# Each stress case uses the corresponding production URL and a restarted backend.
+bun run bench:compare --target "$CLASSIC_URL" --label classic --out bench/results/raw/final-classic-5000.json --runs 1 --edits 5000 --literal-newlines --large-only --performance-only --skip-sw
+bun run bench:compare --target "$V2_URL" --label v2 --out bench/results/raw/final-v2-5000.json --runs 1 --edits 5000 --literal-newlines --large-only --performance-only --skip-sw
+bun scripts/bench/summarize.ts final-classic final-v2 final-classic-5000 final-v2-5000
+
+# Separate diagnostics; never overlap these with latency cases.
+BENCH_PROFILE_DIR=bench/results/profiles/after bun run bench:compare --target "$V2_URL" --label v2 --out bench/results/raw/profile-after.json --runs 1 --edits 200 --literal-newlines --performance-only --skip-sw
 ```
 
-The provisioner uses temporary directories under `/tmp` and Work setup/start
-with `--tailscale`. It is configured for this machine's cshed tailnet domain.
-Use a clean temporary directory for a new campaign; do not rebuild a server
-during measurement. Measured URLs:
+The measured services are:
 
-- https://classic-main-alkalye-bench.cshed.carlassmann.com
-- https://v2-main-alkalye-bench.cshed.carlassmann.com
+- Classic: https://classic-main-alkalye-typing.cshed.carlassmann.com
+- v2: https://web-main-alkalye-typing.cshed.carlassmann.com
 
-The full trace's 33 ms pacing floor alone exceeds two hours, and its
-5,602,244 Arrow-key movements add substantial automation and selection work.
-The 5,000-edit slice includes 26,401 Arrow movements, versus one in the
-200-edit cases. Input latency excludes cursor positioning; whole-window long
-tasks and profiles include it. A 5,000-edit,
-large-document-only slice per side therefore supplies the longer stress case.
-Its raw JSON is separate from the five-run summaries; CPU profiles stay local under `bench/results/raw/profiles/`. Replay commands add
-`--runs 1 --edits 5000 --large-only --literal-newlines --skip-sw
---replay-timeout-ms 2500000`;
-`BENCH_PROFILE_DIR=bench/results/raw/profiles` enables main-page CPU profiling. Pass `--out bench/results/raw/classic-5000.json` or `v2-5000.json` to retain the stress results. To regenerate optimized typing, run `bun run bench:compare --target <v2-url> --label v2 --runs 5 --edits 200 --skip-sw --out bench/results/raw/v2-optimized.json`. Add `--load-only` for the load and Brotli variants, using each preview URL and its corresponding `--out` filename. Then run the summarizer. Fetch missing datasets with `bun run bench:fetch`.
+The five-run command used `BENCH_CLASSIC_TARGET` and `BENCH_V2_TARGET` for those
+URLs, `BENCH_CLASSIC_WORK_ROOT=/tmp/alkalye-bench-production`,
+`BENCH_CLASSIC_COMMAND=sync`, `BENCH_V2_WORK_ROOT=/tmp/alkalye-typing-preview`,
+`BENCH_V2_COMMAND=web` and the Brotli server note retained in the summaries.
 
-## Caveats
-
-Local backends, headless desktop Chromium, one machine and one dataset family.
-No mobile, CDN or cloud conclusions. Cold means a fresh browser context inside the run's Chromium instance, not
-a fresh browser process, cold backend or cleared OS/native-code caches. Classic uses a local SPA-fallback proxy hop. The
-stacks also differ in security semantics: Classic E2EE versus v2 server-readable
-storage. IndexedDB estimates exclude SW/HTTP caches; encoded asset transfers
-reflect this local server rather than CDN compression. Five runs give coarse tails. Immediate
-v2 saves and Classic's debounced saves are the shipped behaviors, so payload
-figures are not a protocol-only comparison. SW blocked first visits exclude
-precache competition; returning cases explicitly install and use the SW.
-Event Timing omits fast events; main-page heap cannot compare total application
-memory. A capture-listener microtask probe in early raw records returned near
-zero and did not measure editor processing, so it is excluded from summaries. Profiles add overhead; the 200-edit, 5,000-edit and development
-diagnostics are separate from the five unprofiled production runs. Failed exploratory attempts are excluded from the production
-comparison and must not be treated as measured wins or regressions.
+The generated Wasm/glue, matching worker and ABI fingerprint are pinned in
+[vendor](../../vendor/README.md). `bun install` verifies and installs that archive
+by rename, preserving Bun's shared package cache. CI/Vercel use the same bytes
+without a Rust toolchain. The clean-source rebuild was exercised with Rust
+1.93.1, wasm32 and wasm-bindgen 0.2.117, with upstream release optimization
+settings and pinned Binaryen 132.0.0. The manifest records source commit,
+engine-patch fingerprint and archive checksum.
 
 written with gpt-6.1-sol in T3 Code (Codex)
