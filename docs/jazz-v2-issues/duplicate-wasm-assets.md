@@ -1,68 +1,58 @@
-# Draft: Vite emits the Jazz Wasm twice across page and worker builds
+# Vite emits identical Jazz Wasm at separate page and worker URLs
 
-Status: upstream issue draft, not submitted; app bundling/compression workaround verified. Jazz `2.0.0-alpha.61`, Astro 5, Vite 7.
+Jazz `2.0.0-alpha.61`, Astro 5, Vite 7. Unsubmitted packaging issue.
 
-Alkalye's production first-load capture downloads two 8,812,317-byte binaries:
-`jazz_wasm_bg-BazWJnU4.wasm` and `jazz_wasm_bg.BazWJnU4.wasm`.
-Both hash to SHA-256
-`793d17d49189ac682d527c4b119a19d0dd52c8276a6d70241f3de725e07c0aff`.
-The two encoded transfers account for 17.63 MB of the 20.84 MB first visit.
+## Observed result
 
-The page imports `jazz-wasm/pkg/jazz_wasm.js`; its `new URL` emits an Astro
-asset with a dotted hash. Jazz's prebundled `dist/worker/jazz-broker-worker.js`
-contains another wasm-bindgen glue copy and a worker-local binary URL. Vite's
-SharedWorker build emits that binary using its hyphenated default. PWA globbing
-then precaches both distinct URLs. Package sources contain two binary copies,
-but the bad outcome depends on the bundler giving identical bytes different
-public URLs.
+Alkalye's original production preview used separate page and worker Wasm URLs,
+with dotted and hyphenated asset hashes. Identical bytes at separate URLs caused
+separate downloads and PWA precache entries.
+The original raw first-load JS/Wasm was about 20.84 MB. See
+[original results](../../bench/results/v2.json) and
+[post-workaround raw control](../../bench/results/v2-optimized-load.json).
+The final [asset diagnostic](../../bench/results/stock-diagnostics.json) records
+SHA-256 `793d17d49189ac682d527c4b119a19d0dd52c8276a6d70241f3de725e07c0aff`
+for the published Wasm.
 
-Jazz also references its broker worker as an ordinary `new URL` for identity,
-and as `new SharedWorker(new URL(...))` for execution. Vite emits both a raw
-worker asset and the processed worker chunk. Only the processed chunk executes.
-Precache both and the unused raw worker adds about 0.89 MB to installation.
+The page's `jazz-wasm` glue and the prebundled Jazz broker worker each resolve a
+Wasm URL. Vite's page and worker builds give it different names. Jazz also uses
+an ordinary worker URL for identity and a `SharedWorker` URL for execution;
+Vite emits a raw asset and a processed worker. See upstream
+[asset URL resolution](https://github.com/garden-co/jazz/blob/v2.0.0-alpha.61/packages/jazz-tools/src/runtime/runtime-config.ts)
+and [SharedWorker connection](https://github.com/garden-co/jazz/blob/v2.0.0-alpha.61/packages/jazz-tools/src/runtime/native-runtime/browser-shared-worker-connection.ts).
+The generated package assets, rather than the source glue path, are what the
+bundler consumes.
 
-## Alkalye workaround
+## Workaround
 
-Set Vite worker `rollupOptions.output.assetFileNames` to
-`_astro/[name].[hash][extname]`, matching Astro's page asset names. Both builds
-then reference one Wasm asset. Exclude the
-unused dotted broker worker asset from the PWA precache; keep the actual
-hyphenated worker chunk and the single Wasm asset.
+Alkalye's [Astro configuration](../../astro.config.ts) matches worker
+`assetFileNames` to Astro's `_astro/[name].[hash][extname]` and excludes the unused
+dotted broker-worker asset from precaching. It keeps the executing worker and
+Wasm cached for offline startup.
 
-The uncompressed Node control still records two uncached transfers of the
-now-identical URL, one per realm. In the compressed preview, the capture records
-one Brotli transfer and one disk-cache read with zero encoded bytes in each
-of five runs. Total JS/Wasm falls from 20.84 MB in the original raw preview to
-3.45 MB with the production-like Brotli preview. The final uncompressed control
-remains 20.86 MB. No compiled
-module override or startup warmup is needed. This distinction matters when using
-a local uncompressed preview to predict CDN transfer size.
+Identical URLs alone did not remove repeated wire transfers in the uncompressed
+control. In the final Brotli preview, each of five fresh contexts recorded one
+Wasm wire transfer of about 2.518 MB and a zero-byte disk-cache read. Total
+JS/Wasm is 3.46 MB, versus Classic's 2.96 MB. See
+[stock asset captures](../../bench/results/stock-diagnostics.json) and
+[benchmark report](../benchmarks/jazz-classic-vs-v2.md).
 
-First-load measurements use a fresh isolated browser context with HTTP caching
-enabled and service workers blocked. The original harness disabled caching on
-every target, forcing repeat downloads of even an identical URL. The old files
-remain unchanged. New results record this difference explicitly.
+The old harness disabled HTTP caching; the final campaign enables it with fresh
+contexts and blocks service workers for first-load measurements.
+[scripts/bench/serve-production.ts](../../scripts/bench/serve-production.ts)
+negotiates Brotli/gzip while preserving MIME types and caching. These local
+measurements do not establish deployed Vercel transfer sizes.
 
-The Node standalone adapter serves Wasm uncompressed. The benchmark provisioner
-now uses `serve-production.ts`, which negotiates Brotli/gzip for static JS, CSS
-and `application/wasm`, while streaming Jazz requests unchanged. Set
-`BENCH_COMPRESSION=identity` for the uncompressed comparison. Both response
-modes preserve the original MIME type and immutable caching.
+## Reproduce and requested packaging
 
-Vercel documents automatic Brotli/gzip negotiation and explicitly includes
-`application/wasm` in its compression allowlist:
-https://vercel.com/docs/how-vercel-cdn-works/compression
+Build a Vite application importing `jazz-tools/local-first`, inspect the emitted
+page and worker Wasm URLs, and precache JS/Wasm assets. In Alkalye, use
+`ALKALYE_LOCAL_PREVIEW=1 bun x astro build`; remove the worker naming override
+and broker-worker precache exclusion to inspect the original naming behavior.
+Capture both page and SharedWorker requests with HTTP caching enabled.
 
-This confirms intended CDN behavior, not an observed Alkalye Vercel deployment.
-Local Brotli quality 6 is an approximation; its exact encoded size is not a
-prediction of Vercel's compression level. The report includes both local modes.
-
-## Reproduction
-
-Build with `ALKALYE_LOCAL_PREVIEW=1 bun x astro build`, list
-`dist/client/_astro/*wasm`, inspect the broker worker URLs, and capture network
-requests from both page and SharedWorker targets. Inspect CacheStorage after
-service-worker installation; it must contain one Wasm and one executing broker
-worker. The final report links raw measurements and offline browser evidence.
+Please provide a bundler-supported shared Wasm asset path and avoid emitting an
+unused broker-worker copy. A documented Vite/PWA configuration would also let
+applications avoid maintaining naming assumptions about package internals.
 
 written with gpt-6.1-sol in T3 Code (Codex)
