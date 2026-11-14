@@ -1,5 +1,7 @@
 # Exploring Jazz v2 in Alkalye
 
+> Short report: [docs/jazz-v2-report.md](jazz-v2-report.md). This document is the detailed version.
+
 This PR explores `jazz-tools@2.0.0-alpha.61` in Alkalye, a local-first Markdown
 PWA previously using Classic Jazz 0.20.18. The port covers the editor, shared
 documents/spaces, comments, media/whiteboards, themes, presentations, history,
