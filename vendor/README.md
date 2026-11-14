@@ -22,7 +22,10 @@ Jazz's text-splice storage budget and concurrent offline Unicode tests cover thi
 
 The Wasm bridge accepts an advisory `text_splice` alongside the full replacement
 and `edited_from`. It checks the replacement against the original JS strings and
-reconstructs its Rust string from one decoded base. Invalid hints, including
+reconstructs its Rust string from one decoded base. A bounded per-database cache
+reuses the previous conversion only when its JavaScript value exactly matches
+the original base. The core compares validated current bytes with that UTF-8
+base before doing another conversion. Invalid hints, including
 surrogate splits, use the original full-string decoder. It still creates a
 normal `LargeValueUpdate::TextEdit`; stale-base handling stays in the core.
 `patches/jazz-text-bridge-alpha.61.patch` adds the optional `editedSplices` SDK

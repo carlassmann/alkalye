@@ -1,8 +1,93 @@
 diff --git i/crates/jazz-wasm/src/lib.rs w/crates/jazz-wasm/src/lib.rs
-index 5c43d6824..01853bdca 100644
+index 5c43d6824..40102a345 100644
 --- i/crates/jazz-wasm/src/lib.rs
 +++ w/crates/jazz-wasm/src/lib.rs
-@@ -2080,12 +2080,105 @@ fn wasm_read_or_pending(future: WasmReadFuture) -> Result<JsValue, JsValue> {
+@@ -16,18 +16,18 @@ use std::rc::Rc;
+ use std::sync::atomic::{AtomicBool, Ordering};
+ use std::task::{Context, Poll, Waker};
+ 
+-use base64::engine::general_purpose::URL_SAFE_NO_PAD;
+ use base64::Engine;
++use base64::engine::general_purpose::URL_SAFE_NO_PAD;
+ use futures_util::future::{AbortHandle, Abortable};
+ use jazz::binding_host::{
+     self, Binding, EventChunk, HostError, HostObject, HostResult, OpenAs, Write,
+ };
+-use jazz::db::{block_on, Error, LargeValueUpdate, SubscriptionEvent, SubscriptionStream};
++use jazz::db::{Error, LargeValueUpdate, SubscriptionEvent, SubscriptionStream, block_on};
+ use jazz::ids::AuthorSubject;
+ use jazz::tx::DurabilityTier;
+ use serde::Serialize;
+-use wasm_bindgen::prelude::*;
+ use wasm_bindgen::JsCast;
++use wasm_bindgen::prelude::*;
+ use wasm_bindgen_futures::future_to_promise;
+ 
+ #[cfg(target_arch = "wasm32")]
+@@ -459,6 +459,12 @@ fn storage_error(message: &str) -> JsValue {
+ struct WasmDbInner {
+     binding: Binding,
+     host: Rc<Host>,
++    text_conversion: Rc<RefCell<Option<DecodedText>>>,
++}
++
++struct DecodedText {
++    javascript: js_sys::JsString,
++    utf8: String,
+ }
+ 
+ impl WasmDbInner {
+@@ -614,7 +620,11 @@ impl WasmDbInner {
+                 }
+                 listening
+             }));
+-        Self { binding, host }
++        Self {
++            binding,
++            host,
++            text_conversion: Rc::new(RefCell::new(None)),
++        }
+     }
+ 
+     fn write(&self, write: HostResult<Write>) -> Result<WasmWrite, JsValue> {
+@@ -1107,8 +1117,10 @@ impl WasmDb {
+         mutations: JsValue,
+         updated_at_ms: Option<f64>,
+     ) -> Result<(), JsValue> {
+-        let mutations = large_value_updates(mutations)?;
+-        self.binding()?
++        let inner = self.open_inner()?;
++        let mutations = large_value_updates(mutations, &inner.text_conversion)?;
++        inner
++            .binding
+             .update_large_values_in_transaction(
+                 &open_transaction_id,
+                 &table,
+@@ -1129,8 +1141,8 @@ impl WasmDb {
+         mutations: JsValue,
+         updated_at_ms: Option<f64>,
+     ) -> Result<WasmWrite, JsValue> {
+-        let mutations = large_value_updates(mutations)?;
+         let inner = self.open_inner()?;
++        let mutations = large_value_updates(mutations, &inner.text_conversion)?;
+         inner.write(inner.binding.update_large_values(
+             &table,
+             &row_id,
+@@ -1367,11 +1379,13 @@ impl WasmDb {
+         // ack waits on it. Removed at close.
+         let weak = Rc::downgrade(&inner.host);
+         let binding = inner.binding.clone();
++        let text_conversion = Rc::clone(&inner.text_conversion);
+         store.on_write_failed(Some(Rc::new(move || {
+             if let Some(host) = weak.upgrade() {
+                 WasmDbInner {
+                     binding: binding.clone(),
+                     host,
++                    text_conversion: Rc::clone(&text_conversion),
+                 }
+                 .request_persist();
+             }
+@@ -2080,12 +2094,125 @@ fn wasm_read_or_pending(future: WasmReadFuture) -> Result<JsValue, JsValue> {
      }
  }
  
@@ -16,7 +101,10 @@ index 5c43d6824..01853bdca 100644
 +    insert: String,
 +}
 +
-+fn text_edit_from_splice(mutation: &JsValue) -> Option<LargeValueUpdate> {
++fn text_edit_from_splice(
++    mutation: &JsValue,
++    cache: &RefCell<Option<DecodedText>>,
++) -> Option<LargeValueUpdate> {
 +    let get = |key: &str| js_sys::Reflect::get(mutation, &JsValue::from_str(key)).ok();
 +    if get("kind")?.as_string()?.as_str() != "text_edit" {
 +        return None;
@@ -42,13 +130,27 @@ index 5c43d6824..01853bdca 100644
 +    if !js_sys::Object::is(expected.as_ref(), replacement.as_ref()) {
 +        return None;
 +    }
-+    let edited_from = source.as_string()?;
++    let column = get("column")?.as_string()?;
++    // An exact previous JS value already has its normal UTF-8 conversion.
++    let cached = cache.borrow_mut().take();
++    let edited_from = match cached {
++        Some(cached) if js_sys::Object::is(cached.javascript.as_ref(), source.as_ref()) => {
++            cached.utf8
++        }
++        _ => source.as_string()?,
++    };
 +    let from = text_byte_offset(&edited_from, splice.from, length)?;
 +    let to = text_byte_offset(&edited_from, splice.to, length)?;
 +    let mut text = edited_from.clone();
 +    text.replace_range(from..to, &splice.insert);
++    if text.len() <= 64 * 1024 * 1024 {
++        cache.replace(Some(DecodedText {
++            javascript: replacement,
++            utf8: text.clone(),
++        }));
++    }
 +    Some(LargeValueUpdate::TextEdit {
-+        column: get("column")?.as_string()?,
++        column,
 +        text,
 +        edited_from,
      })
@@ -89,7 +191,10 @@ index 5c43d6824..01853bdca 100644
 +    }
 +}
 +
-+fn large_value_updates(mutations: JsValue) -> Result<Vec<LargeValueUpdate>, JsValue> {
++fn large_value_updates(
++    mutations: JsValue,
++    cache: &RefCell<Option<DecodedText>>,
++) -> Result<Vec<LargeValueUpdate>, JsValue> {
 +    if !js_sys::Array::is_array(&mutations) {
 +        return Err(JsValue::from_str(
 +            "invalid partial-value update descriptor: expected an array",
@@ -98,7 +203,7 @@ index 5c43d6824..01853bdca 100644
 +    js_sys::Array::from(&mutations)
 +        .iter()
 +        .map(|mutation| {
-+            if let Some(update) = text_edit_from_splice(&mutation) {
++            if let Some(update) = text_edit_from_splice(&mutation, cache) {
 +                return Ok(update);
 +            }
 +            serde_wasm_bindgen::from_value(mutation).map_err(|error| {
@@ -111,7 +216,7 @@ index 5c43d6824..01853bdca 100644
  fn present(value: Option<JsValue>) -> Option<JsValue> {
      value.filter(|value| !value.is_null() && !value.is_undefined())
  }
-@@ -2304,6 +2397,55 @@ fn bytes_to_js(bytes: Vec<u8>) -> Result<JsValue, JsValue> {
+@@ -2304,6 +2431,59 @@ fn bytes_to_js(bytes: Vec<u8>) -> Result<JsValue, JsValue> {
  
  #[cfg(test)]
  mod tests {
@@ -137,8 +242,10 @@ index 5c43d6824..01853bdca 100644
 +    #[cfg(target_arch = "wasm32")]
 +    #[wasm_bindgen_test::wasm_bindgen_test]
 +    fn text_edit_splice_validates_hints_and_keeps_the_original_base() {
++        let cache = std::cell::RefCell::new(None);
 +        for (from, text, start, end, insert) in [
 +            ("a😀z", "a😁z", 1, 3, "😁"),
++            ("a😁z", "a😁zy", 4, 4, "y"),
 +            ("a😀z", "xa😀z", 0, 0, "x"),
 +            ("a😀z", "a😀zx", 4, 4, "x"),
 +            ("a😀z", "correct replacement", 0, 0, "invalid hint"),
@@ -149,9 +256,11 @@ index 5c43d6824..01853bdca 100644
 +                "edited_from": from,
 +                "text_splice": { "from": start, "to": end, "insert": insert }
 +            }]);
-+            let decoded =
-+                super::large_value_updates(serde_wasm_bindgen::to_value(&descriptor).unwrap())
-+                    .unwrap();
++            let decoded = super::large_value_updates(
++                serde_wasm_bindgen::to_value(&descriptor).unwrap(),
++                &cache,
++            )
++            .unwrap();
 +            let super::LargeValueUpdate::TextEdit {
 +                text: actual,
 +                edited_from,
@@ -223,7 +332,7 @@ index 98bf0d882..12000c1b8 100644
  }
  
 diff --git i/crates/jazz/layers/db/src/large_ops.rs w/crates/jazz/layers/db/src/large_ops.rs
-index d40c3c510..d0f4a6f8e 100644
+index d40c3c510..ea33cace8 100644
 --- i/crates/jazz/layers/db/src/large_ops.rs
 +++ w/crates/jazz/layers/db/src/large_ops.rs
 @@ -562,6 +562,10 @@ impl Inner {
@@ -237,6 +346,26 @@ index d40c3c510..d0f4a6f8e 100644
          // A longer insertion materializes a new tree either way (SPEC 19.4),
          // which the whole write builds as well.
          if splice.insert.len() > lv::epoch::EPOCH_INSERT_BYTES {
+@@ -1599,14 +1603,15 @@ impl Inner {
+                         ));
+                     };
+                     let current = if large_cell(&cell) {
+-                        String::from_utf8(self.chunks.materialize(cell.as_ref())?)
+-                            .map_err(|_| query(format!("{table}.{column} is not text")))?
++                        self.chunks.materialize(cell.as_ref())?
+                     } else {
+-                        String::new()
++                        Vec::new()
+                     };
+-                    let value = if current == edited_from {
++                    let value = if current == edited_from.as_bytes() {
+                         text
+                     } else {
++                        let current = String::from_utf8(current)
++                            .map_err(|_| query(format!("{table}.{column} is not text")))?;
+                         jazz_text::merge3_within(
+                             format,
+                             &edited_from,
 diff --git i/crates/jazz/layers/types/src/large_values/mod.rs w/crates/jazz/layers/types/src/large_values/mod.rs
 index b02c0e7a3..8b64b722a 100644
 --- i/crates/jazz/layers/types/src/large_values/mod.rs
