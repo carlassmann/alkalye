@@ -91,6 +91,12 @@ working tree still match the state that was tested. The complete run has a
 Set `CI_BASE_URL` to test against an already-running server instead of
 restarting the `work` services.
 
+On Linux, browser warmup and end-to-end tests use
+`$XDG_CACHE_HOME/alkalye/playwright-tmp`, falling back to
+`~/.cache/alkalye/playwright-tmp`. Set `TMPDIR` explicitly to choose another
+filesystem. Playwright removes its temporary profiles when browsers close.
+See [browser resource failures](docs/browser-resource-failures.md) for diagnosis.
+
 ## License
 
 [MIT](./LICENSE)

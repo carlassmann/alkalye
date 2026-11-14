@@ -2,6 +2,7 @@ import { spawnSync } from "node:child_process"
 import { readFileSync } from "node:fs"
 import { resolve } from "node:path"
 import { chromium } from "@playwright/test"
+import { configureBrowserEnvironment } from "./browser-environment"
 import { setTimeout as delay } from "node:timers/promises"
 import {
 	addedEntryIds,
@@ -193,6 +194,7 @@ async function requireReadyPreview(url: string) {
 }
 
 async function requireReadyApp(url: string) {
+	configureBrowserEnvironment()
 	let browser = await chromium.launch()
 	try {
 		let page = await browser.newPage({ ignoreHTTPSErrors: true })
