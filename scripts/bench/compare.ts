@@ -84,7 +84,13 @@ let runLoads: { run: number; start: number[]; end?: number[] }[] = []
 let syncDiagnostics: unknown[] = []
 let bundleTransfers: unknown[] = []
 let serviceWorkerDiagnostics: unknown[] = []
+let replayVerifications: {
+	run: number
+	document: string
+	persistence: boolean
+}[] = []
 let result = {
+	replayVerifications,
 	runLoads,
 	syncDiagnostics,
 	bundleTransfers,
@@ -327,6 +333,8 @@ try {
 								cpu,
 								reset: name === "small",
 								literalNewlines: values["literal-newlines"],
+								verifyPersistence: editCount >= 5000,
+								flushWrites: values.label !== "classic",
 								finalText:
 									editCount === trace.edits.length
 										? trace.finalText
@@ -335,6 +343,11 @@ try {
 							replayTimeoutMs,
 							`${name} replay`,
 						)
+						replayVerifications.push({
+							run: run + 1,
+							document: name,
+							persistence: metrics.persistenceVerified,
+						})
 						for (let event of metrics.events) {
 							add(`${name}EventDurationMs`, event.duration)
 							add(`${name}EventInputDelayMs`, event.inputDelay)

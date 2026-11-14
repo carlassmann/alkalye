@@ -43,6 +43,7 @@ function codeMirrorSync(
 	let knownText = initial
 	let writing = 0
 	let heldForWrite: { value: string; update?: TextUpdate } | null = null
+	let idleWaiters = new Set<() => void>()
 
 	function changed(text: string, edit?: TextEdit) {
 		if (text === base) return
@@ -71,10 +72,15 @@ function codeMirrorSync(
 
 	function finishedWriting() {
 		writing--
-		if (writing !== 0 || !heldForWrite) return
-		let latest = heldForWrite
-		heldForWrite = null
-		apply(latest.value, latest.update)
+		if (writing !== 0) return
+		if (heldForWrite) {
+			let latest = heldForWrite
+			heldForWrite = null
+			apply(latest.value, latest.update)
+		}
+		if (writing !== 0) return
+		for (let resolve of idleWaiters) resolve()
+		idleWaiters.clear()
 	}
 
 	function apply(value: string, update?: TextUpdate) {
@@ -89,16 +95,17 @@ function codeMirrorSync(
 			changed(shown)
 			return
 		}
-		if (writing > 0) {
-			heldForWrite = { value, update }
-			return
-		}
 		if (pending.length > 0 && value === pendingBase) return
 		let echoed =
 			value === pending.at(-1) ? pending.length - 1 : pending.indexOf(value)
 		if (echoed >= 0) {
 			pending = pending.slice(echoed + 1)
 			pendingBase = pending.length > 0 ? value : null
+			if (writing > 0) heldForWrite = { value, update }
+			return
+		}
+		if (writing > 0) {
+			heldForWrite = { value, update }
 			return
 		}
 		pending = []
@@ -166,6 +173,10 @@ function codeMirrorSync(
 	return {
 		extension,
 		apply,
+		whenIdle() {
+			if (writing === 0) return Promise.resolve()
+			return new Promise<void>(resolve => idleWaiters.add(resolve))
+		},
 		attach(editor: EditorView) {
 			view = editor
 			knownDocument = editor.state.doc

@@ -175,3 +175,36 @@ test("keeps local text visible until asynchronous writes expose their merged sna
 	await Promise.resolve()
 	expect(view.state.doc.toString()).toBe("remote ABC")
 })
+
+test("acknowledges overlapping writes before applying a remote undo", async () => {
+	let finishFirst = () => {}
+	let finishSecond = () => {}
+	let first = new Promise<void>(resolve => {
+		finishFirst = resolve
+	})
+	let second = new Promise<void>(resolve => {
+		finishSecond = resolve
+	})
+	let write = vi.fn().mockReturnValueOnce(first).mockReturnValueOnce(second)
+	let binding = codeMirrorSync("A", write)
+	let view = new EditorView({
+		state: EditorState.create({ doc: "A", extensions: [binding.extension] }),
+	})
+	binding.attach(view)
+	views.push(view)
+	view.dispatch({ changes: { from: 1, insert: "B" } })
+	view.dispatch({ changes: { from: 2, insert: "C" } })
+	let idle = vi.fn()
+	let finished = binding.whenIdle().then(idle)
+	binding.apply("AB")
+	binding.apply("ABC")
+	binding.apply("AB")
+	finishFirst()
+	await Promise.resolve()
+	expect(idle).not.toHaveBeenCalled()
+	expect(view.state.doc.toString()).toBe("ABC")
+	finishSecond()
+	await finished
+	expect(view.state.doc.toString()).toBe("AB")
+	expect(idle).toHaveBeenCalledOnce()
+})

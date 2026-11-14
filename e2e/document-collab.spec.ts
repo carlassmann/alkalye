@@ -105,6 +105,7 @@ test("simultaneous writers converge without rolling back local text", async ({
 		role: "writer",
 	})
 	await page.keyboard.press("Escape")
+	let original = await copyDocument(page)
 	let collaborator = await openAcceptedDocumentInvite(page, {
 		link: invite.link,
 	})
@@ -117,6 +118,7 @@ test("simultaneous writers converge without rolling back local text", async ({
 		let collaboratorEditor = editorFor(collaborator.page)
 		let ownerMarker = "owner sequential ending ".repeat(4)
 		let collaboratorMarker = "collaborator sequential beginning ".repeat(4)
+		let expected = `${collaboratorMarker}\n${original}\n${ownerMarker}`
 		await observeLocalRollback(page, ownerMarker)
 		await observeLocalRollback(collaborator.page, collaboratorMarker)
 
@@ -137,12 +139,20 @@ test("simultaneous writers converge without rolling back local text", async ({
 		})
 		expect(await didLocalTextRollback(page)).toBe(false)
 		expect(await didLocalTextRollback(collaborator.page)).toBe(false)
+		await expect
+			.poll(() => copyDocument(page), { timeout: 20_000 })
+			.toBe(expected)
+		await expect
+			.poll(() => copyDocument(collaborator.page), { timeout: 20_000 })
+			.toBe(expected)
 
 		await Promise.all([page.reload(), collaborator.page.reload()])
 		await expect(editorFor(page)).toContainText(ownerMarker)
 		await expect(editorFor(page)).toContainText(collaboratorMarker)
 		await expect(editorFor(collaborator.page)).toContainText(ownerMarker)
 		await expect(editorFor(collaborator.page)).toContainText(collaboratorMarker)
+		await expect.poll(() => copyDocument(page)).toBe(expected)
+		await expect.poll(() => copyDocument(collaborator.page)).toBe(expected)
 	} finally {
 		await collaborator.context.close()
 	}

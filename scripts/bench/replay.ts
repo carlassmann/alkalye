@@ -2,6 +2,8 @@ import { expect, type Page } from "@playwright/test"
 import { editor, openDocument, readContent, replaceContent } from "./adapter"
 import { instrument } from "./metrics"
 import { mkdir, writeFile } from "node:fs/promises"
+import type { MarkdownSync } from "../../src/app/features/documents/lib/codemirror-sync"
+import type { Database } from "../../src/app/features/documents/lib/library"
 
 export { measureReplay, withDeadline }
 
@@ -12,6 +14,8 @@ interface ReplayOptions {
 	reset: boolean
 	literalNewlines?: boolean
 	finalText?: string
+	verifyPersistence?: boolean
+	flushWrites?: boolean
 }
 
 async function measureReplay(page: Page, options: ReplayOptions) {
@@ -119,7 +123,17 @@ async function measureReplay(page: Page, options: ReplayOptions) {
 
 	let heap = await cdp.send("Runtime.getHeapUsage")
 	ensureHealthy()
+	if (options.verifyPersistence) {
+		console.error("Verifying committed text after reload")
+		if (options.flushWrites)
+			await withDeadline(flushWrites(page), 120_000, "Pending text writes")
+		await openDocument(page, document)
+		await expect
+			.poll(() => readContent(page), { timeout: 120_000 })
+			.toBe(expectedContent)
+	}
 	return {
+		persistenceVerified: options.verifyPersistence === true,
 		paint: metrics.paint,
 		events: metrics.events,
 		dispatchToPaint,
@@ -131,6 +145,30 @@ async function measureReplay(page: Page, options: ReplayOptions) {
 		receivedWsBytesPerEdit: (wire.received - before.received) / edits.length,
 		jsHeapBytes: heap.usedSize,
 	}
+}
+
+async function flushWrites(page: Page) {
+	await page.evaluate(async () => {
+		type Fiber = {
+			return?: Fiber | null
+			memoizedProps?: { sync?: MarkdownSync; value?: { db?: Database } }
+		}
+		let editor = document.querySelector('[data-testid="doc-editor"]')
+		if (!editor) throw new Error("Document editor missing")
+		let key = Object.keys(editor).find(name => name.startsWith("__reactFiber$"))
+		if (!key) throw new Error("React editor root missing")
+		let fiber: Fiber | null | undefined = Reflect.get(editor, key)
+		let binding: MarkdownSync | undefined
+		let db: Database | undefined
+		while (fiber) {
+			binding ??= fiber.memoizedProps?.sync
+			db ??= fiber.memoizedProps?.value?.db
+			fiber = fiber.return
+		}
+		if (!binding || !db) throw new Error("Jazz editor binding missing")
+		await binding.whenIdle()
+		await db.waitForSync({ timeoutMs: 120_000 })
+	})
 }
 
 async function withDeadline<T>(
