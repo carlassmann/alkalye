@@ -44,6 +44,9 @@ async function measureReplay(page: Page, options: ReplayOptions) {
 		window.__bench.longTasks = []
 	})
 	let profileDirectory = process.env.BENCH_PROFILE_DIR
+	let heapDirectory = process.env.BENCH_HEAP_DIR
+	if (heapDirectory)
+		await cdp.send("HeapProfiler.startSampling", { samplingInterval: 32768 })
 	let stopWorkerProfiles = profileDirectory ? await profileWorkers() : undefined
 	if (profileDirectory) {
 		await cdp.send("Profiler.enable")
@@ -121,7 +124,22 @@ async function measureReplay(page: Page, options: ReplayOptions) {
 	)
 		throw new Error("Full trace differs from upstream finalText")
 
+	let after = { ...wire }
 	let heap = await cdp.send("Runtime.getHeapUsage")
+	if (heapDirectory) {
+		await cdp.send("HeapProfiler.collectGarbage")
+		let retained = await cdp.send("Runtime.getHeapUsage")
+		let { profile } = await cdp.send("HeapProfiler.stopSampling")
+		await mkdir(heapDirectory, { recursive: true })
+		await writeFile(
+			`${heapDirectory}/${document.title}.allocations.json`,
+			JSON.stringify(profile),
+		)
+		await writeFile(
+			`${heapDirectory}/${document.title}.heap.json`,
+			JSON.stringify({ before: heap, afterGc: retained }),
+		)
+	}
 	ensureHealthy()
 	let persistenceError: string | undefined
 	if (options.verifyPersistence) {
@@ -147,9 +165,9 @@ async function measureReplay(page: Page, options: ReplayOptions) {
 		longTaskCount: metrics.longTasks.length,
 		longTaskTotalMs: metrics.longTasks.reduce((a, b) => a + b, 0),
 		sentBytesPerEdit:
-			(wire.sent - before.sent + wire.httpSent - before.httpSent) /
+			(after.sent - before.sent + after.httpSent - before.httpSent) /
 			edits.length,
-		receivedWsBytesPerEdit: (wire.received - before.received) / edits.length,
+		receivedWsBytesPerEdit: (after.received - before.received) / edits.length,
 		jsHeapBytes: heap.usedSize,
 	}
 }
@@ -160,7 +178,7 @@ async function flushWrites(page: Page) {
 			return?: Fiber | null
 			memoizedProps?: { sync?: MarkdownSync; value?: { db?: Database } }
 		}
-		let editor = document.querySelector('[data-testid="doc-editor"]')
+		let editor = document.querySelector('[data-testid="doc-editor"] > *')
 		if (!editor) throw new Error("Document editor missing")
 		let key = Object.keys(editor).find(name => name.startsWith("__reactFiber$"))
 		if (!key) throw new Error("React editor root missing")

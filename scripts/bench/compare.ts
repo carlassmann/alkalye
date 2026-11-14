@@ -62,6 +62,8 @@ let sources = await fetchDatasets()
 let { documents, trace } = await loadDatasets(notes)
 let editCount =
 	values.edits === "full" ? trace.edits.length : positive(values.edits)
+let verifyPersistence =
+	editCount >= 5000 || process.env.BENCH_VERIFY_PERSISTENCE === "1"
 let replayTimeoutMs = values["replay-timeout-ms"]
 	? positive(values["replay-timeout-ms"])
 	: Math.max(120_000, editCount * 500)
@@ -132,6 +134,7 @@ let result = {
 		loadOnly: values["load-only"],
 		firstVisitHttpCache: "fresh context, enabled",
 		literalNewlines: values["literal-newlines"],
+		verifyPersistence,
 		automaticPairsAndCompletion: false,
 		replayTimeoutMs,
 	},
@@ -333,7 +336,7 @@ try {
 								cpu,
 								reset: name === "small",
 								literalNewlines: values["literal-newlines"],
-								verifyPersistence: editCount >= 5000,
+								verifyPersistence,
 								flushWrites: values.label !== "classic",
 								finalText:
 									editCount === trace.edits.length

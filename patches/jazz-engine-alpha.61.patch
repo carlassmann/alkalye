@@ -222,6 +222,21 @@ index 98bf0d882..12000c1b8 100644
      }
  }
  
+diff --git i/crates/jazz/layers/db/src/large_ops.rs w/crates/jazz/layers/db/src/large_ops.rs
+index d40c3c510..d0f4a6f8e 100644
+--- i/crates/jazz/layers/db/src/large_ops.rs
++++ w/crates/jazz/layers/db/src/large_ops.rs
+@@ -562,6 +562,10 @@ impl Inner {
+             self.derived.push((*held).clone());
+             return Some(Value::Large(held));
+         };
++        // The wire format accepts longer tails; bound local whole-text descriptor work.
++        if held.kind == lv::LargeValueKind::String && held.edit_tail.len() >= 128 {
++            return None;
++        }
+         // A longer insertion materializes a new tree either way (SPEC 19.4),
+         // which the whole write builds as well.
+         if splice.insert.len() > lv::epoch::EPOCH_INSERT_BYTES {
 diff --git i/crates/jazz/layers/types/src/large_values/mod.rs w/crates/jazz/layers/types/src/large_values/mod.rs
 index b02c0e7a3..8b64b722a 100644
 --- i/crates/jazz/layers/types/src/large_values/mod.rs
@@ -394,3 +409,40 @@ index b02c0e7a3..8b64b722a 100644
      #[test]
      fn node_ref_codec_reuses_the_stored_scalar_root_record() {
          let node_ref = NodeRef {
+diff --git i/crates/jazz/tests/text_splices.rs w/crates/jazz/tests/text_splices.rs
+index d977bd311..65e5520e4 100644
+--- i/crates/jazz/tests/text_splices.rs
++++ w/crates/jazz/tests/text_splices.rs
+@@ -915,3 +915,32 @@ fn same_spot_typing_in_any_order_keeps_every_character() {
+         }
+     }
+ }
++
++/// Both disconnected writers cross local consolidation boundaries before
++/// exchanging their edits. Their complete Unicode insertions must survive.
++#[test]
++fn offline_text_edits_converge_across_early_consolidation() {
++    let server = block_on(Db::open(config(0x71))).unwrap();
++    let mut alice = connect(block_on(Db::open(config(0xa1))).unwrap(), &server);
++    let mut bob = connect(block_on(Db::open(config(0xa2))).unwrap(), &server);
++    let start = "A paragraph with 👩🏽‍💻 and café.\n\n".repeat(2048);
++    insert(&alice.db, &start);
++    settle(&server, &mut [&mut alice, &mut bob]);
++    let mut first = Editor::new(&start, start.len());
++    let mut second = Editor::new(&start, 0);
++    let suffix = "é".repeat(130);
++    let prefix = "語".repeat(130);
++    for character in suffix.chars() {
++        first.type_char(&alice.db, character);
++    }
++    for character in prefix.chars() {
++        second.type_char(&bob.db, character);
++    }
++    assert_eq!(body(&alice.db), format!("{start}{suffix}"));
++    assert_eq!(body(&bob.db), format!("{prefix}{start}"));
++    settle(&server, &mut [&mut alice, &mut bob]);
++    let expected = format!("{prefix}{start}{suffix}");
++    for db in [&server, &alice.db, &bob.db] {
++        assert_eq!(body(db), expected);
++    }
++}

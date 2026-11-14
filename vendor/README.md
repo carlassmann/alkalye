@@ -14,6 +14,12 @@ extension reuses the validated prefix and updates UTF-16 metrics from the edited
 fragments. Exact descriptor hits only copy their validated bytes. A different root, kind, format, hash or
 divergent tail takes the original authenticated materialization path. The patch preserves the stored/sync format and text merge algorithm.
 
+Whole-text replacements rebuild the canonical tree once their current tail has
+128 edits. The existing whole-write path builds one final tree, avoiding growing
+descriptor work and intermediate tree versions. Append and positional APIs keep
+the original policy, and readers still accept the 4,095-edit format limit.
+Jazz's text-splice storage budget and concurrent offline Unicode tests cover this.
+
 The Wasm bridge accepts an advisory `text_splice` alongside the full replacement
 and `edited_from`. It checks the replacement against the original JS strings and
 reconstructs its Rust string from one decoded base. Invalid hints, including

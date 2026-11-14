@@ -199,8 +199,8 @@ test("large text merges concurrent offline typing exactly and survives reload", 
 			setOffline(page, true),
 			setOffline(collaborator.page, true),
 		])
-		let prefix = "offline collaborator insertion "
-		let suffix = " offline owner ending"
+		let prefix = "offline collaborator insertion ".repeat(8)
+		let suffix = " offline owner ending".repeat(8)
 		await editorFor(page).focus()
 		await page.keyboard.press("ControlOrMeta+End")
 		await editorFor(collaborator.page).focus()
