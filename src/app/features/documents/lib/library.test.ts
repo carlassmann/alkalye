@@ -40,6 +40,27 @@ function personal(
 		canAdmin: true,
 	}
 }
+test("a newer saved notification supersedes the earlier result without cancelling either write", async () => {
+	let page = new EventTarget()
+	vi.stubGlobal("window", page)
+	let notifications: unknown[] = []
+	page.addEventListener("alkalye:document-saved", event => {
+		if (event instanceof CustomEvent) notifications.push(event.detail)
+	})
+	let db = actor()
+	let doc = await createDocument(db, ownerId, "A")
+	await Promise.all([
+		updateContent(db, doc, "AB", "A"),
+		updateContent(db, doc, "ABC", "AB"),
+	])
+	await db.waitForSync()
+	await vi.waitFor(() =>
+		expect(notifications).toEqual([{ documentId: doc.id, content: "ABC" }]),
+	)
+	expect((await db.one(app.documents.where({ id: doc.id })))?.content).toBe(
+		"ABC",
+	)
+})
 test("pagehide submits queued text writes in order before Promise continuations", async () => {
 	let page = new EventTarget()
 	vi.stubGlobal("window", page)

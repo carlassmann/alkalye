@@ -3,7 +3,7 @@ import type { JazzClient } from "jazz-tools/client"
 import { toast } from "sonner"
 import { createContext, useContext, useEffect, useState } from "react"
 import { useAll, useDb, useSession, useJazzSession } from "jazz-tools/react"
-import { schema } from "jazz-tools"
+import { schema, type WriteHandle } from "jazz-tools"
 import { app, type DocumentRow } from "@/jazz/schema"
 import { DEFAULT_EDITOR_SETTINGS } from "@/jazz/value-types"
 import {
@@ -393,6 +393,42 @@ function afterPaint<T>(write: () => T) {
 	return result
 }
 
+// Older durability waits must not retain a full document for every keystroke.
+let saveNotifications = new WeakMap<
+	Database,
+	Map<string, { token: symbol; content: string }>
+>()
+
+function notifySaved(
+	db: Database,
+	id: string,
+	content: string,
+	write: WriteHandle<unknown, unknown>,
+) {
+	let pending = saveNotifications.get(db)
+	if (!pending) {
+		pending = new Map()
+		saveNotifications.set(db, pending)
+	}
+	let token = Symbol()
+	pending.set(id, { token, content })
+	void write
+		.wait({ tier: "local" })
+		.then(() => {
+			let saved = pending.get(id)
+			if (saved?.token !== token) return
+			pending.delete(id)
+			window.dispatchEvent(
+				new CustomEvent("alkalye:document-saved", {
+					detail: { documentId: id, content: saved.content },
+				}),
+			)
+		})
+		.catch(() => {
+			if (pending.get(id)?.token === token) pending.delete(id)
+		})
+}
+
 async function updateContent(
 	db: Database,
 	doc: DocumentRow | LibraryDocument,
@@ -420,16 +456,7 @@ async function updateContent(
 		let { syncThemeFromSource } = await import("@/app/features/themes")
 		await syncThemeFromSource(db, doc.id, content)
 	}
-	void write
-		.wait({ tier: "local" })
-		.then(() =>
-			window.dispatchEvent(
-				new CustomEvent("alkalye:document-saved", {
-					detail: { documentId: doc.id, content },
-				}),
-			),
-		)
-		.catch(() => {})
+	notifySaved(db, doc.id, content, write)
 	let ownerId = db.getAuthState().session?.user
 	if (ownerId && getPath(editedFrom) !== getPath(content)) {
 		let folderId = await ensureFolder(db, ownerId, getPath(content))
