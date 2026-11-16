@@ -1,5 +1,14 @@
 [
 	{
+		"id": 169,
+		"date": "2026-11-16",
+		"title": "See your selection inside code",
+		"notes": [
+			"Selecting text now highlights inline code and code blocks too, instead of leaving them looking unselected."
+		],
+		"pr": 76
+	},
+	{
 		"id": 168,
 		"date": "2026-11-12",
 		"title": "See Alkalye in action and ask Carl's Syntwin",
