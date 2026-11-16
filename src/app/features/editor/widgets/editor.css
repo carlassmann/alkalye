@@ -42,6 +42,14 @@
 	background-color: var(--brand-subtle) !important;
 }
 
+/* Behind the text, opaque inline code and code block backgrounds hid the selection.
+   The selection color is translucent, so on top it tints text instead of covering it.
+   CodeMirror sets the layer z-index inline, hence !important. */
+.markdown-editor .cm-editor .cm-selectionLayer {
+	z-index: 1 !important;
+	pointer-events: none;
+}
+
 /* drawSelection hides the native highlight but leaves its white HighlightText color */
 .markdown-editor .cm-line::selection,
 .markdown-editor .cm-line ::selection {
