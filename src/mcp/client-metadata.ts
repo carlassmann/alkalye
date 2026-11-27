@@ -4,7 +4,17 @@ import { get } from "node:https"
 import { BlockList, isIP } from "node:net"
 import type { LookupFunction } from "node:net"
 
-export { fetchClientMetadata, isPublicAddress }
+export {
+	fetchClientMetadata,
+	isPublicAddress,
+	configureCloudflareMetadataFetch,
+}
+
+let cloudflareFetch: typeof fetch | undefined
+
+function configureCloudflareMetadataFetch(fetcher: typeof fetch | undefined) {
+	cloudflareFetch = fetcher
+}
 
 async function fetchClientMetadata(url: URL): Promise<unknown> {
 	let hostname = url.hostname.replace(/^\[|\]$/g, "")
@@ -14,6 +24,7 @@ async function fetchClientMetadata(url: URL): Promise<unknown> {
 	) {
 		throw new Error("invalid_client")
 	}
+	if (cloudflareFetch) return fetchCloudflareMetadata(url, cloudflareFetch)
 	return new Promise((resolve, reject) => {
 		let request = get(
 			url,
@@ -49,6 +60,39 @@ async function fetchClientMetadata(url: URL): Promise<unknown> {
 		)
 		request.on("error", reject)
 	})
+}
+
+async function fetchCloudflareMetadata(url: URL, fetcher: typeof fetch) {
+	// Workers' strictly-public fetch boundary replaces Node's pinned socket lookup.
+	let response = await fetcher(url, {
+		headers: { accept: "application/json" },
+		redirect: "manual",
+		signal: AbortSignal.timeout(5_000),
+	})
+	if (response.status !== 200 || !response.body) {
+		await response.body?.cancel()
+		throw new Error("invalid_client")
+	}
+	let reader = response.body.getReader()
+	let decoder = new TextDecoder()
+	let bytes = 0
+	let body = ""
+	try {
+		while (true) {
+			let { value, done } = await reader.read()
+			if (done) break
+			if (!value) throw new Error("invalid_client")
+			bytes += value.byteLength
+			if (bytes > 64 * 1024) throw new Error("invalid_client")
+			body += decoder.decode(value, { stream: true })
+		}
+		body += decoder.decode()
+		let metadata: unknown = JSON.parse(body)
+		return metadata
+	} finally {
+		await reader.cancel().catch(() => undefined)
+		reader.releaseLock()
+	}
 }
 
 function isPublicAddress(address: string) {

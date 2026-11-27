@@ -9,5 +9,8 @@ test-results
 example
 .claude
 .vercel
+.wrangler/
+.dev.vars*
+.env*.local
 /agents
 tsconfig.tsbuildinfo

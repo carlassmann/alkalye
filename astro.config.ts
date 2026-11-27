@@ -1,6 +1,7 @@
 import { defineConfig, envField } from "astro/config"
 import react from "@astrojs/react"
 import vercel from "@astrojs/vercel"
+import cloudflare from "@astrojs/cloudflare"
 import pwa from "@vite-pwa/astro"
 import tailwindcss from "@tailwindcss/vite"
 import { tanstackRouter } from "@tanstack/router-plugin/vite"
@@ -8,7 +9,14 @@ import { criticalAppPreload } from "./scripts/critical-app-preload"
 
 export default defineConfig({
 	site: "https://www.alkalye.com",
-	adapter: vercel(),
+	adapter:
+		process.env.ASTRO_ADAPTER === "cloudflare"
+			? cloudflare({
+					imageService: "compile",
+					platformProxy: { enabled: false },
+					workerEntryPoint: { path: "./src/cloudflare.ts" },
+				})
+			: vercel(),
 	security: { checkOrigin: false },
 	devToolbar: { enabled: false },
 	// Omny currently renders its provider privacy links relative to the host site.

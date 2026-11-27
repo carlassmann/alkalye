@@ -27,6 +27,7 @@ export {
 	openUserAccount,
 	runWithUserAccount,
 	revokeUserConnection,
+	configureIsolatedUserRuntimes,
 }
 
 type OpenUser = Awaited<ReturnType<typeof openUserAccount>>
@@ -43,6 +44,11 @@ let userOperationTimeout = 20_000
 let userToolTimeout = 60_000
 let userRuntimeIdleTimeout = 5 * 60_000
 let maximumUserRuntimes = 32
+let reuseUserRuntimes = true
+
+function configureIsolatedUserRuntimes() {
+	reuseUserRuntimes = false
+}
 
 async function createUserConnection(
 	syncServer: string,
@@ -169,6 +175,8 @@ async function runWithUserAccountState<Result>(
 		.update(credentials.accountId)
 		.update(credentials.accountSecret)
 		.digest("hex")
+	// Workers sockets belong to the request that opened them.
+	if (!reuseUserRuntimes) key += `:${crypto.randomUUID()}`
 	let runtime = userRuntimes.get(key)
 	if (!runtime) {
 		if (userRuntimes.size >= maximumUserRuntimes)
@@ -239,6 +247,7 @@ async function runWithUserAccountState<Result>(
 		runtime.active--
 		runtime.lastUsedAt = Date.now()
 		release()
+		if (!reuseUserRuntimes) invalidateUserRuntime(key, runtime)
 	}
 }
 

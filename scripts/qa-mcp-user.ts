@@ -64,8 +64,8 @@ async function approve(name: string) {
 		headers: { "content-type": "application/json" },
 		body: JSON.stringify({ decision: "approve", consent, credentials }),
 	})
+	if (!response.ok) throw new Error(`Approval failed: ${response.status}`)
 	let body = z.object({ redirectTo: z.url() }).parse(await response.json())
-	if (!response.ok) throw new Error("Approval failed")
 	let code = new URL(body.redirectTo).searchParams.get("code")
 	if (!code) throw new Error("Missing code")
 	let exchanged = await fetch(`${baseUrl}/oauth/token`, {
@@ -88,6 +88,7 @@ async function approve(name: string) {
 		.parse(await exchanged.json())
 }
 let first = await approve("Custom MCP")
+console.log("PASS first OAuth approval and exchange")
 let second = await approve("Other MCP connection")
 console.log("PASS OAuth approval and exchange as user")
 async function call(

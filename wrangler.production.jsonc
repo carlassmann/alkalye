@@ -1,0 +1,5 @@
+{
+	"extends": "./wrangler.jsonc",
+	"name": "alkalye",
+	"workers_dev": false,
+}
