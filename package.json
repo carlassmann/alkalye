@@ -32,7 +32,9 @@
 		"preview": "astro preview",
 		"format": "prettier --write .",
 		"test": "vitest",
-		"prepare": "effect-language-service patch"
+		"prepare": "effect-language-service patch",
+		"build:cloudflare": "ASTRO_ADAPTER=cloudflare bun run build",
+		"deploy:cloudflare": "bun run build:cloudflare && wrangler deploy --profile carlassmann-holding"
 	},
 	"dependencies": {
 		"@base-ui/react": "^1.1.0",
@@ -109,6 +111,7 @@
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.6",
+		"@astrojs/cloudflare": "^12",
 		"@astrojs/react": "^4.4.2",
 		"@astrojs/ts-plugin": "^1.10.6",
 		"@astrojs/vercel": "^9.0.4",
@@ -141,6 +144,7 @@
 		"typescript": "~5.9.3",
 		"vite": "^7.3.1",
 		"vitest": "^4.0.18",
-		"workbox-window": "^7.4.0"
+		"workbox-window": "^7.4.0",
+		"wrangler": "^4.165.0"
 	}
 }

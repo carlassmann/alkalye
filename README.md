@@ -91,6 +91,35 @@ working tree still match the state that was tested. The complete run has a
 Set `CI_BASE_URL` to test against an already-running server instead of
 restarting the `work` services.
 
+## Cloudflare hosting
+
+Vercel remains the default adapter and rollback host. Cloudflare uses a separate
+adapter selected by `ASTRO_ADAPTER=cloudflare`.
+
+```bash
+bun run build:cloudflare
+bunx wrangler deploy --profile carlassmann-holding
+```
+
+The default Wrangler configuration deploys staging at
+https://alkalye-migration.assmann-568.workers.dev. Production preparation uses
+`--config wrangler.production.jsonc`; it has no public routes until the domain
+cutover. Keep staging and production token keys separate. Production must retain
+the existing `ALKALYE_MCP_TOKEN_KEY`, with `ALKALYE_MCP_BASE_URL` set to
+https://www.alkalye.com, so existing MCP connections survive the move.
+
+The Worker serves `/app/*` from the SPA shell, preserves legacy redirects,
+opens Jazz connections per operation, and fetches OAuth metadata through
+Cloudflare's strictly public global fetch boundary. Redirects, private address
+literals, oversized metadata and slow responses remain rejected.
+
+Before cutover, verify OAuth and document access with disposable QA accounts,
+connect automatic builds, and attach both production hostnames with the apex
+redirecting to `www`. Preserve Vercel until the live checks pass. Roll back by
+removing Cloudflare routes and restoring the recorded Vercel DNS records.
+
+written with GPT-6 in Codex (T3 Code)
+
 ## License
 
 [MIT](./LICENSE)

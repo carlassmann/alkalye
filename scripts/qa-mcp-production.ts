@@ -50,7 +50,7 @@ expect(
 )
 passed("OAuth cross-origin token request")
 
-let mcp = await fetch(new URL("/mcp", baseUrl))
+let mcp = await fetch(new URL("/mcp", baseUrl), { method: "POST" })
 expect(mcp.status === 401, `MCP without authentication returned ${mcp.status}`)
 expect(
 	mcp.headers.get("www-authenticate")?.includes("resource_metadata="),
