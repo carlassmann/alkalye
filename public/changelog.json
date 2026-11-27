@@ -1,5 +1,14 @@
 [
 	{
+		"id": 170,
+		"date": "2026-11-27",
+		"title": "Keep your agent connections when hosting moves",
+		"notes": [
+			"Preparations for Cloudflare hosting preserve existing agent connections, document access and app links. The live app stays on its current host until the move is verified."
+		],
+		"pr": 77
+	},
+	{
 		"id": 169,
 		"date": "2026-11-16",
 		"title": "See your selection inside code",
